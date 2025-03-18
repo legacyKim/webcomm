@@ -1,0 +1,46 @@
+@use "../style/var.scss" as *;/* Login.module.css */
+.flex_center { display: flex; justify-content: center; align-items: center; }
+.page { position: relative; width: 100%; max-width: 1200px; margin: 0 auto; padding-bottom: 100px; }
+.login_page { position: relative; width: 100%; max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; flex-direction: column; min-height: calc(100vh - $header-height - $footer-height); }
+.box_inner { display: flex; justify-content: center; width: 50%; height: 100%; }
+.inside { position: relative; display: flex; justify-content: center; align-items: center; }
+.header_login { position: relative; display: block; margin-bottom: 8px; }
+.header_text { font-size: 32px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; }
+.header_subtext { font-size: 14px; font-weight: 400; line-height: 1.4; margin-bottom: 8px; }
+.error { font-size: 14px; font-weight: 400; line-height: 1.4; color: red; margin-bottom: 10px; }
+.form { display: flex; flex-direction: column; max-width: 388px; width: 100%; }
+.input_group { display: flex; justify-content: flex-start; column-gap: 8px; margin-bottom: 8px; }
+.input_group button { min-width: 80px; white-space: pre-line; }
+.input_box { position: relative; display: flex; justify-content: flex-end; flex-direction: column; border: $border-grey; border-radius: 4px; width: 100%; height: 60px; overflow: hidden; }
+.input_box .input_bg { position: absolute; width: 100%; height: 100%; background-color: #fff; }
+.input_img .label_img { position: relative; display: flex; justify-content: flex-end; flex-direction: column; border-radius: 4px; width: 100%; height: 60px; cursor: pointer; overflow: hidden; }
+.input_img:hover { border: 1px solid $main-color; }
+.input_img:hover .label_img { color: $main-color; transition: none; opacity: 1; }
+.input_img:hover .file_name_label { opacity: 1; }
+.img_preview { @include flex-center; margin-bottom: 8px; height: 200px; border-radius: 4px; border: $border-grey; }
+.img_preview img { object-fit: contain; height: 100%; }
+.file_name { position: relative; z-index: 9; width: 100%; height: 70%; padding: 8px 8px 8px 10px; font-size: 16px; line-height: 1.4; font-weight: 400; outline: none; border-color: #0000; background-color: #0000 !important; }
+.file_name_label { position: absolute; top: 50%; left: 8px; transform: translateY(-50%); display: block; font-size: 14px; line-height: 1.4; opacity: .5; margin-bottom: 4px; transition: none; }
+.file_name_label.after { transform: translateY(-145%) !important; font-size: 12px !important; color: #000 !important; opacity: 1 !important; }
+.input_common { position: relative; z-index: 9; width: 100%; height: 70%; padding: 6px 8px 8px 10px; font-size: 16px; line-height: 1.4; font-weight: 400; outline: none; border-color: transparent; background-color: transparent !important; }
+.input_common:-webkit-autofill { background-color: #fff !important; color: #333 !important; transition: background-color 5000s ease-in-out 0s; }
+.input_common:-webkit-autofill:focus { background-color: #fff !important; color: #333 !important; }
+.input_common:-moz-placeholder { background-color: #fff !important; }
+.label_common { position: absolute; top: 50%; left: 8px; transform: translateY(-50%); display: block; font-size: 14px; line-height: 1.4; opacity: 0.5; margin-bottom: 4px; transition: all 0.3s ease-in-out; }
+/* login ad */
+.login_ad { position: relative; display: block; background-color: #ddd; min-height: 600px; }
+.find_info { display: flex; justify-content: center; align-items: center; column-gap: 10px; padding: 4px 0; }
+.find_info a { font-size: 14px; font-weight: 400; line-height: 1.4; color: $grey-color; }
+.find_info a:hover { color: $main-color; }
+.notice { display: flex; justify-content: flex-start; column-gap: 8px; margin-bottom: 8px; font-size: 14px; font-weight: 400; line-height: 1.6; color: $grey3-color; }
+.notice_true { color: $main-color; }
+.notice_false { color: $red-color; }
+/* membership */
+.membership_wrap {
+}
+.membership { position: relative; display: block; margin-bottom: 32px; }
+.membership_tit { position: relative; display: block; font-size: 16px; font-weight: 700; line-height: 1.6; margin-bottom: 8px; }
+.membership_box { height: 300px; padding: 16px; border: $border-grey; border-radius: 8px; margin-bottom: 12px; overflow-y: scroll; }
+.membership_box::-webkit-scrollbar { width: 4px; height: 4px; }
+.membership_box::-webkit-scrollbar-thumb { background-color: $main-color; border-radius: 100px; }
+.membership_contents {}

@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+npm install pg
+PostgreSQL 사용을 위한 패키지 설치
 
-## Getting Started
+npm install sass
+scss 사용을 위한 패키지 설치
 
-First, run the development server:
+npm install @tanstack/react-query
+리액트 쿼리 라이브러리 설치 명령어
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+npm install axios
+api 요청을 위한 axios 설치
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+npm install nodemailer
+email 인증 서비스
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+npm i --save-dev @types/js-cookie
+쿠키 사용
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+npm install jsonwebtoken / npm install --save-dev @types/jsonwebtoken
+jsonwebtoken 모듈 설치
 
-## Learn More
+npm install @tiptap/react @tiptap/starter-kit
+tiptap editor 설치
 
-To learn more about Next.js, take a look at the following resources:
+npm install @tiptap/extension-image
+npm install @tiptap/extension-video
+tiptap image 및 video 기능 확장
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+npm install @aws-sdk/client-s3
+AWS S3에 파일 업로드 패키지 설치

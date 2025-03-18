@@ -1,0 +1,186 @@
+@use "./var.scss" as *;/* var css */
+html, body { max-width: 100vw; overflow-x: hidden; }
+body { color: $font-color; background: #fff; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+* { box-sizing: border-box; padding: 0; margin: 0; }
+a { color: inherit; text-decoration: none; }
+/* global css */
+
+/* input animation */
+.active_label { transform: translateY(-145%) !important; font-size: 12px !important; color: $font-color !important; opacity: 1 !important; }
+.active_box { border: 1px solid $main-color !important; }
+/* input animation end */
+
+/* page common */
+.page { position: relative; display: block; width: 100%; max-width: 1200px; margin: 0 auto; }
+.container { position: relative; display: block; width: 100%; min-height: 100%; padding-bottom: 100px; }
+.section_top { margin-bottom: 16px; }
+.section_top .title { @include re-bl; font-size: 22px; font-weight: 600; line-height: 1.6; }
+.section_top .notice { @include re-bl; font-size: 16px; font-weight: 400; line-height: 1.6; }
+/* page common *?
+
+/* BUTTON */
+.btn_wrap { display: flex; justify-content: center; align-items: center; column-gap: 8px; margin-bottom: 8px; }
+.btn_wrap_mb0 { margin-bottom: 0; }
+.btn { text-align: center; padding: 16px; font-size: 16px; background-color: $main-color; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; flex: 1; transition: all 0.3s ease-in-out; }
+.btn:hover { background-color: $main-hover-color; }
+.btn_nonactive { background-color: $grey-color; cursor: default; }
+.btn_nonactive:hover { background-color: $grey-color; }
+.btn_width { max-width: 200px; }
+.btn_line_grey { font-weight: 600; color: $grey-color; border: $border-grey; border-radius: 4px; background-color: #fff; font-size: 12px; padding: 0 6px; }
+.btn_line_grey:hover { color: $font-color; background-color: #f9f9f9; }
+.btn-icon { display: flex; justify-content: center; align-items: center; transition: all .3s ease-in-out; }
+.btn-icon i { position: relative; top: 0px; }
+.btn-icon i::before { margin: 0; line-height: 0; width: initial; }
+.btn-icon:hover { background-color: $main-color; }
+.btn-icon:hover i { color: #fff; transition: all .3s ease-in-out; }
+.btn-none { display: none; }
+/* btn end */
+
+/* CHECKBOX */
+.checkbox { position: relative; display: block; margin-bottom: 8px; }
+.checkbox, .checkbox label { align-items: center; display: flex; justify-content: flex-start}
+.checkbox label { display: flex; justify-content: center; align-items: center; color: #333; font-size: 13px; font-weight: 300; line-height: 1.5; transition: all .3s ease-in-out}
+.checkbox label .svg_checkbox { margin-right: 4px; }
+.checkbox input[type="checkbox"] { display: none; }
+.checkbox input[type="checkbox"]+label .svg_checkmark { display: none; }
+.checkbox input[type="checkbox"]:checked+label .svg_checkmark { display: block; }
+/* checkbox end */
+
+/* header */
+header { height: $header-height; display: flex; justify-content: center; align-items: center; }
+.header_top { @include space-between; align-items: center; }
+.logo {
+}
+.header_info { @include flex-center; }
+.header_info .userInfo { @include flex-start; }
+.header_info .userInfo img { width: 24px; height: 24px; object-fit: contain; }
+.header_info .userInfo span {
+}
+.header_info a { font-size: 14px; font-weight: 400; line-height: 1.4; margin-left: 8px; }
+/* header end */
+
+/*footer */
+footer { position: relative; display: block; background-color: $grey4-color; padding: 32px 0; height: $footer-height; }
+.footer_list { display: flex; justify-content: center; align-items: center; column-gap: 18px; }
+.footer_list li { position: relative; display: block; }
+.footer_list li::after { content: ''; width: 1px; height: 10px; background-color: $font2-color; position: absolute; top: 5px; right: -10px; }
+.footer_list li:last-child::after { display: none; }
+.footer_list li a { font-size: 14px; font-weight: 400; line-height: 1.4; color: $font2-color}
+.footer_list li a:hover { color: $font-color; }
+/* footer end */
+
+/* menu */
+.menu_list { display: flex; justify-content: flex-start; flex-direction: column; }
+.menu { width: 120px; }
+.menu_list li a { border: 1px solid #fff; position: relative; display: block; font-size: 14px; font-weight: 600; line-height: 1.6; padding: 3px 5px 2px; width: 100%; border-radius: 4px; }
+.menu_list li a:hover { color: $main-color; }
+/* menu end */
+
+/* search */
+.search { position: relative; display: block; margin-bottom: 32px; @include flex-center; border: 2px solid $font-color; border-radius: 100px; padding: 2px 5px 3px 24px; }
+.search input { height: 52px; background-color: transparent; outline: none; flex: 1; }
+.search input::placeholder { color: $grey-color; }
+.search button { border-radius: 50%; width: 48px; height: 48px; background-color: $grey2-color; }
+.search button { color: $grey-color; }
+/* search end */
+
+/* main */
+main, sub { flex: 5; margin-right: 24px; }
+sub { line-height: initial; width: 100%; }
+.main { display: flex; justify-content: flex-start; align-items: stretch; column-gap: 16px; min-height: calc(100vh - $header-height - $footer-height); }
+.right_ad { flex: 1.5; }
+/* main end */
+
+/* board */
+.board_wrap { position: relative; display: block; }
+.board_single { width: 100%; }
+.board_double { @include space-between; align-items: center; flex-wrap: wrap; column-gap: 24px; }
+.board { position: relative; display: block; margin-bottom: 32px; }
+.board_top { @include space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: $border-grey; }
+.board_top h2 { font-size: 18px; font-weight: 600; line-height: 1.6; }
+.board_top a { font-size: 13px; font-weight: 400; line-height: 1.6; color: $grey-color; }
+.board_list { @include flex-start; flex-direction: column; column-gap: 16px; }
+main .board_list { min-height: 138px; }
+sub .board_list { margin-bottom: 8px; min-height: 276px; }
+.board_double .board { width: calc(50% - 12px); }
+.board_list li { @include space-between; align-items: center; width: 100%; }
+.board_list li:last-child { margin-bottom: 0; }
+.board_list li a { padding: 4px; @include space-between; align-items: center; width: 100%; column-gap: 8px; }
+.board_list li a:hover { background-color: $grey4-color; }
+.category { font-size: 13px; font-weight: 400; line-height: 1.4; padding: 3px 6px 2px; border: 1px solid $grey3-color; color: $grey3-color; border-radius: 4px; }
+.board_list li a span { font-size: 14px; font-weight: 300; line-height: 1.4; color: $grey3-color; }
+.board_list li a span.title { position: relative; display: block; padding-top: 2px; flex: 1; font-size: 15px; font-weight: 500; max-width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.pagination { display: flex; justify-content: center; align-items: center; column-gap: 4px; border-bottom: $border-grey; border-top: $border-grey; padding: 12px 0; }
+.pagination button {
+}
+.pagination a {
+}
+/* view page */
+
+.view_page { margin-bottom: 16px; }
+.view_header {
+}
+.view_header .category { position: relative; display: inline-block; margin-bottom: 8px; }
+.view_header .view_title { position: relative; display: block; font-size: 22px; font-weight: 600; line-height: 1.4; color: $font-color; margin-bottom: 12px; }
+.view_info_area { @include space-between; background-color: $grey4-color; padding: 6px 12px; }
+.view_info { position: relative; @include flex-start; column-gap: 12px; }
+.view_info span { font-size: 14px; font-weight: 400; }
+.view_info span b { font-size: 14px; font-weight: 400; color: $grey3-color; }
+.view_content { padding: 12px; border-bottom: $border-grey; margin-bottom: 16px; }
+.view_btn { @include flex-start; column-gap: 12px; }
+.view_comment { padding: 0 8px; }
+.comment_top { @include flex-start; margin-bottom: 12px; }
+.comment_top b { margin-right: 12px; font-size: 14px; }
+.comment_top .comment_num { font-size: 14px; }
+.comment_list {
+}
+.comment_box {
+}
+.comment_box.re { margin-left: 12px; }
+.comment_info { @include space-between; align-items: center; background-color: $grey4-color; padding: 6px 12px; border-radius: 4px; }
+.comment_box.re .commnet_info { background-color: $grey2-color; }
+.comment_info .writer { font-size: 13px; font-weight: 400; line-height: 1.4; }
+.comment_info .comment_btn { @include flex-start; column-gap: 8px; }
+.comment_info .comment_btn button { font-size: 12px; font-weight: 400; line-height: 1.4; }
+.comment_info .comment_btn button.recomment { color: $blue-color; }
+.comment_info .comment_btn button.comment_likes { color: $blue-color; }
+.comment_info .comment_btn button.comment_report { color: $red-color; }
+.comment_content { @include flex-start; align-items: flex-start; column-gap: 12px; padding: 8px 12px; margin-bottom: 8px; }
+.comment_content pre { position: relative; display: block; flex: 1; white-space: pre-line !important; font-size: 13px; font-weight: 400; line-height: 1.4; }
+.comment_content .comment_content_likes { background-color: $red-color; color: #fff; padding: 2px 9px 5px 8px; border-radius: 4px; font-style: normal; font-size: 13px; font-weight: 400; line-height: 1.4; }
+.comment_add { @include flex-start; align-items: stretch; column-gap: 8px; margin-bottom: 8px; }
+.comment_add.re { margin-left: 12px; }
+.comment_add textarea { flex: 1; resize: none; font-size: 13px; font-weight: 400; line-height: 1.4; padding: 8px; border-radius: 4px; border: 1px solid $grey3-color; outline: none; }
+.comment_add button { font-size: 12px; font-weight: 300; line-height: 1.4; border: 1px solid $grey3-color; color: $grey3-color; padding: 8px; border-radius: 4px; }
+.comment_add button:hover {
+}
+/* view page end */
+
+/* mypage */
+.mypage {
+}
+.mypage_list { @include flex-start; column-gap: 4px; margin-bottom: 12px; }
+.mypage_list button { font-size: 13px; font-weight: 400; line-height: 1.4; color: #666; background-color: #f8f8f8; border-radius: 4px; padding: 4px 16px; border: 1px solid #666; }
+.mypage_list button:hover { background-color: $main-color; color: #fff; border: 1px solid $main-color; }
+.mypage_content { @include flex-start; margin-bottom: 100px; }
+.mypage_info_list { flex: 1; padding: 12px; border: $border-grey; border-right: 0px; border-left: 0px; }
+.mypage_info_pw { flex: 1; border-right: 0px; border-left: 0px; }
+.mypage_info { @include flex-start; align-items: flex-start; margin-bottom: 16px; }
+.mb_4 { margin-bottom: 4px; }
+.mypage_info span { min-width: 120px; padding-top: 10px; font-size: 14px; font-weight: 400; line-height: 1.4; }
+.mypage_info input { border: $border-grey; outline: none; padding: 12px 8px; border-radius: 4px; margin-bottom: 8px; height: 42px; }
+.mypage_info .input_box p { @include flex-start; align-items: flex-start; font-size: 14px; font-weight: 300; line-height: 1.4; color: $grey3-color; }
+.mypage_info .input_box p.notice { color: $red-color; }
+.mypage_info .input_box p::before { content: ""; @include re-bl; top: 7px; left: 0; min-width: 4px; height: 4px; background-color: $grey3-color; border-radius: 50%; margin-right: 4px; }
+.mypage_info .input_box input { margin-right: 8px; }
+.mypage_info .input_box button { position: relative; border: $border-grey; background-color: transparent; height: 42px; border-radius: 4px; top: 1px; white-space: pre-line; padding: 0 8px; font-size: 12px; }
+.mypage_info .input_group { position: relative; display: flex; justify-content: flex-start; column-gap: 8px; margin-bottom: 8px; }
+.mypage_info .input_group button { min-width: 80px; white-space: pre-line; }
+.mypage_info .input_img .label_img { position: relative; display: flex; justify-content: flex-end; flex-direction: column; border-radius: 4px; width: 100%; cursor: pointer; overflow: hidden; }
+.mypage_info .input_img:hover { border: 1px solid $main-color; }
+.mypage_info .input_img .file_name_label { padding-top: 0; }
+.mypage_info .input_img:hover .label_img { color: $main-color; transition: none; opacity: 1; }
+.mypage_info .input_img:hover .file_name_label { opacity: 1; }
+.mypage_info .img_preview { @include flex-center; margin-bottom: 8px; height: 200px; border-radius: 4px; border: $border-grey; overflow: hidden; }
+.mypage_info .img_preview img { object-fit: contain; height: 100%; }
+/* mypage */

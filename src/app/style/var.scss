@@ -1,0 +1,44 @@
+@mixin flex-start {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@mixin space-between {
+    display: flex;
+    justify-content: space-between;
+}
+
+@mixin re-bl {
+    position: relative;
+    display: block;
+}
+
+$main-color: #0070f3;
+$main-hover-color: #005bb5;
+$sub-color: rgb(130, 193, 255);
+$font-color: #000;
+$font2-color: #999;
+$grey-color: #ccc;
+$grey2-color: #efefef;
+$grey3-color: #666;
+$grey4-color: #f8f8f8;
+
+$red-color :rgb(255, 122, 122);
+$blue-color :rgb(77, 145, 255);
+
+$header-height : 80px;
+$footer-height : 166px;
+
+/* admin left */
+$admin_header_height: 54px;
+$admin_left_width: 200px;
+
+/* border */
+$border-grey: 1px solid $grey-color;
