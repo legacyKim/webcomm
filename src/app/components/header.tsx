@@ -36,7 +36,7 @@ export default function Header({ authToken, username, userId, userNick, userProf
             setIsUsername('');
             setLoginStatus(false);
 
-            router.push('/');
+            // router.push('/');
         }
     }
 

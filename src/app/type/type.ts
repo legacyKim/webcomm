@@ -40,6 +40,11 @@ export interface Member {
     authority: number;
 }
 
+export type ImageWithBlob = {
+    file: File;
+    blobUrl: string;
+};
+
 export interface AuthContextType {
     loginStatus: boolean | null,
     setLoginStatus: (loginStatus: boolean) => void,

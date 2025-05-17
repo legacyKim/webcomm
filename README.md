@@ -27,4 +27,8 @@ npm install @tiptap/extension-video
 tiptap image 및 video 기능 확장
 
 npm install @aws-sdk/client-s3
+npm install @aws-sdk/s3-request-presigner
 AWS S3에 파일 업로드 패키지 설치
+
+npm install next-auth @prisma/client
+schema prisma 클라이언트 설치

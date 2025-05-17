@@ -56,3 +56,12 @@ CREATE TRIGGER post_trigger
 AFTER INSERT OR DELETE OR UPDATE ON posts
 FOR EACH ROW
 EXECUTE FUNCTION notify_post_change();
+
+// posting image table
+
+CREATE TABLE post_images (
+    id SERIAL PRIMARY KEY,
+    post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+    image_url TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);

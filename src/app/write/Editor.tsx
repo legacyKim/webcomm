@@ -4,8 +4,14 @@ import { useEffect, useState } from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { StarterKit } from '@tiptap/starter-kit';
 import { Image } from '@tiptap/extension-image';
+import { ImageWithBlob } from '../type/type';
 
-const Editor = ({ editorContent, setEditorContent }: { editorContent: string; setEditorContent: React.Dispatch<React.SetStateAction<string>> }) => {
+const Editor = ({ editorContent, setEditorContent, imageFiles, setImageFiles }: {
+    editorContent: string;
+    setEditorContent: React.Dispatch<React.SetStateAction<string>>
+    imageFiles: ImageWithBlob[];
+    setImageFiles: React.Dispatch<React.SetStateAction<ImageWithBlob[]>>; 
+}) => {
 
     const editor = useEditor({
         extensions: [
@@ -20,14 +26,12 @@ const Editor = ({ editorContent, setEditorContent }: { editorContent: string; se
 
     const uploadImage = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const base64Image = reader.result as string;
-                editor?.commands.insertContent(`<img src="${base64Image}" />`);
-            };
-            reader.readAsDataURL(file);
-        }
+        if (!file || !editor) return;
+
+        const blobUrl = URL.createObjectURL(file);
+        editor.commands.insertContent(`<img src="${blobUrl}" />`);
+        setImageFiles(prev => [...prev, { file, blobUrl }]);
+
     };
 
     const insertVideo = () => {
@@ -39,22 +43,23 @@ const Editor = ({ editorContent, setEditorContent }: { editorContent: string; se
     };
 
     useEffect(() => {
-        if (editor) {
-            editor.on('update', () => {
-                setEditorContent(editor.getHTML());
-            });
-        }
+        if (!editor) return;
 
-        if (editor && editorContent) {
-            editor.commands.setContent(editorContent); // editorContent가 변경될 때 에디터 내용 업데이트
-        }
+        editor.on('update', () => {
+            setEditorContent(editor.getHTML());
+        });
 
         return () => {
-            if (editor) {
-                editor.off('update');
-            }
+            editor.destroy();
         };
-    }, [editor, setEditorContent]);
+    }, [editor]);
+
+    // 글 수정일 경우
+    useEffect(() => {
+        if (editor && editorContent !== editor.getHTML()) {
+            editor.commands.setContent(editorContent);
+        }
+    }, [editorContent, editor]);
 
     return (
         <div>

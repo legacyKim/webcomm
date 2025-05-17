@@ -155,6 +155,8 @@ export default function Mypage() {
         }
     }
 
+    const [option, setOption] = useState<string>("info");
+
     return (
         <sub className="sub">
 
@@ -166,114 +168,128 @@ export default function Mypage() {
                 </div>
 
                 <div className='mypage_list'>
-                    <button type="button">계정 정보</button>
-                    <button type="button">활동 내역</button>
+                    <button type="button" onClick={() => { setOption('info'); }}>계정 정보</button>
+                    <button type="button" onClick={() => { setOption('activity'); }}>활동 내역</button>
                 </div>
 
-                <div className="mypage_content">
-                    <form className='mypage_info_list'>
+                {option === "info" && (
+                    <>
+                        {/* 계정 정보 */}
+                        <div className="mypage_content">
+                            <form className='mypage_info_list'>
 
-                        <div className="mypage_info">
-                            <span>아이디</span>
-                            <div className="input_box">
-                                <input type="text" value={isUsername} disabled />
-                            </div>
-                        </div>
-
-                        <div className="mypage_info">
-                            <span>별명</span>
-                            <div className="input_box">
-                                <input type="text" value={newNick} onChange={(e) => { setNewNick(e.target.value); }} />
-                                <p>별명은 최대 한글 6자, 영문 12자까지 입력이 가능합니다.</p>
-                                <p className="notice">부적절한 별명은 임의로 변경될 수 있습니다.</p>
-                            </div>
-                        </div>
-
-                        <div className="mypage_info">
-                            <span>프로필 사진</span>
-
-                            <div>
-                                <div className="input_group">
-                                    <div className="input_box input_img">
-                                        <label
-                                            className="label_img"
-                                            htmlFor="profileImage"
-                                            ref={labelProfileImgRef}>
-
-                                            {fileName ? (
-                                                <>
-                                                    <span className={`file_name_label after`}>프로필 이미지</span>
-                                                    <p className="file_name">{fileName}</p>
-                                                </>
-                                            ) : (
-                                                <span className="file_name_label">프로필 이미지 변경하기</span>
-                                            )}
-
-                                        </label>
-
-                                        {/* 파일 선택 버튼 (커스텀 스타일링) */}
-                                        <input
-                                            className="input_common"
-                                            ref={inputProfileImgRef}
-                                            type="file"
-                                            id="profileImage"
-                                            name="profileImage"
-                                            accept="image/*"
-                                            onChange={(e) => { handleImageChange(e); }}
-                                            style={{ display: "none" }}
-                                        />
+                                <div className="mypage_info">
+                                    <span>아이디</span>
+                                    <div className="input_box">
+                                        <input type="text" value={isUsername} disabled />
                                     </div>
                                 </div>
 
-                                {/* 미리보기 이미지 */}
-                                {newProfile && (
-                                    <div className="img_preview">
-                                        <img src={newProfile} alt="Profile Preview" />
+                                <div className="mypage_info">
+                                    <span>별명</span>
+                                    <div className="input_box">
+                                        <input type="text" value={newNick} onChange={(e) => { setNewNick(e.target.value); }} />
+                                        <p>별명은 최대 한글 6자, 영문 12자까지 입력이 가능합니다.</p>
+                                        <p className="notice">부적절한 별명은 임의로 변경될 수 있습니다.</p>
                                     </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="mypage_info mb_4">
-                            <span>비밀번호</span>
-                            <div className="input_box">
-                                <input type="password" onChange={(e) => { setNewPassword(e.target.value) }} />
-                            </div>
-                        </div>
-
-                        <div className="mypage_info">
-                            <span>비밀번호 확인</span>
-                            <div className="input_box">
-                                <input type="password" onChange={(e) => { setNewPasswordCon(e.target.value) }} />
-                                <p>{userPasswordNotice}</p>
-                            </div>
-                        </div>
-
-                        <div className="mypage_info mb_4">
-                            <span>이메일</span>
-                            <div className="input_box">
-                                <input type="text" ref={inputEmailRef} value={userEmail} onChange={(e) => { setUserEmail(e.target.value) }} />
-                                <button type="button" onClick={() => emailCheck()}>인증번호 요청</button>
-                            </div>
-                        </div>
-
-                        <div className="mypage_info">
-                            <span>인증번호</span>
-                            <div className="input_box">
-                                <div className="input_box">
-                                    <input type="text" ref={inputCertifyNumRef} onChange={(e) => setCertifyNum(e.target.value)} />
                                 </div>
-                                <p>비밀번호 분실 또는 수정 등의 사이트 활동에 필수적인 메일이 발송되오니 정확히 입력해주세요.</p>
-                            </div>
 
+                                <div className="mypage_info">
+                                    <span>프로필 사진</span>
+
+                                    <div>
+                                        <div className="input_group">
+                                            <div className="input_box input_img">
+                                                <label
+                                                    className="label_img"
+                                                    htmlFor="profileImage"
+                                                    ref={labelProfileImgRef}>
+
+                                                    {fileName ? (
+                                                        <>
+                                                            <span className={`file_name_label after`}>프로필 이미지</span>
+                                                            <p className="file_name">{fileName}</p>
+                                                        </>
+                                                    ) : (
+                                                        <span className="file_name_label">프로필 이미지 변경하기</span>
+                                                    )}
+
+                                                </label>
+
+                                                {/* 파일 선택 버튼 (커스텀 스타일링) */}
+                                                <input
+                                                    className="input_common"
+                                                    ref={inputProfileImgRef}
+                                                    type="file"
+                                                    id="profileImage"
+                                                    name="profileImage"
+                                                    accept="image/*"
+                                                    onChange={(e) => { handleImageChange(e); }}
+                                                    style={{ display: "none" }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* 미리보기 이미지 */}
+                                        {newProfile && (
+                                            <div className="img_preview">
+                                                <img src={newProfile} alt="Profile Preview" />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="mypage_info mb_4">
+                                    <span>비밀번호</span>
+                                    <div className="input_box">
+                                        <input type="password" onChange={(e) => { setNewPassword(e.target.value) }} />
+                                    </div>
+                                </div>
+
+                                <div className="mypage_info">
+                                    <span>비밀번호 확인</span>
+                                    <div className="input_box">
+                                        <input type="password" onChange={(e) => { setNewPasswordCon(e.target.value) }} />
+                                        <p>{userPasswordNotice}</p>
+                                    </div>
+                                </div>
+
+                                <div className="mypage_info mb_4">
+                                    <span>이메일</span>
+                                    <div className="input_box">
+                                        <input type="text" ref={inputEmailRef} value={userEmail} onChange={(e) => { setUserEmail(e.target.value) }} />
+                                        <button type="button" onClick={() => emailCheck()}>인증번호 요청</button>
+                                    </div>
+                                </div>
+
+                                <div className="mypage_info">
+                                    <span>인증번호</span>
+                                    <div className="input_box">
+                                        <div className="input_box">
+                                            <input type="text" ref={inputCertifyNumRef} onChange={(e) => setCertifyNum(e.target.value)} />
+                                        </div>
+                                        <p>비밀번호 분실 또는 수정 등의 사이트 활동에 필수적인 메일이 발송되오니 정확히 입력해주세요.</p>
+                                    </div>
+
+                                </div>
+
+                                <div className="btn_wrap">
+                                    <button type="submit" onClick={(e) => { userChangePost(e); }} className="btn">저장</button>
+                                </div>
+
+                            </form>
                         </div>
+                    </>
+                )}
 
-                        <div className="btn_wrap">
-                            <button type="submit" onClick={(e) => { userChangePost(e); }} className="btn">저장</button>
+                {option === "activity" && (
+                    <>
+                        {/* 활동 내역 */}
+                        <div className="mypage_content">
                         </div>
+                    </>
+                )}
 
-                    </form>
-                </div>
             </div>
         </sub>
     )

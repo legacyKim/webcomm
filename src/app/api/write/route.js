@@ -6,6 +6,8 @@ export async function POST(req) {
     const client = await pool.connect();
     const { boardname, url_slug, user_id, user_nickname, title, content } = await req.json();
 
+    console.log(content);
+
     try {
         const result = await client.query(
             "INSERT INTO posts (board_name, url_slug, user_id, user_nickname, title, content) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",

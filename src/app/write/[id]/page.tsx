@@ -11,6 +11,7 @@ import Editor from '../Editor';
 import { useAuth } from '../../AuthContext'
 
 import { Posts } from '../../type/type';
+import { ImageWithBlob } from '../../type/type';
 
 export default function Write() {
 
@@ -23,9 +24,15 @@ export default function Write() {
 
     const writeTitle = useRef<HTMLInputElement>(null);
     const [editorContent, setEditorContent] = useState<string>('');
+
+    console.log(editorContent);
+
+    const [imageFiles, setImageFiles] = useState<ImageWithBlob[]>([]);
     const [boardInfo, setBoardInfo] = useState<{ board_name: string; url_slug: string }>({ board_name: "", url_slug: "" });
 
     const [writeData, setWriteData] = useState<Posts | null>(null);
+
+    console.log(writeData);
 
     // 글 불러오기
     useEffect(() => {
@@ -142,8 +149,8 @@ export default function Write() {
                 <div className="write_top">
                     <input type="text" ref={writeTitle} />
                 </div>
-
-                <Editor editorContent={editorContent} setEditorContent={setEditorContent} />
+                
+                <Editor editorContent={editorContent} setEditorContent={setEditorContent} imageFiles={imageFiles} setImageFiles={setImageFiles} />
 
                 <div className='btn_wrap'>
                     <button type='submit'>글 수정하기</button>

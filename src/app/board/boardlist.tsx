@@ -1,108 +1,151 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchBoardData } from "../api/api"
-import { Posts } from '../type/type';
+import { fetchBoardData } from "../api/api";
+import { Posts } from "../type/type";
 
-import Link from 'next/link';
+import Link from "next/link";
+
+import { useDropDown } from "app/func/hook/useDropDown";
+import DropDownMenu from "app/components/dropDownMenu";
 
 export default function Boardlist({ url_slug }: { url_slug: string }) {
+  // const router = useRouter();
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
-    const queryClient = useQueryClient();
+  const {
+    data: postData,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["eachBoardData", url_slug, page, limit],
+    queryFn: () => fetchBoardData(url_slug, page, limit),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 60 * 24,
+  });
 
-    const { data: postData, error, isLoading } = useQuery({
-        queryKey: ["eachBoardData", url_slug],
-        queryFn: () => fetchBoardData(url_slug),
-        staleTime: 1000 * 60 * 5,
-        gcTime: 1000 * 60 * 10,
+  useEffect(() => {
+    queryClient.invalidateQueries({
+      queryKey: ["eachBoardData", url_slug],
     });
+  }, [url_slug]);
 
-    // 게시판 실시간 업데이트
-    useEffect(() => {
-        const eventSource = new EventSource("/api/post/stream");
+  useEffect(() => {
+    let eventSource: EventSource | undefined;
 
-        // 새 게시글 또는 삭제된 게시글의 정보를 받으면 데이터 갱신
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
+    function connectSSE() {
+      eventSource = new EventSource(`/api/board/stream/${url_slug}`);
 
-            queryClient.setQueryData(["eachBoardData", url_slug], (oldData: { posts: Posts[] }) => {
-                if (!oldData) return oldData;
+      eventSource.onmessage = (event) => {
+        const updatedData = JSON.parse(event.data);
+        if (updatedData.slug === url_slug) {
+          queryClient.invalidateQueries({ queryKey: ["eachBoardData", url_slug] });
+        }
+      };
 
-                if (data.event === "INSERT") {
-                    return {
-                        ...oldData,
-                        posts: [data, ...oldData.posts], // 새 게시글 추가
-                    };
-                } else if (data.event === "DELETE") {
-                    return {
-                        ...oldData,
-                        posts: oldData.posts.filter((post: Posts) => post.id !== data.id), // 삭제된 게시글 제거
-                    };
-                } else if (data.event === "UPDATE") {
-                    return {
-                        ...oldData,
-                        posts: oldData.posts.map((post: Posts) =>
-                            post.id === data.id
-                                ? { ...post, likes: data.likes, views: data.views, title: data.title, } // 조회수, 공감 업데이트
-                                : post
-                        ),
-                    };
-                }
+      eventSource.onerror = () => {
+        console.warn("SSE 연결 끊김. 5초 후 재연결...");
+        if (eventSource) eventSource.close();
+        setTimeout(connectSSE, 5000);
+      };
+    }
 
-                return oldData;
-            });
-        };
+    connectSSE();
 
-        return () => {
-            eventSource.close();
-        };
-    }, [url_slug]);
+    return () => {
+      if (eventSource) eventSource.close();
+    };
+  }, [url_slug]);
 
-    if (isLoading) return <div>Loading...</div>;
-    if (error instanceof Error) return <div>Error: {error.message}</div>;
+  // writer dropdown
+  const { writerDrop, dropPosition, handleWriterClick } = useDropDown();
+  const [userInfoInDropMenu, setUserInfoInDropMenu] = useState({
+    userId: "",
+    userName: "",
+  });
 
-    return (
-        <>
-            <ol className="board_list">
-                {!isLoading && postData?.posts.length > 0 ? (postData?.posts.map((b: Posts, i: number) => (
-                    <li key={`${b.url_slug}_${b.id}`}>
-                        <Link href={`/board/${url_slug}/${b.id}`}>
-                            <span className="num">{b.post_number}</span>
-                            <span className="title">{b.title}</span>
-                            <span className="writer">{b.user_nickname}</span>
-                            <span className="like"><i></i>{b.likes}</span>
-                            <span className="view"><i></i>{b.views}</span>
-                            {/* <span className="comment"><i></i>33</span> */}
-                            <span className="date">{new Date(b.created_at).toLocaleDateString()}</span>
-                        </Link>
-                    </li>
-                ))) : (
-                    <div className='nodata'>
-                        <span>게시물이 없습니다.</span>
-                    </div>
-                )}
-            </ol>
+  if (isLoading) return <div>Loading...</div>;
+  if (error instanceof Error) return <div>Error: {error.message}</div>;
 
-            <div className="pagination">
+  const totalPages = postData?.totalPages || 1;
 
-                <button>맨처음으로</button>
-                <button>이전</button>
-                <Link href="/" >1</Link>
-                <Link href="/" >2</Link>
-                <Link href="/" >3</Link>
-                <Link href="/" >4</Link>
-                <Link href="/" >5</Link>
-                <Link href="/" >6</Link>
-                <Link href="/" >7</Link>
-                <Link href="/" >8</Link>
-                <Link href="/" >9</Link>
-                <Link href="/" >10</Link>
-                <button>다음</button>
-                <button>마지막으로</button>
+  return (
+    <>
+      <ol className='board_list'>
+        {writerDrop && (
+          <DropDownMenu
+            style={{
+              top: `${dropPosition.top + 22}px`,
+              left: `${dropPosition.left - 4}px`,
+            }}
+            userInfoInDropMenu={userInfoInDropMenu}
+          />
+        )}
 
-            </div>
-        </>
-    )
+        {!isLoading && postData?.posts.length > 0 ? (
+          postData?.posts.map((b: Posts, i: number) => (
+            <li key={`${b.url_slug}_${b.id}`}>
+              <Link href={`/board/${url_slug}/${b.id}`}>
+                <span className='num'>{b.post_number}</span>
+                <span className='title'>{b.title}</span>
+                <span
+                  className='writer'
+                  onClick={(e) => {
+                    handleWriterClick(e);
+                    setUserInfoInDropMenu({
+                      userId: b.user_id,
+                      userName: b.user_nickname,
+                    });
+                  }}>
+                  {b.user_nickname}
+                </span>
+                <span className='like'>
+                  <i></i>
+                  {b.likes}
+                </span>
+                <span className='view'>
+                  <i></i>
+                  {b.views}
+                </span>
+                {/* <span className="comment"><i></i>33</span> */}
+                <span className='date'>{new Date(b.created_at).toLocaleDateString()}</span>
+              </Link>
+            </li>
+          ))
+        ) : (
+          <div className='nodata'>
+            <span>게시물이 없습니다.</span>
+          </div>
+        )}
+      </ol>
 
+      <div className='pagination'>
+        <button onClick={() => setPage(1)} disabled={page === 1}>
+          맨처음으로
+        </button>
+        <button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1}>
+          이전
+        </button>
+
+        {[...Array(totalPages)]
+          .map((_, index) => (
+            <button key={index + 1} onClick={() => setPage(index + 1)} className={page === index + 1 ? "active" : ""}>
+              {index + 1}
+            </button>
+          ))
+          .slice(Math.max(0, page - 5), page + 5)}
+
+        <button onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page === totalPages}>
+          다음
+        </button>
+        <button onClick={() => setPage(totalPages)} disabled={page === totalPages}>
+          마지막으로
+        </button>
+      </div>
+    </>
+  );
 }

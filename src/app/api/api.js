@@ -33,13 +33,14 @@ export const fetchBoard = async () => {
 };
 
 // 각 게시판 
-export const fetchBoardData = async (url_slug) => {
+export async function fetchBoardData(url_slug, page, limit) {
     try {
-        const response = await axios.get(`/api/post/${url_slug}`);
+        // Axios를 사용한 API 요청
+        const response = await axios.get(`/api/board/${url_slug}/${page}/${limit}`);
         return response.data;
     } catch (err) {
         console.error(err);
-        return [];
+        return [];  // 에러 발생 시 빈 배열 반환
     }
 }
 

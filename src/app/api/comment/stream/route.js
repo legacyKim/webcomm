@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import pool from "../../../db/db";
 
 export async function GET() {
-    const client = await pool.connect();
 
+    const client = await pool.connect();
     client.query("LISTEN comment_events");
 
     const encoder = new TextEncoder();
