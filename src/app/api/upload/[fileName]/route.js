@@ -9,7 +9,6 @@ const bucketName = process.env.AWS_BUCKET_NAME;
 const cloudfront = process.env.AWS_CLOUD_FRONT_URL;
 
 export async function GET(req, { params }) {
-  const { params } = await context;
   const fileName = decodeURIComponent(params.fileName);
   const extension = fileName.split(".").pop()?.toLowerCase() || "bin";
   const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(extension);
