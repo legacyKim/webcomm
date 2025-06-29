@@ -2,28 +2,20 @@
 
 import axios from "axios";
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
-import "../style/style.common.scss";
-import styles from "../style/Login.module.scss";
+import "@/style/style.common.scss";
+import styles from "@/style/Login.module.scss";
 
-import { handleBlur, handleFocus } from "../func/inputActive";
+import { handleBlur, handleFocus } from "@/func/inputActive";
 import Cookies from "js-cookie";
-import { useAuth } from '../AuthContext';
+import { useAuth } from "@/AuthContext";
 
 export default function LoginPage() {
-
   const router = useRouter();
-  const {
-    loginStatus,
-    setLoginStatus,
-    setIsUsername,
-    setIsUserId,
-    setIsUserNick,
-    setIsUserProfile,
-    setIsUserEmail,
-  } = useAuth();
+  const { loginStatus, setLoginStatus, setIsUsername, setIsUserId, setIsUserNick, setIsUserProfile, setIsUserEmail } =
+    useAuth();
 
   const [userid, setUserid] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -61,7 +53,8 @@ export default function LoginPage() {
 
     try {
       const response = await axios.post("/api/login", {
-        userid, password
+        userid,
+        password,
       });
 
       if (response.data.success) {
@@ -125,11 +118,30 @@ export default function LoginPage() {
     };
   }, []);
 
-  return (
+  //caps lock
+  const [capsLockOn, setCapsLockOn] = useState(false);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isCapsLock = e.getModifierState("CapsLock");
+    setCapsLockOn(isCapsLock);
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isCapsLock = e.getModifierState("CapsLock");
+    setCapsLockOn(isCapsLock);
+  };
+
+  useEffect(() => {
+    if (capsLockOn) {
+      setError("Caps Lock이 켜져 있습니다!");
+    } else {
+      setError(null);
+    }
+  }, [capsLockOn]);
+
+  return (
     <div className={`${styles.login_page}`}>
       <div className={styles.inside}>
-
         {/* ad 영역 */}
         {/* <div className={`${styles.login_ad} ${styles.box_inner}`}>
 
@@ -144,14 +156,19 @@ export default function LoginPage() {
             <div className={styles.input_group}>
               <div className={styles.input_box} ref={boxIdRef}>
                 <div className={styles.input_bg}></div>
-                <label className={styles.label_common} htmlFor="userid" ref={labelIdRef}>아이디</label>
-                <input className={styles.input_common}
+                <label className={styles.label_common} htmlFor='userid' ref={labelIdRef}>
+                  아이디
+                </label>
+                <input
+                  className={styles.input_common}
                   ref={inputIdRef}
                   onFocus={() => handleFocus(labelIdRef, boxIdRef)}
-                  onBlur={() => { inputIdRef.current && inputIdRef.current.value === "" && handleBlur(labelIdRef, boxIdRef) }}
-                  type="text"
-                  id="userid"
-                  name="USERID"
+                  onBlur={() => {
+                    inputIdRef.current && inputIdRef.current.value === "" && handleBlur(labelIdRef, boxIdRef);
+                  }}
+                  type='text'
+                  id='userid'
+                  name='USERID'
                   value={userid}
                   onChange={(e) => setUserid(e.target.value)}
                 />
@@ -160,74 +177,72 @@ export default function LoginPage() {
             <div className={styles.input_group}>
               <div className={styles.input_box} ref={boxPwRef}>
                 <div className={styles.input_bg}></div>
-                <label className={styles.label_common} htmlFor="password" ref={labelPwRef}>비밀번호</label>
-                <input className={styles.input_common}
+                <label className={styles.label_common} htmlFor='password' ref={labelPwRef}>
+                  비밀번호
+                </label>
+                <input
+                  className={styles.input_common}
                   ref={inputPwRef}
                   onFocus={() => handleFocus(labelPwRef, boxPwRef)}
-                  onBlur={() => { inputPwRef.current && inputPwRef.current.value === "" && handleBlur(labelPwRef, boxPwRef) }}
-                  type="password"
-                  id="password"
-                  name="password"
+                  onBlur={() => {
+                    inputPwRef.current && inputPwRef.current.value === "" && handleBlur(labelPwRef, boxPwRef);
+                    setCapsLockOn(false);
+                  }}
+                  onKeyDown={handleKeyDown}
+                  onKeyUp={handleKeyUp}
+                  type='password'
+                  id='password'
+                  name='password'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
             </div>
 
-            {error && <span className="notice">
-              {error}
-            </span>}
-
             {/* checkbox */}
-            <div className="checkbox">
-              <input type="checkbox" id="remember" name="remember" className="hidden_checkbox" />
-              <label htmlFor="remember" className="custom_checkbox" onChange={() => setRemember(!remember)}>
+            <div className='checkbox'>
+              <input type='checkbox' id='remember' name='remember' className='hidden_checkbox' />
+              <label htmlFor='remember' className='custom_checkbox' onChange={() => setRemember(!remember)}>
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  height="24"
-                  className="svg_checkbox"
-                >
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  width='24'
+                  height='24'
+                  className='svg_checkbox'>
                   <rect
-                    className="svg_box"
-                    x="2"
-                    y="2"
-                    width="20"
-                    height="20"
-                    rx="4"
-                    fill="none"
-                    stroke="#ccc"
-                    strokeWidth="1"
+                    className='svg_box'
+                    x='2'
+                    y='2'
+                    width='20'
+                    height='20'
+                    rx='4'
+                    fill='none'
+                    stroke='#ccc'
+                    strokeWidth='1'
                   />
-                  <path
-                    className="svg_checkmark"
-                    d="M6 12l4 4 8-8"
-                    fill="none"
-                    stroke="#007bff"
-                    strokeWidth="2"
-                  />
+                  <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
                 </svg>
                 <span>아이디 저장</span>
               </label>
             </div>
 
+            {error && <span className={styles.notice}>{error}</span>}
+
             {/* 버튼 */}
-            <div className="btn_wrap">
-              <button type="submit" className="btn">
+            <div className='btn_wrap'>
+              <button type='submit' className='btn'>
                 로그인
               </button>
             </div>
 
             {/* 아이디/비밀번호 찾기 및 회원가입 */}
             <div className={styles.find_info}>
-              <Link href="/find">아이디/비밀번호 찾기</Link>
-              <Link href="/member">회원가입</Link>
+              <Link href='/find'>아이디/비밀번호 찾기</Link>
+              <Link href='/agree'>회원가입</Link>
             </div>
-
           </form>
         </div>
       </div>
     </div>
   );
-};
+}

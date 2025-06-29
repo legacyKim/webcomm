@@ -1,18 +1,18 @@
 import { NextResponse } from "next/server";
-import prisma from "@/app/lib/prisma";
+import pool from "@/db/db"; // pg Pool 인스턴스
 
 export async function POST(request) {
   try {
-    const { userId, reason } = await request.json();
+    const { isUserId, reportedUserId, reason, type } = await request.json();
 
-    // 신고 기록 추가
-    await prisma.userReport.create({
-      data: {
-        reporterId: userId,
-        reportedId: userId,
-        reason: reason,
-      },
-    });
+    // 신고 기록 추가 쿼리 실행
+    await pool.query(
+      `
+      INSERT INTO user_reports ("reporterId", "reportedId", reason, type)
+      VALUES ($1, $2, $3, $4)
+      `,
+      [isUserId, reportedUserId, reason, type],
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {

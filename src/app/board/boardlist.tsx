@@ -1,38 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchBoardData } from "../api/api";
+import { fetchBoardData, fetchUserPostData, fetchUserCommentData, fetchSearchData, fetchBoardPop } from "@/api/api";
 import { Posts } from "../type/type";
+import { useAuth } from "@/AuthContext";
 
 import Link from "next/link";
 
 import { useDropDown } from "app/func/hook/useDropDown";
 import DropDownMenu from "app/components/dropDownMenu";
+import formatPostDate from "app/components/formatDate";
+import Pagination from "app/components/pagination";
 
-export default function Boardlist({ url_slug }: { url_slug: string }) {
-  // const router = useRouter();
+import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
+
+interface BoardlistProps {
+  url_slug: string | null;
+  boardType: string;
+  limit: number;
+}
+
+export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps) {
   const queryClient = useQueryClient();
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState<number>(1);
+
+  const { isUserId, messageToUser } = useAuth();
+
+  const queryKey = useMemo(
+    () => ["eachBoardData", boardType, url_slug, page, limit],
+    [boardType, url_slug, page, limit],
+  );
 
   const {
     data: postData,
     error,
     isLoading,
   } = useQuery({
-    queryKey: ["eachBoardData", url_slug, page, limit],
-    queryFn: () => fetchBoardData(url_slug, page, limit),
+    queryKey,
+    queryFn: () => {
+      if (boardType === "popular") return fetchBoardPop(page, limit, isUserId);
+      if (boardType === "userPost") return fetchUserPostData(url_slug, page, limit);
+      if (boardType === "userComment") return fetchUserCommentData(url_slug, page, limit);
+      if (boardType === "search") return fetchSearchData(url_slug, page, limit, isUserId);
+      if (boardType === "board") return fetchBoardData(url_slug, page, limit, isUserId);
+    },
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 60 * 24,
   });
 
   useEffect(() => {
-    queryClient.invalidateQueries({
-      queryKey: ["eachBoardData", url_slug],
-    });
-  }, [url_slug]);
+    queryClient.invalidateQueries({ queryKey });
+  }, [queryClient, queryKey]);
 
   useEffect(() => {
     let eventSource: EventSource | undefined;
@@ -62,57 +81,85 @@ export default function Boardlist({ url_slug }: { url_slug: string }) {
   }, [url_slug]);
 
   // writer dropdown
-  const { writerDrop, dropPosition, handleWriterClick } = useDropDown();
-  const [userInfoInDropMenu, setUserInfoInDropMenu] = useState({
-    userId: "",
-    userName: "",
+  const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });
+  const [userInfoInDropMenu, setUserInfoInDropMenu] = useState<{
+    userId: number;
+    userNickname: string;
+  }>({
+    userId: 0,
+    userNickname: "",
   });
 
   if (isLoading) return <div>Loading...</div>;
   if (error instanceof Error) return <div>Error: {error.message}</div>;
 
-  const totalPages = postData?.totalPages || 1;
+  const totalPage = postData?.totalPages || 1;
 
   return (
     <>
       <ol className='board_list'>
-        {writerDrop && (
+        {isUserId !== userInfoInDropMenu.userId && writerDrop && (
           <DropDownMenu
             style={{
               top: `${dropPosition.top + 22}px`,
-              left: `${dropPosition.left - 4}px`,
+              left: `${dropPosition.left + 14}px`,
             }}
             userInfoInDropMenu={userInfoInDropMenu}
           />
         )}
 
+        <li className='board_list_header'>
+          {boardType === "popular" ? <span className='category'></span> : <span className='num'></span>}
+          <span className='title'></span>
+          <div className='comment'>
+            <ChatBubbleLeftEllipsisIcon className='icon' />
+          </div>
+          <div className='writer'></div>
+          <div className='like'>
+            <HeartIcon className='icon' />
+          </div>
+          <div className='view'>
+            <EyeIcon className='icon' />
+          </div>
+          <div className='date'>
+            <CalendarIcon className='icon' />
+          </div>
+        </li>
+
         {!isLoading && postData?.posts.length > 0 ? (
           postData?.posts.map((b: Posts, i: number) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link href={`/board/${url_slug}/${b.id}`}>
-                <span className='num'>{b.post_number}</span>
-                <span className='title'>{b.title}</span>
+                {boardType !== "popular" && <span className='num'>{b.post_number}</span>}
+                <span className='title'>
+                  {boardType === "popular" && <span className='category'>{b.url_slug}</span>}
+                  {b.title}
+                </span>
+                <div className='comment'>
+                  <i></i>
+                  {b.comments}
+                </div>
                 <span
                   className='writer'
                   onClick={(e) => {
-                    handleWriterClick(e);
+                    userClick(e);
                     setUserInfoInDropMenu({
-                      userId: b.user_id,
-                      userName: b.user_nickname,
+                      userId: Number(b.user_id),
+                      userNickname: b.user_nickname,
                     });
                   }}>
                   {b.user_nickname}
                 </span>
-                <span className='like'>
+                <div className='like'>
                   <i></i>
                   {b.likes}
-                </span>
-                <span className='view'>
+                </div>
+                <div className='view'>
                   <i></i>
                   {b.views}
-                </span>
+                </div>
                 {/* <span className="comment"><i></i>33</span> */}
-                <span className='date'>{new Date(b.created_at).toLocaleDateString()}</span>
+                <div className='date'>{formatPostDate(b.created_at)}</div>
               </Link>
             </li>
           ))
@@ -123,29 +170,7 @@ export default function Boardlist({ url_slug }: { url_slug: string }) {
         )}
       </ol>
 
-      <div className='pagination'>
-        <button onClick={() => setPage(1)} disabled={page === 1}>
-          맨처음으로
-        </button>
-        <button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1}>
-          이전
-        </button>
-
-        {[...Array(totalPages)]
-          .map((_, index) => (
-            <button key={index + 1} onClick={() => setPage(index + 1)} className={page === index + 1 ? "active" : ""}>
-              {index + 1}
-            </button>
-          ))
-          .slice(Math.max(0, page - 5), page + 5)}
-
-        <button onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page === totalPages}>
-          다음
-        </button>
-        <button onClick={() => setPage(totalPages)} disabled={page === totalPages}>
-          마지막으로
-        </button>
-      </div>
+      <Pagination page={page} setPage={setPage} totalPage={totalPage} />
     </>
   );
 }

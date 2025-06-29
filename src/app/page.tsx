@@ -1,13 +1,7 @@
 "use client";
 
-import "./style/base.css";
-import "./style/font.css";
-import "./style/fontello/css/fontello.css";
-import "./style/fontello/css/animation.css";
-
 // import Image from "next/image";
 import Search from "./components/search";
-import "./style/style.common.scss";
 
 import Link from "next/link";
 
@@ -16,16 +10,28 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchHome, fetchHomePop } from "./api/api";
 import { Posts } from "./type/type";
 
+import { useAuth } from "@/AuthContext";
 import { useDropDown } from "app/func/hook/useDropDown";
 import DropDownMenu from "app/components/dropDownMenu";
+import formatPostDate from "app/components/formatDate";
+
+import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react/24/outline";
 
 export default function Home() {
-  const { data: homeData, isLoading } = useQuery({ queryKey: ["home"], queryFn: fetchHome });
+  const { isUserId, setBoardType, messageToUser } = useAuth();
 
-  const { data: popularPosts, refetch } = useQuery({
-    queryKey: ["popularPosts"],
-    queryFn: fetchHomePop,
-    staleTime: 1000 * 60 * 20, // 20분마다 새로고침
+  const { data: homeData, isLoading } = useQuery({
+    queryKey: ["home", isUserId],
+    queryFn: () => fetchHome(isUserId),
+  });
+
+  const {
+    data: popularPosts,
+    isLoading: isLoadingPop,
+    refetch,
+  } = useQuery({
+    queryKey: ["popularPosts", isUserId],
+    queryFn: () => fetchHomePop(1, 10, isUserId),
   });
 
   // 인기글
@@ -42,21 +48,24 @@ export default function Home() {
   }, [refetch]);
 
   // writer dropdown
-  const { writerDrop, dropPosition, handleWriterClick } = useDropDown();
-  const [userInfoInDropMenu, setUserInfoInDropMenu] = useState({
-    userId: "",
-    userName: "",
+  const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });
+  const [userInfoInDropMenu, setUserInfoInDropMenu] = useState<{
+    userId: number;
+    userNickname: string;
+  }>({
+    userId: 0,
+    userNickname: "",
   });
 
   return (
     <main>
       <Search />
 
-      {writerDrop && (
+      {isUserId !== userInfoInDropMenu.userId && writerDrop && (
         <DropDownMenu
           style={{
             top: `${dropPosition.top + 22}px`,
-            left: `${dropPosition.left - 4}px`,
+            left: `${dropPosition.left + 14}px`,
           }}
           userInfoInDropMenu={userInfoInDropMenu}
         />
@@ -68,41 +77,55 @@ export default function Home() {
           <div className='board'>
             <div className='board_top'>
               <h2>베스트 게시글</h2>
-              <Link href='/board'>더 보기</Link>
+              <Link
+                href='/board/popular'
+                onClick={() => {
+                  setBoardType("popular");
+                }}>
+                더 보기
+              </Link>
             </div>
             <ol className='board_list'>
-              {popularPosts &&
+              {isLoadingPop ? (
+                <div className='data_none'>잠시만 기다려주세요.</div>
+              ) : (
                 popularPosts.map((post: Posts) => (
                   <li key={post.id}>
                     <Link href={`/board/${post.url_slug}/${post.id}`}>
-                      <b className='category'>{post.board_name}</b>
-                      <span className='title'>{post.title}</span>
-                      <span
-                        className='writer'
-                        onClick={(e) => {
-                          handleWriterClick(e);
-                          setUserInfoInDropMenu({
-                            userId: post.user_id,
-                            userName: post.user_nickname,
-                          });
-                        }}>
-                        {post.user_nickname}
-                      </span>
-                      <div className='like'>
-                        <i></i>
-                        {post.likes}
+                      <div className='title'>
+                        <b className='category'>{post.board_name}</b>
+                        <span>{post.title}</span>
                       </div>
-                      <div className='view'>
-                        <i></i>
-                        {post.views}
-                      </div>
-                      <div className='comment'>
-                        <i></i>
-                        {post.comments}
+                      <div className='board_list_info_wrap'>
+                        <div className='comment flex-start'>
+                          <ChatBubbleLeftEllipsisIcon className='icon' />
+                          {post.comments}
+                        </div>
+                        <div
+                          className='writer'
+                          onClick={(e) => {
+                            userClick(e);
+                            setUserInfoInDropMenu({
+                              userId: Number(post.user_id),
+                              userNickname: post.user_nickname,
+                            });
+                          }}>
+                          <span className='writer_name'>{post.user_nickname}</span>
+                        </div>
+                        <div className='like flex-start'>
+                          <HeartIcon className='icon' />
+                          {post.likes}
+                        </div>
+                        <div className='view flex-start'>
+                          <EyeIcon className='icon' />
+                          {post.views}
+                        </div>
+                        <div className='date flex-start'>{formatPostDate(post.created_at)}</div>
                       </div>
                     </Link>
                   </li>
-                ))}
+                ))
+              )}
             </ol>
           </div>
         </div>
@@ -119,28 +142,23 @@ export default function Home() {
               <div key={boardName} className='board'>
                 <div className='board_top'>
                   <h2>{boardName}</h2>
-                  <Link href={`/board/${homeData[boardName].url_slug}`}>더 보기</Link>
+                  <Link
+                    href={`/board/${homeData[boardName].url_slug}`}
+                    onClick={() => {
+                      setBoardType("board");
+                    }}>
+                    더 보기
+                  </Link>
                 </div>
                 <ol className='board_list'>
                   {homeData[boardName].posts.map((post: Posts) => (
                     <li key={`${boardName}${post.id}`}>
                       <Link href={`/board/${homeData[boardName].url_slug}/${post.id}`}>
                         <span className='title'>{post.title}</span>
-                        <div className='view'>
-                          <i></i>
-                          {post.likes}
+                        <div className='view flex-start'>
+                          <EyeIcon className='icon' />
+                          {post.views}
                         </div>
-                        <span
-                          className='writer'
-                          onClick={(e) => {
-                            handleWriterClick(e);
-                            setUserInfoInDropMenu({
-                              userId: post.user_id,
-                              userName: post.user_nickname,
-                            });
-                          }}>
-                          {post.user_id}
-                        </span>
                       </Link>
                     </li>
                   ))}

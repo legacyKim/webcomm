@@ -1,29 +1,36 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/AuthContext";
 
-export function useDropDown() {
+export function useDropDown({ messageToUser }: { messageToUser: number | null }) {
   const [writerDrop, setWriterDrop] = useState<boolean>(false);
   const [dropPosition, setDropPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const clickOutSide = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const dropdownEl = document.querySelector(".dropDownMenu");
+
+      if ((dropdownEl && dropdownEl.contains(target)) || messageToUser !== null) {
+        return;
+      }
       setWriterDrop(false);
     };
 
-    const handleScroll = (e: Event) => {
-      console.log("스크롤 감지됨");
+    const scrolling = (e: Event) => {
+      if (messageToUser !== null) return;
       setWriterDrop(false);
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("scroll", handleScroll);
+    document.addEventListener("mousedown", clickOutSide);
+    window.addEventListener("scroll", scrolling);
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("mousedown", clickOutSide);
+      window.removeEventListener("scroll", scrolling);
     };
-  }, []);
+  }, [messageToUser]);
 
-  const handleWriterClick = (e: React.MouseEvent<HTMLElement>) => {
+  const userClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -43,6 +50,6 @@ export function useDropDown() {
     setWriterDrop,
     dropPosition,
     setDropPosition,
-    handleWriterClick,
+    userClick,
   };
 }

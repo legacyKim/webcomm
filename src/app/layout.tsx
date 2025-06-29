@@ -6,10 +6,13 @@ import { AuthProvider } from "./AuthContext";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-import Header from "./components/header";
-import Footer from "./components/footer";
-import Menu from "./components/menu";
-import Right_ad from "./components/right_ad";
+import LayoutWrapper from "./layoutWrapper";
+
+import "@/style/base.css";
+import "@/style/font.css";
+import "@/style/fontello/css/fontello.css";
+import "@/style/fontello/css/animation.css";
+import "@/style/style.common.scss";
 
 export const metadata: Metadata = {
   title: "New web",
@@ -21,11 +24,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const isAdmin = "admin";
 
   const cookieStore = cookies();
-  const token = (await cookieStore).get("authToken")?.value ?? '';
+  const token = (await cookieStore).get("authToken")?.value ?? "";
 
   let authToken = false;
   let username = "";
@@ -37,7 +39,11 @@ export default async function RootLayout({
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-        username: string, id: number; userNick: string; profile: string; userEmail: string;
+        username: string;
+        id: number;
+        userNick: string;
+        profile: string;
+        userEmail: string;
       };
 
       authToken = true;
@@ -46,32 +52,22 @@ export default async function RootLayout({
       userNick = decoded.userNick;
       userProfile = decoded.profile;
       userEmail = decoded.userEmail;
-
     } catch (error) {
       console.error("토큰 검증 실패:", error);
     }
   }
 
   return (
-    <html lang="en">
+    <html lang='en'>
       <body>
-        <AuthProvider username={username} userId={userId} userNick={userNick} userProfile={userProfile} userEmail={userEmail}>
+        <AuthProvider
+          username={username}
+          userId={userId}
+          userNick={userNick}
+          userProfile={userProfile}
+          userEmail={userEmail}>
           <QueryProvider>
-            {!isAdmin ? (
-              <>{children}</>
-            ) : (
-              <>
-                <Header authToken={authToken} username={username} userId={userId} userNick={userNick} userProfile={userProfile} />
-                <div className="page main">
-                  {/* {!isMember && ( */}
-                  <Menu />
-                  {/* )} */}
-                  {children}
-                  <Right_ad />
-                </div>
-                <Footer />
-              </>
-            )}
+            <LayoutWrapper>{children}</LayoutWrapper>
           </QueryProvider>
         </AuthProvider>
       </body>

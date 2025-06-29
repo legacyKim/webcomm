@@ -3,25 +3,44 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { NextResponse } from "next/server";
 
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import s3 from "../../../db/s3";
+import s3 from "@/db/s3";
 
 const bucketName = process.env.AWS_BUCKET_NAME;
-const clounfront = process.env.AWS_CLOUD_FRONT_URL
+const cloudfront = process.env.AWS_CLOUD_FRONT_URL;
 
 export async function GET(req, { params }) {
-    const filename = params.filenName ?? `img-${Date.now()}.png`;
+  const { params } = await context;
+  const fileName = decodeURIComponent(params.fileName);
+  const extension = fileName.split(".").pop()?.toLowerCase() || "bin";
+  const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(extension);
+  const isVideo = ["mp4", "webm", "ogg"].includes(extension);
 
-    const command = new PutObjectCommand({
-        Bucket: bucketName,
-        Key: `posts/${filename}`,
-        ContentType: "image/png",
-    });
+  let folder = "posts/others";
+  let contentType = "application/octet-stream";
 
-    const url = await getSignedUrl(s3, command, { expiresIn: 60 });
-    const fileUrl = `${clounfront}/posts/${filename}`;
+  console.log(fileName);
 
-    return NextResponse.json({
-        url,
-        fileUrl
-    });
+  if (isImage) {
+    folder = "posts/images";
+    contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
+  } else if (isVideo) {
+    folder = "posts/videos";
+    contentType = `video/${extension}`;
+  }
+
+  const key = `${folder}/${fileName}`;
+
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    ContentType: "image/png",
+  });
+
+  const url = await getSignedUrl(s3, command, { expiresIn: 60 });
+  const fileUrl = `${cloudfront}/${key}`;
+
+  return NextResponse.json({
+    url,
+    fileUrl,
+  });
 }

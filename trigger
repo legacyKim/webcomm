@@ -4,19 +4,25 @@
 // 댓글
 
 CREATE OR REPLACE FUNCTION notify_comment_change() RETURNS TRIGGER AS $$
+DECLARE
+  profile_url TEXT;
 BEGIN
+  SELECT profile INTO profile_url FROM members WHERE id = NEW.user_id;
+
   PERFORM pg_notify('comment_events', json_build_object(
-    'id', COALESCE(NEW.id, OLD.id),  -- id가 NULL일 경우 OLD.id를 사용
+    'id', COALESCE(NEW.id, OLD.id),
     'post_id', NEW.post_id,
     'user_id', NEW.user_id,
     'user_nickname', NEW.user_nickname,
+    'profile', profile_url,
     'parent_id', NEW.parent_id,
     'likes', NEW.likes,
-    'content', COALESCE(NEW.content, OLD.content), -- content가 NULL일 경우 OLD.content를 사용
+    'content', COALESCE(NEW.content, OLD.content),
     'created_at', NEW.created_at,
     'updated_at', NEW.updated_at,
     'event', TG_OP
   )::text);
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -24,7 +30,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER comment_trigger
 AFTER INSERT OR DELETE OR UPDATE ON comments
 FOR EACH ROW
-EXECUTE FUNCTION notify_comment_change(); 
+EXECUTE FUNCTION notify_comment_change();
 
 
 // 게시물
@@ -57,11 +63,118 @@ AFTER INSERT OR DELETE OR UPDATE ON posts
 FOR EACH ROW
 EXECUTE FUNCTION notify_post_change();
 
-// posting image table
 
-CREATE TABLE post_images (
-    id SERIAL PRIMARY KEY,
-    post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
-    image_url TEXT,
-    created_at TIMESTAMP DEFAULT NOW()
-);
+// 댓글 달릴 때 알림 저장
+
+CREATE OR REPLACE FUNCTION insert_notification_for_comment()
+RETURNS trigger AS $$
+BEGIN
+  -- 게시글의 작성자에게 댓글 알림 (자기자신은 제외)
+  IF NEW.parent_id IS NULL THEN
+    INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id)
+    SELECT 
+      'comment',
+      NEW.user_id,
+      p.user_id,
+      NEW.post_id,
+      NEW.id
+    FROM posts p
+    WHERE p.id = NEW.post_id AND p.user_id != NEW.user_id;
+  
+  -- 대댓글일 경우 원댓글 작성자에게 알림
+  ELSE
+    INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id)
+    SELECT
+     'reply',
+      NEW.user_id,
+      c.user_id,
+      NEW.post_id,
+      NEW.id
+    FROM comments c
+    WHERE c.id = NEW.parent_id AND c.user_id != NEW.user_id;
+  END IF;
+
+  PERFORM pg_notify('new_notification', 'new_comment');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_notification_for_comment
+AFTER INSERT ON comments
+FOR EACH ROW
+EXECUTE FUNCTION insert_notification_for_comment();
+
+
+// 댓글 공감 알림
+
+CREATE OR REPLACE FUNCTION insert_notification_for_comment_like()
+RETURNS trigger AS $$
+BEGIN
+  IF NEW.action_type = 'like' THEN
+    INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id)
+    SELECT
+      'like',
+      NEW.user_id,
+      c.user_id,
+      c.post_id,
+      c.id
+    FROM comments c
+    WHERE c.id = NEW.comment_id AND c.user_id != NEW.user_id;
+
+    PERFORM pg_notify('new_notification', 'new_comment_like');
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_notification_for_comment_like
+AFTER INSERT ON comment_actions
+FOR EACH ROW
+WHEN (NEW.action_type = 'like')
+EXECUTE FUNCTION insert_notification_for_comment_like();
+
+
+// 게시글에 공감했을 때 알림
+
+CREATE OR REPLACE FUNCTION insert_notification_for_post_like()
+RETURNS trigger AS $$
+BEGIN
+  -- 게시글 작성자에게 알림, 단 자기 자신에게는 알림 생성 안 함
+  IF NEW.action_type = 'like' THEN
+    INSERT INTO notifications (type, sender_id, receiver_id, post_id)
+    SELECT
+      'post_like',
+      NEW.user_id,
+      p.user_id,
+      p.id
+    FROM posts p
+    WHERE p.id = NEW.post_id AND p.user_id != NEW.user_id;
+
+    PERFORM pg_notify('new_notification', 'new_post_like');
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_notification_for_post_like
+AFTER INSERT ON post_actions
+FOR EACH ROW
+WHEN (NEW.action_type = 'like')
+EXECUTE FUNCTION insert_notification_for_post_like();
+
+
+// 쪽지를 받을 때 알림.
+
+CREATE OR REPLACE FUNCTION insert_notification_for_message()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO notifications (type, sender_id, receiver_id)
+  VALUES ('message', NEW.sender_id, NEW.receiver_id);
+  
+  PERFORM pg_notify('new_notification', 'new_message');
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

@@ -1,9 +1,9 @@
 import pool from "./db";
 
 async function setupTriggers() {
-    const client = await pool.connect();
-    try {
-        await client.query(`
+  const client = await pool.connect();
+  try {
+    await client.query(`
             CREATE OR REPLACE FUNCTION notify_comment_change() RETURNS TRIGGER AS $$
             BEGIN
               PERFORM pg_notify('comment_events', json_build_object(
@@ -25,11 +25,11 @@ async function setupTriggers() {
             FOR EACH ROW
             EXECUTE FUNCTION notify_comment_change();
         `);
-    } catch (error) {
-        console.error("트리거 설정 실패:", error);
-    } finally {
-        client.release();
-    }
+  } catch (error) {
+    console.error("트리거 설정 실패:", error);
+  } finally {
+    client.release();
+  }
 }
 
 setupTriggers();
