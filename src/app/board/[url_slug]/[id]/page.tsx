@@ -253,7 +253,7 @@ export default function View() {
       } else {
         alert(res.data.message || "신고에 실패했습니다.");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("신고 실패:", error);
       alert("서버 오류가 발생했습니다.");
     }

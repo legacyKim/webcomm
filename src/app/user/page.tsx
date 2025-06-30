@@ -161,7 +161,7 @@ export default function User() {
     } else {
       setCertifyAgree(false);
     }
-  }, [inputCertifyNumRef.current?.value, certifyNum]);
+  }, [certifyNum, certifyNumCheck]);
 
   // 프로필 이미지
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -227,7 +227,7 @@ export default function User() {
 
       if (response.data.success) {
         alert(response.data.message);
-        // router.push("/login");
+        router.push("/login");
       } else {
         alert(response.data.message);
       }
