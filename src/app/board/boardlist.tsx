@@ -32,8 +32,6 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     [boardType, url_slug, page, limit],
   );
 
-  console.log(url_slug);
-
   const {
     data: postData,
     error,

@@ -1,16 +1,9 @@
-"use client";
-
-import "@/style/base.css";
-import "@/style/font.css";
-import "@/style/fontello/css/fontello.css";
-import "@/style/fontello/css/animation.css";
-
-// import Image from "next/image";
-import "@/style/style.common.scss";
-
+import React from "react";
 import Board from "@/board/board";
 
-export default function Page({ params }: { params: { keyword: string } }) {
+export default function Page({ params }: { params: Promise<{ keyword: string }> }) {
+  const unwrappedParams = React.use(params);
   const boardType = "search";
-  return <Board url_slug={params.keyword} boardType={boardType} />;
+
+  return <Board url_slug={unwrappedParams.keyword} boardType={boardType} />;
 }
