@@ -18,9 +18,9 @@
         "name": "next"
       }
     ],
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["src/app/*"]
     },
     "types": ["next-auth", "react", "node"]
   },
