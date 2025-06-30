@@ -47,3 +47,9 @@ DB 비우고 다시 push
 
 npm install @heroicons/react
 heroicons 아이콘 사용
+
+npm install --save-dev @types/react @types/node
+타입스크립트 의존성 설치
+
+npm install --save-dev eslint
+ESLint 설치하기
