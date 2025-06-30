@@ -9,7 +9,6 @@ export default function BoardConManagePopup({
   boardContent,
   setPopupOpen,
 }: {
-  section: string;
   boardContent: Posts | null;
   setPopupOpen: (value: boolean) => void;
 }) {

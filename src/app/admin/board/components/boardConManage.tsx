@@ -8,7 +8,7 @@ import { fetchPost, fetchBoard } from "@/api/api";
 import { useState } from "react";
 import BoardConManagePopup from "./popup/boardConManagePopup";
 
-export default function BoardConManage({ section }: { section: string }) {
+export default function BoardConManage() {
   const [selectedSlug, setSelectedSlug] = useState<string>("");
 
   const { data: postData, isLoading: postLoading } = useQuery({
@@ -79,7 +79,7 @@ export default function BoardConManage({ section }: { section: string }) {
         </ol>
       </div>
 
-      {popupOpen && <BoardConManagePopup section={section} boardContent={boardContent} setPopupOpen={setPopupOpen} />}
+      {popupOpen && <BoardConManagePopup boardContent={boardContent} setPopupOpen={setPopupOpen} />}
     </div>
   );
 }

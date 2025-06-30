@@ -33,9 +33,9 @@ export default function Board() {
       </menu>
 
       {section === "boardManage" ? (
-        <BoardManage section={section} />
+        <BoardManage />
       ) : section === "boardConManage" ? (
-        <BoardConManage section={section} />
+        <BoardConManage />
       ) : section === "boardStorage" ? (
         <BoardStorage />
       ) : null}
