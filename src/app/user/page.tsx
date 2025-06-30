@@ -259,7 +259,7 @@ export default function User() {
                     ref={inputIdRef}
                     onFocus={() => handleFocus(labelIdRef, boxIdRef)}
                     onBlur={() => {
-                      inputIdRef.current && inputIdRef.current.value === "" && handleBlur(labelIdRef, boxIdRef);
+                      if (inputIdRef.current && inputIdRef.current.value === "") handleBlur(labelIdRef, boxIdRef);
                     }}
                     type='text'
                     id='userid'
@@ -282,7 +282,8 @@ export default function User() {
                     ref={inputNickRef}
                     onFocus={() => handleFocus(labelNickRef, boxNickRef)}
                     onBlur={() => {
-                      inputNickRef.current && inputNickRef.current.value === "" && handleBlur(labelNickRef, boxNickRef);
+                      if (inputNickRef.current && inputNickRef.current.value === "")
+                        handleBlur(labelNickRef, boxNickRef);
                     }}
                     type='text'
                     id='userNickname'
@@ -357,7 +358,7 @@ export default function User() {
                     ref={inputPwRef}
                     onFocus={() => handleFocus(labelPwRef, boxPwRef)}
                     onBlur={() => {
-                      inputPwRef.current && inputPwRef.current.value === "" && handleBlur(labelPwRef, boxPwRef);
+                      if (inputPwRef.current && inputPwRef.current.value === "") handleBlur(labelPwRef, boxPwRef);
                     }}
                     type='password'
                     id='user_password'
@@ -379,7 +380,7 @@ export default function User() {
                     ref={inputPwcRef}
                     onFocus={() => handleFocus(labelPwcRef, boxPwcRef)}
                     onBlur={() => {
-                      inputPwcRef.current && inputPwcRef.current.value === "" && handleBlur(labelPwcRef, boxPwcRef);
+                      if (inputPwcRef.current && inputPwcRef.current.value === "") handleBlur(labelPwcRef, boxPwcRef);
                     }}
                     type='password'
                     id='user_password_check'
@@ -413,8 +414,7 @@ export default function User() {
                     ref={inputEmailRef}
                     onFocus={() => handleFocus(labelEmailRef, boxEmailRef)}
                     onBlur={() => {
-                      inputEmailRef.current &&
-                        inputEmailRef.current.value === "" &&
+                      if (inputEmailRef.current && inputEmailRef.current.value === "")
                         handleBlur(labelEmailRef, boxEmailRef);
                     }}
                     type='text'
@@ -448,8 +448,7 @@ export default function User() {
                     ref={inputCertifyNumRef}
                     onFocus={() => handleFocus(labelCertifyNumRef, boxCertifyNumRef)}
                     onBlur={() => {
-                      inputCertifyNumRef.current &&
-                        inputCertifyNumRef.current.value === "" &&
+                      if (inputCertifyNumRef.current && inputCertifyNumRef.current.value === "")
                         handleBlur(labelCertifyNumRef, boxCertifyNumRef);
                     }}
                     type='text'
