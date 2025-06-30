@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
 
+export const runtime = "nodejs";
+
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const userId = searchParams.get("userId");

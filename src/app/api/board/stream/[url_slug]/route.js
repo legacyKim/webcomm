@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "../../../../db/db";
 
-export const config = {
-  runtime: "edge",
-};
+export const runtime = "nodejs";
 
 let clients = {};
 
