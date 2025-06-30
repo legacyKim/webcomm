@@ -20,7 +20,7 @@ model Board {
 
 model Member {
   id           Int      @id @default(autoincrement())
-  username    String   @unique @db.VarChar(50)
+  username     String   @unique @db.VarChar(50)
   email        String   @unique @db.VarChar(100)
   all_posts    Int      @default(0)
   authority    Int      @default(0)
@@ -53,20 +53,21 @@ model Member {
 }
 
 model Post {
-  id           Int      @id @default(autoincrement())
-  board_id     Int      @default(1)
-  board_name   String   @db.VarChar(255)
-  title        String   @db.VarChar(255)
-  content      String   @db.Text
+  id           Int        @id @default(autoincrement())
+  board_id     Int        @default(1)
+  board_name   String     @db.VarChar(255)
+  title        String     @db.VarChar(255)
+  content      String     @db.Text
   user_id      Int      
-  views        Int      @default(0)
-  likes        Int      @default(0)
-  dislikes     Int      @default(0)
-  reports      Int      @default(0)
-  created_at   DateTime @default(now())
-  updated_at   DateTime @default(now())
-  url_slug     String   @db.VarChar(255)
-  user_nickname String? @db.VarChar(255)
+  views        Int        @default(0)
+  likes        Int        @default(0)
+  dislikes     Int        @default(0)
+  reports      Int        @default(0)
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @default(now())
+  url_slug     String     @db.VarChar(255)
+  user_nickname String?   @db.VarChar(255)
+  is_deleted    Boolean   @default(false)
   
   // Relations
   board        Board    @relation(fields: [board_id], references: [id])
@@ -76,6 +77,8 @@ model Post {
   images       PostImage[]
 
   @@map("posts")
+
+  notifications Notification[]
 }
 
 model Comment {
@@ -100,6 +103,8 @@ model Comment {
   actions      CommentAction[]
 
   @@map("comments")
+
+  notifications Notification[]
 }
 
 model PostAction {
@@ -150,6 +155,7 @@ model BlockedUser {
   blockerId Int  
   blockedId Int   
   createdAt DateTime @default(now()) @map("created_at")
+
   blocker   Member   @relation("BlockedBy", fields: [blockerId], references: [id])
   blocked   Member   @relation("BlockedUsers", fields: [blockedId], references: [id])
 
@@ -163,6 +169,8 @@ model UserReport {
   reportedId Int  
   reason     String
   createdAt  DateTime @default(now()) @map("created_at")
+  type       String   @default("general")
+
   reporter   Member   @relation("ReportedBy", fields: [reporterId], references: [id])
   reported   Member   @relation("ReportedUsers", fields: [reportedId], references: [id])
 
@@ -170,12 +178,14 @@ model UserReport {
 } 
 
 model UserMessage {
-  id          Int      @id @default(autoincrement())
-  sender_id   Int      @map("sender_id")
-  receiver_id Int      @map("receiver_id")
-  content     String
-  isRead      Boolean  @default(false) @map("is_read")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id                      Int       @id @default(autoincrement())
+  sender_id               Int       @map("sender_id")
+  receiver_id             Int       @map("receiver_id")
+  content                 String
+  isRead                  Boolean   @default(false) @map("is_read")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  is_deleted_by_sender    Boolean   @default(false)
+  is_deleted_by_receiver  Boolean   @default(false)
 
   sender      Member   @relation("SentMessages", fields: [sender_id], references: [id])
   receiver    Member   @relation("ReceivedMessages", fields: [receiver_id], references: [id])
