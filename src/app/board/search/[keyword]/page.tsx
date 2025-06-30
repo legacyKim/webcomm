@@ -10,7 +10,7 @@ import "@/style/style.common.scss";
 
 import Board from "@/board/board";
 
-export default async function Page({ params }: { params: { keyword: string } }) {
+export default function Page({ params }: { params: { keyword: string } }) {
   const boardType = "search";
   return <Board url_slug={params.keyword} boardType={boardType} />;
 }

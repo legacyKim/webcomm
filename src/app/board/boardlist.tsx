@@ -14,6 +14,7 @@ import formatPostDate from "app/components/formatDate";
 import Pagination from "app/components/pagination";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import { url } from "inspector";
 
 interface BoardlistProps {
   url_slug: string | null;
@@ -31,6 +32,8 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     () => ["eachBoardData", boardType, url_slug, page, limit],
     [boardType, url_slug, page, limit],
   );
+
+  console.log(url_slug);
 
   const {
     data: postData,
@@ -129,7 +132,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
         {!isLoading && postData?.posts.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
-              <Link href={`/board/${url_slug}/${b.id}`}>
+              <Link href={`/board/${boardType === "popular" ? b.url_slug : url_slug}/${b.id}`}>
                 {boardType !== "popular" && <span className='num'>{b.post_number}</span>}
                 <span className='title'>
                   {boardType === "popular" && <span className='category'>{b.url_slug}</span>}

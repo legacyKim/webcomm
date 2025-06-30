@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
 import Suggestion from "@tiptap/suggestion";
 
-export default Mention = Extension.create({
+const Mention = Extension.create({
   name: "mention",
 
   addOptions() {
@@ -70,3 +70,5 @@ export default Mention = Extension.create({
     };
   },
 });
+
+export default Mention;

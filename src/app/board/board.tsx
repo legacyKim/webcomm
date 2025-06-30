@@ -23,6 +23,8 @@ export default function Board({ url_slug, boardType }: { url_slug: string; board
     setBoardType(boardType);
   }, [boardType]);
 
+  console.log(url_slug);
+
   const [limit, setLimit] = useState(10);
 
   return (
