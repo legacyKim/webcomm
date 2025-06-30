@@ -28,8 +28,8 @@
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.0",
     "pg": "^8.13.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "sass": "^1.85.0"
   },
   "devDependencies": {
