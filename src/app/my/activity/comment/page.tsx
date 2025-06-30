@@ -8,8 +8,8 @@ import { useAuth } from "@/AuthContext";
 import MyHeader from "@/my/myHeader";
 import MyActivity from "../myActivity";
 
-import formatPostDate from "app/components/formatDate";
-import Pagination from "app/components/pagination";
+import formatPostDate from "@/components/formatDate";
+import Pagination from "@/components/pagination";
 
 interface comment {
   id: number;

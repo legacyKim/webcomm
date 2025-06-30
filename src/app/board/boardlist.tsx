@@ -8,10 +8,10 @@ import { useAuth } from "@/AuthContext";
 
 import Link from "next/link";
 
-import { useDropDown } from "app/func/hook/useDropDown";
-import DropDownMenu from "app/components/dropDownMenu";
-import formatPostDate from "app/components/formatDate";
-import Pagination from "app/components/pagination";
+import { useDropDown } from "@/func/hook/useDropDown";
+import DropDownMenu from "@/components/dropDownMenu";
+import formatPostDate from "@/components/formatDate";
+import Pagination from "@/components/pagination";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
 

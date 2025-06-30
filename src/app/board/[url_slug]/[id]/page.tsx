@@ -8,9 +8,9 @@ import Link from "next/link";
 
 import Boardlist from "@/board/boardlist";
 
-import { useAuth } from "app/AuthContext";
-import { useDropDown } from "app/func/hook/useDropDown";
-import DropDownMenu from "app/components/dropDownMenu";
+import { useAuth } from "@/AuthContext";
+import { useDropDown } from "@/func/hook/useDropDown";
+import DropDownMenu from "@/components/dropDownMenu";
 import TiptapViewer from "@/components/tiptapViewer";
 
 import CommentEditor from "./commentEditor";
