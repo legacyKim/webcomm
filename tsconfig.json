@@ -22,7 +22,7 @@
     "paths": {
       "@/*": ["./app/*"]
     },
-    "types": ["next-auth"]
+    "types": ["next-auth", "react", "node"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/comment/stream.js"],
   "exclude": ["node_modules"]
