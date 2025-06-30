@@ -21,7 +21,8 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./app/*"]
-    }
+    },
+    "types": ["next-auth"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/app/api/comment/stream.js"],
   "exclude": ["node_modules"]

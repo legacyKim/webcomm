@@ -1,15 +1,16 @@
 1. 쪽지함에서 쪽지 크게 보기 ?
 2. 에러 페이지
-
 3. message 박스 금지어 설정.
 4. 관리자 페이지 신고수? 같은 것들?
 5. 관리자 페이지 토스트 적용해 볼까...
 6. right_ad 에 따른 너비 값을 관리자페이지에서 유동적으로 적용 + 게시판 제목의 max-width 값도 비례해서 변경.
 
 << 개념정리 >>
+
 1. queryKey, queryClient - boardList.tsx
-2. axios 요청 방식 정리.
-3. db pool 및 prisma 에 대해 알아보기
+2. axios 요청 방식
+3. db pool 및 prisma
+4. nextauth 폴더 내의 코드 분석 + next-auth.d.ts 파일 참조.
 
 
 << 관리자는 일괄적으로 처리 >>
