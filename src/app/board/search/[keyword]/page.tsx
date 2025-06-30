@@ -8,13 +8,15 @@ import "@/style/fontello/css/animation.css";
 // import Image from "next/image";
 import "@/style/style.common.scss";
 
-interface Board {
-  board_name: string;
-  posts: Array<{ title: string; content: string }>;
-}
+type PageProps = {
+  params: {
+    keyword: string;
+  };
+};
+
 import Board from "@/board/board";
 
-export default async function Page({ params }: { params: { keyword: string } }) {
+export default async function Page({ params }: PageProps) {
   const boardType = "search";
   return <Board url_slug={params.keyword} boardType={boardType} />;
 }
