@@ -11,7 +11,7 @@ import Editor from "../Editor";
 import { useAuth } from "@/AuthContext";
 
 import { Posts } from "@/type/type";
-import { ImageWithBlob } from "@/type/type";
+import { ImageWithBlob, VideoWithBlob } from "@/type/type";
 
 export default function Write() {
   const { isUserId, isUsername, isUserNick } = useAuth();
@@ -24,7 +24,9 @@ export default function Write() {
   const writeTitle = useRef<HTMLInputElement>(null);
   const [editorContent, setEditorContent] = useState<string>("");
 
-  const [imageFiles, setImageFiles] = useState<ImageWithBlob[]>([]);
+  const [, setImageFiles] = useState<ImageWithBlob[]>([]);
+  const [, setVideoFiles] = useState<VideoWithBlob[]>([]);
+
   const [boardInfo, setBoardInfo] = useState<{ board_name: string; url_slug: string }>({
     board_name: "",
     url_slug: "",
@@ -158,8 +160,8 @@ export default function Write() {
         <Editor
           editorContent={editorContent}
           setEditorContent={setEditorContent}
-          imageFiles={imageFiles}
           setImageFiles={setImageFiles}
+          setVideoFiles={setVideoFiles}
         />
 
         <div className='btn_wrap'>
