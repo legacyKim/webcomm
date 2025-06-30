@@ -8,15 +8,9 @@ import "@/style/fontello/css/animation.css";
 // import Image from "next/image";
 import "@/style/style.common.scss";
 
-type PageProps = {
-  params: {
-    keyword: string;
-  };
-};
-
 import Board from "@/board/board";
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: { keyword: string } }) {
   const boardType = "search";
   return <Board url_slug={params.keyword} boardType={boardType} />;
 }
