@@ -9,7 +9,11 @@ interface DecodedToken {
   email: string;
 }
 
-export function middleware(req: NextRequest) {
+interface CustomNextRequest extends NextRequest {
+  username?: string;
+}
+
+export function middleware(req: CustomNextRequest) {
   // const hostname = req.nextUrl.hostname; // 현재 요청된 도메인 (예: customer1.example.com)
 
   // "admin.customer1.example.com" 패턴 감지
@@ -38,7 +42,7 @@ export function middleware(req: NextRequest) {
     const userProfile = decoded.profile;
     const userEmail = decoded.email;
 
-    (req as any).username = username;
+    req.username = username;
 
     return NextResponse.json({
       authenticated: true,
@@ -49,6 +53,7 @@ export function middleware(req: NextRequest) {
       userEmail: userEmail,
     });
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ success: false, message: "유효하지 않은 토큰입니다." }, { status: 401 });
   }
 

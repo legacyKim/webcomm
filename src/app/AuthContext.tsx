@@ -1,7 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { fetchToken } from "./api/api";
 import { AuthContextType } from "./type/type";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

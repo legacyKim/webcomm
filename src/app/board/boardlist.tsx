@@ -127,7 +127,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
         </li>
 
         {!isLoading && postData?.posts.length > 0 ? (
-          postData?.posts.map((b: Posts, i: number) => (
+          postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link href={`/board/${url_slug}/${b.id}`}>
                 {boardType !== "popular" && <span className='num'>{b.post_number}</span>}

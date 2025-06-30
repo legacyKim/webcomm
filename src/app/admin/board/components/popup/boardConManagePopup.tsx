@@ -6,7 +6,6 @@ import formatPostDate from "@/components/formatDate";
 import TiptapViewer from "@/components/tiptapViewer";
 
 export default function BoardConManagePopup({
-  section,
   boardContent,
   setPopupOpen,
 }: {

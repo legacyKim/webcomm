@@ -15,7 +15,7 @@ export default function BoardConManage({ section }: { section: string }) {
     queryKey: ["postData", selectedSlug],
     queryFn: () => fetchPost(selectedSlug),
   });
-  const { data: boardData, isLoading } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
+  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
 
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
   const [boardContent, setBoardContent] = useState<Posts | null>(null);

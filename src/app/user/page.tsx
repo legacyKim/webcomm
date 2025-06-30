@@ -54,11 +54,11 @@ export default function User() {
       return;
     }
 
-    // if (userid.toLowerCase().includes("admin")) {
-    //   alert('"admin"이 포함된 아이디는 사용할 수 없습니다.');
-    //   setUserid("");
-    //   return;
-    // }
+    if (userid.toLowerCase().includes("admin")) {
+      alert('"admin"이 포함된 아이디는 사용할 수 없습니다.');
+      setUserid("");
+      return;
+    }
 
     if (!idRegex.test(userid)) {
       alert("아이디는 4~16자의 영문 소문자 및 숫자로만 입력할 수 있습니다.");
@@ -126,8 +126,7 @@ export default function User() {
   const [userEmail, setUserEmail] = useState<string>("");
   const [certifyNum, setCertifyNum] = useState<string>("");
   const [certifyNumCheck, setCertifyNumCheck] = useState<string>("");
-  // const [certifyAgree, setCertifyAgree] = useState<boolean>(false);
-  const [certifyAgree, setCertifyAgree] = useState<boolean>(true);
+  const [certifyAgree, setCertifyAgree] = useState<boolean>(false);
 
   const emailCheck = async () => {
     if (!userEmail) {
@@ -156,13 +155,13 @@ export default function User() {
     }
   };
 
-  // useEffect(() => {
-  //   if (inputCertifyNumRef.current && inputCertifyNumRef.current.value === certifyNumCheck && certifyNumCheck !== "") {
-  //     setCertifyAgree(true);
-  //   } else {
-  //     setCertifyAgree(false);
-  //   }
-  // }, [inputCertifyNumRef.current?.value, certifyNum]);
+  useEffect(() => {
+    if (inputCertifyNumRef.current && inputCertifyNumRef.current.value === certifyNumCheck && certifyNumCheck !== "") {
+      setCertifyAgree(true);
+    } else {
+      setCertifyAgree(false);
+    }
+  }, [inputCertifyNumRef.current?.value, certifyNum]);
 
   // 프로필 이미지
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -202,11 +201,11 @@ export default function User() {
       return;
     }
 
-    // if (!certifyNumCheck) {
-    //   alert("이메일을 인증해 주세요.");
-    //   inputCertifyNumRef.current?.focus();
-    //   return;
-    // }
+    if (!certifyNumCheck) {
+      alert("이메일을 인증해 주세요.");
+      inputCertifyNumRef.current?.focus();
+      return;
+    }
 
     const formData = new FormData();
 
@@ -469,13 +468,19 @@ export default function User() {
                     if (!idDupliCheck) {
                       e.preventDefault();
                       alert("아이디 중복을 확인해 주세요.");
-                    } else if (userPassword === "" || userPasswordCheck === "") {
+                      return;
+                    }
+                    if (userPassword === "" || userPasswordCheck === "") {
                       e.preventDefault();
                       alert("비밀번호가 올바르지 않습니다.");
-                    } else if (!certifyAgree) {
+                      return;
+                    }
+                    if (!certifyAgree) {
                       e.preventDefault();
                       alert("인증번호를 확인해 주세요.");
+                      return;
                     }
+                    return;
                   }}
                   type='submit'
                   className={`btn ${

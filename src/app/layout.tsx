@@ -24,12 +24,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isAdmin = "admin";
-
   const cookieStore = cookies();
   const token = (await cookieStore).get("authToken")?.value ?? "";
 
-  let authToken = false;
   let username = "";
   let userId = 0;
   let userNick = "";
@@ -46,7 +43,6 @@ export default async function RootLayout({
         userEmail: string;
       };
 
-      authToken = true;
       username = decoded.username;
       userId = decoded.id;
       userNick = decoded.userNick;

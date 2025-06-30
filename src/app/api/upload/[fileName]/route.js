@@ -8,7 +8,7 @@ import s3 from "@/db/s3";
 const bucketName = process.env.AWS_BUCKET_NAME;
 const cloudfront = process.env.AWS_CLOUD_FRONT_URL;
 
-export async function GET(req, { params }) {
+export async function GET() {
   const fileName = decodeURIComponent(params.fileName);
   const extension = fileName.split(".").pop()?.toLowerCase() || "bin";
   const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(extension);
@@ -16,8 +16,6 @@ export async function GET(req, { params }) {
 
   let folder = "posts/others";
   let contentType = "application/octet-stream";
-
-  console.log(fileName);
 
   if (isImage) {
     folder = "posts/images";
@@ -32,7 +30,7 @@ export async function GET(req, { params }) {
   const command = new PutObjectCommand({
     Bucket: bucketName,
     Key: key,
-    ContentType: "image/png",
+    ContentType: contentType,
   });
 
   const url = await getSignedUrl(s3, command, { expiresIn: 60 });

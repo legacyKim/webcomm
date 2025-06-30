@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Mention from "@tiptap/extension-mention";
+// import Mention from "@tiptap/extension-mention";
+import Mention from "./mention";
 
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";

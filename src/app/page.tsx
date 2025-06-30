@@ -20,7 +20,7 @@ import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react
 export default function Home() {
   const { isUserId, setBoardType, messageToUser } = useAuth();
 
-  const { data: homeData, isLoading } = useQuery({
+  const { data: homeData } = useQuery({
     queryKey: ["home", isUserId],
     queryFn: () => fetchHome(isUserId),
   });

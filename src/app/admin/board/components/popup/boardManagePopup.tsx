@@ -189,7 +189,9 @@ export default function BoardManagePopup({
           ) : (
             <button
               onClick={() => {
-                id && seq && putBoard({ id, seq, boardName, urlSlug });
+                if (id && seq) {
+                  putBoard({ id, seq, boardName, urlSlug });
+                }
               }}>
               저장
             </button>

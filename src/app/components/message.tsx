@@ -28,9 +28,11 @@ export default function Message({
         message,
         from: messageFromUser,
       });
-      alert("쪽지를 보냈습니다!");
-      setMessage("");
-      setMessageToUser(null);
+      if (res.data.success) {
+        alert(res.data.message);
+        setMessage("");
+        setMessageToUser(null);
+      }
     } catch (err) {
       console.error(err);
       alert("쪽지 전송에 실패했습니다.");

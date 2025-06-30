@@ -1,11 +1,11 @@
 "use client";
 import axios from "axios";
 
-import { useState, useRef, useEffect, FormEvent } from "react";
+import { useState, useRef, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-import "../style/style.common.scss";
-import styles from "../style/Login.module.scss";
+import "@/style/style.common.scss";
+import styles from "@/style/Login.module.scss";
 
 import { handleBlur, handleFocus } from "../func/inputActive";
 // 생략된 import, useState 등 동일
@@ -15,7 +15,6 @@ export default function Info() {
 
   const [userEmail, setUserEmail] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
 
   const boxEmailRef = useRef<HTMLDivElement | null>(null);
   const inputEmailRef = useRef<HTMLInputElement | null>(null);
@@ -34,12 +33,11 @@ export default function Info() {
     try {
       const response = await axios.post("/api/find", { userEmail });
 
-      setMessage(response.data.message);
-      alert("이메일을 확인해 주세요.");
+      alert(response.data.message);
       router.push("/login");
-    } catch (err: any) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
       } else {
         setError("알 수 없는 오류가 발생했습니다.");
       }
@@ -71,9 +69,9 @@ export default function Info() {
                     ref={inputEmailRef}
                     onFocus={() => handleFocus(labelEmailRef, boxEmailRef)}
                     onBlur={() => {
-                      inputEmailRef.current &&
-                        inputEmailRef.current.value === "" &&
+                      if (inputEmailRef.current && inputEmailRef.current.value === "") {
                         handleBlur(labelEmailRef, boxEmailRef);
+                      }
                     }}
                     type='text'
                     id='user_email'

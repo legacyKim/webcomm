@@ -1,5 +1,14 @@
 import { Node, mergeAttributes, CommandProps } from "@tiptap/core";
 
+interface option {
+  src: string;
+  width?: string;
+  height?: string;
+  frameborder?: string;
+  allow?: string;
+  allowfullscreen?: string;
+}
+
 export const LinkUrl = Node.create({
   name: "iframe",
   group: "block",
@@ -26,17 +35,10 @@ export const LinkUrl = Node.create({
     return ["iframe", mergeAttributes(HTMLAttributes)];
   },
 
-  addCommands(): Partial<Record<string, (options: any) => (props: CommandProps) => boolean>> {
+  addCommands(): Partial<Record<string, (options: option) => (props: CommandProps) => boolean>> {
     return {
       setIframe:
-        (options: {
-          src: string;
-          width?: string;
-          height?: string;
-          frameborder?: string;
-          allow?: string;
-          allowfullscreen?: string;
-        }) =>
+        (options) =>
         ({ commands }: CommandProps) => {
           return commands.insertContent({
             type: this.name,

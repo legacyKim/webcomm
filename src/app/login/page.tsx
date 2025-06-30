@@ -164,7 +164,9 @@ export default function LoginPage() {
                   ref={inputIdRef}
                   onFocus={() => handleFocus(labelIdRef, boxIdRef)}
                   onBlur={() => {
-                    inputIdRef.current && inputIdRef.current.value === "" && handleBlur(labelIdRef, boxIdRef);
+                    if (inputIdRef.current && inputIdRef.current.value === "") {
+                      handleBlur(labelIdRef, boxIdRef);
+                    }
                   }}
                   type='text'
                   id='userid'
@@ -185,8 +187,10 @@ export default function LoginPage() {
                   ref={inputPwRef}
                   onFocus={() => handleFocus(labelPwRef, boxPwRef)}
                   onBlur={() => {
-                    inputPwRef.current && inputPwRef.current.value === "" && handleBlur(labelPwRef, boxPwRef);
-                    setCapsLockOn(false);
+                    if (inputPwRef.current && inputPwRef.current.value === "") {
+                      handleBlur(labelPwRef, boxPwRef);
+                      setCapsLockOn(false);
+                    }
                   }}
                   onKeyDown={handleKeyDown}
                   onKeyUp={handleKeyUp}

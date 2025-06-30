@@ -19,7 +19,7 @@ export default function Write() {
 
   const { id } = useParams();
 
-  const { data: boardData, isLoading } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
+  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
 
   const writeTitle = useRef<HTMLInputElement>(null);
   const [editorContent, setEditorContent] = useState<string>("");

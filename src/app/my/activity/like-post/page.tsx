@@ -11,6 +11,16 @@ import MyActivity from "../myActivity";
 import formatPostDate from "app/components/formatDate";
 import Pagination from "app/components/pagination";
 
+interface post {
+  id: number;
+  url_slug: string;
+  title: string;
+  comments: string;
+  likes: number;
+  views: number;
+  created_at: string;
+}
+
 export default function MyLike() {
   const { isUserId } = useAuth();
   const [page, setPage] = useState<number>(1);
@@ -35,7 +45,7 @@ export default function MyLike() {
                 {isLoading ? (
                   <div>잠시만 기다려주세요.</div>
                 ) : likePostBoards && likePostBoards.posts.length > 0 ? (
-                  likePostBoards.posts.map((post: any, index: number) => (
+                  likePostBoards.posts.map((post: post, index: number) => (
                     <li key={post.id}>
                       <a href={`/board/${post.url_slug}/${post.id}`}>
                         <span className='num'>{index + 1}</span>

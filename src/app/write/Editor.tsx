@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Image } from "@tiptap/extension-image";
@@ -8,7 +8,7 @@ import { Video } from "@/extensions/video";
 import { LinkUrl } from "@/extensions/linkUrl";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
 
-import { PhotoIcon, PaperClipIcon, VideoCameraIcon, ShareIcon } from "@heroicons/react/24/outline";
+import { PhotoIcon, PaperClipIcon, VideoCameraIcon } from "@heroicons/react/24/outline";
 
 const Editor = ({
   editorContent,

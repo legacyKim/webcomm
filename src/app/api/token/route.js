@@ -26,6 +26,7 @@ export async function GET(req) {
       userEmail: userEmail,
     });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ authenticated: false });
   }
 }

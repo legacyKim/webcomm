@@ -1,6 +1,6 @@
 "use client";
 
-import { Board, Posts } from "@/type/type";
+import { Board } from "@/type/type";
 
 import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
@@ -8,7 +8,7 @@ import { fetchBoard } from "@/api/api";
 import { useState } from "react";
 import BoardManagePopup from "./popup/boardManagePopup";
 
-export default function BoardManage({ section }: { section: string }) {
+export default function BoardManage() {
   const { data: boardData, isLoading } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
 
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
@@ -46,7 +46,7 @@ export default function BoardManage({ section }: { section: string }) {
             <span>관리</span>
           </li>
           {!isLoading &&
-            boardData.boards.map((b: Board, i: number) => (
+            boardData.boards.map((b: Board) => (
               <li key={b.id}>
                 <span>{b.seq}</span>
                 <span>{b.board_name}</span>

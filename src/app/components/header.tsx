@@ -29,7 +29,7 @@ export default function Header() {
   const pathname = usePathname();
 
   const router = useRouter();
-  const { loginStatus, setLoginStatus, isUsername, setIsUsername, isUserId, isUserNick, isUserProfile } = useAuth();
+  const { loginStatus, setLoginStatus, setIsUsername, isUserId, isUserNick, isUserProfile } = useAuth();
 
   const logout = async () => {
     const response = await axios.post("/api/logout");

@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "../api/api";
 
 export default function Menu() {
-  const { data: boardData, isLoading } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
+  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
 
   const pathname = usePathname();
   const { setBoardType } = useAuth();

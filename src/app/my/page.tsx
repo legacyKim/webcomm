@@ -1,34 +1,23 @@
 "use client";
 
 import axios from "axios";
-import "../style/style.common.scss";
+import "@/style/style.common.scss";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-import { useAuth } from "../AuthContext";
+import { useAuth } from "@/AuthContext";
 import MyHeader from "./myHeader";
 
 export default function Mypage() {
   const router = useRouter();
 
-  const {
-    isUsername,
-    setIsUsername,
-    isUserId,
-    setIsUserId,
-    isUserNick,
-    setIsUserNick,
-    isUserProfile,
-    setIsUserProfile,
-    isUserEmail,
-    setIsUserEmail,
-  } = useAuth();
+  const { isUsername, isUserId, isUserNick, isUserProfile, isUserEmail } = useAuth();
 
   const [newNick, setNewNick] = useState<string>(isUserNick || "");
 
   const [newPassword, setNewPassword] = useState<string>("");
-  const [newPasswordCon, setNewPasswordCon] = useState<string>("");
+  const [, setNewPasswordCon] = useState<string>("");
   const [userPasswordNotice, setUserPasswordNotice] = useState<string>(
     "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.",
   );
@@ -64,7 +53,7 @@ export default function Mypage() {
   const [certifyNum, setCertifyNum] = useState<string>("");
 
   const [certifyNumCheck, setCertifyNumCheck] = useState<string>("");
-  const [certifyAgree, setCertifyAgree] = useState<boolean>(false);
+  const [, setCertifyAgree] = useState<boolean>(false);
 
   const emailCheck = async () => {
     if (!userEmail) {

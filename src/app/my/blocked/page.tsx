@@ -2,7 +2,6 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
 import MyHeader from "../myHeader";
 import { useAuth } from "@/AuthContext";
 
@@ -18,11 +17,7 @@ export default function MyBlocked() {
 
   const { isUserId } = useAuth();
 
-  const {
-    data: blockedUsers = [],
-    isLoading,
-    isError,
-  } = useQuery<BlockedUser[]>({
+  const { data: blockedUsers = [], isLoading } = useQuery<BlockedUser[]>({
     queryKey: ["blockedUsers", isUserId],
     queryFn: async () => {
       const res = await axios.get("/api/user/block", {

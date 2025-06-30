@@ -25,11 +25,7 @@ export default function MyMessage() {
 
   const queryClient = useQueryClient();
 
-  const {
-    data = { received: [], sent: [] },
-    isLoading,
-    isError,
-  } = useQuery<{ received: Message[]; sent: Message[] }>({
+  const { data = { received: [], sent: [] }, isLoading } = useQuery<{ received: Message[]; sent: Message[] }>({
     queryKey: ["messages", isUserId],
     queryFn: async () => {
       const res = await axios.get("/api/message/", {

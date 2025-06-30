@@ -2,13 +2,11 @@
 
 import axios from "axios";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 import Boardlist from "@/board/boardlist";
-
-import { fetchToken } from "app/api/api";
 
 import { useAuth } from "app/AuthContext";
 import { useDropDown } from "app/func/hook/useDropDown";
@@ -87,8 +85,6 @@ export default function View() {
     id: number;
     recomment_id: number;
   } | null>(null);
-
-  const [commentOption, setCommentOption] = useState<any>(null);
 
   // 컨텐츠 또는 댓글 패치
   useEffect(() => {
@@ -265,6 +261,7 @@ export default function View() {
 
   // 게시물 스크랩.
   const postScrap = async () => {
+    alert("준비 중 입니다!");
     if (isUserId === 0) {
       const isConfirmed = confirm("로그인이 필요합니다.");
       if (isConfirmed) {
@@ -432,8 +429,6 @@ export default function View() {
 
   const mentionUsers = extractMentionUsers();
 
-  console.log(mentionUsers);
-
   if (!viewPost) return <div>Loading...</div>;
 
   return (
@@ -520,7 +515,13 @@ export default function View() {
               <FlagIcon className='icon' />
               신고
             </button>
-            {/* <button type='button' onClick={() => { postScrap(); }}>스크랩</button> */}
+            <button
+              type='button'
+              onClick={() => {
+                postScrap();
+              }}>
+              스크랩
+            </button>
             <button
               className='like_btn'
               type='button'

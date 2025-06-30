@@ -3,24 +3,9 @@
 import Link from "next/link";
 
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 
 export default function MyActivity() {
   const pathname = usePathname();
-
-  const [myActiveMenu, setMyActiveMenu] = useState<string>("정보");
-
-  useEffect(() => {
-    if (pathname === "/my/activity/post") {
-      setMyActiveMenu("내가 쓴 글");
-    } else if (pathname === "/my/activity/comment") {
-      setMyActiveMenu("내가 쓴 댓글");
-    } else if (pathname === "/my/activity/like-post") {
-      setMyActiveMenu("공감한 글");
-    } else if (pathname === "/my/activity/like-comment") {
-      setMyActiveMenu("공감한 댓글");
-    }
-  }, [pathname]);
 
   return (
     <>

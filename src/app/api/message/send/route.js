@@ -20,7 +20,14 @@ export async function POST(req) {
 
     const result = await client.query(insertQuery, [from, parseInt(to, 10), message]);
 
-    return NextResponse.json(result.rows[0], { status: 200 });
+    return NextResponse.json(
+      {
+        ...result.rows[0],
+        success: true,
+        message: "쪽지를 보냈습니다!",
+      },
+      { status: 200 },
+    );
   } catch (err) {
     console.error("쪽지 전송 오류:", err);
     return NextResponse.json({ error: "쪽지 전송 중 오류가 발생했습니다." }, { status: 500 });

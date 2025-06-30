@@ -21,7 +21,7 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
   const router = useRouter();
   const [isBlocked, setIsBlocked] = useState(false);
 
-  const { isUserId, isUsername, setBoardType, messageToUser, setMessageToUser } = useAuth();
+  const { isUserId, messageToUser, setMessageToUser } = useAuth();
 
   // 작성글 검색
   const searchPosts = () => {

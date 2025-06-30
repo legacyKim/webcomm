@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import "../style/style.common.scss";
-import styles from "../style/Login.module.scss";
+import "@/style/style.common.scss";
+import styles from "@/style/Login.module.scss";
 
 export default function Member() {
   const [agree01, setAgree01] = useState(false);
@@ -20,10 +20,11 @@ export default function Member() {
             <h4 className={styles.membership_tit}>회원가입약관</h4>
             <div className={styles.membership_box}>
               <p className={styles.membership_contents}>
-                이용자는 다음 행위를 하여서는 안됩니다. 신청 또는 변경시 허위 내용의 등록 타인의 정보 도용 "몰"에 게시된
-                정보의 변경 "몰"이 정한 정보 이외의 정보(컴퓨터 프로그램 등) 등의 송신 또는 게시 "몰" 기타 제3자의
-                저작권 등 지적재산권에 대한 침해 "몰" 기타 제3자의 명예를 손상시키거나 업무를 방해하는 행위 외설 또는
-                폭력적인 메시지, 화상, 음성, 기타 공서양속에 반하는 정보를 몰에 공개 또는 게시하는 행위
+                이용자는 다음 행위를 하여서는 안됩니다. 신청 또는 변경시 허위 내용의 등록 타인의 정보 도용
+                &quot;몰&quot;에 게시된 정보의 변경 &quot;몰&quot;이 정한 정보 이외의 정보(컴퓨터 프로그램 등) 등의 송신
+                또는 게시 &quot;몰&quot; 기타 제3자의 저작권 등 지적재산권에 대한 침해 &quot;몰&quot; 기타 제3자의
+                명예를 손상시키거나 업무를 방해하는 행위 외설 또는 폭력적인 메시지, 화상, 음성, 기타 공서양속에 반하는
+                정보를 몰에 공개 또는 게시하는 행위
               </p>
             </div>
 
@@ -66,10 +67,11 @@ export default function Member() {
             <h4 className={styles.membership_tit}>개인정보처리방침안내</h4>
             <div className={styles.membership_box}>
               <p className={styles.membership_contents}>
-                이용자는 다음 행위를 하여서는 안됩니다. 신청 또는 변경시 허위 내용의 등록 타인의 정보 도용 "몰"에 게시된
-                정보의 변경 "몰"이 정한 정보 이외의 정보(컴퓨터 프로그램 등) 등의 송신 또는 게시 "몰" 기타 제3자의
-                저작권 등 지적재산권에 대한 침해 "몰" 기타 제3자의 명예를 손상시키거나 업무를 방해하는 행위 외설 또는
-                폭력적인 메시지, 화상, 음성, 기타 공서양속에 반하는 정보를 몰에 공개 또는 게시하는 행위
+                이용자는 다음 행위를 하여서는 안됩니다. 신청 또는 변경시 허위 내용의 등록 타인의 정보 도용
+                &quot;몰&quot;에 게시된 정보의 변경 &quot;몰&quot;이 정한 정보 이외의 정보(컴퓨터 프로그램 등) 등의 송신
+                또는 게시 &quot;몰&quot; 기타 제3자의 저작권 등 지적재산권에 대한 침해 &quot;몰&quot; 기타 제3자의
+                명예를 손상시키거나 업무를 방해하는 행위 외설 또는 폭력적인 메시지, 화상, 음성, 기타 공서양속에 반하는
+                정보를 몰에 공개 또는 게시하는 행위
               </p>
             </div>
 

@@ -1,4 +1,4 @@
-import { Node, CommandProps, RawCommands } from "@tiptap/core";
+import { Node, CommandProps } from "@tiptap/core";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {

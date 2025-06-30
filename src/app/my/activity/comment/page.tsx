@@ -11,6 +11,16 @@ import MyActivity from "../myActivity";
 import formatPostDate from "app/components/formatDate";
 import Pagination from "app/components/pagination";
 
+interface comment {
+  id: number;
+  url_slug: string;
+  title: string;
+  comments: string;
+  likes: number;
+  views: number;
+  created_at: string;
+}
+
 export default function MyComment() {
   const { isUserId } = useAuth();
   const [page, setPage] = useState<number>(1);
@@ -35,7 +45,7 @@ export default function MyComment() {
                 {isLoading ? (
                   <div>잠시만 기다려주세요.</div>
                 ) : commentBoards && commentBoards.posts.length > 0 ? (
-                  commentBoards.posts.map((comment: any, index: number) => (
+                  commentBoards.posts.map((comment: comment, index: number) => (
                     <li key={comment.id}>
                       <a href={`/board/${comment.url_slug}/${comment.id}`}>
                         <span className='num'>{index + 1}</span>

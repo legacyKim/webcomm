@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/AuthContext";
 
 export function useDropDown({ messageToUser }: { messageToUser: number | null }) {
   const [writerDrop, setWriterDrop] = useState<boolean>(false);
@@ -16,7 +15,7 @@ export function useDropDown({ messageToUser }: { messageToUser: number | null })
       setWriterDrop(false);
     };
 
-    const scrolling = (e: Event) => {
+    const scrolling = () => {
       if (messageToUser !== null) return;
       setWriterDrop(false);
     };
