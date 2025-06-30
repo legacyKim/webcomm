@@ -21,6 +21,8 @@
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
     "@types/jest": "^30.0.0",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.0.11",
     "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "dotenv": "^16.4.7",
@@ -32,14 +34,12 @@
     "pg": "^8.13.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sass": "^1.85.0",
-    "@types/react": "^18.3.23",
-    "@types/react-dom": "^18.0.11"
+    "sass": "^1.85.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/js-cookie": "^3.0.6",
-    "@types/jsonwebtoken": "^9.0.9",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.5.1",
     "eslint": "^9.30.0",
     "eslint-config-next": "15.1.7",

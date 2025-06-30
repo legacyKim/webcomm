@@ -54,4 +54,5 @@ npm install --save-dev @types/react @types/node
 npm install --save-dev eslint
 ESLint 설치하기
 
-vercel
+npm install --save-dev @types/jsonwebtoken
+TypeScript에서 사용할 경우 타입 정의 파일
