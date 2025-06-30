@@ -28,6 +28,7 @@
     "dotenv": "^16.4.7",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "@types/jsonwebtoken": "^9.0.10",
     "next": "^13.4.10",
     "next-auth": "^4.24.11",
     "nodemailer": "^6.10.0",
@@ -39,7 +40,6 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/js-cookie": "^3.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.5.1",
     "eslint": "^9.30.0",
     "eslint-config-next": "15.1.7",
