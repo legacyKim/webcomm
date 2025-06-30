@@ -14,7 +14,6 @@ import formatPostDate from "app/components/formatDate";
 import Pagination from "app/components/pagination";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
-import { url } from "inspector";
 
 interface BoardlistProps {
   url_slug: string | null;
