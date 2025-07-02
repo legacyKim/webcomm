@@ -11,6 +11,11 @@
 2. axios 요청 방식
 3. db pool 및 prisma
 4. nextauth 폴더 내의 코드 분석 + next-auth.d.ts 파일 참조.
-
+5. prisma schema.prisma 파일 분석
+    generator client {
+    provider = "prisma-client-js"
+    output   = "./node_modules/@prisma/client"
+    }
+6. 마이그레이션이... 뭘까?
 
 << 관리자는 일괄적으로 처리 >>

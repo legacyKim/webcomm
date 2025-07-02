@@ -66,7 +66,7 @@ model Post {
   updated_at   DateTime   @default(now())
   url_slug     String     @db.VarChar(255)
   user_nickname String?   @db.VarChar(255)
-  is_deleted    Boolean   @default(false)
+  deleted    Boolean   @default(false)
   
   // Relations
   board        Board    @relation(fields: [board_id], references: [id])
