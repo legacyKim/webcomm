@@ -56,3 +56,4 @@ ESLint 설치하기
 
 npm install --save-dev @types/jsonwebtoken
 TypeScript에서 사용할 경우 타입 정의 파일
+.
