@@ -23,7 +23,7 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.member.findUnique({
           where: {
-            user_id: credentials.username,
+            id: Number(credentials.username), // Convert username to number to match Prisma schema
           },
         });
 
@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
         if (user.password !== credentials.password) return null;
 
         return {
-          id: user.user_id,
+          id: String(user.id),
           name: user.user_nickname,
           email: user.email,
         };
