@@ -4,11 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma db push && npx prisma generate && next build",
-    "vercel-build": "prisma generate --no-engine && next build",
+    "build": "npm run migrate && npm run generate && next build",
+    "vercel-build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "migrate": "prisma migrate deploy",
+    "generate": "prisma generate",
+    "apply-triggers": "psql $DATABASE_URL -f prisma/triggers.sql",
+    "deploy": "npm run migrate && npm run apply-triggers"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",

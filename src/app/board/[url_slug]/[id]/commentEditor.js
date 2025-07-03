@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -78,7 +80,7 @@ export default function CommentEditor({ initialContent = "", onChange, onMention
       }),
     ],
     content: initialContent,
-
+    immediatelyRender: false,
     onUpdate({ editor }) {
       if (onChange) {
         onChange(editor.getHTML());

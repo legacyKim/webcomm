@@ -32,8 +32,6 @@ export default function Write() {
     url_slug: "",
   });
 
-  console.log(boardInfo);
-
   const posting = async () => {
     const url_slug = boardInfo.url_slug;
     const boardname = boardInfo.board_name;

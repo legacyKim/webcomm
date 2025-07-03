@@ -13,7 +13,8 @@ import { useDropDown } from "@/func/hook/useDropDown";
 import DropDownMenu from "@/components/dropDownMenu";
 import TiptapViewer from "@/components/tiptapViewer";
 
-import CommentEditor from "./commentEditor";
+import dynamic from "next/dynamic";
+import { SSE_BASE_URL } from "@/lib/sse";
 
 import {
   ChatBubbleLeftEllipsisIcon,
@@ -23,6 +24,8 @@ import {
   PencilSquareIcon,
   FlagIcon,
 } from "@heroicons/react/24/outline";
+
+const CommentEditor = dynamic(() => import("./commentEditor"), { ssr: false });
 
 interface Posts {
   posts: {
@@ -107,7 +110,7 @@ export default function View() {
 
   // 게시물 실시간 열람
   useEffect(() => {
-    const eventSource = new EventSource("/api/post/stream");
+    const eventSource = new EventSource(`${SSE_BASE_URL}/posts/stream`);
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -154,7 +157,7 @@ export default function View() {
 
   // 댓글 실시간 열람
   useEffect(() => {
-    const eventSource = new EventSource("/api/comment/stream");
+    const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);

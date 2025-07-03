@@ -16,6 +16,7 @@ import {
   BellIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
+import { SSE_BASE_URL } from "@/lib/sse";
 
 type Notification = {
   id: number;
@@ -95,7 +96,7 @@ export default function Header() {
   }, [isUserId]);
 
   useEffect(() => {
-    const eventSource = new EventSource(`/api/notifications/stream?userId=${isUserId}`);
+    const eventSource = new EventSource(`${SSE_BASE_URL}/notifications/stream/${isUserId}`);
 
     eventSource.onmessage = (event) => {
       try {

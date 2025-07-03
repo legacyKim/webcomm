@@ -7,7 +7,6 @@ import { fetchMember } from "@/api/api";
 
 export default function MemberManage() {
   const { data: memberData, isLoading } = useQuery({ queryKey: ["boardData"], queryFn: fetchMember });
-  console.log(memberData);
 
   return (
     <div className='admin_content_wrap'>

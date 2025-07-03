@@ -14,6 +14,7 @@ import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import { SSE_BASE_URL } from "@/lib/sse";
 
 interface BoardlistProps {
   url_slug: string | null;
@@ -57,7 +58,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     let eventSource: EventSource | undefined;
 
     function connectSSE() {
-      eventSource = new EventSource(`/api/board/stream/${url_slug}`);
+      eventSource = new EventSource(`${SSE_BASE_URL}/events/${url_slug}`);
 
       eventSource.onmessage = (event) => {
         const updatedData = JSON.parse(event.data);

@@ -16,6 +16,9 @@
     provider = "prisma-client-js"
     output   = "./node_modules/@prisma/client"
     }
-6. 마이그레이션이... 뭘까?
+6. 마이그레이션
+7. dynamic import
+8. tiptap immediatelyRender
+
 
 << 관리자는 일괄적으로 처리 >>

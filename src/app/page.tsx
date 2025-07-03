@@ -16,6 +16,7 @@ import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react/24/outline";
+import { SSE_BASE_URL } from "@/lib/sse";
 
 export default function Home() {
   const { isUserId, setBoardType, messageToUser } = useAuth();
@@ -36,7 +37,7 @@ export default function Home() {
 
   // 인기글
   useEffect(() => {
-    const eventSource = new EventSource("/api/post/stream");
+    const eventSource = new EventSource(`${SSE_BASE_URL}/posts/stream`);
 
     eventSource.onmessage = () => {
       refetch(); // 새로운 데이터 요청

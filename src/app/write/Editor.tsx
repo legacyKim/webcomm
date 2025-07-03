@@ -32,6 +32,7 @@ const Editor = ({
       LinkUrl,
     ],
     content: "",
+    immediatelyRender: false,
   });
 
   // upload image
@@ -78,7 +79,6 @@ const Editor = ({
 
   const insertLink = () => {
     const rawUrl = prompt("유튜브 링크를 입력하세요");
-    console.log(rawUrl);
     if (!rawUrl) {
       alert("URL을 입력해야 합니다.");
       return;
