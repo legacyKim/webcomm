@@ -9,7 +9,6 @@ import { Video } from "@/extensions/video";
 import { LinkUrl } from "@/extensions/linkUrl";
 import { CustomTextStyle } from "@/extensions/CustomTextStyle";
 
-import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
