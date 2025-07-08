@@ -16,6 +16,7 @@ export async function GET(req) {
     const userNick = decoded.user_nickname;
     const userProfile = decoded.profile;
     const userEmail = decoded.email;
+    const userAuthority = decoded.authority;
 
     return NextResponse.json({
       authenticated: true,
@@ -24,6 +25,7 @@ export async function GET(req) {
       userNick: userNick,
       userProfile: userProfile,
       userEmail: userEmail,
+      userAuthority: userAuthority,
     });
   } catch (error) {
     console.error(error);

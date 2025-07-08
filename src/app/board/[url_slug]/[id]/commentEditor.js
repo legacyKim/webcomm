@@ -2,17 +2,31 @@
 
 import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
+
 import StarterKit from "@tiptap/starter-kit";
+import { Image } from "@tiptap/extension-image";
+
 // import Mention from "@tiptap/extension-mention";
 import Mention from "./mention";
 
 import tippy from "tippy.js";
 import "tippy.js/dist/tippy.css";
 
-export default function CommentEditor({ initialContent = "", onChange, onMentionUsersChange, users, reset }) {
+export default function CommentEditor({
+  singleCommentImageFile,
+  initialContent = "",
+  onChange,
+  onMentionUsersChange,
+  users,
+  reset,
+}) {
   const editor = useEditor({
     extensions: [
       StarterKit,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
       Mention.configure({
         HTMLAttributes: {
           class: "mention",
@@ -111,10 +125,17 @@ export default function CommentEditor({ initialContent = "", onChange, onMention
   });
 
   useEffect(() => {
-    if (editor && reset) {
-      editor.commands.setContent("");
-    }
-  }, [reset, editor]);
+    if (!editor) return;
 
-  return <EditorContent editor={editor} />;
+    if (reset) {
+      editor.commands.setContent("");
+      return;
+    }
+
+    // 이미지 업로드
+    if (!singleCommentImageFile) return;
+    editor.commands.insertContent(`<img src="${singleCommentImageFile}" />`);
+  }, [reset, editor, singleCommentImageFile]);
+
+  return <EditorContent className='tiptap_editor_area' editor={editor} />;
 }

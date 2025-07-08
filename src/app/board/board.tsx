@@ -40,7 +40,7 @@ export default function Board({ url_slug, boardType }: { url_slug: string; board
               <option value={50}>50</option>
             </select>
 
-            {(isUserId ?? 0) > 0 && (
+            {isUserId !== null && (
               <div>
                 <Link href='/write'>
                   <PencilSquareIcon className='icon' />

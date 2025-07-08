@@ -71,4 +71,6 @@ export interface AuthContextType {
   setBoardType: (type: string | null) => void;
   messageToUser: number | null;
   setMessageToUser: (type: number | null) => void;
+  isUserAuthority: number | null;
+  setIsUserAuthority: (authority: number | null) => void;
 }

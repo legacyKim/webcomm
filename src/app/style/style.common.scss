@@ -253,6 +253,7 @@ header {
   font-size: 16px;
 }
 .header_info .userinfo .userinfo_name > span {
+  font-size: 16px;
   font-weight: 600;
 }
 .header_info a {
@@ -417,11 +418,13 @@ main,
 sub {
   flex: 5;
   margin-right: 24px;
+  min-width: 788px;
 }
 sub {
   line-height: initial;
   width: 100%;
   margin-bottom: 100px;
+  min-width: 788px;
 }
 .main {
   display: flex;
@@ -433,7 +436,8 @@ sub {
 .right_ad {
   // display: none;
   flex: 1.5;
-  min-width: 236px;
+  width: 100%;
+  max-width: 236px;
 }
 .right_ad.active {
   display: block;
@@ -453,6 +457,7 @@ main .title {
 .board_wrap {
   position: relative;
   display: block;
+  margin-bottom: 100px;
 }
 .board_single {
   width: 100%;
@@ -466,7 +471,7 @@ main .title {
 .board {
   position: relative;
   display: block;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 .board_top {
   @include space-between;
@@ -485,31 +490,47 @@ main .title {
   font-weight: 400;
   line-height: 1.6;
   padding: 4px 12px;
-  border: $border-grey;
   border-radius: 4px;
+  height: 34px;
+  border: $border-grey;
+}
+.board_top a.more {
+  border: none;
+}
+.board_top a svg {
+  width: 16px;
+  height: 16px;
+  color: $grey-color;
 }
 .board_top a:hover {
-  border-color: $main-hover-color;
-  background-color: $main-hover-color;
-  color: #fff;
+  color: $main-hover-color;
+}
+.board_top a:hover svg {
+  color: $main-hover-color;
 }
 .board_top select {
   border: $border-grey;
   padding: 0px 4px 0px 2px;
   border-radius: 4px;
+  min-width: 65px;
+  height: 34px;
 }
+
 .board_list {
   @include flex-start;
   flex-direction: column;
   column-gap: 16px;
 }
 main .board_list {
-  min-height: 155px;
+  min-height: 120px;
+  border-bottom: $border-grey;
+  padding-bottom: 12px;
 }
 sub .board_list {
   position: relative;
   margin-bottom: 8px;
-  min-height: 276px;
+
+  min-height: 328.8px;
 }
 .board_double .board {
   width: calc(50% - 12px);
@@ -519,6 +540,7 @@ sub .board_list {
   @include space-between;
   align-items: center;
   width: 100%;
+  margin-bottom: 4px;
   border-bottom: $border-grey;
 }
 .board_list .writer {
@@ -544,6 +566,7 @@ sub .board_list {
   padding: 4px;
   align-items: center;
   width: 100%;
+  border-radius: 4px;
 }
 .board_list li a:hover {
   background-color: $grey4-color;
@@ -666,7 +689,7 @@ sub .board_list {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
 }
 .message_list li .message {
@@ -704,8 +727,81 @@ sub .board_list {
   object-fit: cover;
   border-radius: 50%;
 }
+
+.data_wait {
+  @include flex-center;
+  width: 100%;
+  min-height: 276px;
+
+  color: $grey6-color;
+
+  min-height: 276px;
+}
+.data_wait span {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+.dot {
+  opacity: 0;
+  animation: none;
+  color: $grey6-color;
+}
+
+/* 애니메이션 정의는 하나로 통일 */
+@keyframes appearDot1 {
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes appearDot2 {
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes appearDot3 {
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* 4초짜리 애니메이션을 동시에 시작하되, 각 점이 정해진 타이밍에만 보이게 */
+.dot1 {
+  animation: appearDot1 4s steps(1, end) infinite;
+}
+.dot2 {
+  animation: appearDot2 4s steps(1, end) infinite;
+}
+.dot3 {
+  animation: appearDot3 4s steps(1, end) infinite;
+}
+
 .data_none {
   @include flex-center;
+  min-height: 276px;
+  gap: 8px;
+}
+
+.data_none svg {
+  width: 32px;
+  height: 32px;
+  color: $grey6-color;
+}
+
+.data_none span {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: $grey6-color;
 }
 
 .pagination {
@@ -718,9 +814,12 @@ sub .board_list {
   gap: 8px;
 }
 .pagination button {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.4;
+}
+.pagination button.active {
+  font-weight: 500;
 }
 .pagination button .icon {
   width: 20px;
@@ -754,18 +853,95 @@ sub .board_list {
   min-height: 42px;
   border-bottom: $border-grey;
 }
-.write .upload {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.write .toolbar {
+  position: sticky;
+  top: 0;
 }
-.write .upload label,
-.write .upload button {
+.write .toolbar label,
+.write .toolbar button {
   opacity: 0.5;
 }
-.write .upload label:hover,
-.write .upload button:hover {
+.write .toolbar label:hover,
+.write .toolbar button:hover {
   opacity: 1;
+}
+.write .toolbar .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.editor_pick {
+  cursor: pointer;
+}
+
+.editor_pick_box {
+  display: none;
+}
+
+.editor_pick_box.open {
+  position: absolute;
+  @include flex-start;
+  flex-direction: column;
+  align-items: baseline;
+  gap: 4px;
+  border: $border-grey;
+  border-radius: 4px;
+  padding: 8px 6px;
+  z-index: $zIndexFirst;
+}
+
+.editor_pick_box_fs.open {
+  top: 0;
+  left: calc(112%);
+}
+
+.editor_pick_box_color.open {
+  top: 2px;
+  left: calc(82%);
+}
+
+.editor_pick_box > button {
+  @include re-bl;
+  text-align: left;
+  width: 100%;
+}
+
+.editor_fontsize_pick {
+  font-size: 16px;
+}
+
+.editor_color_pick {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.editor_pick_box .editor_color_pick {
+  width: 14px;
+  height: 14px;
+}
+
+.editor_bar {
+  width: 20px;
+  height: 1px;
+  background-color: $grey-color;
+}
+
+.text-size-12px {
+  font-size: 14px;
+}
+.text-size-14px {
+  font-size: 14px;
+}
+.text-size-16px {
+  font-size: 14px;
+}
+.text-size-18px {
+  font-size: 18px;
+}
+.text-size-24px {
+  font-size: 24px;
 }
 
 .write .write_box {
@@ -914,21 +1090,21 @@ sub .board_list {
   margin-bottom: 12px;
 }
 .comment_top b {
-  margin-right: 12px;
+  margin-right: 6px;
   font-size: 14px;
 }
 .comment_top .comment_num {
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .comment_box.re {
-  margin-left: 12px;
+  margin-left: 16px;
 }
 .comment_info {
   @include space-between;
   align-items: center;
   background-color: $grey4-color;
-  padding: 6px 12px;
+  padding: 6px 12px 6px 8px;
   border-radius: 4px;
 }
 .comment_box.re .commnet_info {
@@ -973,6 +1149,7 @@ sub .board_list {
   position: relative;
   display: block;
   flex: 1;
+  width: 100%;
   white-space: pre-line !important;
   font-size: 13px;
   font-weight: 400;
@@ -989,16 +1166,13 @@ sub .board_list {
   line-height: 1.4;
 }
 .comment_add {
-  @include flex-start;
-  align-items: stretch;
   column-gap: 8px;
   margin-bottom: 8px;
 }
 .comment_add > div {
-  flex: 1;
+  width: 100%;
 }
 .comment_add > div .tiptap {
-  flex: 1;
   border: $border-grey;
   outline: none;
   height: 100%;
@@ -1020,6 +1194,7 @@ sub .board_list {
   outline: none;
 }
 .comment_add button {
+  @include re-bl;
   font-size: 12px;
   font-weight: 300;
   line-height: 1.4;
@@ -1028,10 +1203,39 @@ sub .board_list {
   padding: 8px;
   border-radius: 4px;
   min-width: 80px;
+  height: 32px;
 }
 .comment_add button:hover {
   border: 1px solid $grey3-color;
   color: $grey3-color;
+}
+.comment_editor {
+  @include space-between;
+  align-items: stretch;
+
+  width: 100%;
+}
+.comment_editor label {
+  @include flex-center;
+  gap: 4px;
+}
+.comment_editor label svg {
+  opacity: 0.5;
+}
+.comment_editor label:hover svg {
+  opacity: 1;
+}
+.comment_editor label .notice {
+  font-size: 13px;
+  font-weight: 400;
+  color: $grey5-color;
+}
+.comment_editor label .notice .red {
+  color: $red-color;
+}
+
+.tiptap_editor_area {
+  margin-bottom: 6px;
 }
 
 .go_to_login_for_comment {
@@ -1196,7 +1400,7 @@ sub .board_list {
 .mypage_info p {
   @include flex-start;
   align-items: flex-start;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 300;
   line-height: 1.4;
   color: $grey6-color;
@@ -1339,7 +1543,7 @@ sub .board_list {
 
   border: $border-grey;
   background-color: #fff;
-  padding: 10px 8px;
+  padding: 8px 6px;
   border-radius: 4px;
   box-shadow: 0 2px 12px 4px rgba(67, 67, 67, 0.07);
 }
@@ -1350,7 +1554,7 @@ sub .board_list {
   margin-bottom: 0;
 }
 .dropDownMenu li button {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 400;
   line-height: 1.4;
   color: $font-color;

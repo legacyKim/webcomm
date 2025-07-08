@@ -14,6 +14,8 @@ import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import { NoSymbolIcon } from "@heroicons/react/24/solid";
+
 import { SSE_BASE_URL } from "@/lib/sse";
 
 interface BoardlistProps {
@@ -91,8 +93,17 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     userNickname: "",
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error instanceof Error) return <div>Error: {error.message}</div>;
+  if (isLoading)
+    return (
+      <div className='data_wait'>
+        <span>잠시만 기다려 주세요.</span>
+        <div className='dots'>
+          <span className='dot dot1'>.</span>
+          <span className='dot dot2'>.</span>
+          <span className='dot dot3'>.</span>
+        </div>
+      </div>
+    );
 
   const totalPage = postData?.totalPages || 1;
 
@@ -165,8 +176,9 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
             </li>
           ))
         ) : (
-          <div className='nodata'>
-            <span>게시물이 없습니다.</span>
+          <div className='data_none'>
+            <NoSymbolIcon />
+            <span>작성한 글이 없습니다.</span>
           </div>
         )}
       </ol>

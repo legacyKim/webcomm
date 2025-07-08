@@ -30,6 +30,7 @@ export async function POST(req) {
         profile: user.profile,
         userNick: user.user_nickname,
         userEmail: user.email,
+        userAuthority: user.authority,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" },
@@ -42,6 +43,7 @@ export async function POST(req) {
       userNick: user.user_nickname,
       userProfile: user.profile,
       userEmail: user.email,
+      userAuthority: user.authority,
     });
     response.headers.set(
       "Set-Cookie",

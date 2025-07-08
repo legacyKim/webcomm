@@ -1,62 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-interface DecodedToken {
-  userid: string;
-  id: string;
-  userNick: string;
-  profile: string;
-  email: string;
-}
+const PROTECTED_PATHS = ["/write", "/my", "/admin", "/api"];
 
-interface CustomNextRequest extends NextRequest {
-  username?: string;
-}
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-export function middleware(req: CustomNextRequest) {
-  // const hostname = req.nextUrl.hostname; // 현재 요청된 도메인 (예: customer1.example.com)
-
-  // "admin.customer1.example.com" 패턴 감지
-  // if (hostname.startsWith("admin.")) {
-  //     return NextResponse.rewrite(new URL(`/admin`, req.url));
-  // }
+  if (!PROTECTED_PATHS.some((path) => pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
 
   const token = req.cookies.get("authToken")?.value;
-
   if (!token) {
-    return NextResponse.json(
-      { success: false, message: "토근이 만료되었습니다. 다시 로그인 해주세요." },
-      { status: 401 },
-    );
+    if (pathname.startsWith("/api")) {
+      return NextResponse.json({ success: false, message: "로그인이 필요합니다." }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   try {
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET is not defined");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    let authority: any = undefined;
+    let authorityRaw: any = undefined;
+
+    console.log("decoded:", decoded);
+    console.log("authority:", authority, typeof authority);
+
+    if (typeof decoded === "object" && decoded !== null) {
+      authority = decoded.userAuthority;
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as DecodedToken;
 
-    const username = decoded.userid;
-    const userId = decoded.id;
-    const userNick = decoded.userNick;
-    const userProfile = decoded.profile;
-    const userEmail = decoded.email;
+    const authorityNum = Number(authorityRaw);
 
-    req.username = username;
+    const response = NextResponse.next();
+    response.headers.set("x-auth-authority-raw", String(authority));
+    response.headers.set("x-auth-authority-num", String(authorityNum));
+    response.headers.set("x-request-path", pathname);
 
-    return NextResponse.json({
-      authenticated: true,
-      username: username,
-      userId: userId,
-      userNick: userNick,
-      userProfile: userProfile,
-      userEmail: userEmail,
-    });
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json({ success: false, message: "유효하지 않은 토큰입니다." }, { status: 401 });
+    if (pathname.startsWith("/admin") && authority !== 0) {
+      if (pathname.startsWith("/api")) {
+        return NextResponse.json({ success: false, message: "관리자 권한이 필요합니다." }, { status: 403 });
+      }
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+
+    return NextResponse.next();
+  } catch {
+    if (pathname.startsWith("/api")) {
+      return NextResponse.json({ success: false, message: "토큰이 만료되었거나 유효하지 않습니다." }, { status: 401 });
+    }
+    return NextResponse.redirect(new URL("/login", req.url));
   }
-
-  // "customer1.example.com" 같은 커뮤니티 사이트 감지
-  return NextResponse.next();
 }

@@ -166,7 +166,7 @@ export default function Mypage() {
             <div className='mypage_info'>
               <span>아이디</span>
               <div className='input_box'>
-                <input type='text' value={isUsername} disabled />
+                <input type='text' value={isUsername || ""} disabled />
               </div>
             </div>
 

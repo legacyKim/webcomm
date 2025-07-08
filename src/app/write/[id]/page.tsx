@@ -12,6 +12,7 @@ import { useAuth } from "@/AuthContext";
 
 import { Posts } from "@/type/type";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
+import { replaceBlobsWithS3Urls } from "@/func/replaceBlobsWithS3Urls";
 
 export default function Write() {
   const { isUserId, isUsername, isUserNick } = useAuth();
@@ -24,8 +25,8 @@ export default function Write() {
   const writeTitle = useRef<HTMLInputElement>(null);
   const [editorContent, setEditorContent] = useState<string>("");
 
-  const [, setImageFiles] = useState<ImageWithBlob[]>([]);
-  const [, setVideoFiles] = useState<VideoWithBlob[]>([]);
+  const [imageFiles, setImageFiles] = useState<ImageWithBlob[]>([]);
+  const [videoFiles, setVideoFiles] = useState<VideoWithBlob[]>([]);
 
   const [boardInfo, setBoardInfo] = useState<{ board_name: string; url_slug: string }>({
     board_name: "",
@@ -64,24 +65,23 @@ export default function Write() {
 
     const boardname = boardInfo.board_name;
     const url_slug = boardInfo.url_slug;
-
-    if (boardname === "선택") {
-      alert("카테고리를 선택해 주세요!");
-      return;
-    }
-
+    const title = writeTitle.current?.value;
     const user_id = isUserId;
     const user_nickname = isUserNick;
-    const title = writeTitle.current?.value;
 
-    if (title === "") {
-      alert("제목을 입력해 주세요!");
+    if (!boardname || !title) {
+      alert("카테고리와 제목을 모두 입력해 주세요!");
       return;
     }
 
-    const content = editorContent;
+    if (editorContent.length === 0) {
+      alert("내용을 입력해 주세요!");
+      return;
+    }
 
     try {
+      const content = await replaceBlobsWithS3Urls(editorContent, imageFiles, videoFiles);
+
       const response = await axios.put(`/api/write/${id}`, {
         id,
         boardname,
@@ -101,12 +101,16 @@ export default function Write() {
     }
   };
 
-  // useEffect(() => {
-  //     if (isUsername === null) {
-  //         alert("로그인이 필요합니다!");
-  //         router.push("/login");
-  //     }
-  // }, [isUsername, router]);
+  useEffect(() => {
+    if (isUserId === 0) {
+      const isConfirmed = confirm("로그인이 필요합니다.");
+      if (isConfirmed) {
+        router.push("/login");
+      } else {
+        return;
+      }
+    }
+  }, [isUsername, router]);
 
   useEffect(() => {
     if (writeData !== null) {
@@ -119,7 +123,16 @@ export default function Write() {
   }, [writeData]);
 
   if (writeData === null) {
-    return <div>Loading...</div>;
+    return (
+      <div className='data_wait'>
+        <span>잠시만 기다려 주세요.</span>
+        <div className='dots'>
+          <span className='dot dot1'>.</span>
+          <span className='dot dot2'>.</span>
+          <span className='dot dot3'>.</span>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -164,8 +177,10 @@ export default function Write() {
           setVideoFiles={setVideoFiles}
         />
 
-        <div className='btn_wrap'>
-          <button type='submit'>글 수정하기</button>
+        <div className='btn_wrap btn_posting_wrap'>
+          <button type='submit' className='btn btn_posting'>
+            EDITING
+          </button>
         </div>
       </form>
     </sub>

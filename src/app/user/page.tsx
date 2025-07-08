@@ -171,15 +171,20 @@ export default function User() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
-    if (file) {
-      setFileName(file.name);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-      setFile(file);
+    if (!file) return;
+
+    if (file.size > 1 * 1024 * 1024) {
+      alert("최대 1MB 이하의 이미지만 업로드 가능합니다.");
+      return;
     }
+
+    setFileName(file.name);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfileImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    setFile(file);
   };
 
   // 회원가입 요청
@@ -222,8 +227,6 @@ export default function User() {
       const response = await axios.post("/api/user", formData, {
         validateStatus: () => true, // 모든 status 를 err 처리하지 않기.
       });
-
-      console.log(response);
 
       if (response.data.success) {
         alert(response.data.message);
@@ -338,6 +341,10 @@ export default function User() {
                   />
                 </div>
               </div>
+
+              <span className={`${styles.notice}`}>
+                용량이 <b className={`${styles.red}`}>1MB</b> 이하인 이미지만 업로드가 가능합니다.
+              </span>
 
               {/* 미리보기 이미지 */}
               {profileImage && (

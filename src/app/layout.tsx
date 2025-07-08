@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 
-import QueryProvider from "./QueryProvider";
-import { AuthProvider } from "./AuthContext";
+import QueryProvider from "@/QueryProvider";
+import { AuthProvider } from "@/AuthContext";
 
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-import LayoutWrapper from "./layoutWrapper";
+import LayoutWrapper from "@/layoutWrapper";
 
 import "@/style/base.css";
 import "@/style/font.css";
@@ -28,10 +28,11 @@ export default async function RootLayout({
   const token = (await cookieStore).get("authToken")?.value ?? "";
 
   let username = "";
-  let userId = 0;
+  let userId = null;
   let userNick = "";
   let userProfile = "";
   let userEmail = "";
+  let userAuthority = null;
 
   if (token) {
     try {
@@ -41,6 +42,7 @@ export default async function RootLayout({
         userNick: string;
         profile: string;
         userEmail: string;
+        userAuthority: number | null;
       };
 
       username = decoded.username;
@@ -48,10 +50,13 @@ export default async function RootLayout({
       userNick = decoded.userNick;
       userProfile = decoded.profile;
       userEmail = decoded.userEmail;
+      userAuthority = decoded.userAuthority;
     } catch (error) {
       console.error("토큰 검증 실패:", error);
     }
   }
+
+  console.log(userAuthority, "userAuthority in layout");
 
   return (
     <html lang='en'>
@@ -61,7 +66,8 @@ export default async function RootLayout({
           userId={userId}
           userNick={userNick}
           userProfile={userProfile}
-          userEmail={userEmail}>
+          userEmail={userEmail}
+          userAuthority={userAuthority}>
           <QueryProvider>
             <LayoutWrapper>{children}</LayoutWrapper>
           </QueryProvider>

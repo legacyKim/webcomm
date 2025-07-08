@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { AuthContextType } from "./type/type";
+import { AuthContextType } from "@/type/type";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -12,19 +12,22 @@ export function AuthProvider({
   userNick,
   userProfile,
   userEmail,
+  userAuthority,
 }: {
   children: React.ReactNode;
   username: string;
-  userId: number;
+  userId: number | null;
   userNick: string;
   userProfile: string;
   userEmail: string;
+  userAuthority: number | null;
 }) {
   const [isUsername, setIsUsername] = useState<string | null>(username);
   const [isUserId, setIsUserId] = useState<number | null>(userId);
   const [isUserNick, setIsUserNick] = useState<string | null>(userNick);
   const [isUserProfile, setIsUserProfile] = useState<string | null>(userProfile);
   const [isUserEmail, setIsUserEmail] = useState<string | null>(userEmail);
+  const [isUserAuthority, setIsUserAuthority] = useState<number | null>(userAuthority);
 
   const [loginStatus, setLoginStatus] = useState<boolean | null>(false);
 
@@ -37,7 +40,8 @@ export function AuthProvider({
     setIsUserNick(userNick);
     setIsUserProfile(userProfile);
     setIsUserEmail(userEmail);
-  }, [username, userId, userNick, userProfile, userEmail]);
+    setIsUserAuthority(userAuthority);
+  }, [username, userId, userNick, userProfile, userEmail, userAuthority]);
 
   return (
     <AuthContext.Provider
@@ -58,6 +62,8 @@ export function AuthProvider({
         setBoardType,
         messageToUser,
         setMessageToUser,
+        isUserAuthority,
+        setIsUserAuthority,
       }}>
       {children}
     </AuthContext.Provider>
@@ -66,22 +72,5 @@ export function AuthProvider({
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  return context as {
-    loginStatus: boolean | null;
-    setLoginStatus: (loginStatus: boolean) => void;
-    isUsername: string;
-    setIsUsername: (username: string) => void;
-    isUserId: number | null;
-    setIsUserId: (userId: number) => void;
-    isUserNick: string | null;
-    setIsUserNick: (userNick: string) => void;
-    isUserProfile: string | null;
-    setIsUserProfile: (userProfile: string) => void;
-    isUserEmail: string | null;
-    setIsUserEmail: (userProfile: string) => void;
-    boardType: string | null;
-    setBoardType: (type: string | null) => void;
-    messageToUser: number | null;
-    setMessageToUser: (type: number | null) => void;
-  };
+  return context as AuthContextType;
 }

@@ -1,7 +1,21 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import { prisma } from "@/lib/prisma";
+
+declare module "next-auth" {
+  interface User {
+    authority?: number;
+  }
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      authority?: number;
+    };
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -36,6 +50,7 @@ export const authOptions: NextAuthOptions = {
           id: String(user.id),
           name: user.user_nickname,
           email: user.email,
+          authority: user.authority,
         };
       },
     }),
@@ -52,6 +67,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
+        token.authority = user.authority;
       }
       return token;
     },
@@ -60,6 +76,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.name = token.name as string;
         session.user.email = token.email as string;
+        session.user.authority = token.authority as number;
       }
       return session;
     },

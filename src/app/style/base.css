@@ -99,9 +99,29 @@ input {
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 14px; /*font: inherit; */
+  font-size: 14px;
   vertical-align: baseline;
   text-decoration: none;
+  color: inherit;
+}
+
+u {
+  text-decoration: underline;
+  font-size: inherit;
+}
+
+em {
+  font-size: inherit;
+}
+
+strong {
+  font-size: inherit;
+}
+
+.ProseMirror p,
+.ProseMirror h1,
+.ProseMirror h2 {
+  text-align: inherit;
 }
 
 /* HTML5 display-role reset for older browsers */

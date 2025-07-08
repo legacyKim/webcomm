@@ -18,28 +18,14 @@ export async function GET(request, context) {
   const rawSize = searchParams.get("size");
   const fileSize = Number(rawSize);
 
-  const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(extension);
-  const isVideo = ["mp4", "webm", "ogg"].includes(extension);
+  const MAX_SIZE = 2 * 1024 * 1024;
 
-  let folder = "posts/others";
-  let contentType = "application/octet-stream";
-  let maxSize = 5 * 1024 * 1024;
-
-  if (isImage) {
-    folder = "posts/images";
-    contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
-    maxSize = 5 * 1024 * 1024;
-  } else if (isVideo) {
-    folder = "posts/videos";
-    contentType = `video/${extension}`;
-    maxSize = 50 * 1024 * 1024;
+  if (fileSize > MAX_SIZE) {
+    return NextResponse.json({ error: `파일 용량 초과 (최대 ${MAX_SIZE / 1024 / 1024}MB)` }, { status: 400 });
   }
 
-  if (fileSize > maxSize) {
-    return NextResponse.json({ error: `파일 용량 초과 (최대 ${maxSize / 1024 / 1024}MB)` }, { status: 400 });
-  }
-
-  const key = `${folder}/${fileName}`;
+  let contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
+  const key = `comment/${fileName}`;
 
   const command = new PutObjectCommand({
     Bucket: bucketName,

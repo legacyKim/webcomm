@@ -8,6 +8,8 @@ import MyHeader from "../myHeader";
 import { useAuth } from "@/AuthContext";
 import Message from "@/components/message";
 
+import { NoSymbolIcon } from "@heroicons/react/24/solid";
+
 interface Message {
   id: number;
   content: string;
@@ -110,9 +112,19 @@ export default function MyMessage() {
 
             <div className='mypage_message_box'>
               {isLoading ? (
-                <p>불러오는 중...</p>
+                <div className='data_wait'>
+                  <span>잠시만 기다려 주세요.</span>
+                  <div className='dots'>
+                    <span className='dot dot1'>.</span>
+                    <span className='dot dot2'>.</span>
+                    <span className='dot dot3'>.</span>
+                  </div>
+                </div>
               ) : messages.length === 0 ? (
-                <div className='data_none'>쪽지가 없습니다.</div>
+                <div className='data_none'>
+                  <NoSymbolIcon />
+                  <span>쪽지가 없습니다.</span>
+                </div>
               ) : (
                 <ul className='message_list board_list'>
                   {messages.map((msg, index) => (

@@ -7,6 +7,8 @@ import axios from "axios";
 import { useAuth } from "@/AuthContext";
 import Message from "@/components/message";
 
+import { useLoginCheck } from "@/func/hook/useLoginCheck";
+
 // import Link from 'next/link';
 
 interface DropDownMenuProps {
@@ -22,6 +24,7 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
   const [isBlocked, setIsBlocked] = useState(false);
 
   const { isUserId, messageToUser, setMessageToUser } = useAuth();
+  const { loginCheck } = useLoginCheck();
 
   // 작성글 검색
   const searchPosts = () => {
@@ -41,6 +44,8 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
 
   // 차단하기
   const blockUserConfirm = () => {
+    loginCheck();
+
     const isConfirmed = confirm(`${userInfoInDropMenu.userNickname}님을 차단하시겠습니까?`);
     if (isConfirmed) {
       blockUser();
@@ -66,6 +71,8 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
 
   // 신고하기
   const reportUser = async () => {
+    loginCheck();
+
     const reason = prompt("신고 사유를 입력해주세요.");
     if (!reason) return;
 
@@ -87,25 +94,28 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
 
   return (
     <>
-      <ul className='dropDownMenu' style={style}>
-        <li>
-          <button onClick={searchPosts}>작성글 검색</button>
-        </li>
-        <li>
-          <button onClick={searchComments}>댓글 검색</button>
-        </li>
-        <li>
-          <button onClick={sendMessage}>쪽지 보내기</button>
-        </li>
-        <li>
-          <button onClick={blockUserConfirm} disabled={isBlocked} style={{ color: isBlocked ? "gray" : "inherit" }}>
-            {isBlocked ? "차단됨" : "차단하기"}
-          </button>
-        </li>
-        <li>
-          <button onClick={reportUser}>신고하기</button>
-        </li>
-      </ul>
+      {isUserId !== null && (
+        <ul className='dropDownMenu' style={style}>
+          <li>
+            <button onClick={searchPosts}>작성글 검색</button>
+          </li>
+          <li>
+            <button onClick={searchComments}>댓글 검색</button>
+          </li>
+
+          <li>
+            <button onClick={sendMessage}>쪽지 보내기</button>
+          </li>
+          <li>
+            <button onClick={blockUserConfirm} disabled={isBlocked} style={{ color: isBlocked ? "gray" : "inherit" }}>
+              {isBlocked ? "차단됨" : "차단하기"}
+            </button>
+          </li>
+          <li>
+            <button onClick={reportUser}>신고하기</button>
+          </li>
+        </ul>
+      )}
 
       {messageToUser !== null && (
         <Message

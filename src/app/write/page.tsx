@@ -9,12 +9,8 @@ import { fetchBoard } from "../api/api";
 
 import Editor from "./Editor";
 import { useAuth } from "@/AuthContext";
+import { replaceBlobsWithS3Urls } from "@/func/replaceBlobsWithS3Urls";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
-
-export interface BlobFile {
-  file: File;
-  blobUrl: string;
-}
 
 export default function Write() {
   const { isUserId, isUserNick } = useAuth();
@@ -33,55 +29,21 @@ export default function Write() {
   });
 
   const posting = async () => {
-    const url_slug = boardInfo.url_slug;
     const boardname = boardInfo.board_name;
+    const url_slug = boardInfo.url_slug;
     const title = writeTitle.current?.value;
+    const user_id = isUserId;
+    const user_nickname = isUserNick;
 
     if (!boardname || !title) {
       alert("카테고리와 제목을 모두 입력해 주세요!");
       return;
     }
 
-    const user_id = isUserId;
-    const user_nickname = isUserNick;
-
-    const replaceBlobsWithS3Urls = async (html: string, images: BlobFile[], videos: BlobFile[]) => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
-
-      const processTags = async (tagName: string, attrName: string, files: BlobFile[]) => {
-        const tags = Array.from(doc.querySelectorAll(tagName));
-        for (const tag of tags) {
-          const src = tag.getAttribute(attrName);
-          const match = files.find(({ blobUrl }) => blobUrl === src);
-
-          if (match) {
-            const file = match.file;
-            const fileName = encodeURIComponent(file.name);
-            const presignedRes = await axios.get(`/api/upload/${fileName}`);
-            const { url, fileUrl } = presignedRes.data;
-
-            try {
-              await fetch(url, {
-                method: "PUT",
-                headers: { "Content-Type": file.type },
-                body: file,
-              });
-              tag.setAttribute(attrName, fileUrl);
-            } catch (uploadError) {
-              console.error("파일 업로드 실패:", file.name, uploadError);
-              throw new Error("업로드 중 문제가 발생했습니다. 다시 시도해 주세요.");
-            }
-          }
-        }
-      };
-
-      await processTags("img", "src", images);
-      await processTags("video", "src", videos);
-      await processTags("source", "src", videos); // for <video><source src=...>
-
-      return doc.body.innerHTML;
-    };
+    if (editorContent.length === 0) {
+      alert("내용을 입력해 주세요!");
+      return;
+    }
 
     try {
       const content = await replaceBlobsWithS3Urls(editorContent, imageFiles, videoFiles);
@@ -97,7 +59,8 @@ export default function Write() {
 
       if (response.data.success) {
         alert("게시글 등록 성공!");
-        router.push(`/board/${url_slug}`);
+        const postId = response.data.postId;
+        router.push(`/board/${url_slug}/${postId}`);
       } else {
         throw new Error("DB 저장 실패");
       }
@@ -113,10 +76,6 @@ export default function Write() {
       router.push("/login");
     }
   }, [isUserId, router]);
-
-  if (isUserId === null) {
-    return null;
-  }
 
   return (
     <sub className='sub'>

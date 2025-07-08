@@ -11,6 +11,8 @@ import MyActivity from "../myActivity";
 import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
 
+import { NoSymbolIcon } from "@heroicons/react/24/solid";
+
 interface post {
   id: number;
   url_slug: string;
@@ -45,7 +47,14 @@ export default function MyPost() {
 
               <ul className='mypage_boardlist_common board_list'>
                 {isLoading ? (
-                  <div>잠시만 기다려주세요.</div>
+                  <div className='data_wait'>
+                    <span>잠시만 기다려 주세요.</span>
+                    <div className='dots'>
+                      <span className='dot dot1'>.</span>
+                      <span className='dot dot2'>.</span>
+                      <span className='dot dot3'>.</span>
+                    </div>
+                  </div>
                 ) : writeBoards && writeBoards.posts.length > 0 ? (
                   writeBoards.posts.map((post: post, index: number) => (
                     <li key={post.id}>
@@ -70,7 +79,10 @@ export default function MyPost() {
                     </li>
                   ))
                 ) : (
-                  <div className='data_none'>작성한 글이 없습니다.</div>
+                  <div className='data_none'>
+                    <NoSymbolIcon />
+                    <span>작성한 글이 없습니다.</span>
+                  </div>
                 )}
               </ul>
 

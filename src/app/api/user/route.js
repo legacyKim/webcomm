@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import pool from "../../db/db";
+import pool from "@/db/db";
 
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import s3 from "../../db/s3";
+import s3 from "@/db/s3";
 
 const bucketName = process.env.AWS_BUCKET_NAME;
 
@@ -16,6 +16,15 @@ export async function POST(req) {
     const userPassword = formData.get("userPassword");
     const userEmail = formData.get("userEmail");
     const profileImage = formData.get("profileImage");
+
+    // 프로필 이미지 용량 제한
+    const MAX_SIZE = 1 * 1024 * 1024;
+    if (profileImage && profileImage.size > MAX_SIZE) {
+      return NextResponse.json(
+        { success: false, message: "프로필 이미지 용량은 최대 1MB까지 가능합니다." },
+        { status: 400 },
+      );
+    }
 
     // 비밀번호 해쉬
     const saltRounds = 10;
@@ -30,7 +39,7 @@ export async function POST(req) {
 
       const s3Params = {
         Bucket: bucketName,
-        Key: filename,
+        Key: `profile/${filename}`,
         Body: buffer,
         ContentType: profileImage.type || "application/octet-stream",
       };

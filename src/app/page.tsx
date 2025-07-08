@@ -18,6 +18,8 @@ import formatPostDate from "@/components/formatDate";
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react/24/outline";
 import { SSE_BASE_URL } from "@/lib/sse";
 
+import { ChevronRightIcon } from "@heroicons/react/24/solid";
+
 export default function Home() {
   const { isUserId, setBoardType, messageToUser } = useAuth();
 
@@ -25,6 +27,8 @@ export default function Home() {
     queryKey: ["home", isUserId],
     queryFn: () => fetchHome(isUserId),
   });
+
+  console.log(homeData);
 
   const {
     data: popularPosts,
@@ -79,16 +83,24 @@ export default function Home() {
             <div className='board_top'>
               <h2>베스트 게시글</h2>
               <Link
+                className='more'
                 href='/board/popular'
                 onClick={() => {
                   setBoardType("popular");
                 }}>
-                더 보기
+                <ChevronRightIcon />
               </Link>
             </div>
             <ol className='board_list'>
               {isLoadingPop ? (
-                <div className='data_none'>잠시만 기다려주세요.</div>
+                <div className='data_wait'>
+                  <span>잠시만 기다려 주세요.</span>
+                  <div className='dots'>
+                    <span className='dot dot1'>.</span>
+                    <span className='dot dot2'>.</span>
+                    <span className='dot dot3'>.</span>
+                  </div>
+                </div>
               ) : (
                 popularPosts.map((post: Posts) => (
                   <li key={post.id}>
@@ -134,7 +146,13 @@ export default function Home() {
         {/* board ad */}
         <div
           className='board_ad'
-          style={{ width: "100%", height: "200px", backgroundColor: "#ddd", marginBottom: "32px" }}></div>
+          style={{
+            width: "100%",
+            height: "200px",
+            backgroundColor: "#ddd",
+            marginBottom: "32px",
+            display: "none",
+          }}></div>
 
         <div className='board_double'>
           {/* board */}
@@ -144,11 +162,12 @@ export default function Home() {
                 <div className='board_top'>
                   <h2>{boardName}</h2>
                   <Link
+                    className='more'
                     href={`/board/${homeData[boardName].url_slug}`}
                     onClick={() => {
                       setBoardType("board");
                     }}>
-                    더 보기
+                    <ChevronRightIcon />
                   </Link>
                 </div>
                 <ol className='board_list'>

@@ -4,7 +4,7 @@ export async function POST() {
   try {
     const response = NextResponse.json({ success: true, message: "로그아웃 되었습니다." });
 
-    response.headers.set("Set-Cookie", `authToken=; Path=/; HttpOnly; Max-Age=0; Secure="false"; SameSite=Strict`);
+    response.headers.set("Set-Cookie", `authToken=; Path=/; HttpOnly; Max-Age=0; Secure; SameSite=Strict`);
 
     return response;
   } catch (error) {

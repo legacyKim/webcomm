@@ -30,7 +30,16 @@ export default function Header() {
   const pathname = usePathname();
 
   const router = useRouter();
-  const { loginStatus, setLoginStatus, setIsUsername, isUserId, isUserNick, isUserProfile } = useAuth();
+  const {
+    loginStatus,
+    setLoginStatus,
+    setIsUsername,
+    isUserId,
+    isUserNick,
+    isUserProfile,
+    isUserAuthority,
+    setIsUserAuthority,
+  } = useAuth();
 
   const logout = async () => {
     const response = await axios.post("/api/logout");
@@ -39,6 +48,7 @@ export default function Header() {
 
       setIsUsername("");
       setLoginStatus(false);
+      setIsUserAuthority(null);
 
       if (pathname.startsWith("/my")) {
         router.push("/");
@@ -220,7 +230,7 @@ export default function Header() {
                 </div>
               </div>
 
-              {isUserId === 1 ? (
+              {isUserAuthority === 0 ? (
                 <Link href='/admin'>
                   <WrenchScrewdriverIcon className='icon' />
                   <span>관리자 페이지</span>

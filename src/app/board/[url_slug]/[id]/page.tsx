@@ -10,6 +10,8 @@ import Boardlist from "@/board/boardlist";
 
 import { useAuth } from "@/AuthContext";
 import { useDropDown } from "@/func/hook/useDropDown";
+import { useLoginCheck } from "@/func/hook/useLoginCheck";
+
 import DropDownMenu from "@/components/dropDownMenu";
 import TiptapViewer from "@/components/tiptapViewer";
 
@@ -23,6 +25,7 @@ import {
   ListBulletIcon,
   PencilSquareIcon,
   FlagIcon,
+  PhotoIcon,
 } from "@heroicons/react/24/outline";
 
 const CommentEditor = dynamic(() => import("./commentEditor"), { ssr: false });
@@ -69,9 +72,13 @@ type CommentList = {
   };
 };
 
+type CommentImage = { file: File; blobUrl: string };
+
 export default function View() {
   const params = useParams();
   const router = useRouter();
+
+  const { loginCheck } = useLoginCheck();
 
   const { isUserId, isUserNick, messageToUser, boardType } = useAuth();
   const [limit, setLimit] = useState(10);
@@ -88,6 +95,24 @@ export default function View() {
     id: number;
     recomment_id: number;
   } | null>(null);
+
+  // 댓글 이미지 업로드
+  const [commentImagesFile, setCommentImagesFile] = useState<CommentImage[]>([]);
+  const [singleCommentImageFile, setSingleCommentImageFile] = useState<string | null>(null);
+
+  const commentImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("최대 2MB 이하의 이미지만 업로드 가능합니다.");
+      return;
+    }
+
+    const blobUrl = URL.createObjectURL(file);
+    setSingleCommentImageFile(blobUrl);
+    setCommentImagesFile((prev) => [...prev, { file, blobUrl }]);
+  };
 
   // 컨텐츠 또는 댓글 패치
   useEffect(() => {
@@ -221,15 +246,7 @@ export default function View() {
 
   // 게시물 좋아요.
   const postLike = async () => {
-    if (isUserId === 0) {
-      const isConfirmed = confirm("로그인이 필요합니다.");
-      if (isConfirmed) {
-        router.push("/login");
-        return;
-      } else {
-        return;
-      }
-    }
+    if (!loginCheck()) return;
 
     await axios.post("/api/post/action/like", {
       isUserId,
@@ -239,6 +256,8 @@ export default function View() {
 
   // 게시물 신고.
   const postReport = async () => {
+    if (!loginCheck()) return;
+
     const reason = prompt("신고 사유를 입력해주세요.");
     if (!reason) return;
 
@@ -265,15 +284,7 @@ export default function View() {
   // 게시물 스크랩.
   const postScrap = async () => {
     alert("준비 중 입니다!");
-    if (isUserId === 0) {
-      const isConfirmed = confirm("로그인이 필요합니다.");
-      if (isConfirmed) {
-        router.push("/login");
-        return;
-      } else {
-        return;
-      }
-    }
+    if (!loginCheck()) return;
 
     await axios.post("/api/post/action/scrap", {
       isUserId,
@@ -304,21 +315,72 @@ export default function View() {
 
     setReset(true);
 
-    const response = await axios.post(`/api/comment/${params.id}`, {
-      comment,
-      isUserId,
-      isUserNick,
-      parentId,
-      mentionedUserIds: commentMentionUser,
-    });
+    const replaceBlobsWithS3Urls = async (html: string, images: CommentImage[]): Promise<string> => {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
 
-    if (response.data.success) {
-      setCommentContent("");
-      setRecommentContent("");
-      alert(response.data.message);
-      setCommentAdd(null);
-      setRecommentAdd(null);
-      setReset(false);
+      const imgTags = Array.from(doc.querySelectorAll("img"));
+
+      for (const tag of imgTags) {
+        const src = tag.getAttribute("src");
+        const match = images.find((img) => img.blobUrl === src);
+
+        if (match) {
+          const file = match.file;
+          const fileName = encodeURIComponent(file.name);
+          const presignedRes = await axios.get(`/api/comment/upload/${fileName}?size=${file.size}`);
+          const { url, fileUrl } = presignedRes.data;
+          try {
+            await fetch(url, {
+              method: "PUT",
+              headers: { "Content-Type": file.type },
+              body: file,
+            });
+
+            tag.setAttribute("src", fileUrl);
+          } catch (err) {
+            console.error("이미지 업로드 실패:", err);
+            throw new Error("이미지 업로드 중 문제가 발생했습니다.");
+          }
+        }
+      }
+
+      return doc.body.innerHTML;
+    };
+
+    try {
+      const finalComment = await replaceBlobsWithS3Urls(comment, commentImagesFile);
+      const response = await axios.post(`/api/comment/${params.id}`, {
+        comment: finalComment,
+        isUserId,
+        isUserNick,
+        parentId,
+        mentionedUserIds: commentMentionUser,
+      });
+
+      if (response.data.success) {
+        setCommentContent("");
+        setRecommentContent("");
+        alert(response.data.message);
+        setCommentAdd(null);
+        setRecommentAdd(null);
+        setCommentImagesFile([]);
+        setSingleCommentImageFile(null);
+        setReset(false);
+      } else {
+        if (response.data.message === "인증되지 않은 사용자입니다.") {
+          const isConfirmed = confirm("로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?");
+          if (isConfirmed) {
+            router.push("/login");
+          }
+          return;
+        } else {
+          alert(response.data.message || "댓글 등록에 실패했습니다.");
+        }
+      }
+    } catch (error) {
+      console.error("댓글 등록 실패:", error);
+      alert("댓글 등록에 실패했습니다. 다시 시도해 주세요.");
     }
   };
 
@@ -432,7 +494,17 @@ export default function View() {
 
   const mentionUsers = extractMentionUsers();
 
-  if (!viewPost) return <div>Loading...</div>;
+  if (!viewPost)
+    return (
+      <div className='data_wait'>
+        <span>잠시만 기다려 주세요.</span>
+        <div className='dots'>
+          <span className='dot dot1'>.</span>
+          <span className='dot dot2'>.</span>
+          <span className='dot dot3'>.</span>
+        </div>
+      </div>
+    );
 
   return (
     <sub className='sub'>
@@ -519,6 +591,7 @@ export default function View() {
               신고
             </button>
             <button
+              style={{ display: "none" }} // 스크랩 기능은 현재 준비 중이므로 숨김 처리
               type='button'
               onClick={() => {
                 postScrap();
@@ -639,18 +712,47 @@ export default function View() {
                     commentCorrect?.id === comment.id ? (
                       <div className='comment_add re'>
                         <CommentEditor
+                          singleCommentImageFile={singleCommentImageFile}
                           initialContent={commentCorrect ? commentCorrect.content : ""}
                           onChange={(html: string) => setCommentContent(html)}
                           onMentionUsersChange={setCommentMentionUser}
                           users={mentionUsers}
                           reset={reset}
                         />
-
-                        {commentCorrect ? (
-                          <button onClick={() => commentUpdate(commentContent, comment.id)}>댓글 수정</button>
-                        ) : (
-                          <button onClick={() => commentPost(commentContent, comment.id)}>댓글 추가</button>
-                        )}
+                        <div className='comment_editor'>
+                          <div>
+                            <input
+                              id='image-upload'
+                              type='file'
+                              accept='image/*'
+                              onChange={commentImageUpload}
+                              style={{ display: "none" }}
+                            />
+                            <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
+                              <PhotoIcon className='icon' />
+                              <span className='notice'>
+                                용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드가 가능합니다.
+                              </span>
+                            </label>
+                          </div>
+                          <div className='btn_wrap'>
+                            {commentCorrect ? (
+                              <button onClick={() => commentUpdate(commentContent, comment.id)}>댓글 수정</button>
+                            ) : (
+                              <button onClick={() => commentPost(commentContent, comment.id)}>댓글 추가</button>
+                            )}
+                            <button
+                              onClick={() => {
+                                setCommentAdd(null);
+                                setRecommentAdd(null);
+                                setCommentCorrect(null);
+                                setCommentContent("");
+                                setReset(true);
+                              }}>
+                              취소
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ) : null}
 
@@ -758,6 +860,7 @@ export default function View() {
                               recommentCorrect?.recomment_id === recomment.id)) && (
                             <div className='comment_add re'>
                               <CommentEditor
+                                singleCommentImageFile={singleCommentImageFile}
                                 initialContent={commentCorrect ? commentCorrect.content : ""}
                                 onChange={(html: string) => setCommentContent(html)}
                                 onMentionUsersChange={setCommentMentionUser}
@@ -765,21 +868,51 @@ export default function View() {
                                 reset={reset}
                               />
 
-                              {recommentCorrect ? (
-                                <button
-                                  onClick={() => {
-                                    commentUpdate(recommentContent, recomment.id);
-                                  }}>
-                                  댓글 수정
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => {
-                                    commentPost(commentContent, comment.id);
-                                  }}>
-                                  댓글 추가
-                                </button>
-                              )}
+                              <div className='comment_editor'>
+                                <div>
+                                  <input
+                                    id='image-upload'
+                                    type='file'
+                                    accept='image/*'
+                                    onChange={commentImageUpload}
+                                    style={{ display: "none" }}
+                                  />
+                                  <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
+                                    <PhotoIcon className='icon' />
+                                    <span className='notice'>
+                                      용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드 가능합니다.{" "}
+                                    </span>
+                                  </label>
+                                </div>
+                                <div className='btn_wrap'>
+                                  {recommentCorrect ? (
+                                    <button
+                                      onClick={() => {
+                                        commentUpdate(recommentContent, recomment.id);
+                                      }}>
+                                      댓글 수정
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={() => {
+                                        commentPost(commentContent, comment.id);
+                                      }}>
+                                      댓글 추가
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() => {
+                                      setCommentAdd(null);
+                                      setRecommentAdd(null);
+                                      setCommentCorrect(null);
+                                      setRecommentCorrect(null);
+                                      setRecommentContent("");
+                                      setReset(true);
+                                    }}>
+                                    취소
+                                  </button>
+                                </div>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -792,18 +925,39 @@ export default function View() {
         {isUserId !== 0 ? (
           <div className='comment_add'>
             <CommentEditor
+              singleCommentImageFile={singleCommentImageFile}
               initialContent={commentCorrect ? commentCorrect.content : ""}
               onChange={(html: string) => setCommentContent(html)}
               onMentionUsersChange={setCommentMentionUser}
               users={mentionUsers}
               reset={reset}
             />
-            <button
-              onClick={() => {
-                commentPost(commentContent);
-              }}>
-              댓글 추가
-            </button>
+            <div className='comment_editor'>
+              <div>
+                <input
+                  id='image-upload'
+                  type='file'
+                  accept='image/*'
+                  onChange={commentImageUpload}
+                  style={{ display: "none" }}
+                />
+                <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
+                  <PhotoIcon className='icon' />
+                  <span className='notice'>
+                    용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드 가능합니다.{" "}
+                  </span>
+                </label>
+              </div>
+
+              <div className='btn_wrap'>
+                <button
+                  onClick={() => {
+                    commentPost(commentContent);
+                  }}>
+                  댓글 추가
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           <Link href='/login' className='go_to_login_for_comment'>
@@ -824,10 +978,12 @@ export default function View() {
             <ListBulletIcon className='icon' />
             <span>목록으로</span>
           </Link>
-          <Link href={`/write`}>
-            <PencilSquareIcon className='icon' />
-            <span>글쓰기</span>
-          </Link>
+          {isUserId !== null && (
+            <Link href={`/write`}>
+              <PencilSquareIcon className='icon' />
+              <span>글쓰기</span>
+            </Link>
+          )}
         </div>
       </div>
 

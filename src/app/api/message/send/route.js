@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
 
+import { serverTokenCheck } from "@/lib/serverTokenCheck";
+
 export async function POST(req) {
   const client = await pool.connect();
 
   try {
+    const user = await serverTokenCheck();
+    if (!user) {
+      return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
+    }
+
     const body = await req.json();
     const { to, message, from } = body;
 

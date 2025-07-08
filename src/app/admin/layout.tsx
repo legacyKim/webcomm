@@ -1,5 +1,5 @@
-import "../style/base.css";
-import "./admin.scss";
+import "@/style/base.css";
+import "@/admin/admin.scss";
 
 import Link from "next/link";
 
@@ -7,8 +7,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className='admin-container'>
       <header className='admin_header'>
-        <Link className='admin_logo' href='/admin'>
-          어드민
+        <Link className='admin_logo' href='/'>
+          홈으로
         </Link>
         <menu className='admin_menu'>
           <Link href='/admin/board'>게시판 관리</Link>

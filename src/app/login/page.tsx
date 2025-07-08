@@ -14,8 +14,16 @@ import { useAuth } from "@/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginStatus, setLoginStatus, setIsUsername, setIsUserId, setIsUserNick, setIsUserProfile, setIsUserEmail } =
-    useAuth();
+  const {
+    loginStatus,
+    setLoginStatus,
+    setIsUsername,
+    setIsUserId,
+    setIsUserNick,
+    setIsUserProfile,
+    setIsUserEmail,
+    setIsUserAuthority,
+  } = useAuth();
 
   const [userid, setUserid] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -64,6 +72,7 @@ export default function LoginPage() {
         setIsUserProfile(response.data.userProfile);
         setIsUserEmail(response.data.userEmail);
         setLoginStatus(response.data.success);
+        setIsUserAuthority(response.data.userAuthority);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -230,7 +239,7 @@ export default function LoginPage() {
               </label>
             </div>
 
-            {error && <span className={styles.notice}>{error}</span>}
+            {error && <span className={`${styles.notice} ${styles.blue}`}>{error}</span>}
 
             {/* 버튼 */}
             <div className='btn_wrap'>

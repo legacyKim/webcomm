@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
+import { serverTokenCheck } from "@/lib/serverTokenCheck";
 
 export async function GET(req, context) {
   const { id } = await context.params;
@@ -46,6 +47,11 @@ export async function POST(req, context) {
   const { isUserId, isUserNick, parentId, comment, mentionedUserIds = [] } = await req.json();
 
   try {
+    const user = await serverTokenCheck();
+    if (!user) {
+      return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
+    }
+
     await client.query("BEGIN");
 
     // 댓글 저장 후 commentId 받아오기

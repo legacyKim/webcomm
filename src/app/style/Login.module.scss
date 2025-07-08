@@ -216,11 +216,17 @@
 }
 .notice {
   @include re-bl;
-  color: $blue-color;
+  color: $grey5-color;
   margin-bottom: 8px;
   font-size: 15px;
   font-weight: 400;
   line-height: 1.6;
+}
+.notice.red {
+  color: $red-color;
+}
+.notice.blue {
+  color: $blue-color;
 }
 .notice_true {
   color: $main-color;
