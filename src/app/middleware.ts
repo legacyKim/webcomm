@@ -20,8 +20,8 @@ export function middleware(req: NextRequest) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    let authority: any = undefined;
-    let authorityRaw: any = undefined;
+    let authority: number | undefined = undefined;
+    let authorityRaw: number | undefined = undefined;
 
     console.log("decoded:", decoded);
     console.log("authority:", authority, typeof authority);

@@ -35,11 +35,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     [boardType, url_slug, page, limit],
   );
 
-  const {
-    data: postData,
-    error,
-    isLoading,
-  } = useQuery({
+  const { data: postData, isLoading } = useQuery({
     queryKey,
     queryFn: () => {
       if (boardType === "popular") return fetchBoardPop(page, limit, isUserId);

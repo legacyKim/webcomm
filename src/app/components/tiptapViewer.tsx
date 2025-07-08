@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import { EditorContent, useEditor } from "@tiptap/react";
 
 import { StarterKit } from "@tiptap/starter-kit";
@@ -8,8 +6,6 @@ import { Video } from "@/extensions/video";
 import { LinkUrl } from "@/extensions/linkUrl";
 import { CustomTextStyle } from "@/extensions/CustomTextStyle";
 
-import TextStyle from "@tiptap/extension-text-style";
-import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";

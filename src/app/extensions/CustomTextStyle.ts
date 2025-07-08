@@ -1,7 +1,7 @@
 // extensions/CustomTextStyle.ts
 
 import TextStyle from "@tiptap/extension-text-style";
-import { Editor, Mark, mergeAttributes } from "@tiptap/core";
+import { mergeAttributes } from "@tiptap/core";
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
