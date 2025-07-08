@@ -20,22 +20,7 @@ export function middleware(req: NextRequest) {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    let authority: number | undefined = undefined;
-    const authorityRaw: number | undefined = undefined;
-
-    console.log("decoded:", decoded);
-    console.log("authority:", authority, typeof authority);
-
-    if (typeof decoded === "object" && decoded !== null) {
-      authority = decoded.userAuthority;
-    }
-
-    const authorityNum = Number(authorityRaw);
-
-    const response = NextResponse.next();
-    response.headers.set("x-auth-authority-raw", String(authority));
-    response.headers.set("x-auth-authority-num", String(authorityNum));
-    response.headers.set("x-request-path", pathname);
+    const authority = (decoded as jwt.JwtPayload).userAuthority;
 
     if (pathname.startsWith("/admin") && authority !== 0) {
       if (pathname.startsWith("/api")) {
@@ -52,3 +37,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 }
+
+export const config = {
+  matcher: ["/admin/:path*", "/write/:path*", "/my/:path*", "/api/:path*"],
+};
