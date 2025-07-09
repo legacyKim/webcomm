@@ -45,7 +45,7 @@ export function middleware(req: NextRequest) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
     const authority = (decoded as jwt.JwtPayload).userAuthority;
 
-    if (pathname.startsWith("/admin") && authority !== 0) {
+    if (pathname.startsWith("/admin") && Number(authority) !== 0) {
       if (pathname.startsWith("/api")) {
         return NextResponse.json({ success: false, message: "관리자 권한이 필요합니다." }, { status: 403 });
       }
@@ -62,5 +62,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/write/:path*", "/my/:path*", "/api/:path*"],
+  matcher: ["/admin", "/admin/:path*", "/write", "/write/:path*", "/my", "/my/:path*"],
 };

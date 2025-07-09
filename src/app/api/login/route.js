@@ -45,13 +45,19 @@ export async function POST(req) {
       userEmail: user.email,
       userAuthority: user.authority,
     });
-    response.headers.set(
-      "Set-Cookie",
-      `authToken=${token}; Path=/; HttpOnly; Max-Age=3600; Secure=${
-        process.env.NODE_ENV === "production"
-      }; SameSite=Strict`,
-      // `authToken=${token}; Path=/; Max-Age=3600; SameSite=Strict`,
-    );
+
+    const isProduction = process.env.NODE_ENV === "production";
+
+    const cookie = [
+      `authToken=${token}`,
+      `Path=/`,
+      `HttpOnly`,
+      `Max-Age=3600`,
+      `SameSite=Lax`, // 개발중엔 Lax 추천
+      ...(isProduction ? ["Secure"] : []),
+    ].join("; ");
+
+    response.headers.set("Set-Cookie", cookie);
 
     return response;
   } catch (error) {
