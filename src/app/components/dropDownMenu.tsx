@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -92,30 +92,34 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
     }
   };
 
+  if (isUserId === null) {
+    const isConfirmed = confirm("로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?");
+    if (isConfirmed) {
+      router.push("/login");
+    }
+  }
+
   return (
     <>
-      {isUserId !== null && (
-        <ul className='dropDownMenu' style={style}>
-          <li>
-            <button onClick={searchPosts}>작성글 검색</button>
-          </li>
-          <li>
-            <button onClick={searchComments}>댓글 검색</button>
-          </li>
-
-          <li>
-            <button onClick={sendMessage}>쪽지 보내기</button>
-          </li>
-          <li>
-            <button onClick={blockUserConfirm} disabled={isBlocked} style={{ color: isBlocked ? "gray" : "inherit" }}>
-              {isBlocked ? "차단됨" : "차단하기"}
-            </button>
-          </li>
-          <li>
-            <button onClick={reportUser}>신고하기</button>
-          </li>
-        </ul>
-      )}
+      <ul className='dropDownMenu' style={style}>
+        <li>
+          <button onClick={searchPosts}>작성글 검색</button>
+        </li>
+        <li>
+          <button onClick={searchComments}>댓글 검색</button>
+        </li>
+        <li>
+          <button onClick={sendMessage}>쪽지 보내기</button>
+        </li>
+        <li>
+          <button onClick={blockUserConfirm} disabled={isBlocked} style={{ color: isBlocked ? "gray" : "inherit" }}>
+            {isBlocked ? "차단됨" : "차단하기"}
+          </button>
+        </li>
+        <li>
+          <button onClick={reportUser}>신고하기</button>
+        </li>
+      </ul>
 
       {messageToUser !== null && (
         <Message

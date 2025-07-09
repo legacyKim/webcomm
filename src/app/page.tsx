@@ -1,6 +1,5 @@
 "use client";
 
-// import Image from "next/image";
 import Search from "./components/search";
 
 import Link from "next/link";
@@ -19,6 +18,7 @@ import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react
 import { SSE_BASE_URL } from "@/lib/sse";
 
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
+import { NoSymbolIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
   const { isUserId, setBoardType, messageToUser } = useAuth();
@@ -171,17 +171,24 @@ export default function Home() {
                   </Link>
                 </div>
                 <ol className='board_list'>
-                  {homeData[boardName].posts.map((post: Posts) => (
-                    <li key={`${boardName}${post.id}`}>
-                      <Link href={`/board/${homeData[boardName].url_slug}/${post.id}`}>
-                        <span className='title'>{post.title}</span>
-                        <div className='view flex-start'>
-                          <EyeIcon className='icon' />
-                          {post.views}
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
+                  {Array.isArray(homeData[boardName].posts) && homeData[boardName].posts.length > 0 ? (
+                    homeData[boardName].posts.map((post: Posts) => (
+                      <li key={`${boardName}${post.id}`}>
+                        <Link href={`/board/${homeData[boardName].url_slug}/${post.id}`}>
+                          <span className='title'>{post.title}</span>
+                          <div className='view flex-start'>
+                            <EyeIcon className='icon' />
+                            {post.views}
+                          </div>
+                        </Link>
+                      </li>
+                    ))
+                  ) : (
+                    <div className='data_none'>
+                      <NoSymbolIcon />
+                      <span>작성한 글이 없습니다.</span>
+                    </div>
+                  )}
                 </ol>
               </div>
             ))}

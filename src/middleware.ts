@@ -1,7 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
-const PROTECTED_PATHS = ["/write", "/my", "/admin", "/api"];
+const PROTECTED_PATHS = [
+  "/write",
+  "/my",
+  "/admin",
+
+  "/api/board/popular",
+  "/api/board/userPost",
+  "/api/board/userComment",
+  "/api/board/search",
+  "/api/board/stream",
+
+  "/api/comment/action",
+  "/api/comment/upload",
+
+  "/api/member",
+  "/api/message",
+  "/api/my",
+
+  "/api/post/action",
+  "/api/upload",
+
+  "/api/user/block",
+  "/api/user/report",
+];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;

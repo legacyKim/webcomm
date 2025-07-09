@@ -3,7 +3,7 @@
 import axios from "axios";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/AuthContext";
@@ -64,25 +64,29 @@ export default function Header() {
   };
 
   const [messageBox, setMessageBox] = useState<boolean>(false);
+  const messageBoxRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     const clickOutSide = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const messageBtn = document.querySelector(".message_btn");
+      const messageBtn = document.querySelector(".header_btn"); // 버튼 클래스명 확인
       const dropdownBox = document.querySelector(".message");
 
       if ((dropdownBox && dropdownBox.contains(target)) || (messageBtn && messageBtn.contains(target))) {
         return;
       }
-      setMessageBox(false);
+
+      // 최신 상태 참조하여 messageBox가 열려있을 때만 닫기 실행
+      if (messageBoxRef.current) {
+        setMessageBox(false);
+      }
     };
 
     document.addEventListener("mousedown", clickOutSide);
-
     return () => {
       document.removeEventListener("mousedown", clickOutSide);
     };
-  }, [messageBox]);
+  }, []);
 
   // 알림 SSE
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -149,7 +153,7 @@ export default function Header() {
             is_read: false,
           },
         ]);
-        setMessageBox(true); // 메시지창 열기
+        setMessageBox(true);
       } catch (err) {
         console.error("SSE 메시지 처리 오류:", err);
       }
@@ -204,8 +208,11 @@ export default function Header() {
               <div className='notice_popup'>
                 <button
                   className='header_btn'
-                  onClick={() => {
-                    setMessageBox(true);
+                  ref={messageBoxRef}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setMessageBox(!messageBox);
                   }}>
                   <BellIcon className='icon' />
                   <span>알림</span>
