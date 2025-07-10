@@ -31,6 +31,7 @@ export interface Posts {
   dislike: number;
   reports: number;
   comment_count: number;
+  notice: boolean;
   created_at: string;
   updated_at: string;
 }

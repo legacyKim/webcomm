@@ -13,7 +13,13 @@ import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
 
-import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import {
+  ChatBubbleLeftEllipsisIcon,
+  EyeIcon,
+  HeartIcon,
+  CalendarIcon,
+  SpeakerWaveIcon,
+} from "@heroicons/react/24/outline";
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
 
 import { SSE_BASE_URL } from "@/lib/sse";
@@ -115,7 +121,6 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
             userInfoInDropMenu={userInfoInDropMenu}
           />
         )}
-
         <li className='board_list_header'>
           {boardType === "popular" ? <span className='category'></span> : <span className='num'></span>}
           <span className='title'></span>
@@ -133,12 +138,16 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
             <CalendarIcon className='icon' />
           </div>
         </li>
-
         {!isLoading && postData?.posts.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link href={`/board/${boardType === "popular" ? b.url_slug : url_slug}/${b.id}`}>
-                {boardType !== "popular" && <span className='num'>{b.post_number}</span>}
+                {boardType !== "popular" &&
+                  (b.notice ? (
+                    <SpeakerWaveIcon className='icon notice' />
+                  ) : (
+                    <span className='num'>{b.post_number}</span>
+                  ))}
                 <span className='title'>
                   {boardType === "popular" && <span className='category'>{b.url_slug}</span>}
                   {b.title}

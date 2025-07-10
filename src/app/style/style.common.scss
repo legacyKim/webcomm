@@ -631,6 +631,11 @@ sub .board_list {
   text-align: center;
   min-width: 30px;
 }
+.icon.notice {
+  width: 30px;
+  height: 17px;
+  color: $main-color;
+}
 
 .like,
 .view,

@@ -60,7 +60,7 @@ export function middleware(req: NextRequest) {
     if (pathname.startsWith("/api")) {
       return NextResponse.json({ success: false, message: "토큰이 만료되었거나 유효하지 않습니다." }, { status: 401 });
     }
-    return NextResponse.redirect(new URL("/login", req.url));
+    // return NextResponse.redirect(new URL("/login", req.url));
   }
 }
 

@@ -35,9 +35,10 @@ export async function GET(req, context) {
       ) c ON p.id = c.post_id
       LEFT JOIN members m ON p.user_id = m.id
       WHERE p.deleted = FALSE
-      AND p.user_id NOT IN (
-        SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
-      )
+        AND p.notice = FALSE
+        AND p.user_id NOT IN (
+          SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
+        )
       ORDER BY score DESC
       LIMIT $2 OFFSET $3;
     `;

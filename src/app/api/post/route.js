@@ -17,6 +17,7 @@ export async function GET(req) {
         p.likes,
         p.dislikes,
         p.reports,
+        p.notice,
         p.created_at,
         COALESCE(c.comment_count, 0) AS comment_count
       FROM posts p

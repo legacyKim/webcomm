@@ -1,0 +1,165 @@
+"use client";
+
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchBoard } from "@/api/api";
+
+import axios from "axios";
+
+interface Notice {
+  url_slug: string;
+  id: number;
+  title: string;
+  content: string;
+  created_at: string;
+}
+
+export default function BoardNoticePopup({
+  setPopupOpen,
+  editingNotice,
+  setEditingNotice,
+}: {
+  setPopupOpen: (value: boolean) => void;
+  editingNotice: Notice | null;
+  setEditingNotice: (notice: Notice | null) => void;
+}) {
+  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
+  const [boardInfo, setBoardInfo] = useState<{ board_name: string; url_slug: string }>({
+    board_name: "",
+    url_slug: "",
+  });
+
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: "",
+  });
+
+  useEffect(() => {
+    if (editingNotice && editor) {
+      setBoardInfo({
+        board_name: editingNotice.url_slug,
+        url_slug: editingNotice.url_slug,
+      });
+      setTitle(editingNotice.title);
+      editor.commands.setContent(editingNotice.content);
+    }
+  }, [editingNotice, editor]);
+
+  const [title, setTitle] = useState("");
+
+  const noticeSubmit = async () => {
+    if (!editor) return;
+
+    const boardname = boardInfo.board_name;
+    const url_slug = boardInfo.url_slug;
+
+    const content = editor.getHTML();
+
+    try {
+      const res = await axios.post("/api/notice", {
+        boardname,
+        url_slug,
+        title,
+        content,
+      });
+
+      if (res.data.success) {
+        alert("공지사항이 등록되었습니다.");
+        setPopupOpen(false);
+      } else {
+        alert("등록 실패: " + res.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("오류 발생");
+    }
+  };
+
+  const noticeCorrect = async () => {
+    if (!editor || !editingNotice) return;
+
+    const boardname = boardInfo.board_name;
+    const url_slug = boardInfo.url_slug;
+
+    const content = editor.getHTML();
+    try {
+      const res = await axios.patch(`/api/notice/${editingNotice.id}`, {
+        boardname,
+        url_slug,
+        title,
+        content,
+      });
+
+      if (res.data.success) {
+        alert("공지사항이 수정되었습니다.");
+        setPopupOpen(false);
+      } else {
+        alert("수정 실패: " + res.data.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("수정 중 오류가 발생했습니다.");
+    }
+  };
+
+  return (
+    <div className='admin_popup_bg'>
+      <div className='admin_popup'>
+        <div className='admin_popup_header'>
+          <h6>공지사항 작성</h6>
+          <button onClick={() => setPopupOpen(false)}>
+            <i className='icon-cancel'></i>
+          </button>
+        </div>
+
+        <div className='admin_popup_content'>
+          <select
+            className='board_category'
+            value={boardInfo.url_slug}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+              const selectedBoard = boardData.boards.find(
+                (b: { board_name: string; url_slug: string }) => b.url_slug === e.target.value,
+              );
+              if (selectedBoard) {
+                setBoardInfo({
+                  board_name: selectedBoard.board_name,
+                  url_slug: selectedBoard.url_slug,
+                });
+              } else {
+                setBoardInfo({ board_name: "", url_slug: "" });
+              }
+            }}>
+            <option>선택</option>
+            {boardData &&
+              boardData?.boards?.map((b: { board_name: string; url_slug: string }) => (
+                <option key={b.board_name} value={b.url_slug}>
+                  {b.board_name}
+                </option>
+              ))}
+          </select>
+          <input
+            className='notice_title_input'
+            placeholder='제목을 입력하세요'
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <EditorContent editor={editor} className='notice_editor' />
+        </div>
+
+        <div className='admin_popup_footer'>
+          {editingNotice ? <button onClick={noticeCorrect}>수정</button> : <button onClick={noticeSubmit}>저장</button>}
+          <button
+            onClick={() => {
+              setPopupOpen(false);
+              setEditingNotice(null);
+            }}>
+            취소
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

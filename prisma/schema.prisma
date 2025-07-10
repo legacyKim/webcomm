@@ -52,21 +52,22 @@ model Member {
 }
 
 model Post {
-  id           Int        @id @default(autoincrement())
-  board_id     Int        @default(1)
-  board_name   String     @db.VarChar(255)
-  title        String     @db.VarChar(255)
-  content      String     @db.Text
-  user_id      Int      
-  views        Int        @default(0)
-  likes        Int        @default(0)
-  dislikes     Int        @default(0)
-  reports      Int        @default(0)
-  created_at   DateTime   @default(now())
-  updated_at   DateTime   @default(now())
-  url_slug     String     @db.VarChar(255)
-  user_nickname String?   @db.VarChar(255)
-  deleted    Boolean   @default(false)
+  id            Int         @id @default(autoincrement())
+  board_id      Int         @default(1)
+  board_name    String      @db.VarChar(255)
+  title         String      @db.VarChar(255)
+  content       String      @db.Text
+  user_id       Int      
+  views         Int         @default(0)
+  likes         Int         @default(0)
+  dislikes      Int         @default(0)
+  reports       Int         @default(0)
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @default(now())
+  url_slug      String      @db.VarChar(255)
+  user_nickname String?     @db.VarChar(255)
+  deleted       Boolean     @default(false)
+  notice        Boolean     @default(false)
   
   // Relations
   board        Board    @relation(fields: [board_id], references: [id])

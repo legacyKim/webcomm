@@ -30,6 +30,7 @@ export async function GET(req) {
             SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
           ))
           AND p.deleted = FALSE
+          AND p.notice = FALSE
       )
       SELECT 
           board_name, 

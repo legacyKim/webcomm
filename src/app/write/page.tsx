@@ -5,7 +5,7 @@ import axios from "axios";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { fetchBoard } from "../api/api";
+import { fetchBoard } from "@/api/api";
 
 import Editor from "./Editor";
 import { useAuth } from "@/AuthContext";

@@ -48,6 +48,7 @@ interface Posts {
       user_profile: string;
       views: number;
       comments: number;
+      notice: boolean;
     }>;
   };
 }
@@ -85,6 +86,8 @@ export default function View() {
 
   const [viewPost, setViewPost] = useState<Posts | null>(null);
   const [commentList, setCommentList] = useState<CommentList | null>(null);
+
+  console.log(viewPost);
 
   const [commentAdd, setCommentAdd] = useState<{ user_id: number; id: number } | null>(null);
   const [recommentAdd, setRecommentAdd] = useState<{ user_id: number; id: number; recomment_id: number } | null>(null);
@@ -585,14 +588,17 @@ export default function View() {
 
         {viewPost?.posts?.rows?.[0]?.user_nickname !== isUserNick && (
           <div className='view_content_btn'>
-            <button
-              type='button'
-              onClick={() => {
-                postReport();
-              }}>
-              <FlagIcon className='icon' />
-              신고
-            </button>
+            {!viewPost?.posts?.rows?.[0]?.notice && (
+              <button
+                type='button'
+                onClick={() => {
+                  postReport();
+                }}>
+                <FlagIcon className='icon' />
+                신고
+              </button>
+            )}
+
             <button
               style={{ display: "none" }} // 스크랩 기능은 현재 준비 중이므로 숨김 처리
               type='button'

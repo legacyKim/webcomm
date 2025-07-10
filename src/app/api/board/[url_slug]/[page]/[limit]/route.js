@@ -13,6 +13,29 @@ export async function GET(req, context) {
   const client = await pool.connect();
 
   try {
+    const noticeQuery = `
+      SELECT 
+        p.id,
+        p.title,
+        p.content,
+        p.user_id,
+        p.user_nickname,
+        p.board_name,
+        p.url_slug,
+        p.views,
+        p.likes,
+        p.notice,
+        p.created_at,
+        0 AS comments,
+        0 AS post_number
+      FROM posts p
+      WHERE p.url_slug = $1
+        AND p.deleted = FALSE
+        AND p.notice = TRUE
+      ORDER BY p.created_at DESC
+    `;
+    const noticeResult = await client.query(noticeQuery, [url_slug]);
+
     // 전체 게시물 개수 조회
     const countQuery = `
       SELECT COUNT(*) FROM (
@@ -50,20 +73,23 @@ export async function GET(req, context) {
       FROM posts p
       LEFT JOIN comments c ON p.id = c.post_id
       WHERE p.url_slug = $1
-      AND p.deleted = FALSE
-      AND p.user_id NOT IN (
-        SELECT "blockedId"
-        FROM blocked_users
-        WHERE "blockerId" = $2
-      )
+        AND p.deleted = FALSE
+        AND p.notice = FALSE
+        AND p.user_id NOT IN (
+          SELECT "blockedId"
+          FROM blocked_users
+          WHERE "blockerId" = $2
+        )
       GROUP BY p.id
       ORDER BY p.created_at DESC
       LIMIT $3 OFFSET $4
     `;
     const result = await client.query(query, [url_slug, blockerId, limitNum, offset]);
 
+    const posts = [...noticeResult.rows, ...result.rows];
+
     return NextResponse.json({
-      posts: result.rows,
+      posts,
       totalPosts,
       totalPages: Math.ceil(totalPosts / limitNum),
     });
