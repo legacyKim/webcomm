@@ -38,6 +38,7 @@ export default function BoardNoticeManage() {
       alert("삭제되었습니다.");
       location.reload(); // 또는 queryClient.invalidateQueries(["notices"])
     } catch (err) {
+      console.error(err);
       alert("삭제 실패");
     }
   };
