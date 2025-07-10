@@ -73,7 +73,7 @@ button {
   display: block;
   text-align: center;
   gap: 8px;
-  min-width: 100px;
+  // min-width: 100px;
   cursor: pointer;
 }
 
@@ -168,6 +168,10 @@ button {
 }
 .btn.undefined {
   background-color: $grey-color;
+}
+.cancel {
+  font-size: 15px;
+  color: $grey3-color;
 }
 .block_btn {
   padding: 8px 15px;
@@ -522,7 +526,7 @@ main .title {
   column-gap: 16px;
 }
 main .board_list {
-  min-height: 120px;
+  min-height: 133px;
   border-bottom: $border-grey;
   padding-bottom: 12px;
 }
@@ -545,6 +549,8 @@ sub .board_list {
 }
 .board_list .writer {
   @include ellipsis;
+  min-width: 76px;
+  max-width: 76px;
 }
 
 .board_list_header .category {
@@ -973,16 +979,27 @@ sub .board_list {
 .view_header .category {
   position: relative;
   display: inline-block;
-  margin-bottom: 8px;
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
-  padding: 4px 12px;
+  border: none;
+  padding: 0;
+  color: #000;
 }
+
+.view_header .bar {
+  position: relative;
+  display: inline-block;
+  width: 1px;
+  height: 12px;
+  background-color: $grey5-color;
+  top: 2px;
+}
+
 .view_header .view_title {
   position: relative;
   display: block;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   line-height: 1.4;
   color: $font-color;
@@ -990,9 +1007,9 @@ sub .board_list {
 }
 .view_info_area {
   @include space-between;
-  background-color: $grey4-color;
   padding: 10px 14px;
-  border-radius: 4px;
+  padding-left: 4px;
+  border-bottom: $border-grey;
 }
 .view_info {
   position: relative;
@@ -1115,7 +1132,7 @@ sub .board_list {
   font-size: 13px;
   font-weight: 400;
   line-height: 1.4;
-  min-width: 200px;
+  // min-width: 200px;
 }
 .comment_info .writer > .writer_name {
   text-align: left;
@@ -1221,6 +1238,8 @@ sub .board_list {
 }
 .comment_editor label svg {
   opacity: 0.5;
+  width: 20px;
+  height: 20px;
 }
 .comment_editor label:hover svg {
   opacity: 1;
@@ -1276,7 +1295,7 @@ sub .board_list {
   background-color: #fff;
   border: $border-grey;
   border-radius: 16px;
-  padding: 48px 16px 24px;
+  padding: 20px 16px 14px;
   max-width: 376px;
   width: 100%;
 }

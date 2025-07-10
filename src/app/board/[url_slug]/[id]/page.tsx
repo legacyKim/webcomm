@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -466,6 +466,7 @@ export default function View() {
   }, [recommentContent]);
 
   // writer dropdown
+  const writerRef = useRef<HTMLDivElement>(null);
   const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });
   const [userInfoInDropMenu, setUserInfoInDropMenu] = useState<{
     userId: number;
@@ -511,8 +512,8 @@ export default function View() {
       {isUserId !== userInfoInDropMenu.userId && writerDrop && (
         <DropDownMenu
           style={{
-            top: `${dropPosition.top + 42}px`,
-            left: `${dropPosition.left + 14}px`,
+            top: `${dropPosition.top}px`,
+            left: `${dropPosition.left + (writerRef.current?.offsetWidth ?? 0) + 8}px`,
           }}
           userInfoInDropMenu={userInfoInDropMenu}
         />
@@ -527,6 +528,7 @@ export default function View() {
               <div className='view_info_left'>
                 <div
                   className='writer'
+                  ref={writerRef}
                   onClick={(e) => {
                     userClick(e);
                     setUserInfoInDropMenu({
@@ -555,6 +557,7 @@ export default function View() {
                   <HeartIcon className='icon' />
                   <span>{viewPost?.posts?.rows?.[0]?.likes}</span>
                 </span>
+                <div className='bar'></div>
                 <span className='date'>{new Date(viewPost?.posts?.rows?.[0]?.created_at).toLocaleDateString()}</span>
               </div>
             </div>

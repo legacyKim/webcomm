@@ -16,6 +16,7 @@ interface DropDownMenuProps {
   userInfoInDropMenu: {
     userId: number;
     userNickname: string;
+    userUiWidth?: number;
   };
 }
 

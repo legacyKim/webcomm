@@ -4,7 +4,7 @@ import Search from "./components/search";
 
 import Link from "next/link";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchHome, fetchHomePop } from "./api/api";
 import { Posts } from "./type/type";
@@ -53,6 +53,7 @@ export default function Home() {
   }, [refetch]);
 
   // writer dropdown
+  const writerRef = useRef<HTMLDivElement>(null);
   const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });
   const [userInfoInDropMenu, setUserInfoInDropMenu] = useState<{
     userId: number;
@@ -69,8 +70,8 @@ export default function Home() {
       {isUserId !== userInfoInDropMenu.userId && writerDrop && (
         <DropDownMenu
           style={{
-            top: `${dropPosition.top + 22}px`,
-            left: `${dropPosition.left + 14}px`,
+            top: `${dropPosition.top}px`,
+            left: `${dropPosition.left + (writerRef.current?.offsetWidth ?? 0) + 8}px`,
           }}
           userInfoInDropMenu={userInfoInDropMenu}
         />
@@ -116,6 +117,7 @@ export default function Home() {
                         </div>
                         <div
                           className='writer'
+                          ref={writerRef}
                           onClick={(e) => {
                             userClick(e);
                             setUserInfoInDropMenu({

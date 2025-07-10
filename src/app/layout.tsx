@@ -56,8 +56,6 @@ export default async function RootLayout({
     }
   }
 
-  console.log(userAuthority, "userAuthority in layout");
-
   return (
     <html lang='en'>
       <body>

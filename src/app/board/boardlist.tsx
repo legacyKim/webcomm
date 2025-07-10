@@ -109,8 +109,8 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
         {isUserId !== userInfoInDropMenu.userId && writerDrop && (
           <DropDownMenu
             style={{
-              top: `${dropPosition.top + 22}px`,
-              left: `${dropPosition.left + 14}px`,
+              top: `${dropPosition.top}px`,
+              left: `${dropPosition.left}px`,
             }}
             userInfoInDropMenu={userInfoInDropMenu}
           />

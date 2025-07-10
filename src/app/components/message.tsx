@@ -58,6 +58,7 @@ export default function Message({
             보내기
           </button>
           <button
+            className='cancel'
             onClick={() => {
               setMessageToUser(null);
             }}>
