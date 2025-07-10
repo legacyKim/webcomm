@@ -1427,6 +1427,9 @@ sub .board_list {
 .mypage_info p.notice {
   color: $red-color;
 }
+.mypage_info .input_box {
+  @include re-bl;
+}
 .mypage_info .input_box input {
   margin-right: 8px;
 }
