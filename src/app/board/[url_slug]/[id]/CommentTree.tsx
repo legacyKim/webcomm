@@ -45,10 +45,12 @@ export default function CommentTree({
   setRecommentAdd,
 
   commentPost,
+
+  commentCorrect,
+  setCommentCorrect,
 }: CommentTreeProps) {
   const { isUserId } = useAuth();
 
-  const [commentCorrect, setCommentCorrect] = useState<{ content: string; id: number } | null>(null);
   const [recommentCorrect, setRecommentCorrect] = useState<{
     content: string;
     id: number;
@@ -370,6 +372,8 @@ export default function CommentTree({
                     recommentAdd={recommentAdd}
                     setRecommentAdd={setRecommentAdd}
                     commentPost={commentPost}
+                    commentCorrect={commentCorrect}
+                    setCommentCorrect={setCommentCorrect}
                   />
                 </div>
               )}

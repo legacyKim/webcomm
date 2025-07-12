@@ -1,3 +1,5 @@
+import { NextRouter } from "next/router";
+
 export type CommentImage = { file: File; blobUrl: string };
 
 export type CommentTreeNode = {
@@ -18,13 +20,18 @@ export type CommentTreeNodeArr = {
   comments: CommentTreeNode[];
 };
 
+interface MentionUser {
+  id: number;
+  nickname: string;
+}
+
 export interface CommentTreeProps {
   params: { id: string; url_slug: string };
   setCommentList: React.Dispatch<React.SetStateAction<CommentTreeNodeArr | null>>;
 
   comments: CommentTreeNode[];
-  router: any;
-  mentionUsers: any[];
+  router: NextRouter;
+  mentionUsers: MentionUser[];
   loginCheck: () => Promise<boolean>;
   userClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   setUserInfoInDropMenu: (info: { userId: number; userNickname: string }) => void;
@@ -53,4 +60,7 @@ export interface CommentTreeProps {
   setRecommentAdd?: (recommentAdd: { user_id: number; id: number; recomment_id: number } | null) => void;
 
   commentPost?: (commentContent: string, id?: number, depth?: number) => void;
+
+  commentCorrect: { content: string; id: number } | null;
+  setCommentCorrect: React.Dispatch<React.SetStateAction<{ content: string; id: number } | null>>;
 }

@@ -559,6 +559,8 @@ export default function View() {
               recommentAdd={recommentAdd}
               setRecommentAdd={setRecommentAdd}
               commentPost={commentPost}
+              commentCorrect={commentCorrect}
+              setCommentCorrect={setCommentCorrect}
             />
           </div>
         </div>

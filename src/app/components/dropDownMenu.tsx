@@ -107,7 +107,7 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
               const ok = await loginCheck();
               if (!ok) return;
 
-              blockUserConfirm;
+              blockUserConfirm();
             }}
             disabled={isBlocked}
             style={{ color: isBlocked ? "gray" : "inherit" }}>
@@ -120,7 +120,7 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
               const ok = await loginCheck();
               if (!ok) return;
 
-              reportUser;
+              reportUser();
             }}>
             신고하기
           </button>
