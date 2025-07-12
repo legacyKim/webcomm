@@ -3,17 +3,18 @@
 import axios from "axios";
 
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "@/AuthContext";
+import { useRouter } from "next/navigation";
 
+import { useAuth } from "@/AuthContext";
 import TiptapViewer from "@/components/tiptapViewer";
 import CommentEditor from "./commentEditor";
+
 import { PhotoIcon } from "@heroicons/react/24/outline";
 
 import { CommentTreeProps } from "@/type/commentType";
 
 export default function CommentTree({
   params,
-  router,
 
   comments,
   setCommentList,
@@ -49,6 +50,8 @@ export default function CommentTree({
   commentCorrect,
   setCommentCorrect,
 }: CommentTreeProps) {
+  const router = useRouter();
+
   const { isUserId } = useAuth();
 
   const [recommentCorrect, setRecommentCorrect] = useState<{
@@ -349,7 +352,6 @@ export default function CommentTree({
                       id: params.id as string,
                       url_slug: params.url_slug as string,
                     }}
-                    router={router}
                     comments={comment.children}
                     setCommentList={setCommentList}
                     loginCheck={loginCheck}

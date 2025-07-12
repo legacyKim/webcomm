@@ -22,6 +22,7 @@ export async function GET(req) {
       },
     });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { success: false, message: "토큰 오류 또는 만료", isAuthenticated: false },
       { status: 401 },

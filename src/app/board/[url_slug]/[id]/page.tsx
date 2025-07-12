@@ -536,7 +536,6 @@ export default function View() {
                 id: params.id as string,
                 url_slug: params.url_slug as string,
               }}
-              router={router}
               comments={commentTree}
               setCommentList={setCommentList}
               loginCheck={loginCheck}
