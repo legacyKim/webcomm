@@ -20,7 +20,7 @@ export async function GET(req, context) {
             UNION ALL
 
             SELECT 
-              c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, ct.depth + 1,
+              c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, c.depth,
               m.profile,
               ARRAY_APPEND(ct.children, to_jsonb(c))
             FROM comments c
@@ -34,7 +34,7 @@ export async function GET(req, context) {
 
     const comments = await client.query(query, [id]);
 
-    return NextResponse.json({ comments });
+    return NextResponse.json({ comments: comments.rows });
   } finally {
     client.release();
   }
@@ -44,7 +44,7 @@ export async function POST(req, context) {
   const client = await pool.connect();
 
   const { id } = await context.params;
-  const { isUserId, isUserNick, parentId, comment, mentionedUserIds = [] } = await req.json();
+  const { isUserId, isUserNick, parentId, comment, mentionedUserIds = [], commentDepth } = await req.json();
 
   try {
     const user = await serverTokenCheck();
@@ -54,11 +54,25 @@ export async function POST(req, context) {
 
     await client.query("BEGIN");
 
+    let depth = 0;
+
+    console.log(commentDepth);
+
+    if (commentDepth === 2) {
+      depth = 3;
+    } else if (commentDepth === 1) {
+      depth = 2;
+    } else if (commentDepth === 0) {
+      depth = 1;
+    }
+
+    console.log(depth, "depth 여기서 depth 가 어떻게 저장되는가?");
+
     // 댓글 저장 후 commentId 받아오기
     const insertResult = await client.query(
-      `INSERT INTO comments (post_id, user_id, user_nickname, parent_id, content)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [id, isUserId, isUserNick, parentId, comment],
+      `INSERT INTO comments (post_id, user_id, user_nickname, parent_id, content, depth)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [id, isUserId, isUserNick, parentId, comment, depth],
     );
 
     const commentId = insertResult.rows[0].id;

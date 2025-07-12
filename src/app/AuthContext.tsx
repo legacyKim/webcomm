@@ -13,6 +13,7 @@ export function AuthProvider({
   userProfile,
   userEmail,
   userAuthority,
+  tokenExp,
 }: {
   children: React.ReactNode;
   username: string;
@@ -21,6 +22,7 @@ export function AuthProvider({
   userProfile: string;
   userEmail: string;
   userAuthority: number | null;
+  tokenExp: number | null;
 }) {
   const [isUsername, setIsUsername] = useState<string | null>(username);
   const [isUserId, setIsUserId] = useState<number | null>(userId);
@@ -30,6 +32,7 @@ export function AuthProvider({
   const [isUserAuthority, setIsUserAuthority] = useState<number | null>(userAuthority);
 
   const [loginStatus, setLoginStatus] = useState<boolean | null>(false);
+  const [tokenExpiration, setTokenExpiration] = useState<number | null>(tokenExp);
 
   const [boardType, setBoardType] = useState<string | null>("board");
   const [messageToUser, setMessageToUser] = useState<number | null>(null);
@@ -41,7 +44,8 @@ export function AuthProvider({
     setIsUserProfile(userProfile);
     setIsUserEmail(userEmail);
     setIsUserAuthority(userAuthority);
-  }, [username, userId, userNick, userProfile, userEmail, userAuthority]);
+    setTokenExpiration(tokenExp);
+  }, [username, userId, userNick, userProfile, userEmail, userAuthority, tokenExpiration]);
 
   return (
     <AuthContext.Provider
@@ -64,6 +68,8 @@ export function AuthProvider({
         setMessageToUser,
         isUserAuthority,
         setIsUserAuthority,
+        tokenExpiration,
+        setTokenExpiration,
       }}>
       {children}
     </AuthContext.Provider>

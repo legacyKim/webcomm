@@ -74,4 +74,6 @@ export interface AuthContextType {
   setMessageToUser: (type: number | null) => void;
   isUserAuthority: number | null;
   setIsUserAuthority: (authority: number | null) => void;
+  tokenExpiration: number | null;
+  setTokenExpiration: (expiration: number | null) => void;
 }

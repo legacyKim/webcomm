@@ -44,6 +44,7 @@ export async function POST(req) {
       userProfile: user.profile,
       userEmail: user.email,
       userAuthority: user.authority,
+      exp: user.exp,
     });
 
     const isProduction = process.env.NODE_ENV === "production";

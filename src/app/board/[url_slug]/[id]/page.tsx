@@ -15,6 +15,9 @@ import { useLoginCheck } from "@/func/hook/useLoginCheck";
 import DropDownMenu from "@/components/dropDownMenu";
 import TiptapViewer from "@/components/tiptapViewer";
 
+import CommentTreeBuild from "./CommentTreeBuild";
+import CommentTree from "./CommentTree";
+
 import dynamic from "next/dynamic";
 import { SSE_BASE_URL } from "@/lib/sse";
 
@@ -26,96 +29,55 @@ import {
   PencilSquareIcon,
   FlagIcon,
   PhotoIcon,
+  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
+
+import { CommentImage, CommentTreeNode, CommentTreeNodeArr } from "@/type/commentType";
 
 const CommentEditor = dynamic(() => import("./commentEditor"), { ssr: false });
 
 interface Posts {
   posts: {
-    rows: Array<{
-      id: number;
-      board_name: string;
-      title: string;
-      content: string;
-      likes: number;
-      dislikes: number;
-      reports: number;
-      created_at: Date;
-      updated_at: Date;
-      url_slug: string;
-      user_id: number;
-      user_nickname: string;
-      user_profile: string;
-      views: number;
-      comments: number;
-      notice: boolean;
-    }>;
+    id: number;
+    board_name: string;
+    title: string;
+    content: string;
+    likes: number;
+    dislikes: number;
+    reports: number;
+    created_at: Date;
+    updated_at: Date;
+    url_slug: string;
+    user_id: number;
+    user_nickname: string;
+    user_profile: string;
+    views: number;
+    comments: number;
+    notice: boolean;
   };
 }
 
-type Comments = {
+interface AppComment {
   id: number;
-  post_id: number;
+  parent_id: number | null;
   user_id: number;
   user_nickname: string;
   content: string;
+  profile?: string;
   likes: number;
-  dislikes: number;
-  profile: string | null;
-  parent_id: number | null;
-  created_at: Date;
-  updated_at: Date;
-};
-
-type CommentList = {
-  comments: {
-    rows: Comments[];
-  };
-};
-
-type CommentImage = { file: File; blobUrl: string };
+}
 
 export default function View() {
   const params = useParams();
   const router = useRouter();
 
-  const { loginCheck } = useLoginCheck();
+  const loginCheck = useLoginCheck();
 
   const { isUserId, isUserNick, messageToUser, boardType } = useAuth();
   const [limit, setLimit] = useState(10);
 
   const [viewPost, setViewPost] = useState<Posts | null>(null);
-  const [commentList, setCommentList] = useState<CommentList | null>(null);
-
   console.log(viewPost);
-
-  const [commentAdd, setCommentAdd] = useState<{ user_id: number; id: number } | null>(null);
-  const [recommentAdd, setRecommentAdd] = useState<{ user_id: number; id: number; recomment_id: number } | null>(null);
-
-  const [commentCorrect, setCommentCorrect] = useState<{ content: string; id: number } | null>(null);
-  const [recommentCorrect, setRecommentCorrect] = useState<{
-    content: string;
-    id: number;
-    recomment_id: number;
-  } | null>(null);
-
-  // 댓글 이미지 업로드
-  const [commentImagesFile, setCommentImagesFile] = useState<CommentImage[]>([]);
-  const [singleCommentImageFile, setSingleCommentImageFile] = useState<string | null>(null);
-
-  const commentImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 2 * 1024 * 1024) {
-      alert("최대 2MB 이하의 이미지만 업로드 가능합니다.");
-      return;
-    }
-
-    const blobUrl = URL.createObjectURL(file);
-    setSingleCommentImageFile(blobUrl);
-    setCommentImagesFile((prev) => [...prev, { file, blobUrl }]);
-  };
 
   // 컨텐츠 또는 댓글 패치
   useEffect(() => {
@@ -143,86 +105,28 @@ export default function View() {
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
 
-      if (data.event === "INSERT") {
-        setViewPost((prev) =>
-          prev
-            ? {
-                posts: {
-                  rows: [...prev.posts.rows, data],
-                },
-              }
-            : null,
-        );
-      } else if (data.event === "DELETE") {
-        setViewPost((prev) =>
-          prev
-            ? {
-                posts: {
-                  rows: prev.posts.rows.filter((c) => c.id !== data.id),
-                },
-              }
-            : null,
-        );
-      } else if (data.event === "UPDATE") {
-        setViewPost((prev) =>
-          prev
-            ? {
-                posts: {
-                  rows: prev.posts.rows.map((c) =>
-                    c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c,
-                  ),
-                },
-              }
-            : null,
-        );
-      }
-    };
+      setViewPost((prev) => {
+        if (!prev) return null;
 
-    return () => {
-      eventSource.close();
-    };
-  }, []);
+        if (data.id !== prev.posts.id) return prev; // 다른 글이면 무시
 
-  // 댓글 실시간 열람
-  useEffect(() => {
-    const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
+        if (data.event === "DELETE") {
+          return null; // 글이 삭제된 경우
+        }
 
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+        if (data.event === "UPDATE") {
+          return {
+            posts: {
+              ...prev.posts,
+              likes: data.likes,
+              content: data.content,
+            },
+          };
+        }
 
-      if (data.event === "INSERT") {
-        setCommentList((prev) =>
-          prev
-            ? {
-                comments: {
-                  rows: [...prev.comments.rows, data],
-                },
-              }
-            : null,
-        );
-      } else if (data.event === "DELETE") {
-        setCommentList((prev) =>
-          prev
-            ? {
-                comments: {
-                  rows: prev.comments.rows.filter((c) => c.id !== data.id),
-                },
-              }
-            : null,
-        );
-      } else if (data.event === "UPDATE") {
-        setCommentList((prev) =>
-          prev
-            ? {
-                comments: {
-                  rows: prev.comments.rows.map((c) =>
-                    c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c,
-                  ),
-                },
-              }
-            : null,
-        );
-      }
+        // INSERT 이벤트는 단일 post view에서는 무의미하므로 무시
+        return prev;
+      });
     };
 
     return () => {
@@ -249,8 +153,6 @@ export default function View() {
 
   // 게시물 좋아요.
   const postLike = async () => {
-    if (!loginCheck()) return;
-
     await axios.post("/api/post/action/like", {
       isUserId,
       id: params.id,
@@ -259,8 +161,6 @@ export default function View() {
 
   // 게시물 신고.
   const postReport = async () => {
-    if (!loginCheck()) return;
-
     const reason = prompt("신고 사유를 입력해주세요.");
     if (!reason) return;
 
@@ -286,25 +186,71 @@ export default function View() {
 
   // 게시물 스크랩.
   const postScrap = async () => {
-    alert("준비 중 입니다!");
-    if (!loginCheck()) return;
-
     await axios.post("/api/post/action/scrap", {
       isUserId,
       id: params.id,
     });
   };
 
-  // 댓글 등록
-  const [reset, setReset] = useState<boolean>(false);
+  // 댓글 기능
+  const [commentList, setCommentList] = useState<CommentTreeNodeArr | null>(null);
+
+  // 댓글 실시간 열람
+  useEffect(() => {
+    const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
+
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data) as CommentTreeNode & { event: string };
+
+      if (data.event === "INSERT") {
+        setCommentList((prev: CommentTreeNodeArr | null) => {
+          if (!prev) {
+            return { comments: [data] };
+          }
+          return { comments: [...prev.comments, data] };
+        });
+      } else if (data.event === "DELETE") {
+        setCommentList((prev: CommentTreeNodeArr | null) => {
+          if (!prev) return prev;
+          return { comments: prev.comments.filter((c) => c.id !== data.id) };
+        });
+      } else if (data.event === "UPDATE") {
+        setCommentList((prev: CommentTreeNodeArr | null) => {
+          if (!prev) return prev;
+          return {
+            comments: prev.comments.map((c) =>
+              c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c,
+            ),
+          };
+        });
+      }
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
+  // 댓글 트리 구조로 변환
+  const rows = commentList?.comments ?? [];
+  const commentTree = CommentTreeBuild(rows as AppComment[]);
+
+  // 댓글 내용
   const [commentContent, setCommentContent] = useState<string>("");
   const [recommentContent, setRecommentContent] = useState<string>("");
 
-  const [commentMentionUser, setCommentMentionUser] = useState<number[]>([]);
+  // 댓글 수정
+  const [commentCorrect, setCommentCorrect] = useState<{ content: string; id: number } | null>(null);
 
-  const commentPost = async (commentContent: string, id?: number) => {
+  // 댓글 등록
+  const [commentAdd, setCommentAdd] = useState<{ user_id: number; id: number } | null>(null);
+  const [recommentAdd, setRecommentAdd] = useState<{ user_id: number; id: number; recomment_id: number } | null>(null);
+
+  // 댓글 등록
+  const commentPost = async (commentContent: string, id?: number, depth?: number) => {
     const comment = commentContent.trim();
     const parentId = id;
+    const commentDepth = depth ?? null;
 
     if (comment === "") {
       alert("댓글을 입력해 주세요.");
@@ -359,6 +305,7 @@ export default function View() {
         isUserNick,
         parentId,
         mentionedUserIds: commentMentionUser,
+        commentDepth,
       });
 
       if (response.data.success) {
@@ -368,7 +315,9 @@ export default function View() {
         setCommentAdd(null);
         setRecommentAdd(null);
         setCommentImagesFile([]);
-        setSingleCommentImageFile(null);
+        if (setSingleCommentImageFile) {
+          setSingleCommentImageFile(null);
+        }
         setReset(false);
       } else {
         if (response.data.message === "인증되지 않은 사용자입니다.") {
@@ -387,86 +336,26 @@ export default function View() {
     }
   };
 
-  const commentDelete = async (id: number) => {
-    const isConfirmed = confirm("삭제하시겠습니까?");
-    if (isConfirmed) {
-      const response = await axios.delete(`/api/comment/${params.id}`, {
-        data: { id },
-      });
+  // 에디터 초기화
+  const [reset, setReset] = useState<boolean>(false);
 
-      if (response.data.success) {
-        alert(response.data.message);
-      }
+  // 댓글 이미지 업로드
+  const [commentImagesFile, setCommentImagesFile] = useState<CommentImage[]>([]);
+  const [singleCommentImageFile, setSingleCommentImageFile] = useState<string | null>(null);
+
+  const commentImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert("최대 2MB 이하의 이미지만 업로드 가능합니다.");
+      return;
     }
+
+    const blobUrl = URL.createObjectURL(file);
+    setSingleCommentImageFile(blobUrl);
+    setCommentImagesFile((prev) => [...prev, { file, blobUrl }]);
   };
-
-  const commentUpdate = async (recommentContent: string, id: number) => {
-    const comment = recommentContent.trim();
-
-    setReset(true);
-
-    const response = await axios.put(`/api/comment/${params.id}`, {
-      comment,
-      id,
-    });
-
-    if (response.data.success) {
-      setCommentContent("");
-      setRecommentContent("");
-      alert(response.data.message);
-      setCommentCorrect(null);
-      setRecommentCorrect(null);
-      setReset(true);
-    }
-  };
-
-  const commentLike = async (id: number) => {
-    if (isUserId === 0) {
-      const isConfirmed = confirm("로그인이 필요합니다.");
-      if (isConfirmed) {
-        router.push("/login");
-      } else {
-        return;
-      }
-    }
-
-    await axios.post("/api/comment/action/like", {
-      isUserId,
-      id,
-    });
-  };
-
-  const commentReport = async (id: number) => {
-    const reason = prompt("신고 사유를 입력해주세요.");
-    if (!reason) return;
-
-    try {
-      const response = await axios.post("/api/user/report", {
-        isUserId,
-        reportedUserId: id,
-        reason,
-        type: "comment",
-      });
-      if (response.data.success) {
-        alert("신고가 접수되었습니다.");
-      }
-    } catch (error) {
-      console.error("신고 실패:", error);
-      alert("신고에 실패했습니다.");
-    }
-  };
-
-  useEffect(() => {
-    if (recommentContent && commentCorrect?.content) {
-      setRecommentContent(commentCorrect.content);
-    }
-  }, [recommentContent]);
-
-  useEffect(() => {
-    if (recommentContent && recommentCorrect?.content) {
-      setRecommentContent(recommentCorrect.content);
-    }
-  }, [recommentContent]);
 
   // writer dropdown
   const writerRef = useRef<HTMLDivElement>(null);
@@ -480,12 +369,14 @@ export default function View() {
   });
 
   // user mention
+  const [commentMentionUser, setCommentMentionUser] = useState<number[]>([]);
+
   const extractMentionUsers = () => {
     const userMap = new Map<number, string>();
 
     if (viewPost && commentList) {
-      userMap.set(viewPost.posts.rows[0].user_id, viewPost.posts.rows[0].user_nickname);
-      for (const comment of commentList.comments.rows) {
+      userMap.set(viewPost?.posts?.user_id, viewPost?.posts?.user_nickname);
+      for (const comment of commentList.comments) {
         userMap.set(comment.user_id, comment.user_nickname);
       }
     }
@@ -524,48 +415,51 @@ export default function View() {
 
       <div className='view_page'>
         <div className='view_header'>
-          <b className='category'>{viewPost?.posts?.rows?.[0]?.board_name}</b>
-          <h4 className='view_title'>{viewPost?.posts?.rows?.[0]?.title}</h4>
+          <b className='category'>{viewPost?.posts?.board_name}</b>
+          <h4 className='view_title'>{viewPost?.posts?.title}</h4>
           <div className='view_info_area'>
             <div className='view_info'>
               <div className='view_info_left'>
                 <div
                   className='writer'
                   ref={writerRef}
-                  onClick={(e) => {
+                  onClick={async (e) => {
+                    const ok = await loginCheck();
+                    if (!ok) return;
+
                     userClick(e);
                     setUserInfoInDropMenu({
-                      userId: viewPost?.posts?.rows?.[0]?.user_id,
-                      userNickname: viewPost?.posts?.rows?.[0]?.user_nickname,
+                      userId: viewPost?.posts?.user_id,
+                      userNickname: viewPost?.posts?.user_nickname,
                     });
                   }}>
                   <img
                     className='profile_img'
-                    src={viewPost?.posts?.rows?.[0]?.user_profile ?? "/profile/basic.png"}
-                    alt={`${viewPost?.posts?.rows?.[0]?.user_nickname}의 프로필`}
+                    src={viewPost?.posts?.user_profile ?? "/profile/basic.png"}
+                    alt={`${viewPost?.posts?.user_nickname}의 프로필`}
                   />
-                  <span className='writer_name'>{viewPost?.posts?.rows?.[0]?.user_nickname}</span>
+                  <span className='writer_name'>{viewPost?.posts?.user_nickname}</span>
                 </div>
               </div>
               <div className='view_info_right'>
                 <span className='view flex-start'>
                   <EyeIcon className='icon' />
-                  <span>{viewPost?.posts?.rows?.[0]?.views}</span>
+                  <span>{viewPost?.posts?.views}</span>
                 </span>
                 <span className='comment flex-start'>
                   <ChatBubbleLeftEllipsisIcon className='icon' />
-                  <span>{commentList?.comments?.rows.length}</span>
+                  <span>{commentList?.comments?.length}</span>
                 </span>
                 <span className='like flex-start'>
                   <HeartIcon className='icon' />
-                  <span>{viewPost?.posts?.rows?.[0]?.likes}</span>
+                  <span>{viewPost?.posts?.likes}</span>
                 </span>
                 <div className='bar'></div>
-                <span className='date'>{new Date(viewPost?.posts?.rows?.[0]?.created_at).toLocaleDateString()}</span>
+                <span className='date'>{new Date(viewPost?.posts?.created_at).toLocaleDateString()}</span>
               </div>
             </div>
 
-            {isUserId !== 0 && isUserId === viewPost?.posts?.rows?.[0]?.user_id && (
+            {isUserId !== 0 && isUserId === viewPost?.posts?.user_id && (
               <div className='view_btn'>
                 <Link href={`/write/${params.id}`} type='button'>
                   수정
@@ -583,15 +477,18 @@ export default function View() {
         </div>
 
         <div className='view_content'>
-          <TiptapViewer content={viewPost?.posts?.rows?.[0]?.content} />
+          <TiptapViewer content={viewPost?.posts?.content} />
         </div>
 
-        {viewPost?.posts?.rows?.[0]?.user_nickname !== isUserNick && (
+        {viewPost?.posts?.user_nickname !== isUserNick && (
           <div className='view_content_btn'>
-            {!viewPost?.posts?.rows?.[0]?.notice && (
+            {!viewPost?.posts?.notice && (
               <button
                 type='button'
-                onClick={() => {
+                onClick={async () => {
+                  const ok = await loginCheck();
+                  if (!ok) return;
+
                   postReport();
                 }}>
                 <FlagIcon className='icon' />
@@ -602,7 +499,10 @@ export default function View() {
             <button
               style={{ display: "none" }} // 스크랩 기능은 현재 준비 중이므로 숨김 처리
               type='button'
-              onClick={() => {
+              onClick={async () => {
+                const ok = await loginCheck();
+                if (!ok) return;
+
                 postScrap();
               }}>
               스크랩
@@ -610,7 +510,10 @@ export default function View() {
             <button
               className='like_btn'
               type='button'
-              onClick={() => {
+              onClick={async () => {
+                const ok = await loginCheck();
+                if (!ok) return;
+
                 postLike();
               }}>
               <HeartIcon className='icon' />
@@ -621,313 +524,42 @@ export default function View() {
 
         <div className='view_comment'>
           <div className='comment_top'>
+            <ChatBubbleLeftRightIcon className='icon' />
             <b>댓글</b>
-            <span className='comment_num'>( {commentList?.comments?.rows.length} )</span>
+            <span className='comment_num'> {commentList?.comments?.length} </span>
             {/* <span className="comment_num"><i></i>{viewPost?.posts?.comments}</span> */}
           </div>
 
           <div className='comment_list'>
-            {commentList &&
-              commentList?.comments?.rows
-                .filter((row) => row.parent_id === null)
-                .map((comment: Comments) => (
-                  <div key={comment.id} className={`comment_box`} id={`comment-${comment.id}`}>
-                    <div className='comment_info'>
-                      <div
-                        className='writer'
-                        onClick={(e) => {
-                          userClick(e);
-                          setUserInfoInDropMenu({
-                            userId: comment.user_id,
-                            userNickname: comment.user_nickname,
-                          });
-                        }}>
-                        <img
-                          className='profile_img'
-                          src={comment.profile ?? "/profile/basic.png"}
-                          alt={`${comment.user_nickname}의 프로필`}
-                        />
-                        <span className='writer_name'>{comment.user_nickname}</span>
-                      </div>
-                      {isUserId !== null && (
-                        <div className='comment_btn'>
-                          <button
-                            type='button'
-                            onClick={() => {
-                              if (isUserId === 0) {
-                                const isConfirmed = confirm("로그인이 필요합니다.");
-                                if (isConfirmed) {
-                                  router.push("/login");
-                                } else {
-                                  return;
-                                }
-                              }
-
-                              setCommentAdd({ user_id: comment.user_id, id: comment.id });
-                              setRecommentAdd(null);
-                              setCommentCorrect(null);
-                              setRecommentCorrect(null);
-                            }}>
-                            대댓글
-                          </button>
-                          {comment.user_id !== isUserId && (
-                            <>
-                              <button
-                                type='button'
-                                onClick={() => {
-                                  commentLike(comment.id);
-                                }}>
-                                공감
-                              </button>
-                              <button
-                                type='button'
-                                onClick={() => {
-                                  commentReport(comment.user_id);
-                                }}>
-                                신고
-                              </button>
-                            </>
-                          )}
-
-                          {isUserId === comment.user_id && (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setCommentAdd(null);
-                                  setRecommentAdd(null);
-                                  setRecommentCorrect(null);
-                                  setCommentCorrect({ content: comment.content, id: comment.id });
-                                }}>
-                                수정
-                              </button>
-                              <button
-                                onClick={() => {
-                                  commentDelete(comment.id);
-                                }}>
-                                삭제
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className='comment_content'>
-                      <TiptapViewer content={comment.content} key={comment.id + comment.content} />
-                      <i className='comment_content_likes'>{comment.likes}</i>
-                    </div>
-
-                    {(commentAdd?.user_id !== null && commentAdd?.id === comment.id) ||
-                    commentCorrect?.id === comment.id ? (
-                      <div className='comment_add re'>
-                        <CommentEditor
-                          singleCommentImageFile={singleCommentImageFile}
-                          initialContent={commentCorrect ? commentCorrect.content : ""}
-                          onChange={(html: string) => setCommentContent(html)}
-                          onMentionUsersChange={setCommentMentionUser}
-                          users={mentionUsers}
-                          reset={reset}
-                        />
-                        <div className='comment_editor'>
-                          <div>
-                            <input
-                              id='image-upload'
-                              type='file'
-                              accept='image/*'
-                              onChange={commentImageUpload}
-                              style={{ display: "none" }}
-                            />
-                            <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
-                              <PhotoIcon className='icon' />
-                              <span className='notice'>
-                                용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드가 가능합니다.
-                              </span>
-                            </label>
-                          </div>
-                          <div className='btn_wrap'>
-                            {commentCorrect ? (
-                              <button onClick={() => commentUpdate(commentContent, comment.id)}>댓글 수정</button>
-                            ) : (
-                              <button onClick={() => commentPost(commentContent, comment.id)}>댓글 추가</button>
-                            )}
-                            <button
-                              onClick={() => {
-                                setCommentAdd(null);
-                                setRecommentAdd(null);
-                                setCommentCorrect(null);
-                                setCommentContent("");
-                                setReset(true);
-                              }}>
-                              취소
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {commentList?.comments?.rows
-                      .filter((row) => row.parent_id === comment.id)
-                      .map((recomment: Comments) => (
-                        <div key={recomment.id} className={`comment_box re`}>
-                          <div className='comment_info'>
-                            <div
-                              className='writer'
-                              onClick={(e) => {
-                                userClick(e);
-                                setUserInfoInDropMenu({
-                                  userId: recomment.user_id,
-                                  userNickname: recomment.user_nickname,
-                                });
-                              }}>
-                              <img
-                                className='profile_img'
-                                src={recomment.profile ?? "/profile/basic.png"}
-                                alt={`${recomment.user_nickname}의 프로필`}
-                              />
-                              <span className='writer_name'>{recomment.user_nickname}</span>
-                            </div>
-                            {isUserId !== null && (
-                              <div className='comment_btn'>
-                                {isUserId !== recomment.user_id && (
-                                  <>
-                                    <button
-                                      type='button'
-                                      onClick={() => {
-                                        if (isUserId === 0) {
-                                          const isConfirmed = confirm("로그인이 필요합니다.");
-                                          if (isConfirmed) {
-                                            router.push("/login");
-                                          } else {
-                                            return;
-                                          }
-                                        }
-
-                                        setRecommentAdd({
-                                          user_id: recomment.user_id,
-                                          id: comment.id,
-                                          recomment_id: recomment.id,
-                                        });
-                                        setCommentAdd(null);
-                                        setCommentCorrect(null);
-                                        setRecommentCorrect(null);
-                                      }}>
-                                      대댓글
-                                    </button>
-                                    <button
-                                      type='button'
-                                      onClick={() => {
-                                        commentLike(recomment.id);
-                                      }}>
-                                      공감
-                                    </button>
-                                    <button
-                                      type='button'
-                                      onClick={() => {
-                                        commentReport(recomment.user_id);
-                                      }}>
-                                      신고
-                                    </button>
-                                  </>
-                                )}
-
-                                {isUserId === recomment.user_id && (
-                                  <>
-                                    <button
-                                      onClick={() => {
-                                        setCommentAdd(null);
-                                        setRecommentAdd(null);
-                                        setCommentCorrect(null);
-                                        setRecommentCorrect({
-                                          content: recomment.content,
-                                          id: comment.id,
-                                          recomment_id: recomment.id,
-                                        });
-                                      }}>
-                                      수정
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        commentDelete(recomment.id);
-                                      }}>
-                                      삭제
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className='comment_content'>
-                            <TiptapViewer content={recomment.content} key={recomment.id + recomment.content} />
-                            <i className='comment_content_likes'>{recomment.likes}</i>
-                          </div>
-
-                          {((recommentAdd?.user_id !== null &&
-                            recommentAdd?.id === comment.id &&
-                            recommentAdd?.recomment_id === recomment.id) ||
-                            (recommentCorrect?.id === comment.id &&
-                              recommentCorrect?.recomment_id === recomment.id)) && (
-                            <div className='comment_add re'>
-                              <CommentEditor
-                                singleCommentImageFile={singleCommentImageFile}
-                                initialContent={commentCorrect ? commentCorrect.content : ""}
-                                onChange={(html: string) => setCommentContent(html)}
-                                onMentionUsersChange={setCommentMentionUser}
-                                users={mentionUsers}
-                                reset={reset}
-                              />
-
-                              <div className='comment_editor'>
-                                <div>
-                                  <input
-                                    id='image-upload'
-                                    type='file'
-                                    accept='image/*'
-                                    onChange={commentImageUpload}
-                                    style={{ display: "none" }}
-                                  />
-                                  <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
-                                    <PhotoIcon className='icon' />
-                                    <span className='notice'>
-                                      용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드 가능합니다.{" "}
-                                    </span>
-                                  </label>
-                                </div>
-                                <div className='btn_wrap'>
-                                  {recommentCorrect ? (
-                                    <button
-                                      onClick={() => {
-                                        commentUpdate(recommentContent, recomment.id);
-                                      }}>
-                                      댓글 수정
-                                    </button>
-                                  ) : (
-                                    <button
-                                      onClick={() => {
-                                        commentPost(commentContent, comment.id);
-                                      }}>
-                                      댓글 추가
-                                    </button>
-                                  )}
-                                  <button
-                                    onClick={() => {
-                                      setCommentAdd(null);
-                                      setRecommentAdd(null);
-                                      setCommentCorrect(null);
-                                      setRecommentCorrect(null);
-                                      setRecommentContent("");
-                                      setReset(true);
-                                    }}>
-                                    취소
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                ))}
+            <CommentTree
+              params={{
+                id: params.id as string,
+                url_slug: params.url_slug as string,
+              }}
+              router={router}
+              comments={commentTree}
+              setCommentList={setCommentList}
+              loginCheck={loginCheck}
+              userClick={userClick}
+              setUserInfoInDropMenu={setUserInfoInDropMenu}
+              mentionUsers={mentionUsers}
+              setCommentMentionUser={setCommentMentionUser}
+              singleCommentImageFile={singleCommentImageFile}
+              setSingleCommentImageFile={setSingleCommentImageFile}
+              commentImageUpload={commentImageUpload}
+              setCommentImagesFile={setCommentImagesFile}
+              commentContent={commentContent}
+              setCommentContent={setCommentContent}
+              recommentContent={recommentContent}
+              setRecommentContent={setRecommentContent}
+              reset={reset}
+              setReset={setReset}
+              commentAdd={commentAdd}
+              setCommentAdd={setCommentAdd}
+              recommentAdd={recommentAdd}
+              setRecommentAdd={setRecommentAdd}
+              commentPost={commentPost}
+            />
           </div>
         </div>
 

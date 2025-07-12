@@ -11,6 +11,7 @@ import { Posts } from "./type/type";
 
 import { useAuth } from "@/AuthContext";
 import { useDropDown } from "@/func/hook/useDropDown";
+import { useLoginCheck } from "@/func/hook/useLoginCheck";
 import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 
@@ -63,15 +64,17 @@ export default function Home() {
     userNickname: "",
   });
 
+  const loginCheck = useLoginCheck();
+
   return (
     <main>
       <Search />
 
-      {isUserId !== userInfoInDropMenu.userId && writerDrop && (
+      {isUserId && isUserId !== userInfoInDropMenu.userId && writerDrop && (
         <DropDownMenu
           style={{
-            top: `${dropPosition.top}px`,
-            left: `${dropPosition.left + (writerRef.current?.offsetWidth ?? 0) + 8}px`,
+            top: `${dropPosition.top + (writerRef.current?.offsetHeight ?? 0)}px`,
+            left: `${dropPosition.left}px`,
           }}
           userInfoInDropMenu={userInfoInDropMenu}
         />
@@ -118,7 +121,10 @@ export default function Home() {
                         <div
                           className='writer'
                           ref={writerRef}
-                          onClick={(e) => {
+                          onClick={async (e) => {
+                            const ok = await loginCheck();
+                            if (!ok) return;
+
                             userClick(e);
                             setUserInfoInDropMenu({
                               userId: Number(post.user_id),

@@ -25,7 +25,7 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
   const [isBlocked, setIsBlocked] = useState(false);
 
   const { isUserId, messageToUser, setMessageToUser } = useAuth();
-  const { loginCheck } = useLoginCheck();
+  const loginCheck = useLoginCheck();
 
   // 작성글 검색
   const searchPosts = () => {
@@ -45,8 +45,6 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
 
   // 차단하기
   const blockUserConfirm = () => {
-    loginCheck();
-
     const isConfirmed = confirm(`${userInfoInDropMenu.userNickname}님을 차단하시겠습니까?`);
     if (isConfirmed) {
       blockUser();
@@ -72,8 +70,6 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
 
   // 신고하기
   const reportUser = async () => {
-    loginCheck();
-
     const reason = prompt("신고 사유를 입력해주세요.");
     if (!reason) return;
 
@@ -93,13 +89,6 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
     }
   };
 
-  if (isUserId === null) {
-    const isConfirmed = confirm("로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?");
-    if (isConfirmed) {
-      router.push("/login");
-    }
-  }
-
   return (
     <>
       <ul className='dropDownMenu' style={style}>
@@ -113,12 +102,28 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
           <button onClick={sendMessage}>쪽지 보내기</button>
         </li>
         <li>
-          <button onClick={blockUserConfirm} disabled={isBlocked} style={{ color: isBlocked ? "gray" : "inherit" }}>
+          <button
+            onClick={async () => {
+              const ok = await loginCheck();
+              if (!ok) return;
+
+              blockUserConfirm;
+            }}
+            disabled={isBlocked}
+            style={{ color: isBlocked ? "gray" : "inherit" }}>
             {isBlocked ? "차단됨" : "차단하기"}
           </button>
         </li>
         <li>
-          <button onClick={reportUser}>신고하기</button>
+          <button
+            onClick={async () => {
+              const ok = await loginCheck();
+              if (!ok) return;
+
+              reportUser;
+            }}>
+            신고하기
+          </button>
         </li>
       </ul>
 

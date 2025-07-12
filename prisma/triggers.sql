@@ -18,6 +18,7 @@ BEGIN
     'parent_id', NEW.parent_id,
     'likes', NEW.likes,
     'content', COALESCE(NEW.content, OLD.content),
+    'depth', NEW.depth,
     'created_at', NEW.created_at,
     'updated_at', NEW.updated_at,
     'event', TG_OP

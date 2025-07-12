@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
 import { useRouter, usePathname } from "next/navigation";
+
 import { useAuth } from "@/AuthContext";
 
 import {
@@ -39,6 +40,7 @@ export default function Header() {
     isUserProfile,
     isUserAuthority,
     setIsUserAuthority,
+    tokenExpiration,
   } = useAuth();
 
   const logout = async () => {
@@ -62,6 +64,26 @@ export default function Header() {
       logout();
     }
   };
+
+  // 토큰 만료시 자동 로그아웃
+  useEffect(() => {
+    if (tokenExpiration) {
+      const now = Math.floor(Date.now() / 1000);
+      const msUntilExpire = (tokenExpiration - now) * 1000;
+
+      if (msUntilExpire <= 0) {
+        alert("토큰이 만료되어 로그아웃됩니다.");
+        logout();
+      } else {
+        const timer = setTimeout(() => {
+          alert("토큰이 만료되어 로그아웃됩니다.");
+          logout();
+        }, msUntilExpire);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [tokenExpiration]);
 
   const [messageBox, setMessageBox] = useState<boolean>(false);
   const messageBoxRef = useRef<HTMLButtonElement | null>(null);

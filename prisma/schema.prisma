@@ -92,6 +92,7 @@ model Comment {
   likes         Int      @default(0)
   dislikes      Int      @default(0)
   user_nickname String?  @db.VarChar(255)
+  depth         Int      
   is_deleted    Boolean  @default(false)
   deleted_at    DateTime?
 

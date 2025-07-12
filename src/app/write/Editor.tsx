@@ -272,19 +272,19 @@ const Editor = ({
         <div className='editor_bar'></div>
 
         {/* 이미지 업로드 */}
-        <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }} title='이미지 업로드'>
+        <label htmlFor='image-upload' style={{ cursor: "pointer" }} title='이미지 업로드'>
           <PhotoIcon className='icon' />
         </label>
         <input id='image-upload' type='file' accept='image/*' onChange={uploadImage} style={{ display: "none" }} />
 
         {/* 비디오 업로드 */}
-        <label htmlFor='video-upload' style={{ cursor: "pointer", marginRight: "10px" }} title='비디오 업로드'>
+        <label htmlFor='video-upload' style={{ cursor: "pointer" }} title='비디오 업로드'>
           <VideoCameraIcon className='icon' />
         </label>
         <input id='video-upload' type='file' accept='video/*' onChange={uploadVideo} style={{ display: "none" }} />
 
         {/* URL 링크 추가 */}
-        <button type='button' onClick={insertLink} style={{ marginRight: "10px" }} title='URL 링크 추가'>
+        <button type='button' onClick={insertLink} title='URL 링크 추가'>
           <PaperClipIcon className='icon' />
         </button>
       </div>

@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchBoardData, fetchUserPostData, fetchUserCommentData, fetchSearchData, fetchBoardPop } from "@/api/api";
-import { Posts } from "../type/type";
+import { Posts } from "@/type/type";
 import { useAuth } from "@/AuthContext";
 
 import Link from "next/link";
 
 import { useDropDown } from "@/func/hook/useDropDown";
+import { useLoginCheck } from "@/func/hook/useLoginCheck";
 import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
@@ -86,6 +87,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
   }, [url_slug]);
 
   // writer dropdown
+  const writerRef = useRef<HTMLDivElement>(null);
   const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });
   const [userInfoInDropMenu, setUserInfoInDropMenu] = useState<{
     userId: number;
@@ -94,6 +96,8 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     userId: 0,
     userNickname: "",
   });
+
+  const loginCheck = useLoginCheck();
 
   if (isLoading)
     return (
@@ -112,10 +116,10 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
   return (
     <>
       <ol className='board_list'>
-        {isUserId !== userInfoInDropMenu.userId && writerDrop && (
+        {isUserId && isUserId !== userInfoInDropMenu.userId && writerDrop && (
           <DropDownMenu
             style={{
-              top: `${dropPosition.top}px`,
+              top: `${dropPosition.top + (writerRef.current?.offsetHeight ?? 0)}px`,
               left: `${dropPosition.left}px`,
             }}
             userInfoInDropMenu={userInfoInDropMenu}
@@ -158,7 +162,11 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
                 </div>
                 <span
                   className='writer'
-                  onClick={(e) => {
+                  ref={writerRef}
+                  onClick={async (e) => {
+                    const ok = await loginCheck();
+                    if (!ok) return;
+
                     userClick(e);
                     setUserInfoInDropMenu({
                       userId: Number(b.user_id),

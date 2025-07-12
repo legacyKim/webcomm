@@ -50,6 +50,9 @@ jwt 토큰 인증
 npm install --save-dev @types/jwt-decode  
 jwt 타입 정의 (TypeScript용)
 
+npm install react-google-recaptcha
+reCAPTCHA 적용
+
 - tiptap
 
 npm install @tiptap/react @tiptap/starter-kit

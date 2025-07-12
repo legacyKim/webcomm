@@ -12,7 +12,6 @@ import Underline from "@tiptap/extension-underline";
 
 // tiptap viewer
 const TiptapViewer = ({ content }: { content: string }) => {
-  console.log(content, "content in TiptapViewer");
   const editor = useEditor({
     extensions: [
       CustomTextStyle,
@@ -31,6 +30,7 @@ const TiptapViewer = ({ content }: { content: string }) => {
     ],
     content: content,
     editable: false,
+    immediatelyRender: true,
   });
 
   if (!editor) return <p>로딩 중...</p>;
