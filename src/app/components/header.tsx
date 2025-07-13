@@ -43,10 +43,14 @@ export default function Header() {
     tokenExpiration,
   } = useAuth();
 
-  const logout = async () => {
+  const logout = async (exp?: number) => {
     const response = await axios.post("/api/logout");
     if (response.data.success) {
-      alert("로그아웃 되었습니다.");
+      if (exp) {
+        alert("토큰이 만료되어 로그아웃됩니다.");
+      } else {
+        alert("로그아웃 되었습니다.");
+      }
 
       setIsUsername("");
       setLoginStatus(false);
@@ -72,12 +76,10 @@ export default function Header() {
       const msUntilExpire = (tokenExpiration - now) * 1000;
 
       if (msUntilExpire <= 0) {
-        alert("토큰이 만료되어 로그아웃됩니다.");
-        logout();
+        logout(msUntilExpire);
       } else {
         const timer = setTimeout(() => {
-          alert("토큰이 만료되어 로그아웃됩니다.");
-          logout();
+          logout(msUntilExpire);
         }, msUntilExpire);
 
         return () => clearTimeout(timer);

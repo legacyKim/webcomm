@@ -77,7 +77,6 @@ export default function View() {
   const [limit, setLimit] = useState(10);
 
   const [viewPost, setViewPost] = useState<Posts | null>(null);
-  console.log(viewPost);
 
   // 컨텐츠 또는 댓글 패치
   useEffect(() => {

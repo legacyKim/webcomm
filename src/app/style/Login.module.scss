@@ -244,11 +244,17 @@
 }
 .membership_tit {
   position: relative;
-  display: block;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
   font-size: 16px;
   font-weight: 700;
   line-height: 1.6;
   margin-bottom: 8px;
+}
+.membership_tit svg {
+  color: $main-color;
 }
 .membership_box {
   height: 300px;
@@ -266,5 +272,18 @@
   background-color: $main-color;
   border-radius: 100px;
 }
-.membership_contents {
+.membership_contents p,
+.membership_contents li {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.membership_contents h2 {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 24px 0 12px;
+}
+
+.membership_contents h2:first-child {
+  padding-top: 12px;
 }

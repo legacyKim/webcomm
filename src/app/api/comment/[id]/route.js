@@ -56,8 +56,6 @@ export async function POST(req, context) {
 
     let depth = 0;
 
-    console.log(commentDepth);
-
     if (commentDepth === 2) {
       depth = 3;
     } else if (commentDepth === 1) {
@@ -65,8 +63,6 @@ export async function POST(req, context) {
     } else if (commentDepth === 0) {
       depth = 1;
     }
-
-    console.log(depth, "depth 여기서 depth 가 어떻게 저장되는가?");
 
     // 댓글 저장 후 commentId 받아오기
     const insertResult = await client.query(

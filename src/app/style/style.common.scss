@@ -200,6 +200,7 @@ button {
   align-items: center;
   display: flex;
   justify-content: flex-start;
+  cursor: pointer;
 }
 .checkbox label {
   display: flex;
@@ -222,6 +223,13 @@ button {
 }
 .checkbox input[type="checkbox"]:checked + label .svg_checkmark {
   display: block;
+}
+.checkbox .custom_checkbox span {
+  font-size: 15px;
+  color: #000;
+}
+.checkbox:hover .custom_checkbox span {
+  text-decoration: underline;
 }
 /* CHECKBOX end */
 
@@ -1152,15 +1160,29 @@ sub .board_list {
 .depth_indicator {
   display: inline-block;
   vertical-align: top;
+  margin-top: -23px;
 }
 .depth_indicator_box {
   display: flex;
-  height: 100%;
+  height: calc(100% + 23px);
 }
 .depth_reply {
+  position: relative;
   width: 1px;
   height: 100%;
   background-color: $grey5-color;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.depth_reply::before {
+  content: "";
+  position: absolute;
+  width: 40px;
+  height: 1px;
+  background-color: #999;
+  top: 43px;
+  left: 0px;
 }
 .depth_reply.depth2 {
   margin-left: 41px;

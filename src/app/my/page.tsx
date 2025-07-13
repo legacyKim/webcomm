@@ -155,6 +155,24 @@ export default function Mypage() {
     }
   };
 
+  /*
+  const memberWithdrawal = async () => {
+    try {
+      const response = await axios.post("/api/member/withdrawal");
+      if (response.data.success) {
+        alert("회원 탈퇴가 완료되었습니다.");
+        // 예: 로그아웃 처리, 리다이렉트
+        window.location.href = "/";
+      } else {
+        alert("회원 탈퇴에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("회원 탈퇴 중 오류:", error);
+      alert("서버 오류로 회원 탈퇴가 실패했습니다.");
+    }
+  };
+  */
+
   return (
     <sub className='sub'>
       <div className='mypage'>
@@ -296,6 +314,12 @@ export default function Mypage() {
               </button>
             </div>
           </form>
+          {/* <div className='withdrawal'>
+            <button
+              onClick={() => {
+                memberWithdrawal();
+              }}></button>
+          </div> */}
         </div>
       </div>
     </sub>
