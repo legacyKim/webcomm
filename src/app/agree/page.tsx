@@ -26,8 +26,8 @@ export default function Member() {
             <div className={styles.membership_box}>
               <div className={styles.membership_contents}>
                 <p>
-                  본 약관은 tokti.site(이하 "사이트")가 제공하는 서비스의 이용과 관련하여, 회원과 사이트 간의 권리, 의무
-                  및 책임사항 등을 규정함을 목적으로 합니다.
+                  본 약관은 tokti.site(이하 &quot;사이트&quot;)가 제공하는 서비스의 이용과 관련하여, 회원과 사이트 간의
+                  권리, 의무 및 책임사항 등을 규정함을 목적으로 합니다.
                 </p>
 
                 <h2>제1조. 목적</h2>
@@ -185,13 +185,13 @@ export default function Member() {
               <div className={styles.membership_contents}>
                 <h2>제1조 (목적)</h2>
                 <p>
-                  이 약관은 tokti(이하 "사이트")가 제공하는 커뮤니티 서비스의 이용조건 및 운영자의 권리·의무 등을
-                  규정함을 목적으로 합니다.
+                  이 약관은 tokti(이하 &quot;사이트&quot;)가 제공하는 커뮤니티 서비스의 이용조건 및 운영자의 권리·의무
+                  등을 규정함을 목적으로 합니다.
                 </p>
                 <h2>제2조 (정의)</h2>
                 <ol>
-                  <li>"회원"이란 사이트에 가입하여 서비스를 이용하는 자를 말합니다.</li>
-                  <li>"비회원"이란 회원에 가입하지 않고 서비스를 이용하는 자를 말합니다.</li>
+                  <li>&quot;회원&quot;이란 사이트에 가입하여 서비스를 이용하는 자를 말합니다.</li>
+                  <li>&quot;비회원&quot;이란 회원에 가입하지 않고 서비스를 이용하는 자를 말합니다.</li>
                 </ol>
                 <h2>제3조 (약관의 게시 및 설명 의무)</h2>
                 <ol>
