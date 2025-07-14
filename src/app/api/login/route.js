@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import pool from "../../db/db";
+import pool from "@/db/db";
 
 export async function POST(req) {
   const client = await pool.connect();
