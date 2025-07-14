@@ -1,4 +1,5 @@
 "use client";
+
 import axios from "axios";
 
 import { useState, useRef, FormEvent } from "react";
@@ -7,8 +8,7 @@ import { useRouter } from "next/navigation";
 import "@/style/style.common.scss";
 import styles from "@/style/Login.module.scss";
 
-import { handleBlur, handleFocus } from "../func/inputActive";
-// 생략된 import, useState 등 동일
+import { handleBlur, handleFocus } from "@/func/inputActive";
 
 export default function Info() {
   const router = useRouter();

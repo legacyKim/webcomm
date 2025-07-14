@@ -9,10 +9,22 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/AuthContext";
 import MyHeader from "./myHeader";
 
+import { useLoadRecaptcha } from "@/func/hook/useLoadRecaptcha";
+
 export default function Mypage() {
   const router = useRouter();
 
-  const { isUsername, isUserId, isUserNick, isUserProfile, isUserEmail } = useAuth();
+  const {
+    isUsername,
+    isUserId,
+    isUserNick,
+    isUserProfile,
+    isUserEmail,
+
+    setIsUsername,
+    setLoginStatus,
+    setIsUserAuthority,
+  } = useAuth();
 
   const [newNick, setNewNick] = useState<string>(isUserNick || "");
 
@@ -97,6 +109,11 @@ export default function Mypage() {
 
   // 회원가입 요청
   const inputPwRef = useRef<HTMLInputElement>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const loadRecaptcha = useLoadRecaptcha(setRecaptchaToken);
+  useEffect(() => {
+    loadRecaptcha();
+  }, []);
 
   const userChangePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,6 +151,7 @@ export default function Mypage() {
     formData.append("userNickname", newNick);
     formData.append("userPassword", newPassword);
     formData.append("userEmail", userEmail);
+    formData.append("recaptchaToken", recaptchaToken || "");
 
     if (file) {
       formData.append("profileImage", file);
@@ -145,8 +163,14 @@ export default function Mypage() {
       if (response.data.success) {
         alert(response.data.message);
         await axios.post("/api/logout");
+
+        setIsUsername("");
+        setLoginStatus(false);
+        setIsUserAuthority(null);
+
         router.push("/login");
       } else {
+        console.log(response.data);
         alert(response.data.message);
       }
     } catch (error) {
@@ -247,12 +271,14 @@ export default function Mypage() {
                   </div>
                 )}
 
-                <p>프로필 이미지 설명</p>
+                <p>
+                  최대 &nbsp;<b className='notice'>1MB</b>&nbsp; 이하의 이미지만 업로드 가능합니다.
+                </p>
               </div>
             </div>
 
             <div className='mypage_info mb_4'>
-              <span>비밀번호</span>
+              <span>비밀번호 변경</span>
               <div className='input_box'>
                 <input
                   type='password'
@@ -277,7 +303,7 @@ export default function Mypage() {
             </div>
 
             <div className='mypage_info mb_4'>
-              <span>이메일</span>
+              <span>이메일 변경</span>
               <div className='input_box'>
                 <input
                   type='text'

@@ -544,6 +544,9 @@ main .title {
   flex-direction: column;
   column-gap: 16px;
 }
+.board_list li {
+  cursor: pointer;
+}
 main .board_list {
   min-height: 133px;
   border-bottom: $border-grey;
@@ -1170,7 +1173,7 @@ sub .board_list {
 }
 .depth_indicator_box {
   display: flex;
-  height: calc(100% + 23px);
+  height: calc(100%);
 }
 .depth_reply {
   position: relative;
@@ -1535,7 +1538,11 @@ sub .board_list {
   line-height: 1.4;
   color: $grey6-color;
 }
-.mypage_info p.notice {
+.mypage_info p b {
+  font-size: inherit;
+  line-height: inherit;
+}
+.mypage_info .notice {
   color: $red-color;
 }
 .mypage_info .input_box {
@@ -1607,13 +1614,15 @@ sub .board_list {
   @include flex-center;
   margin-bottom: 8px;
   height: 200px;
+  width: 200px;
   border-radius: 4px;
   border: $border-grey;
   overflow: hidden;
 }
 .mypage_info .img_preview img {
-  object-fit: contain;
+  object-fit: cover;
   height: 100%;
+  width: 100%;
 }
 
 /* mypage board list */

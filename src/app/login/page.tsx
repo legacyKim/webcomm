@@ -34,6 +34,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const savedUserid = Cookies.get("savedUserid");
+    console.log(savedUserid);
     if (savedUserid) {
       setUserid(savedUserid);
       setRemember(true);
@@ -215,7 +216,7 @@ export default function LoginPage() {
             {/* checkbox */}
             <div className='checkbox'>
               <input type='checkbox' id='remember' name='remember' className='hidden_checkbox' />
-              <label htmlFor='remember' className='custom_checkbox' onChange={() => setRemember(!remember)}>
+              <label htmlFor='remember' className='custom_checkbox' onClick={() => setRemember(!remember)}>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 24 24'

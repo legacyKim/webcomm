@@ -68,4 +68,5 @@ export const config = {
 8. tiptap immediatelyRender
 9. jwt 토큰 이해
 10. next auth session 이해
+11. useCallback 알아보기
 

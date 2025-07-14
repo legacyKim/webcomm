@@ -8,12 +8,11 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "../api/api";
 
 export default function Menu() {
-  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
-
   const pathname = usePathname();
-  const { setBoardType } = useAuth();
+  if (pathname === "/login" || pathname === "/user" || pathname === "/find" || pathname === "/agree") return null;
 
-  if (pathname === "/login" || pathname === "/user") return null;
+  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
+  const { setBoardType } = useAuth();
 
   return (
     <menu className='menu'>

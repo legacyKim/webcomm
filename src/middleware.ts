@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import path from "path";
 
 const PROTECTED_PATHS = [
   "/write",
@@ -9,11 +10,14 @@ const PROTECTED_PATHS = [
   "/api/member",
   "/api/message",
   "/api/my",
+  "/api/user",
   "/api/upload",
   "/api/post/action/like",
   "/api/post/action/report",
   "/api/post/action/scrap",
 ];
+
+const EXCLUDE_PATHS = ["/api/user/duplicate", "/api/user/email"];
 
 function getJwtSecretKey() {
   const secret = process.env.JWT_SECRET;
@@ -26,6 +30,14 @@ export async function middleware(req: NextRequest) {
   const method = req.method;
 
   if (pathname.startsWith("/api/comment") && method === "GET") {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/api/user") && method === "POST") {
+    return NextResponse.next();
+  }
+
+  if (EXCLUDE_PATHS.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
   }
 

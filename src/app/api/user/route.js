@@ -119,8 +119,33 @@ export async function PUT(req) {
 
     // 닉네임 변경
     if (userNickname && userNickname !== user.usernickname) {
+      const dupCheck = await client.query("SELECT 1 FROM members WHERE user_nickname = $1 AND id != $2", [
+        userNickname,
+        userid,
+      ]);
+      if (dupCheck.rowCount > 0) {
+        return NextResponse.json({ success: false, message: "이미 사용 중인 닉네임입니다." }, { status: 400 });
+      }
+
+      const now = new Date();
+      const lastUpdated = user.nickname_updated_at ? new Date(user.nickname_updated_at) : null;
+
+      if (lastUpdated && now.getTime() - lastUpdated.getTime() < 1000 * 60 * 60 * 24 * 14) {
+        return NextResponse.json(
+          { success: false, message: "닉네임은 2주에 한 번만 변경할 수 있습니다." },
+          { status: 400 },
+        );
+      }
+
       updateFields.push(`user_nickname = $${valueIndex++}`);
       updateValues.push(userNickname);
+
+      updateFields.push(`nickname_updated_at = $${valueIndex++}`);
+      updateValues.push(now.toISOString());
+
+      // 닉네임 변경 시 posts, comments 테이블 내에 모든 user_nickname 업데이트
+      await client.query("UPDATE posts SET user_nickname = $1 WHERE user_id = $2", [userNickname, userid]);
+      await client.query("UPDATE comments SET user_nickname = $1 WHERE user_id = $2", [userNickname, userid]);
     }
 
     // 비밀번호 변경 (입력값이 있을 경우에만 해싱 후 업데이트)
@@ -166,17 +191,17 @@ export async function PUT(req) {
 
     // 업데이트 쿼리 실행
     const updateQuery = `
-            UPDATE members 
-            SET ${updateFields.join(", ")}
-            WHERE id = $${valueIndex}
-            RETURNING *;
-        `;
+        UPDATE members 
+        SET ${updateFields.join(", ")}
+        WHERE id = $${valueIndex}
+        RETURNING *;
+    `;
     updateValues.push(userid);
 
     const updateResult = await client.query(updateQuery, updateValues);
 
     return NextResponse.json(
-      { success: true, user: updateResult.rows[0], message: "회원 정보가 업데이트되었습니다." },
+      { success: true, user: updateResult.rows[0], message: "회원 정보가 업데이트되었습니다. 다시 로그인 해야합니다." },
       { status: 200 },
     );
   } catch (error) {

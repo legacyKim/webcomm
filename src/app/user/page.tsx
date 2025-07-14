@@ -7,7 +7,8 @@ import { useState, useRef, useEffect } from "react";
 import "../style/style.common.scss";
 import styles from "../style/Login.module.scss";
 
-import { handleBlur, handleFocus } from "../func/inputActive";
+import { handleBlur, handleFocus } from "@/func/inputActive";
+import { useLoadRecaptcha } from "@/func/hook/useLoadRecaptcha";
 
 declare global {
   interface Window {
@@ -174,30 +175,8 @@ export default function User() {
 
   // recaptcha
   const [recaptchaToken, setRecaptchaToken] = useState("");
-
+  const loadRecaptcha = useLoadRecaptcha(setRecaptchaToken);
   useEffect(() => {
-    const loadRecaptcha = async () => {
-      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-      if (!siteKey) {
-        console.error("reCAPTCHA site key 누락");
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
-      script.async = true;
-      script.onload = () => {
-        if (window.grecaptcha) {
-          window.grecaptcha.ready(() => {
-            window.grecaptcha.execute(`${siteKey}`, { action: "signup" }).then((token) => {
-              setRecaptchaToken(token);
-            });
-          });
-        }
-      };
-      document.head.appendChild(script);
-    };
-
     loadRecaptcha();
   }, []);
 
@@ -256,7 +235,7 @@ export default function User() {
     formData.append("userNickname", userNickname);
     formData.append("userPassword", userPassword);
     formData.append("userEmail", userEmail);
-    formData.append("recaptchaToken", recaptchaToken);
+    formData.append("recaptchaToken", recaptchaToken ?? "");
 
     if (file) {
       formData.append("profileImage", file);
