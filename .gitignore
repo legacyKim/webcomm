@@ -45,3 +45,5 @@ yarn-error.log*
 # mine
 text
 trigger
+
+prisma/seed.ts

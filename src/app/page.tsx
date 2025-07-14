@@ -103,7 +103,7 @@ export default function Home() {
                     <span className='dot dot3'>.</span>
                   </div>
                 </div>
-              ) : popularPosts ? (
+              ) : popularPosts.length !== 0 ? (
                 popularPosts.map((post: Posts) => (
                   <li key={post.id}>
                     <Link href={`/board/${post.url_slug}/${post.id}`}>

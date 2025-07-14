@@ -53,6 +53,9 @@ jwt 타입 정의 (TypeScript용)
 npm install react-google-recaptcha
 reCAPTCHA 적용
 
+npm install -D ts-node typescript
+seed.ts 적용을 위한 설치
+
 - tiptap
 
 npm install @tiptap/react @tiptap/starter-kit
