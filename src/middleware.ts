@@ -23,6 +23,11 @@ function getJwtSecretKey() {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const method = req.method;
+
+  if (pathname.startsWith("/api/comment") && method === "GET") {
+    return NextResponse.next();
+  }
 
   if (!PROTECTED_PATHS.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
