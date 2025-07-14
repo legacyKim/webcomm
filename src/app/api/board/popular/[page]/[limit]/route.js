@@ -7,8 +7,8 @@ export async function GET(req, context) {
 
   const { page, limit } = (await context.params) || {};
 
-  const limitNum = parseInt(limit); // ✅ 누락된 부분
-  const pageNum = parseInt(page); // ✅ 누락된 부분
+  const limitNum = parseInt(limit);
+  const pageNum = parseInt(page);
   const offset = (pageNum - 1) * limitNum;
 
   const client = await pool.connect();

@@ -45,9 +45,6 @@ export function middleware(req: NextRequest) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
     const authority = (decoded as jwt.JwtPayload).userAuthority;
 
-    console.log("✅ decoded:", decoded);
-    console.log("✅ userAuthority:", authority);
-
     if (pathname.startsWith("/admin") && Number(authority) !== 0) {
       if (pathname.startsWith("/api")) {
         return NextResponse.json({ success: false, message: "관리자 권한이 필요합니다." }, { status: 403 });

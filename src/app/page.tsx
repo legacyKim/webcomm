@@ -182,7 +182,7 @@ export default function Home() {
                   </Link>
                 </div>
                 <ol className='board_list'>
-                  {Array.isArray(homeData[boardName].posts) && homeData[boardName].posts.length > 0 ? (
+                  {homeData[boardName].posts.length > 0 ? (
                     homeData[boardName].posts.map((post: Posts) => (
                       <li key={`${boardName}${post.id}`}>
                         <Link href={`/board/${homeData[boardName].url_slug}/${post.id}`}>

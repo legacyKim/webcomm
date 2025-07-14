@@ -33,12 +33,14 @@ export default function Board({ url_slug, boardType }: { url_slug: string; board
         {/* board best */}
         <div className='board'>
           <div className='board_top'>
-            <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={30}>30</option>
-              <option value={50}>50</option>
-            </select>
+            {isUserId !== null && (
+              <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={30}>30</option>
+                <option value={50}>50</option>
+              </select>
+            )}
 
             {isUserId !== null && (
               <div>

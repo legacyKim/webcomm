@@ -13,7 +13,7 @@ export async function GET() {
         COUNT(p.id) AS post_count,
         COALESCE(SUM(p.views), 0) AS total_views
       FROM boards b
-      LEFT JOIN posts p ON p.board_name = b.board_name
+      LEFT JOIN posts p ON p.url_slug = b.url_slug
       GROUP BY b.id, b.board_name, b.url_slug, b.seq
       ORDER BY b.seq ASC;
     `;
