@@ -103,7 +103,7 @@ export default function Home() {
                     <span className='dot dot3'>.</span>
                   </div>
                 </div>
-              ) : (
+              ) : popularPosts ? (
                 popularPosts.map((post: Posts) => (
                   <li key={post.id}>
                     <Link href={`/board/${post.url_slug}/${post.id}`}>
@@ -144,6 +144,11 @@ export default function Home() {
                     </Link>
                   </li>
                 ))
+              ) : (
+                <div className='data_none'>
+                  <NoSymbolIcon />
+                  <span>작성한 글이 없습니다.</span>
+                </div>
               )}
             </ol>
           </div>

@@ -12,7 +12,8 @@
     "migrate": "prisma migrate deploy",
     "generate": "prisma generate",
     "apply-triggers": "psql $DATABASE_URL -f prisma/triggers.sql",
-    "deploy": "npm run migrate && npm run apply-triggers"
+    "deploy": "npm run migrate && npm run apply-triggers",
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.758.0",
@@ -53,10 +54,11 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/jwt-decode": "^2.2.1",
-    "@types/node": "^20.5.1",
+    "@types/node": "^20.19.7",
     "eslint": "^9.30.0",
     "eslint-config-next": "15.1.7",
     "prisma": "^6.6.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
 }

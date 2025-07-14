@@ -16,6 +16,24 @@ export async function POST(req) {
     const userPassword = formData.get("userPassword");
     const userEmail = formData.get("userEmail");
     const profileImage = formData.get("profileImage");
+    const recaptchaToken = formData.get("recaptchaToken");
+
+    // recaptcha check
+    if (!recaptchaToken || typeof recaptchaToken !== "string") {
+      return NextResponse.json({ success: false, message: "reCAPTCHA 토큰 누락" }, { status: 400 });
+    }
+
+    const verifyRes = await axios.post("https://www.google.com/recaptcha/api/siteverify", null, {
+      params: {
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: recaptchaToken,
+      },
+    });
+
+    const { success, score, action } = verifyRes.data;
+    if (!success || score < 0.5 || action !== "signup") {
+      return NextResponse.json({ success: false, message: "reCAPTCHA 검증 실패" }, { status: 403 });
+    }
 
     // 프로필 이미지 용량 제한
     const MAX_SIZE = 1 * 1024 * 1024;

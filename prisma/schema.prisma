@@ -10,7 +10,7 @@ datasource db {
 model Board {
   id        Int      @id @default(autoincrement())
   board_name String  @unique @db.VarChar(255)
-  url_slug   String  @db.VarChar(255)
+  url_slug   String  @unique @db.VarChar(255) 
   seq       Int      @default(autoincrement())
   posts     Post[]
 

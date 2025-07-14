@@ -9,6 +9,15 @@ import styles from "../style/Login.module.scss";
 
 import { handleBlur, handleFocus } from "../func/inputActive";
 
+declare global {
+  interface Window {
+    grecaptcha: {
+      ready: (cb: () => void) => void;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    };
+  }
+}
+
 const idRegex = /^[a-z0-9]{4,16}$/;
 const nickRegex = /^[a-zA-Z0-9가-힣]{2,12}$/;
 
@@ -163,6 +172,37 @@ export default function User() {
     }
   }, [certifyNum, certifyNumCheck]);
 
+  // recaptcha
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+
+  console.log(recaptchaToken);
+
+  useEffect(() => {
+    const loadRecaptcha = async () => {
+      const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+      if (!siteKey) {
+        console.error("reCAPTCHA site key 누락");
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = `https://www.google.com/recaptcha/api.js?render=${siteKey}`;
+      script.async = true;
+      script.onload = () => {
+        if (window.grecaptcha) {
+          window.grecaptcha.ready(() => {
+            window.grecaptcha.execute(`${siteKey}`, { action: "signup" }).then((token) => {
+              setRecaptchaToken(token);
+            });
+          });
+        }
+      };
+      document.head.appendChild(script);
+    };
+
+    loadRecaptcha();
+  }, []);
+
   // 프로필 이미지
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -218,6 +258,7 @@ export default function User() {
     formData.append("userNickname", userNickname);
     formData.append("userPassword", userPassword);
     formData.append("userEmail", userEmail);
+    formData.append("recaptchaToken", recaptchaToken);
 
     if (file) {
       formData.append("profileImage", file);
