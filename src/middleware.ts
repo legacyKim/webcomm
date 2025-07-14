@@ -1,32 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { jwtVerify } from "jose";
 
 const PROTECTED_PATHS = [
   "/write",
   "/my",
   "/admin",
-
-  "/api/board/popular",
-  "/api/board/userPost",
-  "/api/board/userComment",
-  "/api/board/search",
-  "/api/board/stream",
-
-  "/api/comment/action",
-  "/api/comment/upload",
-
+  "/api/board",
+  "/api/comment",
   "/api/member",
   "/api/message",
   "/api/my",
-
-  "/api/post/action",
+  "/api/post",
   "/api/upload",
-
-  "/api/user/block",
-  "/api/user/report",
+  "/api/user",
 ];
 
-export function middleware(req: NextRequest) {
+function getJwtSecretKey() {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error("JWT_SECRET is not defined");
+  return new TextEncoder().encode(secret);
+}
+
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (!PROTECTED_PATHS.some((path) => pathname.startsWith(path))) {
@@ -34,36 +29,32 @@ export function middleware(req: NextRequest) {
   }
 
   const token = req.cookies.get("authToken")?.value;
+
   if (!token) {
-    if (pathname.startsWith("/api")) {
-      return NextResponse.json({ success: false, message: "로그인이 필요합니다." }, { status: 401 });
-    }
-    return NextResponse.redirect(new URL("/login", req.url));
+    return pathname.startsWith("/api")
+      ? NextResponse.json({ success: false, message: "로그인이 필요합니다." }, { status: 401 })
+      : NextResponse.redirect(new URL("/login", req.url));
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    const authority = (decoded as jwt.JwtPayload).userAuthority;
+    const { payload } = await jwtVerify(token, getJwtSecretKey());
+    const authority = Number(payload.userAuthority);
 
-    console.log("✅ decoded:", decoded);
-    console.log("✅ userAuthority:", authority);
-
-    if (pathname.startsWith("/admin") && Number(authority) !== 0) {
-      if (pathname.startsWith("/api")) {
-        return NextResponse.json({ success: false, message: "관리자 권한이 필요합니다." }, { status: 403 });
-      }
-      return NextResponse.redirect(new URL("/", req.url));
+    if (pathname.startsWith("/admin") && authority !== 0) {
+      return pathname.startsWith("/api")
+        ? NextResponse.json({ success: false, message: "관리자 권한이 필요합니다." }, { status: 403 })
+        : NextResponse.redirect(new URL("/", req.url));
     }
 
     return NextResponse.next();
-  } catch {
-    if (pathname.startsWith("/api")) {
-      return NextResponse.json({ success: false, message: "토큰이 만료되었거나 유효하지 않습니다." }, { status: 401 });
-    }
-    // return NextResponse.redirect(new URL("/login", req.url));
+  } catch (err) {
+    console.error("JWT Verify Error:", err);
+    return pathname.startsWith("/api")
+      ? NextResponse.json({ success: false, message: "토큰 검증 실패" }, { status: 401 })
+      : NextResponse.redirect(new URL("/login", req.url));
   }
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*", "/write", "/write/:path*", "/my", "/my/:path*"],
+  matcher: ["/admin/:path*", "/write/:path*", "/my/:path*", "/api/:path*"],
 };

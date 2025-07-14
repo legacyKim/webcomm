@@ -62,6 +62,9 @@ bcrypt ts 설치
 npm install @upstash/ratelimit redis
 RATE LIMIT - API 요청수 제한
 
+npm install jose
+Next.js의 middleware가 Edge Runtime에서 실행되기 때문이고, 이 환경에서는 jsonwebtoken 라이브러리에서 사용하는 Node.js의 crypto 모듈이 지원되지 않는다는.
+
 - tiptap
 
 npm install @tiptap/react @tiptap/starter-kit
