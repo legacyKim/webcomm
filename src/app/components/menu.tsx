@@ -9,10 +9,11 @@ import { fetchBoard } from "../api/api";
 
 export default function Menu() {
   const pathname = usePathname();
-  if (pathname === "/login" || pathname === "/user" || pathname === "/find" || pathname === "/agree") return null;
 
   const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
   const { setBoardType } = useAuth();
+
+  if (pathname === "/login" || pathname === "/user" || pathname === "/find" || pathname === "/agree") return null;
 
   return (
     <menu className='menu'>

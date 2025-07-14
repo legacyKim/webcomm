@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
-import path from "path";
 
 const PROTECTED_PATHS = [
   "/write",
