@@ -170,41 +170,42 @@ export default function Home() {
         <div className='board_double'>
           {/* board */}
           {homeData &&
-            Object.keys(homeData).map((boardName) => (
-              <div key={boardName} className='board'>
-                <div className='board_top'>
-                  <h2>{boardName}</h2>
-                  <Link
-                    className='more'
-                    href={`/board/${homeData[boardName].url_slug}`}
-                    onClick={() => {
-                      setBoardType("board");
-                    }}>
-                    <ChevronRightIcon />
-                  </Link>
+            Object.keys(homeData).map((boardName) => {
+              const board = homeData[boardName];
+              const posts = Array.isArray(board.posts) ? board.posts : [];
+
+              return (
+                <div key={boardName} className='board'>
+                  <div className='board_top'>
+                    <h2>{boardName}</h2>
+                    <Link className='more' href={`/board/${board.url_slug}`} onClick={() => setBoardType("board")}>
+                      <ChevronRightIcon />
+                    </Link>
+                  </div>
+
+                  <ol className='board_list'>
+                    {posts.length > 0 ? (
+                      posts.map((post: Posts) => (
+                        <li key={`${boardName}${post.id}`}>
+                          <Link href={`/board/${board.url_slug}/${post.id}`}>
+                            <span className='title'>{post.title}</span>
+                            <div className='view flex-start'>
+                              <EyeIcon className='icon' />
+                              {post.views}
+                            </div>
+                          </Link>
+                        </li>
+                      ))
+                    ) : (
+                      <div className='data_none'>
+                        <NoSymbolIcon />
+                        <span>작성한 글이 없습니다.</span>
+                      </div>
+                    )}
+                  </ol>
                 </div>
-                <ol className='board_list'>
-                  {homeData[boardName].posts.length > 0 ? (
-                    homeData[boardName].posts.map((post: Posts) => (
-                      <li key={`${boardName}${post.id}`}>
-                        <Link href={`/board/${homeData[boardName].url_slug}/${post.id}`}>
-                          <span className='title'>{post.title}</span>
-                          <div className='view flex-start'>
-                            <EyeIcon className='icon' />
-                            {post.views}
-                          </div>
-                        </Link>
-                      </li>
-                    ))
-                  ) : (
-                    <div className='data_none'>
-                      <NoSymbolIcon />
-                      <span>작성한 글이 없습니다.</span>
-                    </div>
-                  )}
-                </ol>
-              </div>
-            ))}
+              );
+            })}
         </div>
       </div>
     </main>

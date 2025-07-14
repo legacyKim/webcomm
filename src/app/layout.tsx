@@ -15,7 +15,7 @@ import "@/style/fontello/css/animation.css";
 import "@/style/style.common.scss";
 
 export const metadata: Metadata = {
-  title: "New web",
+  title: "tokti",
   description: "community",
 };
 
