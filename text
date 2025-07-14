@@ -18,10 +18,10 @@
 ; 작업중
 
 1. 보안 관련 - 도메인 설정 후
-  a. reCAPTCHA v3: UX 저하 적고 정교함
+  # a. reCAPTCHA v3: UX 저하 적고 정교함
   b. Cloudflare 설정
   c. 개인정보 처리 방침 및 회원 이용 약관
-  d. 로고
+  d. 로고 + 기본 프로필 이미지?
 
 2. RateLimit ?
 3. middleware.ts 처리해야함. - 보류, 회원가입을 완료해야 함.

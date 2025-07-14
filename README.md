@@ -59,6 +59,9 @@ seed.ts 적용을 위한 설치
 npm i --save-dev @types/bcrypt
 bcrypt ts 설치
 
+npm install @upstash/ratelimit redis
+RATE LIMIT - API 요청수 제한
+
 - tiptap
 
 npm install @tiptap/react @tiptap/starter-kit

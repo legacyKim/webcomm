@@ -71,8 +71,8 @@ export async function POST(req) {
     }
 
     const insertResult = await client.query(
-      "INSERT INTO members (username, password, email, user_nickname, profile) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-      [userid, hashedPassword, userEmail, userNickname, imgPath],
+      "INSERT INTO members (username, password, email, user_nickname, profile, authority) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [userid, hashedPassword, userEmail, userNickname, imgPath, 1],
     );
 
     return NextResponse.json(

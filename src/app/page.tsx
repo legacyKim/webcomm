@@ -95,7 +95,7 @@ export default function Home() {
                 <ChevronRightIcon />
               </Link>
             </div>
-            <ol className='board_list'>
+            <ol className='board_list board_list_popular'>
               {isLoadingPop ? (
                 <div className='data_wait'>
                   <span>잠시만 기다려 주세요.</span>

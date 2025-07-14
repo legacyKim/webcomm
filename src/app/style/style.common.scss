@@ -549,6 +549,9 @@ main .board_list {
   border-bottom: $border-grey;
   padding-bottom: 12px;
 }
+main .board_list.board_list_popular {
+  min-height: 340.8px;
+}
 sub .board_list {
   position: relative;
   margin-bottom: 8px;
