@@ -816,6 +816,9 @@ sub .board_list {
   animation: appearDot3 4s steps(1, end) infinite;
 }
 
+.board_double .data_none {
+  min-height: 120px;
+}
 .data_none {
   @include flex-center;
   min-height: 276px;

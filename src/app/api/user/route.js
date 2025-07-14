@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import pool from "@/db/db";
 
+import axios from "axios";
+
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "@/db/s3";
 
