@@ -5,14 +5,12 @@ const PROTECTED_PATHS = [
   "/write",
   "/my",
   "/admin",
-  "/api/board",
   "/api/comment",
   "/api/member",
   "/api/message",
   "/api/my",
   "/api/post",
   "/api/upload",
-  "/api/user",
 ];
 
 function getJwtSecretKey() {
@@ -23,6 +21,11 @@ function getJwtSecretKey() {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  const excludedPaths = ["/api/board", "/api/user", "api/find", "/api/login", "/api/logout"];
+  if (excludedPaths.some((path) => pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
 
   if (!PROTECTED_PATHS.some((path) => pathname.startsWith(path))) {
     return NextResponse.next();
