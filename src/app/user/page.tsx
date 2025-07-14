@@ -175,8 +175,6 @@ export default function User() {
   // recaptcha
   const [recaptchaToken, setRecaptchaToken] = useState("");
 
-  console.log(recaptchaToken);
-
   useEffect(() => {
     const loadRecaptcha = async () => {
       const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;

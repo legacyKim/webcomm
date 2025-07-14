@@ -29,8 +29,6 @@ export default function Home() {
     queryFn: () => fetchHome(isUserId),
   });
 
-  console.log(homeData);
-
   const {
     data: popularPosts,
     isLoading: isLoadingPop,

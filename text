@@ -23,7 +23,7 @@
   c. 개인정보 처리 방침 및 회원 이용 약관
   d. 로고 + 기본 프로필 이미지?
 
-2. RateLimit ?
+2. RateLimit ? - reddis?
 3. middleware.ts 처리해야함. - 보류, 회원가입을 완료해야 함.
 4. jwt HttpOnly 여부 확인
 
