@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 import { useAuth } from "@/AuthContext";
-import Logo from "@/components/logo";
+import Logo from "@/components/Logo";
 
 import {
   ArrowRightStartOnRectangleIcon,
