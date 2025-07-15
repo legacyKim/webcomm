@@ -9,7 +9,6 @@ import { useAuth } from "@/AuthContext";
 import Link from "next/link";
 
 import { useDropDown } from "@/func/hook/useDropDown";
-import { useLoginCheck } from "@/func/hook/useLoginCheck";
 import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
@@ -96,8 +95,6 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     userId: 0,
     userNickname: "",
   });
-
-  const loginCheck = useLoginCheck();
 
   if (isLoading)
     return (
