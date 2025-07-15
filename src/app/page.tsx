@@ -37,6 +37,8 @@ export default function Home() {
     queryFn: () => fetchHomePop(1, 10, isUserId),
   });
 
+  console.log("popularPosts", popularPosts);
+
   // 인기글
   useEffect(() => {
     const eventSource = new EventSource(`${SSE_BASE_URL}/posts/stream`);

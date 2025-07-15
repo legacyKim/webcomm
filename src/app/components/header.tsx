@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 import { useAuth } from "@/AuthContext";
+import Logo from "@/components/logo";
 
 import {
   ArrowRightStartOnRectangleIcon,
@@ -220,7 +221,7 @@ export default function Header() {
     <header className='header'>
       <div className='header_top page'>
         <Link href='/' className='logo'>
-          로고
+          <Logo />
         </Link>
 
         <div className='header_info'>

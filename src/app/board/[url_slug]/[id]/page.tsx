@@ -616,12 +616,14 @@ export default function View() {
       </div>
 
       <div className='board_top'>
-        <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={30}>30</option>
-          <option value={50}>50</option>
-        </select>
+        {isUserId !== null && (
+          <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={30}>30</option>
+            <option value={50}>50</option>
+          </select>
+        )}
         <div className='btn_wrap btn_wrap_mb0'>
           <Link href={`/board/${params.url_slug}`}>
             <ListBulletIcon className='icon' />

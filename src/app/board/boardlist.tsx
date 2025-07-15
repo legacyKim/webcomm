@@ -150,7 +150,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
                     <span className='num'>{b.post_number}</span>
                   ))}
                 <span className='title'>
-                  {boardType === "popular" && <span className='category'>{b.url_slug}</span>}
+                  {boardType === "popular" && <span className='category'>{b.board_name}</span>}
                   {b.title}
                 </span>
                 <div className='comment'>

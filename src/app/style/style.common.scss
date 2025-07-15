@@ -244,7 +244,8 @@ header {
   @include space-between;
   align-items: center;
 }
-.logo {
+.logo img {
+  object-fit: contain;
 }
 .header_info {
   @include flex-center;
@@ -1072,7 +1073,7 @@ sub .board_list {
   @include flex-start;
 }
 .view_info span {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
 }
 .view_info span b {

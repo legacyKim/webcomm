@@ -15,8 +15,11 @@ import "@/style/fontello/css/animation.css";
 import "@/style/style.common.scss";
 
 export const metadata: Metadata = {
-  title: "tokti",
-  description: "community",
+  title: "Tokti",
+  description: "Tokti 커뮤니티",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default async function RootLayout({
