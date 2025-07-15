@@ -14,6 +14,7 @@ import { useAuth } from "@/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const {
     loginStatus,
     setLoginStatus,
@@ -23,7 +24,10 @@ export default function LoginPage() {
     setIsUserProfile,
     setIsUserEmail,
     setIsUserAuthority,
+    redirectPath,
   } = useAuth();
+
+  console.log("LoginPage render", redirectPath);
 
   const [userid, setUserid] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -34,7 +38,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     const savedUserid = Cookies.get("savedUserid");
-    console.log(savedUserid);
     if (savedUserid) {
       setUserid(savedUserid);
       setRemember(true);
@@ -84,7 +87,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (loginStatus) {
-      router.push("/");
+      router.push(redirectPath || "/");
     }
   }, [loginStatus]);
 

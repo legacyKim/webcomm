@@ -11,6 +11,7 @@ import Boardlist from "@/board/boardlist";
 import { useAuth } from "@/AuthContext";
 import { useDropDown } from "@/func/hook/useDropDown";
 import { useLoginCheck } from "@/func/hook/useLoginCheck";
+import { usePathname } from "next/navigation";
 
 import DropDownMenu from "@/components/dropDownMenu";
 import TiptapViewer from "@/components/tiptapViewer";
@@ -68,12 +69,18 @@ interface AppComment {
 }
 
 export default function View() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setRedirectPath(pathname);
+  }, []);
+
   const params = useParams();
   const router = useRouter();
 
   const loginCheck = useLoginCheck();
 
-  const { isUserId, isUserNick, messageToUser, boardType } = useAuth();
+  const { isUserId, isUserNick, messageToUser, boardType, setRedirectPath } = useAuth();
   const [limit, setLimit] = useState(10);
 
   const [viewPost, setViewPost] = useState<Posts | null>(null);
@@ -423,9 +430,6 @@ export default function View() {
                   className='writer'
                   ref={writerRef}
                   onClick={async (e) => {
-                    const ok = await loginCheck();
-                    if (!ok) return;
-
                     userClick(e);
                     setUserInfoInDropMenu({
                       userId: viewPost?.posts?.user_id,
@@ -479,7 +483,7 @@ export default function View() {
           <TiptapViewer content={viewPost?.posts?.content} />
         </div>
 
-        {viewPost?.posts?.user_nickname !== isUserNick && (
+        {isUserId && viewPost?.posts?.user_nickname !== isUserNick && (
           <div className='view_content_btn'>
             {!viewPost?.posts?.notice && (
               <button
@@ -563,43 +567,47 @@ export default function View() {
           </div>
         </div>
 
-        {isUserId !== 0 ? (
-          <div className='comment_add'>
-            <CommentEditor
-              singleCommentImageFile={singleCommentImageFile}
-              initialContent={commentCorrect ? commentCorrect.content : ""}
-              onChange={(html: string) => setCommentContent(html)}
-              onMentionUsersChange={setCommentMentionUser}
-              users={mentionUsers}
-              reset={reset}
-            />
-            <div className='comment_editor'>
-              <div>
-                <input
-                  id='image-upload'
-                  type='file'
-                  accept='image/*'
-                  onChange={commentImageUpload}
-                  style={{ display: "none" }}
-                />
-                <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
-                  <PhotoIcon className='icon' />
-                  <span className='notice'>
-                    용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드 가능합니다.{" "}
-                  </span>
-                </label>
-              </div>
+        {isUserId !== null ? (
+          commentAdd === null ? (
+            <div className='comment_add'>
+              <CommentEditor
+                singleCommentImageFile={singleCommentImageFile}
+                initialContent={commentCorrect ? commentCorrect.content : ""}
+                onChange={(html: string) => setCommentContent(html)}
+                onMentionUsersChange={setCommentMentionUser}
+                users={mentionUsers}
+                reset={reset}
+              />
+              <div className='comment_editor'>
+                <div>
+                  <input
+                    id='image-upload'
+                    type='file'
+                    accept='image/*'
+                    onChange={commentImageUpload}
+                    style={{ display: "none" }}
+                  />
+                  <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
+                    <PhotoIcon className='icon' />
+                    <span className='notice'>
+                      용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드 가능합니다.{" "}
+                    </span>
+                  </label>
+                </div>
 
-              <div className='btn_wrap'>
-                <button
-                  onClick={() => {
-                    commentPost(commentContent);
-                  }}>
-                  댓글 추가
-                </button>
+                <div className='btn_wrap'>
+                  <button
+                    onClick={() => {
+                      commentPost(commentContent);
+                    }}>
+                    댓글 추가
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <></>
+          )
         ) : (
           <Link href='/login' className='go_to_login_for_comment'>
             댓글을 입력하려면 로그인 해야합니다.

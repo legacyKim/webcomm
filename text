@@ -69,4 +69,4 @@ export const config = {
 9. jwt 토큰 이해
 10. next auth session 이해
 11. useCallback 알아보기
-
+12. useCommentResizeObserver 분석...

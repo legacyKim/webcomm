@@ -33,14 +33,21 @@ export default function Header() {
   const router = useRouter();
   const {
     loginStatus,
-    setLoginStatus,
-    setIsUsername,
     isUserId,
     isUserNick,
     isUserProfile,
     isUserAuthority,
-    setIsUserAuthority,
     tokenExpiration,
+
+    setLoginStatus,
+    setIsUsername,
+    setIsUserId,
+    setIsUserNick,
+    setIsUserProfile,
+    setIsUserEmail,
+    setIsUserAuthority,
+    setTokenExpiration,
+    setIsUserNickUpdatedAt,
   } = useAuth();
 
   const logout = async (exp?: number) => {
@@ -52,9 +59,15 @@ export default function Header() {
         alert("로그아웃 되었습니다.");
       }
 
-      setIsUsername("");
       setLoginStatus(false);
+      setIsUsername(null);
+      setIsUserId(null);
+      setIsUserNick(null);
+      setIsUserProfile(null);
+      setIsUserEmail(null);
       setIsUserAuthority(null);
+      setTokenExpiration(null);
+      setIsUserNickUpdatedAt(null);
 
       if (pathname.startsWith("/my")) {
         router.push("/");

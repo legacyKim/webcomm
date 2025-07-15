@@ -14,6 +14,7 @@ export function AuthProvider({
   userEmail,
   userAuthority,
   tokenExp,
+  userNickUpdatedAt,
 }: {
   children: React.ReactNode;
   username: string;
@@ -23,6 +24,7 @@ export function AuthProvider({
   userEmail: string;
   userAuthority: number | null;
   tokenExp: number | null;
+  userNickUpdatedAt: Date | null;
 }) {
   const [isUsername, setIsUsername] = useState<string | null>(username);
   const [isUserId, setIsUserId] = useState<number | null>(userId);
@@ -30,12 +32,14 @@ export function AuthProvider({
   const [isUserProfile, setIsUserProfile] = useState<string | null>(userProfile);
   const [isUserEmail, setIsUserEmail] = useState<string | null>(userEmail);
   const [isUserAuthority, setIsUserAuthority] = useState<number | null>(userAuthority);
+  const [isUserNickUpdatedAt, setIsUserNickUpdatedAt] = useState<Date | null>(userNickUpdatedAt);
 
   const [loginStatus, setLoginStatus] = useState<boolean | null>(false);
   const [tokenExpiration, setTokenExpiration] = useState<number | null>(tokenExp);
 
   const [boardType, setBoardType] = useState<string | null>("board");
   const [messageToUser, setMessageToUser] = useState<number | null>(null);
+  const [redirectPath, setRedirectPath] = useState<string | null>(null);
 
   useEffect(() => {
     setIsUsername(username);
@@ -45,6 +49,7 @@ export function AuthProvider({
     setIsUserEmail(userEmail);
     setIsUserAuthority(userAuthority);
     setTokenExpiration(tokenExp);
+    setIsUserNickUpdatedAt(userNickUpdatedAt);
   }, [username, userId, userNick, userProfile, userEmail, userAuthority, tokenExpiration]);
 
   return (
@@ -70,6 +75,10 @@ export function AuthProvider({
         setIsUserAuthority,
         tokenExpiration,
         setTokenExpiration,
+        isUserNickUpdatedAt,
+        setIsUserNickUpdatedAt,
+        redirectPath,
+        setRedirectPath,
       }}>
       {children}
     </AuthContext.Provider>

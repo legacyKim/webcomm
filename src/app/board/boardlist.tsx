@@ -164,9 +164,6 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
                   className='writer'
                   ref={writerRef}
                   onClick={async (e) => {
-                    const ok = await loginCheck();
-                    if (!ok) return;
-
                     userClick(e);
                     setUserInfoInDropMenu({
                       userId: Number(b.user_id),

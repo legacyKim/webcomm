@@ -34,6 +34,7 @@ export default async function RootLayout({
   let userEmail = "";
   let userAuthority = null;
   let tokenExp = null;
+  let userNickUpdatedAt = null;
 
   if (token) {
     try {
@@ -45,6 +46,7 @@ export default async function RootLayout({
         userEmail: string;
         userAuthority: number | null;
         exp: number | null;
+        userNickUpdatedAt: Date | null;
       };
 
       username = decoded.username;
@@ -54,6 +56,7 @@ export default async function RootLayout({
       userEmail = decoded.userEmail;
       userAuthority = decoded.userAuthority;
       tokenExp = decoded.exp;
+      userNickUpdatedAt = decoded.userNickUpdatedAt;
     } catch (error) {
       console.error("토큰 검증 실패:", error);
     }
@@ -69,7 +72,8 @@ export default async function RootLayout({
           userProfile={userProfile}
           userEmail={userEmail}
           userAuthority={userAuthority}
-          tokenExp={tokenExp}>
+          tokenExp={tokenExp}
+          userNickUpdatedAt={userNickUpdatedAt}>
           <QueryProvider>
             <LayoutWrapper>{children}</LayoutWrapper>
           </QueryProvider>

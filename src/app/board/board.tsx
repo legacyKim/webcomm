@@ -4,11 +4,12 @@
 import Link from "next/link";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
+
 import Search from "@/components/search";
+import Boardlist from "@/board/boardlist";
 
 import { useAuth } from "@/AuthContext";
-
-import Boardlist from "@/board/boardlist";
 
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 
@@ -18,7 +19,13 @@ interface Board {
 }
 
 export default function Board({ url_slug, boardType }: { url_slug: string; boardType: string }) {
-  const { isUserId, setBoardType } = useAuth();
+  const { isUserId, setBoardType, setRedirectPath } = useAuth();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setRedirectPath(pathname);
+  }, []);
+
   useEffect(() => {
     setBoardType(boardType);
   }, [boardType]);

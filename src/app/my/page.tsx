@@ -11,6 +11,17 @@ import MyHeader from "./myHeader";
 
 import { useLoadRecaptcha } from "@/func/hook/useLoadRecaptcha";
 
+function getNicknameCooldownLeft(nicknameUpdatedAt: string | Date | null): number {
+  if (!nicknameUpdatedAt) return 0;
+  const last = new Date(nicknameUpdatedAt);
+  const now = new Date();
+  const diffMs = now.getTime() - last.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  const remaining = 14 - diffDays;
+  return Math.max(0, remaining); // 음수 방지
+}
+
 export default function Mypage() {
   const router = useRouter();
 
@@ -20,11 +31,15 @@ export default function Mypage() {
     isUserNick,
     isUserProfile,
     isUserEmail,
+    isUserNickUpdatedAt,
 
     setIsUsername,
     setLoginStatus,
     setIsUserAuthority,
+    setIsUserNickUpdatedAt,
   } = useAuth();
+
+  console.log("isUserNickUpdatedAt:", isUserNickUpdatedAt);
 
   const [newNick, setNewNick] = useState<string>(isUserNick || "");
 
@@ -167,6 +182,7 @@ export default function Mypage() {
         setIsUsername("");
         setLoginStatus(false);
         setIsUserAuthority(null);
+        setIsUserNickUpdatedAt(null);
 
         router.push("/login");
       } else {
@@ -224,6 +240,13 @@ export default function Mypage() {
                 />
                 <p>별명은 최대 한글 6자, 영문 12자까지 입력이 가능합니다.</p>
                 <p className='notice'>부적절한 별명은 임의로 변경될 수 있습니다.</p>
+                <p className='notice'>
+                  {getNicknameCooldownLeft(isUserNickUpdatedAt) === 0 ? (
+                    <></>
+                  ) : (
+                    <>별명은 {getNicknameCooldownLeft(isUserNickUpdatedAt)} 일 후에 변경이 가능합니다.</>
+                  )}
+                </p>
               </div>
             </div>
 

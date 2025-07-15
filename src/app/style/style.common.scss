@@ -1042,7 +1042,7 @@ sub .board_list {
   display: inline-block;
   width: 1px;
   height: 12px;
-  background-color: $grey5-color;
+  background-color: $grey6-color;
   top: 2px;
 }
 
@@ -1058,8 +1058,10 @@ sub .board_list {
 .view_info_area {
   @include space-between;
   padding: 10px 14px;
-  padding-left: 4px;
-  border-bottom: $border-grey;
+  padding-left: 16px;
+  background-color: $grey4-color;
+  box-shadow: $box-shadow;
+  border-radius: 4px 4px 0 0;
 }
 .view_info {
   position: relative;
@@ -1098,10 +1100,11 @@ sub .board_list {
 }
 
 .view_content {
-  padding: 12px;
-  border-bottom: $border-grey;
+  padding: 24px;
+  box-shadow: $box-shadow;
   margin-bottom: 16px;
   min-height: 276px;
+  border-radius: 0 0 4px 4px;
 }
 .view_btn {
   @include flex-start;
@@ -1129,7 +1132,6 @@ sub .board_list {
 .view_content_btn {
   @include flex-center;
   gap: 12px;
-  border-bottom: $border-grey;
   margin-bottom: 32px;
   padding-bottom: 16px;
 }
@@ -1161,7 +1163,7 @@ sub .board_list {
   font-size: 14px;
 }
 .comment_top .comment_num {
-  font-size: 13px;
+  font-size: 14px;
 }
 .comment_top .icon {
   margin-right: 8px;
@@ -1179,7 +1181,7 @@ sub .board_list {
   position: relative;
   width: 1px;
   height: 100%;
-  background-color: $grey5-color;
+  background-color: $grey-color;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1189,7 +1191,7 @@ sub .board_list {
   position: absolute;
   width: 40px;
   height: 1px;
-  background-color: #999;
+  background-color: $grey-color;
   top: 43px;
   left: 0px;
 }
@@ -1202,7 +1204,7 @@ sub .board_list {
 .depth_line {
   width: 1px;
   height: 100%;
-  background-color: $grey5-color;
+  background-color: $grey-color;
 }
 .depth_line.depth3 {
   margin-left: 41px;
@@ -1210,13 +1212,19 @@ sub .board_list {
 .comment_info {
   @include space-between;
   align-items: flex-start;
-  padding: 14px 14px 0px 16px;
+  padding: 14px 18px 0px 16px;
   border-radius: 4px;
 }
 .comment_info .bar {
   width: 1px;
   height: 7px;
   background-color: $grey5-color;
+}
+.comment_info .ball {
+  min-width: 2px;
+  min-height: 2px;
+  background-color: $grey-color;
+  border-radius: 50%;
 }
 .comment_box.re .commnet_info {
   background-color: $grey2-color;
@@ -1235,12 +1243,23 @@ sub .board_list {
 .comment_info .comment_btn {
   @include flex-start;
   column-gap: 6px;
+  display: none;
+}
+.comment_box_inner:hover .comment_info .comment_btn {
+  display: flex;
 }
 .comment_info .comment_btn button {
+  @include flex-start;
+  align-items: center;
   font-size: 12px;
   font-weight: 300;
   line-height: 1.4;
   color: $grey5-color;
+}
+.comment_info .comment_btn button .icon {
+  width: 14px;
+  height: 14px;
+  margin-right: 4px;
 }
 .comment_info .comment_btn button:hover {
   color: $main-color;
@@ -1251,7 +1270,7 @@ sub .board_list {
 .comment_info .comment_btn button.comment_likes {
   color: $blue-color;
 }
-.comment_info .comment_btn button.comment_report {
+.comment_info .comment_btn button.comment_report:hover {
   color: $red-color;
 }
 .comment_box_wrap {
@@ -1267,14 +1286,14 @@ sub .board_list {
   display: block;
   width: 100%;
   border-radius: 4px;
-  background-color: $grey4-color;
   margin-bottom: 12px;
+  box-shadow: $box-shadow;
 }
 .comment_content {
   @include flex-start;
-  align-items: flex-start;
+  align-items: flex-end;
   column-gap: 12px;
-  padding: 16px 20px 12px;
+  padding: 16px 20px 22px;
 }
 .comment_content > div {
   position: relative;
@@ -1287,7 +1306,7 @@ sub .board_list {
   line-height: 1.4;
 }
 .comment_content .comment_content_likes {
-  background-color: $red-color;
+  background-color: $main-color;
   color: #fff;
   padding: 2px 9px 5px 8px;
   border-radius: 4px;
@@ -1304,12 +1323,20 @@ sub .board_list {
   width: 100%;
 }
 .comment_add > div .tiptap {
-  border: $border-grey;
+  box-shadow: $box-shadow;
   outline: none;
   height: 100%;
   border-radius: 4px;
   padding: 12px;
+  min-height: 96px;
 }
+.comment_box_inner .comment_add {
+  padding: 0 12px 12px 12px;
+}
+.comment_box_inner .comment_add > div .tiptap {
+  box-shadow: $box-shadow2;
+}
+
 .comment_add.re {
   margin-left: 12px;
 }
@@ -1325,7 +1352,7 @@ sub .board_list {
   outline: none;
 }
 .comment_add button {
-  @include re-bl;
+  @include flex-center;
   font-size: 12px;
   font-weight: 300;
   line-height: 1.4;
@@ -1368,7 +1395,7 @@ sub .board_list {
 }
 
 .tiptap_editor_area {
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .go_to_login_for_comment {

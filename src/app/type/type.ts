@@ -59,15 +59,15 @@ export interface AuthContextType {
   loginStatus: boolean | null;
   setLoginStatus: (loginStatus: boolean) => void;
   isUsername: string | null;
-  setIsUsername: (userid: string) => void;
+  setIsUsername: (userid: string | null) => void;
   isUserId: number | null;
-  setIsUserId: (userId: number) => void;
+  setIsUserId: (userId: number | null) => void;
   isUserNick: string | null;
-  setIsUserNick: (userNick: string) => void;
+  setIsUserNick: (userNick: string | null) => void;
   isUserProfile: string | null;
-  setIsUserProfile: (userProfile: string) => void;
+  setIsUserProfile: (userProfile: string | null) => void;
   isUserEmail: string | null;
-  setIsUserEmail: (userProfile: string) => void;
+  setIsUserEmail: (userProfile: string | null) => void;
   boardType: string | null;
   setBoardType: (type: string | null) => void;
   messageToUser: number | null;
@@ -76,4 +76,8 @@ export interface AuthContextType {
   setIsUserAuthority: (authority: number | null) => void;
   tokenExpiration: number | null;
   setTokenExpiration: (expiration: number | null) => void;
+  isUserNickUpdatedAt: Date | null;
+  setIsUserNickUpdatedAt: (userNickUpdatedAt: Date | null) => void;
+  redirectPath: string | null;
+  setRedirectPath: (path: string | null) => void;
 }
