@@ -854,28 +854,26 @@ sub .board_list {
   padding: 12px 0;
   gap: 8px;
 }
-.pagination button {
+.pagination a {
   font-size: 16px;
   font-weight: 300;
   line-height: 1.4;
   color: $grey-color;
 }
-.pagination button:hover {
+.pagination a:hover {
   color: $main-color;
 }
-.pagination button.active {
+.pagination a.active {
   font-weight: 500;
   color: #000;
 }
-.pagination button .icon {
+.pagination a .icon {
   width: 20px;
   height: 20px;
   color: $grey-color;
 }
-.pagination button .icon:hover {
+.pagination a .icon:hover {
   color: $main-color;
-}
-.pagination a {
 }
 /* write */
 .write_wrap {

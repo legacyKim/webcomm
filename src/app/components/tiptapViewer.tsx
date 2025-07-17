@@ -30,7 +30,7 @@ const TiptapViewer = ({ content }: { content: string }) => {
     ],
     content: content,
     editable: false,
-    immediatelyRender: true,
+    immediatelyRender: false,
   });
 
   if (!editor) return <p>로딩 중...</p>;

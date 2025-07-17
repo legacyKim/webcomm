@@ -31,7 +31,7 @@ export async function GET(req, context) {
     // 트랜잭션 커밋
     await client.query("COMMIT");
 
-    return NextResponse.json({ response: true, posts: posts.rows[0] });
+    return NextResponse.json({ response: true, post: posts.rows[0] });
   } catch (error) {
     // 에러 발생 시 롤백
     await client.query("ROLLBACK");

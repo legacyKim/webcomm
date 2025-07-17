@@ -39,8 +39,6 @@ export default function Mypage() {
     setIsUserNickUpdatedAt,
   } = useAuth();
 
-  console.log("isUserNickUpdatedAt:", isUserNickUpdatedAt);
-
   const [newNick, setNewNick] = useState<string>(isUserNick || "");
 
   const [newPassword, setNewPassword] = useState<string>("");
@@ -186,7 +184,6 @@ export default function Mypage() {
 
         router.push("/login");
       } else {
-        console.log(response.data);
         alert(response.data.message);
       }
     } catch (error) {

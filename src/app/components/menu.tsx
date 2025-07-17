@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/AuthContext";
 
 import { useQuery } from "@tanstack/react-query";
-import { fetchBoard } from "../api/api";
+import { fetchBoard } from "@/api/api";
 
 export default function Menu() {
   const pathname = usePathname();

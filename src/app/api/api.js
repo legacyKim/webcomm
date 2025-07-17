@@ -1,5 +1,7 @@
 import axios from "axios";
 
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 // 메인
 export const fetchHome = async (isUserId) => {
   try {
@@ -41,7 +43,7 @@ export const fetchBoard = async () => {
 export async function fetchBoardData(url_slug, page, limit, isUserId) {
   try {
     // Axios를 사용한 API 요청
-    const response = await axios.get(`/api/board/${url_slug}/${page}/${limit}`, {
+    const response = await axios.get(`${baseUrl}/api/board/${url_slug}/${page}/${limit}`, {
       params: { userId: isUserId },
     });
     return response.data;
@@ -158,6 +160,17 @@ export const fetchPost = async (url_slug) => {
     return [];
   }
 };
+
+// 게시물 상세 조회
+export default async function fetchPostDetail(url_slug, id) {
+  try {
+    const response = await axios.get(`${baseUrl}/api/post/${url_slug}/${id}`);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
 
 // 회원
 export const fetchMember = async () => {

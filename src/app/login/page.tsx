@@ -27,8 +27,6 @@ export default function LoginPage() {
     redirectPath,
   } = useAuth();
 
-  console.log("LoginPage render", redirectPath);
-
   const [userid, setUserid] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);

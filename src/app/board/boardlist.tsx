@@ -26,37 +26,38 @@ import { SSE_BASE_URL } from "@/lib/sse";
 
 interface BoardlistProps {
   url_slug: string | null;
+  page: number;
   boardType: string;
   limit: number;
+  initData?: any;
 }
 
-export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps) {
-  const queryClient = useQueryClient();
-  const [page, setPage] = useState<number>(1);
-
+export default function Boardlist({ url_slug, page, boardType, limit, initData }: BoardlistProps) {
   const { isUserId, messageToUser } = useAuth();
-
-  const queryKey = useMemo(
-    () => ["eachBoardData", boardType, url_slug, page, limit],
-    [boardType, url_slug, page, limit],
-  );
-
-  const { data: postData, isLoading } = useQuery({
-    queryKey,
-    queryFn: () => {
-      if (boardType === "popular") return fetchBoardPop(page, limit, isUserId);
-      if (boardType === "userPost") return fetchUserPostData(url_slug, page, limit);
-      if (boardType === "userComment") return fetchUserCommentData(url_slug, page, limit);
-      if (boardType === "search") return fetchSearchData(url_slug, page, limit, isUserId);
-      if (boardType === "board") return fetchBoardData(url_slug, page, limit, isUserId);
-    },
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 60 * 24,
-  });
+  const [postData, setPostData] = useState<any>(initData || { posts: [] });
 
   useEffect(() => {
-    queryClient.invalidateQueries({ queryKey });
-  }, [queryClient, queryKey]);
+    // CSR: 2페이지 이상일 때만 실행
+    if (page !== 1) {
+      const fetchData = async () => {
+        try {
+          let data;
+          if (boardType === "popular") data = await fetchBoardPop(page, 10, isUserId);
+          else if (boardType === "userPost") data = await fetchUserPostData(url_slug, page, 10);
+          else if (boardType === "userComment") data = await fetchUserCommentData(url_slug, page, 10);
+          else if (boardType === "search") data = await fetchSearchData(url_slug, page, 10, isUserId);
+          else if (boardType === "board") data = await fetchBoardData(url_slug, page, 10, isUserId);
+          setPostData(data);
+        } catch (err) {
+          console.error("CSR fetch error:", err);
+        }
+      };
+
+      fetchData();
+    } else {
+      setPostData(initData);
+    }
+  }, [url_slug, page, boardType, isUserId]);
 
   useEffect(() => {
     let eventSource: EventSource | undefined;
@@ -64,17 +65,26 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     function connectSSE() {
       eventSource = new EventSource(`${SSE_BASE_URL}/events/${url_slug}`);
 
+      // eventSource.onmessage = (event) => {
+      //   const updatedData = JSON.parse(event.data);
+      //   if (updatedData.slug === url_slug) {
+      //     queryClient.invalidateQueries({ queryKey: ["eachBoardData", url_slug] });
+      //   }
+      // };
+
+      // eventSource.onerror = () => {
+      //   console.warn("SSE 연결 끊김. 5초 후 재연결...");
+      //   if (eventSource) eventSource.close();
+      //   setTimeout(connectSSE, 5000);
+      // };
+
       eventSource.onmessage = (event) => {
-        const updatedData = JSON.parse(event.data);
-        if (updatedData.slug === url_slug) {
-          queryClient.invalidateQueries({ queryKey: ["eachBoardData", url_slug] });
-        }
+        const newPost = JSON.parse(event.data);
+        setPostData((prev: typeof postData) => [newPost, ...prev]);
       };
 
-      eventSource.onerror = () => {
-        console.warn("SSE 연결 끊김. 5초 후 재연결...");
+      return () => {
         if (eventSource) eventSource.close();
-        setTimeout(connectSSE, 5000);
       };
     }
 
@@ -96,17 +106,17 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
     userNickname: "",
   });
 
-  if (isLoading)
-    return (
-      <div className='data_wait'>
-        <span>잠시만 기다려 주세요.</span>
-        <div className='dots'>
-          <span className='dot dot1'>.</span>
-          <span className='dot dot2'>.</span>
-          <span className='dot dot3'>.</span>
-        </div>
-      </div>
-    );
+  // if (isLoading)
+  //   return (
+  //     <div className='data_wait'>
+  //       <span>잠시만 기다려 주세요.</span>
+  //       <div className='dots'>
+  //         <span className='dot dot1'>.</span>
+  //         <span className='dot dot2'>.</span>
+  //         <span className='dot dot3'>.</span>
+  //       </div>
+  //     </div>
+  //   );
 
   const totalPage = postData?.totalPages || 1;
 
@@ -139,7 +149,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
             <CalendarIcon className='icon' />
           </div>
         </li>
-        {!isLoading && postData?.posts.length > 0 ? (
+        {postData?.posts.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link href={`/board/${boardType === "popular" ? b.url_slug : url_slug}/${b.id}`}>
@@ -190,7 +200,7 @@ export default function Boardlist({ url_slug, boardType, limit }: BoardlistProps
         )}
       </ol>
 
-      <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+      <Pagination page={page} totalPage={totalPage} />
     </>
   );
 }

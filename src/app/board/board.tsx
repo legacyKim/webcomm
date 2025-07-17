@@ -18,7 +18,17 @@ interface Board {
   posts: Array<{ title: string; content: string }>;
 }
 
-export default function Board({ url_slug, boardType }: { url_slug: string; boardType: string }) {
+export default function Board({
+  url_slug,
+  page,
+  boardType,
+  initData,
+}: {
+  url_slug: string;
+  page: number;
+  boardType: string;
+  initData: Board;
+}) {
   const { isUserId, setBoardType, setRedirectPath } = useAuth();
   const pathname = usePathname();
 
@@ -59,7 +69,13 @@ export default function Board({ url_slug, boardType }: { url_slug: string; board
             )}
           </div>
 
-          <Boardlist url_slug={url_slug as string} boardType={boardType} limit={limit as number} />
+          <Boardlist
+            url_slug={url_slug as string}
+            page={page}
+            boardType={boardType}
+            limit={limit as number}
+            initData={initData}
+          />
         </div>
       </div>
     </sub>

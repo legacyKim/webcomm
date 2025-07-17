@@ -70,3 +70,4 @@ export const config = {
 10. next auth session 이해
 11. useCallback 알아보기
 12. useCommentResizeObserver 분석...
+13. 아예 API 거치지 않고 DB 직접 호출?

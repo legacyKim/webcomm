@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+
 interface pagination {
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
@@ -13,30 +16,34 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 
-export default function Pagination({ page, setPage, totalPage }: pagination) {
+export default function Pagination({ page, totalPage }: { page: number; totalPage: number }) {
+  const pathname = usePathname();
+
+  const getPageLink = (p: number) => `${pathname}?page=${p}`;
+
+  const pageButtons = [...Array(totalPage)].map((_, index) => index + 1).slice(Math.max(0, page - 5), page + 5);
+
   return (
     <div className='pagination'>
-      <button onClick={() => setPage(1)} disabled={page === 1}>
+      <Link href={getPageLink(1)} aria-disabled={page === 1}>
         <ChevronDoubleLeftIcon className='icon' />
-      </button>
-      <button onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1}>
+      </Link>
+      <Link href={getPageLink(Math.max(page - 1, 1))} aria-disabled={page === 1}>
         <ChevronLeftIcon className='icon' />
-      </button>
+      </Link>
 
-      {[...Array(totalPage)]
-        .map((_, index) => (
-          <button key={index + 1} onClick={() => setPage(index + 1)} className={page === index + 1 ? "active" : ""}>
-            {index + 1}
-          </button>
-        ))
-        .slice(Math.max(0, page - 5), page + 5)}
+      {pageButtons.map((p) => (
+        <Link key={p} href={getPageLink(p)} className={page === p ? "active" : ""}>
+          {p}
+        </Link>
+      ))}
 
-      <button onClick={() => setPage((prev) => Math.min(prev + 1, totalPage))} disabled={page === totalPage}>
+      <Link href={getPageLink(Math.min(page + 1, totalPage))} aria-disabled={page === totalPage}>
         <ChevronRightIcon className='icon' />
-      </button>
-      <button onClick={() => setPage(totalPage)} disabled={page === totalPage}>
+      </Link>
+      <Link href={getPageLink(totalPage)} aria-disabled={page === totalPage}>
         <ChevronDoubleRightIcon className='icon' />
-      </button>
+      </Link>
     </div>
   );
 }
