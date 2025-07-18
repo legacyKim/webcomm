@@ -13,8 +13,8 @@ interface CustomJwtPayload {
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: Promise<{ url_slug: string }> }) {
-  const { url_slug } = await params;
+export async function generateMetadata({ params }: { params: { url_slug: string } }) {
+  const { url_slug } = params;
   return {
     title: `${url_slug} 게시판`,
     description: `${url_slug} 게시판의 최신 글 목록입니다.`,
