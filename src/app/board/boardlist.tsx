@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 // import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchBoardData, fetchUserPostData, fetchUserCommentData, fetchSearchData, fetchBoardPop } from "@/api/api";
 import { Posts, initDataPosts } from "@/type/type";
@@ -34,7 +34,7 @@ interface BoardlistProps {
 
 export default function Boardlist({ url_slug, page, boardType, limit, initData }: BoardlistProps) {
   const { isUserId, messageToUser } = useAuth();
-  const [postData, setPostData] = useState<any>(initData || { posts: [] });
+  const [postData, setPostData] = useState<initDataPosts>(initData || { posts: [] });
 
   useEffect(() => {
     if (!initData) {

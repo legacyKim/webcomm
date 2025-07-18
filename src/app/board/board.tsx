@@ -37,7 +37,7 @@ export default function Board({
     setBoardType(boardType);
   }, [boardType]);
 
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
 
   return (
     <sub className='sub'>

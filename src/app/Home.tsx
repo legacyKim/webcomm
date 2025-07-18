@@ -4,9 +4,9 @@ import Search from "./components/search";
 
 import Link from "next/link";
 
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchHome, fetchHomePop } from "./api/api";
+import { fetchHome } from "./api/api";
 import { Posts, initDataPosts } from "./type/type";
 
 import { useAuth } from "@/AuthContext";
@@ -15,7 +15,7 @@ import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react/24/outline";
-import { SSE_BASE_URL } from "@/lib/sse";
+// import { SSE_BASE_URL } from "@/lib/sse";
 
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
