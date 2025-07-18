@@ -80,7 +80,10 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
 
       eventSource.onmessage = (event) => {
         const newPost = JSON.parse(event.data);
-        setPostData((prev: typeof postData) => [newPost, ...prev]);
+        setPostData((prev: initDataPosts) => ({
+          ...prev,
+          posts: [newPost, ...(prev.posts || [])],
+        }));
       };
 
       return () => {
