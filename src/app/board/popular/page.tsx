@@ -44,11 +44,11 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: { url_slug: string };
-  searchParams: { page?: number; limit?: string };
+  params: Promise<{ url_slug: string }>;
+  searchParams: Promise<{ page?: number; limit?: string }>;
 }) {
-  const { url_slug } = params;
-  const { page = 1 } = searchParams;
+  const { url_slug } = await params;
+  const { page = 1 } = await searchParams;
 
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken")?.value;

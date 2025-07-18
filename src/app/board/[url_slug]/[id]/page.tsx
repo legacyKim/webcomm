@@ -7,8 +7,8 @@ import View from "./View";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { url_slug: string; id: string } }) {
-  const { url_slug, id } = params;
+export async function generateMetadata({ params }: { params: Promise<{ url_slug: string; id: string }> }) {
+  const { url_slug, id } = await params;
 
   const postData = await fetchPostDetail(url_slug, id);
   const post = postData.post;
@@ -44,11 +44,11 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: { url_slug: string; id: string };
-  searchParams: { page?: string };
+  params: Promise<{ url_slug: string; id: string }>;
+  searchParams: Promise<{ page?: string }>;
 }) {
-  const { url_slug, id } = params;
-  const { page = "1" } = searchParams;
+  const { url_slug, id } = await params;
+  const { page = "1" } = await searchParams;
 
   const post = await fetchPostDetail(url_slug, id);
 
