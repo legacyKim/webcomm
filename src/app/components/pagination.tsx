@@ -1,13 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-
-interface pagination {
-  page: number;
-  setPage: React.Dispatch<React.SetStateAction<number>>;
-  totalPage: number;
-}
 
 import {
   ChevronDoubleLeftIcon,
@@ -16,10 +9,24 @@ import {
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
 
-export default function Pagination({ page, totalPage }: { page: number; totalPage: number }) {
-  const pathname = usePathname();
-
-  const getPageLink = (p: number) => `${pathname}?page=${p}`;
+export default function Pagination({
+  page,
+  totalPage,
+  type,
+  url_slug,
+  cate,
+}: {
+  page: number;
+  totalPage: number;
+  type: "board" | "my";
+  url_slug?: string | null;
+  cate?: string | null;
+}) {
+  const getPageLink = (p: number) => {
+    if (type === "board" && url_slug) return `/board/${url_slug}?page=${p}`;
+    if (type === "my") return `/my/activity/${cate}?page=${p}`;
+    return `?page=${p}`;
+  };
 
   const pageButtons = [...Array(totalPage)].map((_, index) => index + 1).slice(Math.max(0, page - 5), page + 5);
 

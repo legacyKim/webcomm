@@ -34,27 +34,9 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { CommentImage, CommentTreeNode, CommentTreeNodeArr } from "@/type/commentType";
+import { Posts, initDataPosts } from "@/type/type";
 
 const CommentEditor = dynamic(() => import("./commentEditor"), { ssr: false });
-
-interface Post {
-  id: number;
-  board_name: string;
-  title: string;
-  content: string;
-  likes: number;
-  dislikes: number;
-  reports: number;
-  created_at: Date;
-  updated_at: Date;
-  url_slug: string;
-  user_id: number;
-  user_nickname: string;
-  user_profile: string;
-  views: number;
-  comments: number;
-  notice: boolean;
-}
 
 interface AppComment {
   id: number;
@@ -66,7 +48,7 @@ interface AppComment {
   likes: number;
 }
 
-export default function View({ post }: { post: Post }) {
+export default function View({ post, page }: { post: Posts; page: number }) {
   const pathname = usePathname();
 
   useEffect(() => {
@@ -78,10 +60,10 @@ export default function View({ post }: { post: Post }) {
 
   const loginCheck = useLoginCheck();
 
-  const { isUserId, isUserNick, messageToUser, boardType, setRedirectPath } = useAuth();
+  const { isUserId, isUserNick, messageToUser, boardType, setRedirectPath, initData } = useAuth();
   const [limit, setLimit] = useState(10);
 
-  const [viewPost, setViewPost] = useState<Post | null>(post);
+  const [viewPost, setViewPost] = useState<Posts | null>(post);
 
   // 컨텐츠 또는 댓글 패치
   useEffect(() => {
@@ -112,10 +94,10 @@ export default function View({ post }: { post: Post }) {
       setViewPost((prev) => {
         if (!prev) return null;
 
-        if (data.id !== prev.id) return prev; // 다른 글이면 무시
+        if (data.id !== prev.id) return prev;
 
         if (data.event === "DELETE") {
-          return null; // 글이 삭제된 경우
+          return null;
         }
 
         if (data.event === "UPDATE") {
@@ -426,6 +408,8 @@ export default function View({ post }: { post: Post }) {
                   className='writer'
                   ref={writerRef}
                   onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     userClick(e);
                     setUserInfoInDropMenu({
                       userId: viewPost?.user_id,
@@ -496,7 +480,7 @@ export default function View({ post }: { post: Post }) {
             )}
 
             <button
-              style={{ display: "none" }} // 스크랩 기능은 현재 준비 중이므로 숨김 처리
+              style={{ display: "none" }}
               type='button'
               onClick={async () => {
                 const ok = await loginCheck();
@@ -636,9 +620,10 @@ export default function View({ post }: { post: Post }) {
 
       <Boardlist
         url_slug={params.url_slug as string}
-        page={1}
+        page={page}
         boardType={boardType as string}
         limit={limit as number}
+        initData={initData as initDataPosts}
       />
     </sub>
   );

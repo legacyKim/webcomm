@@ -36,7 +36,7 @@ export default function BoardNoticeManage() {
     try {
       await axios.delete(`/api/notice/${id}`);
       alert("삭제되었습니다.");
-      location.reload(); // 또는 queryClient.invalidateQueries(["notices"])
+      location.reload();
     } catch (err) {
       console.error(err);
       alert("삭제 실패");

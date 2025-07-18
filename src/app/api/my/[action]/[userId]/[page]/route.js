@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import pool from "@/db/db";
 
 export async function GET(req, context) {
-  const { action, userId } = (await context.params) || {};
+  const { action, userId, page } = (await context.params) || {};
   const client = await pool.connect();
 
   try {
@@ -11,7 +11,6 @@ export async function GET(req, context) {
     }
 
     const limit = 10;
-    const page = Number(req.nextUrl.searchParams.get("page") || "1");
     const offset = (page - 1) * limit;
 
     let queryText = "";

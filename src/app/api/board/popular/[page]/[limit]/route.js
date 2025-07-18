@@ -24,7 +24,7 @@ export async function GET(req, context) {
     `;
     const countResult = await client.query(countQuery, [userId]);
     const totalPosts = parseInt(countResult.rows[0].total);
-    const totalPages = Math.ceil(totalPosts / limitNum); // ✅ 이제 정상 작동
+    const totalPages = Math.ceil(totalPosts / limitNum);
 
     // 2. 인기 점수 정렬 게시글 조회
     const postQuery = `

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { mypageLikeComments } from "@/api/api";
 import { useAuth } from "@/AuthContext";
+import { useSearchParams } from "next/navigation";
 
 import MyHeader from "@/my/myHeader";
 import MyActivity from "../myActivity";
@@ -25,11 +25,13 @@ interface comment {
 
 export default function MyLikeComment() {
   const { isUserId } = useAuth();
-  const [page, setPage] = useState<number>(1);
+
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") || 1);
 
   const { data: likeCommentBoards, isLoading } = useQuery({
-    queryKey: ["mypageLikeComments", isUserId],
-    queryFn: () => mypageLikeComments("like-comment", isUserId),
+    queryKey: ["mypageLikeComments", isUserId, page],
+    queryFn: () => mypageLikeComments("like-comment", isUserId, page),
   });
 
   const totalPage = likeCommentBoards?.totalPages || 1;
@@ -83,7 +85,7 @@ export default function MyLikeComment() {
                   </div>
                 )}
               </ul>
-              <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+              <Pagination page={page} totalPage={totalPage} type={"my"} cate={"like-comment"} />
             </div>
           </div>
         </div>

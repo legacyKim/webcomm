@@ -215,6 +215,8 @@ export default function CommentTree({
                   <div
                     className='writer'
                     onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       userClick(e);
                       setUserInfoInDropMenu({
                         userId: comment.user_id,

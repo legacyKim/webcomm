@@ -1,30 +1,35 @@
 ; 나중에 해야할 일들
+
 ; 1. 건의사항 - 관리자에서 받기.
-; 2. 쪽지함에서 쪽지 크게 보기 ?
+; 2. 쪽지함에서 쪽지 확대
 ; 3. 에러 페이지
 ; 4. message 박스 금지어 설정.
 ; 5. 관리자 페이지 toast 적용 + 디자인
 ; 6. right_ad 에 따른 너비 값을 관리자페이지에서 유동적으로 적용 + 게시판 제목의 max-width 값도 비례해서 변경.
 
+
 ; 개발 ( 관리자 )
 1. 관리자 페이지 최소한으로 설정해 보자.
  - 가령, a 게시판의 글을 b 게시판으로 옮기는 기능
-
 2. 확인한 알림의 경우 3일 후 삭제되도록.
-
 3. 작업이 어느 정도 끝나면 branch 생성 및 main 배포 막기
 
 
 ; 작업중
 
+250718
+ - SSE 처리해야함.
+ - 홈 화면 ISR 처리 + 디자인 변경
+ - 토큰 만료됐는데, 로그아웃 처리x
+
 1. 보안 관련 - 도메인 설정 후
   # a. reCAPTCHA v3: UX 저하 적고 정교함
   b. Cloudflare 설정
-  c. 개인정보 처리 방침 및 회원 이용 약관
-  d. 로고 + 기본 프로필 이미지?
+  ; c. 개인정보 처리 방침 및 회원 이용 약관
+  ; d. 로고 + 기본 프로필 이미지?
 
 2. RateLimit ? - reddis?
-3. middleware.ts 처리해야함. - 보류, 회원가입을 완료해야 함.
+; 3. middleware.ts 처리해야함. - 보류, 회원가입을 완료해야 함.
 4. jwt HttpOnly 여부 확인
 
 
@@ -39,11 +44,13 @@
   f. 회원 활동 기록은 그대로 보존
   g. deleted 값이 true 일 시 유효성 막기
 
-* 대댓글 작성시 기존 댓글창 숨기기
-* 댓글 트리 구조 디자인
+; * 대댓글 작성시 기존 댓글창 숨기기
+; * 댓글 트리 구조 디자인
 * title seo
 * stream 처리시.. 댓글이 실시간으로 달리는게 좋은지 여부 판단 - 로그인을 하지 않은 유저의 경우는?
 * 모바일 반응형 작업...
+* ISR
+* CDN 설정
 
 
 ; ** 로그인 처리
@@ -51,11 +58,10 @@ export const config = {
   matcher: ["/((?!_next|favicon.ico).*)"], // 모든 경로에 적용 (정적 자산 제외)
 };
 
-
 ; << 개념정리 >>
 
 1. queryKey, queryClient - boardList.tsx
-2. axios 요청 방식
+2. api 요청 방식 + params
 3. db pool 및 prisma
 4. nextauth 폴더 내의 코드 분석 + next-auth.d.ts 파일 참조.
 5. prisma schema.prisma 파일 분석
@@ -71,3 +77,5 @@ export const config = {
 11. useCallback 알아보기
 12. useCommentResizeObserver 분석...
 13. 아예 API 거치지 않고 DB 직접 호출?
+14. generateMetadata
+15. CDN 설정

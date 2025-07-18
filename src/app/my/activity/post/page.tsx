@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { mypageWrite } from "@/api/api";
 import { useAuth } from "@/AuthContext";
+import { useSearchParams } from "next/navigation";
 
 import MyHeader from "@/my/myHeader";
 import MyActivity from "../myActivity";
@@ -25,11 +25,13 @@ interface post {
 
 export default function MyPost() {
   const { isUserId } = useAuth();
-  const [page, setPage] = useState<number>(1);
+
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") || 1);
 
   const { data: writeBoards, isLoading } = useQuery({
-    queryKey: ["mypageWrite", isUserId],
-    queryFn: () => mypageWrite("write", isUserId),
+    queryKey: ["mypageWrite", isUserId, page],
+    queryFn: () => mypageWrite("write", isUserId, page),
   });
 
   const totalPage = writeBoards?.totalPages || 1;
@@ -86,7 +88,7 @@ export default function MyPost() {
                 )}
               </ul>
 
-              <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+              <Pagination page={page} totalPage={totalPage} type={"my"} cate={"post"} />
             </div>
           </div>
         </div>

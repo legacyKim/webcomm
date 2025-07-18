@@ -19,9 +19,8 @@ export async function POST(req) {
       // 실제 탈퇴 처리 (회원 삭제)
       await client.query("DELETE FROM members WHERE id = $1", [userId]);
 
-      // 응답 + 쿠키 제거 (로그아웃 유도)
       const res = NextResponse.json({ success: true, message: "탈퇴 완료" });
-      res.cookies.set("authToken", "", { maxAge: 0, path: "/" }); // 쿠키 삭제
+      res.cookies.set("authToken", "", { maxAge: 0, path: "/" });
 
       return res;
     } finally {

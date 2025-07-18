@@ -56,7 +56,8 @@ export async function POST(req) {
       `Path=/`,
       `HttpOnly`,
       `Max-Age=3600`,
-      `SameSite=Lax`, // 개발중엔 Lax 추천
+      // `Max-Age=10`,
+      `SameSite=Lax`,
       ...(isProduction ? ["Secure"] : []),
     ].join("; ");
 

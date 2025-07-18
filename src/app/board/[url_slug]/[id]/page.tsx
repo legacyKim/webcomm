@@ -1,18 +1,11 @@
 // app/board/[url_slug]/[postId]/page.tsx
 
 import React from "react";
-import { cookies } from "next/headers";
-import jwt from "jsonwebtoken";
-
 import fetchPostDetail from "@/api/api";
 
 import View from "./View";
 
-interface CustomJwtPayload {
-  id: number;
-}
-
-export const dynamic = "force-dynamic"; // SSR 강제화
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { url_slug: string; id: string } }) {
   const { url_slug, id } = await params;
@@ -27,7 +20,7 @@ export async function generateMetadata({ params }: { params: { url_slug: string;
     openGraph: {
       title: post.title,
       description: post.content.slice(0, 150),
-      url: `https://www.tokti.net/board/${params.url_slug}/${params.id}`,
+      url: `https://www.tokti.net/board/${url_slug}/${id}`,
       type: "article",
       images: [
         {
@@ -47,23 +40,17 @@ export async function generateMetadata({ params }: { params: { url_slug: string;
   };
 }
 
-export default async function Page({ params }: { params: { url_slug: string; id: string } }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { url_slug: string; id: string };
+  searchParams: { page?: string };
+}) {
   const { url_slug, id } = await params;
-
-  const cookieStore = await cookies();
-  const token = cookieStore.get("authToken")?.value;
-  let userId: number | null = null;
-
-  if (token) {
-    try {
-      const decoded = jwt.decode(token) as CustomJwtPayload | null;
-      userId = decoded?.id || null;
-    } catch (err) {
-      console.error("토큰 디코딩 실패", err);
-    }
-  }
+  const { page = "1" } = await searchParams;
 
   const post = await fetchPostDetail(url_slug, id);
 
-  return <View post={post.post} />;
+  return <View post={post.post} page={Number(page)} />;
 }

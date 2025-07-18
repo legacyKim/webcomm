@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import pool from "@/db/db"; // pg Pool 인스턴스
+import pool from "@/db/db";
 
 export async function POST(request) {
   try {

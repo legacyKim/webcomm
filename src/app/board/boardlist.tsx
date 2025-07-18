@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+// import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchBoardData, fetchUserPostData, fetchUserCommentData, fetchSearchData, fetchBoardPop } from "@/api/api";
-import { Posts } from "@/type/type";
+import { Posts, initDataPosts } from "@/type/type";
 import { useAuth } from "@/AuthContext";
 
 import Link from "next/link";
@@ -29,7 +29,7 @@ interface BoardlistProps {
   page: number;
   boardType: string;
   limit: number;
-  initData?: any;
+  initData?: initDataPosts;
 }
 
 export default function Boardlist({ url_slug, page, boardType, limit, initData }: BoardlistProps) {
@@ -37,16 +37,16 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
   const [postData, setPostData] = useState<any>(initData || { posts: [] });
 
   useEffect(() => {
-    // CSR: 2페이지 이상일 때만 실행
-    if (page !== 1) {
+    if (!initData) {
       const fetchData = async () => {
         try {
           let data;
-          if (boardType === "popular") data = await fetchBoardPop(page, 10, isUserId);
-          else if (boardType === "userPost") data = await fetchUserPostData(url_slug, page, 10);
-          else if (boardType === "userComment") data = await fetchUserCommentData(url_slug, page, 10);
-          else if (boardType === "search") data = await fetchSearchData(url_slug, page, 10, isUserId);
-          else if (boardType === "board") data = await fetchBoardData(url_slug, page, 10, isUserId);
+          if (boardType === "popular") {
+            data = await fetchBoardPop(page, limit, isUserId);
+          } else if (boardType === "userPost") data = await fetchUserPostData(url_slug, page, limit);
+          else if (boardType === "userComment") data = await fetchUserCommentData(url_slug, page, limit);
+          else if (boardType === "search") data = await fetchSearchData(url_slug, page, limit, isUserId);
+          else if (boardType === "board") data = await fetchBoardData(url_slug, page, limit, isUserId);
           setPostData(data);
         } catch (err) {
           console.error("CSR fetch error:", err);
@@ -57,7 +57,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
     } else {
       setPostData(initData);
     }
-  }, [url_slug, page, boardType, isUserId]);
+  }, [url_slug, page, limit, boardType, isUserId]);
 
   useEffect(() => {
     let eventSource: EventSource | undefined;
@@ -152,7 +152,10 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
         {postData?.posts.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
-              <Link href={`/board/${boardType === "popular" ? b.url_slug : url_slug}/${b.id}`}>
+              <Link
+                href={`/board/${boardType === "popular" ? b.url_slug : url_slug}/${b.id}/?${new URLSearchParams({
+                  page: String(page),
+                })}`}>
                 {boardType !== "popular" &&
                   (b.notice ? (
                     <SpeakerWaveIcon className='icon notice' />
@@ -171,6 +174,8 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
                   className='writer'
                   ref={writerRef}
                   onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     userClick(e);
                     setUserInfoInDropMenu({
                       userId: Number(b.user_id),
@@ -200,7 +205,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
         )}
       </ol>
 
-      <Pagination page={page} totalPage={totalPage} />
+      <Pagination page={page} totalPage={totalPage} type={"board"} url_slug={url_slug} />
     </>
   );
 }

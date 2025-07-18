@@ -73,6 +73,7 @@ export default function Header() {
       if (pathname.startsWith("/my")) {
         router.push("/");
       }
+      return;
     }
   };
 
@@ -114,7 +115,6 @@ export default function Header() {
         return;
       }
 
-      // 최신 상태 참조하여 messageBox가 열려있을 때만 닫기 실행
       if (messageBoxRef.current) {
         setMessageBox(false);
       }

@@ -553,14 +553,9 @@ main .board_list {
   border-bottom: $border-grey;
   padding-bottom: 12px;
 }
-main .board_list.board_list_popular {
-  min-height: 340.8px;
-}
 sub .board_list {
   position: relative;
   margin-bottom: 8px;
-
-  min-height: 328.8px;
 }
 .board_double .board {
   width: calc(50% - 12px);
@@ -1655,6 +1650,7 @@ sub .board_list {
 .mypage_boardlist_common {
   @include flex-column;
   width: 100%;
+  min-height: 300px !important;
 }
 .mypage_boardlist_single {
   @include flex-column;
@@ -1690,10 +1686,6 @@ sub .board_list {
 .mypage_list_sub button.active {
   background-color: transparent;
   color: $main-color;
-}
-
-.mypage_boardlist_common {
-  @include flex-column;
 }
 
 /* message */

@@ -18,12 +18,19 @@ export const fetchHome = async (isUserId) => {
 // 메인 페이지 베스트 게시판
 export const fetchHomePop = async (page, limit, isUserId) => {
   try {
-    const response = await axios.get(`/api/home/popular/${page}/${limit}`, {
-      params: { userId: isUserId },
+    const res = await fetch(`${baseUrl}/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`, {
+      next: {
+        revalidate: 60 * 10,
+      },
     });
-    return response.data;
+
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      return Object.values(data);
+    }
+    return data;
   } catch (err) {
-    console.error(err);
+    console.error("ISR fetch error:", err);
     return [];
   }
 };
@@ -42,48 +49,49 @@ export const fetchBoard = async () => {
 // 각 게시판
 export async function fetchBoardData(url_slug, page, limit, isUserId) {
   try {
-    // Axios를 사용한 API 요청
     const response = await axios.get(`${baseUrl}/api/board/${url_slug}/${page}/${limit}`, {
       params: { userId: isUserId },
     });
     return response.data;
   } catch (err) {
     console.error(err);
-    return []; // 에러 발생 시 빈 배열 반환
+    return [];
   }
 }
 
 // 특정 유저가 작성한 게시물
 export async function fetchUserPostData(nickname, page, limit) {
   try {
-    // Axios를 사용한 API 요청
     const response = await axios.get(`/api/board/userPost/${nickname}/${page}/${limit}`);
     return response.data;
   } catch (err) {
     console.error(err);
-    return []; // 에러 발생 시 빈 배열 반환
+    return [];
   }
 }
 
 // 특정 유저의 댓글이 적힌 게시물
 export async function fetchUserCommentData(nickname, page, limit) {
   try {
-    // Axios를 사용한 API 요청
     const response = await axios.get(`/api/board/userComment/${nickname}/${page}/${limit}`);
     return response.data;
   } catch (err) {
     console.error(err);
-    return []; // 에러 발생 시 빈 배열 반환
+    return [];
   }
 }
 
 // 인기 게시판
 export const fetchBoardPop = async (page, limit, isUserId) => {
   try {
-    const response = await axios.get(`/api/board/popular/${page}/${limit}`, {
+    const response = await fetch(`${baseUrl}/api/board/popular/${page}/${limit}`, {
       params: { userId: isUserId },
+      next: {
+        revalidate: 60 * 10,
+      },
     });
-    return response.data;
+    const data = await response.json();
+    return data;
   } catch (err) {
     console.error(err);
     return [];
@@ -93,14 +101,13 @@ export const fetchBoardPop = async (page, limit, isUserId) => {
 // 검색한 게시물
 export async function fetchSearchData(keyword, page, limit, isUserId) {
   try {
-    // Axios를 사용한 API 요청
     const response = await axios.get(`/api/board/search/${keyword}/${page}/${limit}`, {
       params: { userId: isUserId },
     });
     return response.data;
   } catch (err) {
     console.error(err);
-    return []; // 에러 발생 시 빈 배열 반환
+    return [];
   }
 }
 
@@ -164,8 +171,13 @@ export const fetchPost = async (url_slug) => {
 // 게시물 상세 조회
 export default async function fetchPostDetail(url_slug, id) {
   try {
-    const response = await axios.get(`${baseUrl}/api/post/${url_slug}/${id}`);
-    return response.data;
+    const response = await fetch(`${baseUrl}/api/post/${url_slug}/${id}`, {
+      next: {
+        revalidate: 60 * 10,
+      },
+    });
+    const data = await response.json();
+    return data;
   } catch (err) {
     console.error(err);
     return null;

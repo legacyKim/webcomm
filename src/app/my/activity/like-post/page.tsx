@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { mypageLikeWrite } from "@/api/api";
 import { useAuth } from "@/AuthContext";
+import { useSearchParams } from "next/navigation";
 
 import MyHeader from "@/my/myHeader";
 import MyActivity from "../myActivity";
@@ -25,10 +25,12 @@ interface post {
 
 export default function MyLike() {
   const { isUserId } = useAuth();
-  const [page, setPage] = useState<number>(1);
+
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") || 1);
 
   const { data: likePostBoards, isLoading } = useQuery({
-    queryKey: ["mypageLikeWrite", isUserId],
+    queryKey: ["mypageLikeWrite", isUserId, page],
     queryFn: () => mypageLikeWrite("like-post", isUserId, page),
   });
 
@@ -82,7 +84,7 @@ export default function MyLike() {
                   </div>
                 )}
               </ul>
-              <Pagination page={page} setPage={setPage} totalPage={totalPage} />
+              <Pagination page={page} totalPage={totalPage} type={"my"} cate={"like-post"} />
             </div>
           </div>
         </div>

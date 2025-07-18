@@ -82,7 +82,6 @@ export async function POST(req) {
   } catch (err) {
     console.log(err);
     if (err.code === "23505") {
-      // 고유 제약 조건 위반 (UNIQUE constraint)
       if (err.detail.includes("email")) {
         return NextResponse.json({ success: false, message: "이메일이 중복됩니다!" }, { status: 400 });
       } else if (err.detail.includes("user_id")) {
@@ -90,7 +89,6 @@ export async function POST(req) {
       }
     }
 
-    // 기타 에러는 내부 서버 오류로 처리
     return NextResponse.json({ success: false, message: "서버 오류가 발생했습니다." }, { status: 500 });
   } finally {
     client.release();

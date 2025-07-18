@@ -47,10 +47,10 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ url_slug: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: number; limit?: string }>;
 }) {
   const { url_slug } = await params;
-  const { page = "1" } = await searchParams;
+  const { page = 1 } = await searchParams;
 
   const cookieStore = await cookies();
   const token = cookieStore.get("authToken")?.value;
@@ -65,6 +65,7 @@ export default async function Page({
     }
   }
 
-  const data = await fetchBoardData(url_slug, page, 10, userId);
+  const data = await fetchBoardData(url_slug, page, 20, userId);
+
   return <Board url_slug={url_slug} page={Number(page)} boardType='board' initData={data} />;
 }

@@ -35,10 +35,7 @@ export function useDropDown({ messageToUser }: { messageToUser: number | null })
   }, [messageToUser]);
 
   const userClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (loginStatus) return;
-
-    e.preventDefault();
-    e.stopPropagation();
+    if (!loginStatus) return;
 
     const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();

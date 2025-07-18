@@ -22,7 +22,7 @@ export interface Posts {
   url_slug: string;
   title: string;
   content: string;
-  user_id: string;
+  user_id: number;
   user_nickname: string;
   user_profile: string;
   views: number;
@@ -34,6 +34,12 @@ export interface Posts {
   notice: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface initDataPosts {
+  posts: Posts[];
+  totalPosts?: number;
+  totalPages?: number;
 }
 
 export interface Member {
@@ -80,4 +86,6 @@ export interface AuthContextType {
   setIsUserNickUpdatedAt: (userNickUpdatedAt: Date | null) => void;
   redirectPath: string | null;
   setRedirectPath: (path: string | null) => void;
+  initData: { posts: Posts[] } | null;
+  setInitData: (data: { posts: Posts[] } | null) => void;
 }

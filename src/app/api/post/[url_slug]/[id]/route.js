@@ -24,7 +24,6 @@ export async function GET(req, context) {
       return NextResponse.json({ response: false, message: "Post not found" });
     }
 
-    // 조회수 증가 (트랜잭션 내에서 한 번만 실행)
     const viewsQuery = `UPDATE posts SET views = views + 1 WHERE id = $1 RETURNING views;`;
     await client.query(viewsQuery, [id]);
 
@@ -33,7 +32,6 @@ export async function GET(req, context) {
 
     return NextResponse.json({ response: true, post: posts.rows[0] });
   } catch (error) {
-    // 에러 발생 시 롤백
     await client.query("ROLLBACK");
     console.error(error);
     return NextResponse.json({ response: false, message: "Internal server error" });

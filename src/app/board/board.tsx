@@ -12,11 +12,7 @@ import Boardlist from "@/board/boardlist";
 import { useAuth } from "@/AuthContext";
 
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
-
-interface Board {
-  board_name: string;
-  posts: Array<{ title: string; content: string }>;
-}
+import { initDataPosts } from "@/type/type";
 
 export default function Board({
   url_slug,
@@ -27,13 +23,14 @@ export default function Board({
   url_slug: string;
   page: number;
   boardType: string;
-  initData: Board;
+  initData?: initDataPosts;
 }) {
-  const { isUserId, setBoardType, setRedirectPath } = useAuth();
+  const { isUserId, setBoardType, setRedirectPath, setInitData } = useAuth();
   const pathname = usePathname();
 
   useEffect(() => {
     setRedirectPath(pathname);
+    setInitData(initData || null);
   }, []);
 
   useEffect(() => {
@@ -50,14 +47,15 @@ export default function Board({
         {/* board best */}
         <div className='board'>
           <div className='board_top'>
-            {isUserId !== null && (
+            {/* {isUserId !== null && (
               <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
                 <option value={30}>30</option>
                 <option value={50}>50</option>
               </select>
-            )}
+            )} */}
+            <div></div>
 
             {isUserId !== null && (
               <div>

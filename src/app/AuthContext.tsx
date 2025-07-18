@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { AuthContextType } from "@/type/type";
+import { Posts } from "@/type/type";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -41,6 +42,8 @@ export function AuthProvider({
   const [messageToUser, setMessageToUser] = useState<number | null>(null);
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
 
+  const [initData, setInitData] = useState<{ posts: Posts[] } | null>(null);
+
   useEffect(() => {
     setIsUsername(username);
     setIsUserId(userId);
@@ -79,6 +82,8 @@ export function AuthProvider({
         setIsUserNickUpdatedAt,
         redirectPath,
         setRedirectPath,
+        initData,
+        setInitData,
       }}>
       {children}
     </AuthContext.Provider>

@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import pool from "@/db/db";
 
-// ✅ POST: 공지 등록
 export async function POST(req) {
   const client = await pool.connect();
 
@@ -44,7 +43,6 @@ export async function POST(req) {
   }
 }
 
-// ✅ GET: 공지 리스트 가져오기
 export async function GET() {
   const client = await pool.connect();
 
