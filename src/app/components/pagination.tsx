@@ -18,12 +18,15 @@ export default function Pagination({
 }: {
   page: number;
   totalPage: number;
-  type: "board" | "my";
+  type: string;
   url_slug?: string | null;
   cate?: string | null;
 }) {
   const getPageLink = (p: number) => {
     if (type === "board" && url_slug) return `/board/${url_slug}?page=${p}`;
+    if (type === "userPosts" && url_slug) return `/board/post/${url_slug}?page=${p}`;
+    if (type === "userComments" && url_slug) return `/board/comment/${url_slug}?page=${p}`;
+    if (type === "search" && url_slug) return `/board/search/${url_slug}?page=${p}`;
     if (type === "my") return `/my/activity/${cate}?page=${p}`;
     return `?page=${p}`;
   };

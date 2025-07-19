@@ -1,5 +1,3 @@
-// app/board/[url_slug]/[postId]/page.tsx
-
 import React from "react";
 import fetchPostDetail from "@/api/api";
 

@@ -156,7 +156,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link
-                href={`/board/${boardType === "popular" ? b.url_slug : url_slug}/${b.id}/?${new URLSearchParams({
+                href={`/board/${boardType === "popular" ? "popular" : url_slug}/${b.id}/?${new URLSearchParams({
                   page: String(page),
                 })}`}>
                 {boardType !== "popular" &&
@@ -208,7 +208,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
         )}
       </ol>
 
-      <Pagination page={page} totalPage={totalPage} type={"board"} url_slug={url_slug} />
+      <Pagination page={page} totalPage={totalPage} type={boardType} url_slug={url_slug} />
     </>
   );
 }

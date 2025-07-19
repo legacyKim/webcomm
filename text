@@ -20,8 +20,9 @@
 250718
  - SSE 처리해야함.
  - 홈 화면 ISR 처리 + 디자인 변경 - initData 변경에 따른 소스 변경 필요
- - 토큰 만료됐는데, 로그아웃 처리x
- - Home 에서 게시글 클릭시 에러, boardList 에서 initData 가 빈 문제인가...?
+;  - 토큰 만료됐는데, 로그아웃 처리x
+;  - Home 에서 게시글 클릭시 에러, boardList 에서 initData 가 빈 문제인가...?
+  - board server 컴포넌트 공통화
 
 1. 보안 관련 - 도메인 설정 후
   # a. reCAPTCHA v3: UX 저하 적고 정교함
