@@ -152,7 +152,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
             <CalendarIcon className='icon' />
           </div>
         </li>
-        {postData?.posts.length > 0 ? (
+        {postData?.posts?.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link
