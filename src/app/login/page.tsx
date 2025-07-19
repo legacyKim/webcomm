@@ -69,7 +69,6 @@ export default function LoginPage() {
       });
 
       if (response.data.success) {
-        console.log("로그인 성공:", response.data);
         setIsUsername(response.data.username);
         setIsUserId(response.data.userId);
         setIsUserNick(response.data.userNick);

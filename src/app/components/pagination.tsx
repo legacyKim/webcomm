@@ -27,6 +27,7 @@ export default function Pagination({
     if (type === "userPosts" && url_slug) return `/board/post/${url_slug}?page=${p}`;
     if (type === "userComments" && url_slug) return `/board/comment/${url_slug}?page=${p}`;
     if (type === "search" && url_slug) return `/board/search/${url_slug}?page=${p}`;
+    if (type === "popular") return `/board/popular?page=${p}`;
     if (type === "my") return `/my/activity/${cate}?page=${p}`;
     return `?page=${p}`;
   };

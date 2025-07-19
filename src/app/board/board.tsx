@@ -31,7 +31,7 @@ export default function Board({
   useEffect(() => {
     setRedirectPath(pathname);
     setInitData(initData || null);
-  }, []);
+  }, [initData]);
 
   useEffect(() => {
     setBoardType(boardType);
