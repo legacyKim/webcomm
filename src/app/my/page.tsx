@@ -236,14 +236,14 @@ export default function Mypage() {
                   }}
                 />
                 <p>별명은 최대 한글 6자, 영문 12자까지 입력이 가능합니다.</p>
-                <p className='notice'>부적절한 별명은 임의로 변경될 수 있습니다.</p>
-                <p className='notice'>
+                <p className='notice blue'>
                   {getNicknameCooldownLeft(isUserNickUpdatedAt) === 0 ? (
-                    <></>
+                    <>별명은 14일마다 변경이 가능합니다.</>
                   ) : (
-                    <>별명은 {getNicknameCooldownLeft(isUserNickUpdatedAt)} 일 후에 변경이 가능합니다.</>
+                    <>{getNicknameCooldownLeft(isUserNickUpdatedAt)} 일 후에 변경이 가능합니다.</>
                   )}
                 </p>
+                <p className='notice red'>부적절한 별명은 임의로 변경될 수 있습니다.</p>
               </div>
             </div>
 

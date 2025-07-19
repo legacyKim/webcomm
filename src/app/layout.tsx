@@ -39,6 +39,8 @@ export default async function RootLayout({
   let tokenExp = null;
   let userNickUpdatedAt = null;
 
+  let loginStatusCheck = null;
+
   if (token) {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
@@ -60,9 +62,13 @@ export default async function RootLayout({
       userAuthority = decoded.userAuthority;
       tokenExp = decoded.exp;
       userNickUpdatedAt = decoded.userNickUpdatedAt;
+
+      loginStatusCheck = true;
     } catch (error) {
       console.error("토큰 검증 실패:", error);
     }
+  } else {
+    loginStatusCheck = false;
   }
 
   const pathname = (await headers()).get("x-next-url") || "/";
@@ -78,7 +84,8 @@ export default async function RootLayout({
           userEmail={userEmail}
           userAuthority={userAuthority}
           tokenExp={tokenExp}
-          userNickUpdatedAt={userNickUpdatedAt}>
+          userNickUpdatedAt={userNickUpdatedAt}
+          loginStatusCheck={loginStatusCheck}>
           <QueryProvider>
             <LayoutWrapper pathname={pathname}>{children}</LayoutWrapper>
           </QueryProvider>

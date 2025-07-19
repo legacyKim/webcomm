@@ -24,6 +24,7 @@ export default function LoginPage() {
     setIsUserProfile,
     setIsUserEmail,
     setIsUserAuthority,
+    setTokenExpiration,
     redirectPath,
   } = useAuth();
 
@@ -68,6 +69,7 @@ export default function LoginPage() {
       });
 
       if (response.data.success) {
+        console.log("로그인 성공:", response.data);
         setIsUsername(response.data.username);
         setIsUserId(response.data.userId);
         setIsUserNick(response.data.userNick);
@@ -75,6 +77,7 @@ export default function LoginPage() {
         setIsUserEmail(response.data.userEmail);
         setLoginStatus(response.data.success);
         setIsUserAuthority(response.data.userAuthority);
+        setTokenExpiration(response.data.exp);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

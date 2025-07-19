@@ -1563,8 +1563,11 @@ sub .board_list {
   font-size: inherit;
   line-height: inherit;
 }
-.mypage_info .notice {
+.notice.red {
   color: $red-color;
+}
+.notice.blue {
+  color: $blue-color;
 }
 .mypage_info .input_box {
   @include re-bl;

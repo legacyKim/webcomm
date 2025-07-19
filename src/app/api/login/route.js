@@ -37,6 +37,9 @@ export async function POST(req) {
       { expiresIn: "1h" },
     );
 
+    const decoded = jwt.decode(token);
+    const exp = decoded?.exp;
+
     const response = NextResponse.json({
       success: true,
       username: user.username,
@@ -46,7 +49,7 @@ export async function POST(req) {
       userEmail: user.email,
       userAuthority: user.authority,
       userNickUpdatedAt: user.nickname_updated_at,
-      exp: user.exp,
+      exp,
     });
 
     const isProduction = process.env.NODE_ENV === "production";
@@ -56,7 +59,6 @@ export async function POST(req) {
       `Path=/`,
       `HttpOnly`,
       `Max-Age=3600`,
-      // `Max-Age=10`,
       `SameSite=Lax`,
       ...(isProduction ? ["Secure"] : []),
     ].join("; ");

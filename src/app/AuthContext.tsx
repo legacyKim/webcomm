@@ -16,6 +16,7 @@ export function AuthProvider({
   userAuthority,
   tokenExp,
   userNickUpdatedAt,
+  loginStatusCheck,
 }: {
   children: React.ReactNode;
   username: string;
@@ -26,16 +27,18 @@ export function AuthProvider({
   userAuthority: number | null;
   tokenExp: number | null;
   userNickUpdatedAt: Date | null;
+  loginStatusCheck: boolean | null;
 }) {
   const [isUsername, setIsUsername] = useState<string | null>(username);
   const [isUserId, setIsUserId] = useState<number | null>(userId);
   const [isUserNick, setIsUserNick] = useState<string | null>(userNick);
   const [isUserProfile, setIsUserProfile] = useState<string | null>(userProfile);
+
   const [isUserEmail, setIsUserEmail] = useState<string | null>(userEmail);
   const [isUserAuthority, setIsUserAuthority] = useState<number | null>(userAuthority);
   const [isUserNickUpdatedAt, setIsUserNickUpdatedAt] = useState<Date | null>(userNickUpdatedAt);
 
-  const [loginStatus, setLoginStatus] = useState<boolean | null>(false);
+  const [loginStatus, setLoginStatus] = useState<boolean | null>(loginStatusCheck);
   const [tokenExpiration, setTokenExpiration] = useState<number | null>(tokenExp);
 
   const [boardType, setBoardType] = useState<string | null>("board");
@@ -44,16 +47,16 @@ export function AuthProvider({
 
   const [initData, setInitData] = useState<{ posts: Posts[] } | null>(null);
 
-  useEffect(() => {
-    setIsUsername(username);
-    setIsUserId(userId);
-    setIsUserNick(userNick);
-    setIsUserProfile(userProfile);
-    setIsUserEmail(userEmail);
-    setIsUserAuthority(userAuthority);
-    setTokenExpiration(tokenExp);
-    setIsUserNickUpdatedAt(userNickUpdatedAt);
-  }, [username, userId, userNick, userProfile, userEmail, userAuthority, tokenExpiration]);
+  // useEffect(() => {
+  //   setIsUsername(username);
+  //   setIsUserId(userId);
+  //   setIsUserNick(userNick);
+  //   setIsUserProfile(userProfile);
+  //   setIsUserEmail(userEmail);
+  //   setIsUserAuthority(userAuthority);
+  //   setTokenExpiration(tokenExp);
+  //   setIsUserNickUpdatedAt(userNickUpdatedAt);
+  // }, [username, userId, userNick, userProfile, userEmail, userAuthority, tokenExpiration]);
 
   return (
     <AuthContext.Provider

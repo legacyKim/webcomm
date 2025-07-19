@@ -52,6 +52,8 @@ export default function Header() {
   } = useAuth();
 
   const logout = async (exp?: number) => {
+    console.log(exp, "어허 진짜로");
+
     const response = await axios.post("/api/logout");
     if (response.data.success) {
       if (exp) {
@@ -86,15 +88,21 @@ export default function Header() {
 
   // 토큰 만료시 자동 로그아웃
   useEffect(() => {
+    console.log("토큰 만료 시간:", tokenExpiration);
     if (tokenExpiration) {
       const now = Math.floor(Date.now() / 1000);
       const msUntilExpire = (tokenExpiration - now) * 1000;
+
+      console.log("남은 시간 (ms):", msUntilExpire);
+
+      console.log(msUntilExpire <= 0 ? "토큰이 만료되었습니다." : "토큰이 아직 유효합니다.");
 
       if (msUntilExpire <= 0) {
         logout(msUntilExpire);
       } else {
         const timer = setTimeout(() => {
           logout(msUntilExpire);
+          console.log("토큰이 만료되어 로그아웃합니다.");
         }, msUntilExpire);
 
         return () => clearTimeout(timer);
