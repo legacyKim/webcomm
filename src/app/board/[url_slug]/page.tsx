@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ url_slug:
       card: "summary_large_image",
       title: `tokti ${url_slug} 게시판`,
       description: `tokti ${url_slug} 게시판의 최신 글 목록입니다.`,
-      imagimages: ["https://www.tokti.net/default-thumbnail.jpg"],
+      images: ["https://www.tokti.net/default-thumbnail.jpg"],
     },
   };
 }

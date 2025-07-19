@@ -1,16 +1,10 @@
-"use client";
-
-import { usePathname } from "next/navigation";
-
 import Header from "./components/header";
 import Footer from "./components/footer";
-import Menu from "./components/menu";
+import MenuServer from "./components/menu.server";
 import Right_ad from "./components/right_ad";
 
-export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+export default function LayoutWrapper({ children, pathname }: { children: React.ReactNode; pathname: string }) {
   const isAdmin = pathname.startsWith("/admin");
-
   if (isAdmin) {
     return <>{children}</>;
   }
@@ -19,7 +13,7 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
     <>
       <Header />
       <div className='page main'>
-        <Menu />
+        <MenuServer />
         {children}
         <Right_ad />
       </div>

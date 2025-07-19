@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import QueryProvider from "@/QueryProvider";
 import { AuthProvider } from "@/AuthContext";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import jwt from "jsonwebtoken";
 
 import LayoutWrapper from "@/layoutWrapper";
@@ -65,6 +65,8 @@ export default async function RootLayout({
     }
   }
 
+  const pathname = (await headers()).get("x-next-url") || "/";
+
   return (
     <html lang='en'>
       <body>
@@ -78,7 +80,7 @@ export default async function RootLayout({
           tokenExp={tokenExp}
           userNickUpdatedAt={userNickUpdatedAt}>
           <QueryProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
+            <LayoutWrapper pathname={pathname}>{children}</LayoutWrapper>
           </QueryProvider>
         </AuthProvider>
       </body>

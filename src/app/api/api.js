@@ -38,8 +38,10 @@ export const fetchHomePop = async (page, limit, isUserId) => {
 // 게시판
 export const fetchBoard = async () => {
   try {
-    const response = await axios.get(`/api/board`);
-    return response.data;
+    const res = await fetch(`${baseUrl}/api/board`, {
+      next: { revalidate: 6000 },
+    });
+    return res.json();
   } catch (err) {
     console.error(err);
     return [];
