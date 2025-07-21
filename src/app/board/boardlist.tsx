@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 // import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchBoardData, fetchUserPostData, fetchUserCommentData, fetchSearchData, fetchBoardPop } from "@/api/api";
 import { Posts, initDataPosts } from "@/type/type";
@@ -23,8 +23,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
 
-import { SSE_BASE_URL } from "@/lib/sse";
-
 interface BoardlistProps {
   url_slug: string | null;
   page: number;
@@ -35,8 +33,8 @@ interface BoardlistProps {
 
 // BoardList React Query CSR
 const getBoardQueryFn = (boardType: string) => {
-  return async ({ queryKey }: { queryKey: any[] }) => {
-    const [_key, url_slug, page, limit, userId] = queryKey;
+  return async ({ queryKey }: { queryKey: [string | null, number, number, number | null] }) => {
+    const [url_slug, page, limit, userId] = queryKey;
 
     if (boardType === "popular") {
       return await fetchBoardPop(page, limit, userId);
@@ -56,12 +54,8 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
   const { isUserId, messageToUser } = useAuth();
   // const [postData, setPostData] = useState<initDataPosts>(initData || { posts: [] });
 
-  const {
-    data: postData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["posts", url_slug, page, limit, isUserId],
+  const { data: postData } = useQuery({
+    queryKey: [url_slug, page, limit, isUserId],
     queryFn: getBoardQueryFn(boardType),
     staleTime: 0,
     initialData: initData && initData.initUrlSlug === url_slug ? initData : undefined,

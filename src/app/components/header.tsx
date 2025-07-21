@@ -18,7 +18,6 @@ import {
   BellIcon,
   WrenchScrewdriverIcon,
 } from "@heroicons/react/24/outline";
-import { SSE_BASE_URL } from "@/lib/sse";
 
 type Notification = {
   id: number;

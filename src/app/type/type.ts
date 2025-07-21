@@ -1,5 +1,3 @@
-import { init } from "next/dist/compiled/webpack/webpack";
-
 export interface BoardData {
   boards: {
     rows: {

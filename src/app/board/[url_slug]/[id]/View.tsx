@@ -63,7 +63,7 @@ export default function View({ post, page }: { post: Posts; page: number }) {
   const { isUserId, isUserNick, messageToUser, boardType, setRedirectPath, initData } = useAuth();
   const [limit, setLimit] = useState(10);
 
-  const [viewPost, setViewPost] = useState<Posts | null>(post);
+  const [viewPost] = useState<Posts | null>(post);
 
   // 컨텐츠 또는 댓글 패치
   useEffect(() => {
