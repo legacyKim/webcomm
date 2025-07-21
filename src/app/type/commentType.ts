@@ -1,5 +1,10 @@
 export type CommentImage = { file: File; blobUrl: string };
 
+interface MentionUser {
+  id: number;
+  name: string;
+}
+
 export type CommentTreeNode = {
   id: number;
   parent_id: number | null;
@@ -14,21 +19,12 @@ export type CommentTreeNode = {
   children: CommentTreeNode[];
 };
 
-export type CommentTreeNodeArr = {
-  comments: CommentTreeNode[];
-};
-
-interface MentionUser {
-  id: number;
-  name: string;
-}
-
 export interface CommentTreeProps {
   params: { id: string; url_slug: string };
-  commentList: CommentTreeNodeArr | null;
-  setCommentList: React.Dispatch<React.SetStateAction<CommentTreeNodeArr | null>>;
+  commentList: CommentTreeNode[] | null;
+  setCommentList: React.Dispatch<React.SetStateAction<CommentTreeNode[] | null>>;
 
-  comments: CommentTreeNode[];
+  comments: CommentTreeNode[] | null;
   mentionUsers: MentionUser[];
   loginCheck: () => Promise<boolean>;
   userClick: (e: React.MouseEvent<HTMLDivElement>) => void;

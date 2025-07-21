@@ -180,7 +180,11 @@ export default async function fetchPostDetail(url_slug, id) {
     return data;
   } catch (err) {
     console.error(err);
-    return null;
+    return {
+      post: null,
+      comments: [],
+      response: false,
+    };
   }
 }
 

@@ -16,7 +16,7 @@ import { usePathname } from "next/navigation";
 import DropDownMenu from "@/components/dropDownMenu";
 import TiptapViewer from "@/components/tiptapViewer";
 
-import CommentTreeBuild from "./CommentTreeBuild";
+import { CommentTreeBuild } from "./CommentTreeBuild";
 import CommentTree from "./CommentTree";
 
 import dynamic from "next/dynamic";
@@ -33,22 +33,20 @@ import {
   ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 
-import { CommentImage, CommentTreeNode, CommentTreeNodeArr } from "@/type/commentType";
+import { CommentImage, CommentTreeNode } from "@/type/commentType";
 import { Posts, initDataPosts } from "@/type/type";
 
 const CommentEditor = dynamic(() => import("./commentEditor"), { ssr: false });
 
-interface AppComment {
-  id: number;
-  parent_id: number | null;
-  user_id: number;
-  user_nickname: string;
-  content: string;
-  profile?: string;
-  likes: number;
-}
-
-export default function View({ post, page }: { post: Posts; page: number }) {
+export default function View({
+  post,
+  comment,
+  page,
+}: {
+  post: Posts;
+  comment: CommentTreeNode[] | null;
+  page: number;
+}) {
   const pathname = usePathname();
 
   useEffect(() => {
@@ -65,21 +63,21 @@ export default function View({ post, page }: { post: Posts; page: number }) {
 
   const [viewPost] = useState<Posts | null>(post);
 
-  // 컨텐츠 또는 댓글 패치
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (params.id) {
-          const commentRes = await axios.get(`/api/comment/${params.id}`);
-          setCommentList(commentRes.data);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  // 댓글 패치
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       if (params.id) {
+  //         const commentRes = await axios.get(`/api/comment/${params.id}`);
+  //         setCommentList(commentRes.data);
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
 
-    fetchData();
-  }, [params.id, params.url_slug]);
+  //   fetchData();
+  // }, [params.id, params.url_slug]);
 
   // 게시물 실시간 열람
   // useEffect(() => {
@@ -174,7 +172,7 @@ export default function View({ post, page }: { post: Posts; page: number }) {
   };
 
   // 댓글 기능
-  const [commentList, setCommentList] = useState<CommentTreeNodeArr | null>(null);
+  const [commentList, setCommentList] = useState<CommentTreeNode[] | null>(comment ?? []);
 
   // 댓글 실시간 열람
   useEffect(() => {
@@ -184,25 +182,21 @@ export default function View({ post, page }: { post: Posts; page: number }) {
       const data = JSON.parse(event.data) as CommentTreeNode & { event: string };
 
       if (data.event === "INSERT") {
-        setCommentList((prev: CommentTreeNodeArr | null) => {
+        setCommentList((prev: CommentTreeNode[] | null) => {
           if (!prev) {
-            return { comments: [data] };
+            return [data];
           }
-          return { comments: [...prev.comments, data] };
+          return [...prev, data];
         });
       } else if (data.event === "DELETE") {
-        setCommentList((prev: CommentTreeNodeArr | null) => {
+        setCommentList((prev: CommentTreeNode[] | null) => {
           if (!prev) return prev;
-          return { comments: prev.comments.filter((c) => c.id !== data.id) };
+          return prev.filter((c) => c.id !== data.id);
         });
       } else if (data.event === "UPDATE") {
-        setCommentList((prev: CommentTreeNodeArr | null) => {
+        setCommentList((prev: CommentTreeNode[] | null) => {
           if (!prev) return prev;
-          return {
-            comments: prev.comments.map((c) =>
-              c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c,
-            ),
-          };
+          return prev.map((c) => (c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c));
         });
       }
     };
@@ -213,8 +207,8 @@ export default function View({ post, page }: { post: Posts; page: number }) {
   }, []);
 
   // 댓글 트리 구조로 변환
-  const rows = commentList?.comments ?? [];
-  const commentTree = CommentTreeBuild(rows as AppComment[]);
+  const rows = commentList ?? [];
+  const commentTree = CommentTreeBuild(rows);
 
   // 댓글 내용
   const [commentContent, setCommentContent] = useState<string>("");
@@ -357,7 +351,7 @@ export default function View({ post, page }: { post: Posts; page: number }) {
 
     if (viewPost && commentList) {
       userMap.set(viewPost?.user_id, viewPost?.user_nickname);
-      for (const comment of commentList.comments) {
+      for (const comment of commentList) {
         userMap.set(comment.user_id, comment.user_nickname);
       }
     }
@@ -428,7 +422,7 @@ export default function View({ post, page }: { post: Posts; page: number }) {
                 </span>
                 <span className='comment flex-start'>
                   <ChatBubbleLeftEllipsisIcon className='icon' />
-                  <span>{commentList?.comments?.length}</span>
+                  <span>{commentList?.length}</span>
                 </span>
                 <span className='like flex-start'>
                   <HeartIcon className='icon' />
@@ -506,7 +500,7 @@ export default function View({ post, page }: { post: Posts; page: number }) {
           <div className='comment_top'>
             <ChatBubbleLeftRightIcon className='icon' />
             <b>댓글</b>
-            <span className='comment_num'> {commentList?.comments?.length} </span>
+            <span className='comment_num'> {commentList?.length} </span>
             {/* <span className="comment_num"><i></i>{viewPost?.comments}</span> */}
           </div>
 

@@ -129,7 +129,7 @@ export default function Home({
                       <div className='board_list_info_wrap'>
                         <div className='comment flex-start'>
                           <ChatBubbleLeftEllipsisIcon className='icon' />
-                          {post.comments}
+                          <span className='icon_text'>{post.comments}</span>
                         </div>
                         <div
                           className='writer'
@@ -148,11 +148,11 @@ export default function Home({
                         </div>
                         <div className='like flex-start'>
                           <HeartIcon className='icon' />
-                          {post.likes}
+                          <span className='icon_text'>{post.likes}</span>
                         </div>
                         <div className='view flex-start'>
                           <EyeIcon className='icon' />
-                          {post.views}
+                          <span className='icon_text'>{post.views}</span>
                         </div>
                         <div className='date flex-start'>{formatPostDate(post.created_at)}</div>
                       </div>
@@ -204,7 +204,7 @@ export default function Home({
                             <span className='title'>{post.title}</span>
                             <div className='view flex-start'>
                               <EyeIcon className='icon' />
-                              {post.views}
+                              <span className='icon_text'>{post.views}</span>
                             </div>
                           </Link>
                         </li>

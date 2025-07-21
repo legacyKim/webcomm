@@ -410,6 +410,7 @@ footer {
   border: 2px solid $font-color;
   border-radius: 100px;
   padding: 2px 5px 3px 24px;
+  box-shadow: $box-shadow;
 }
 .search input {
   height: 52px;
@@ -466,9 +467,7 @@ sub {
   display: block;
 }
 main .board_top {
-  border-bottom: $border-grey;
   border-color: $grey6-color;
-  margin-bottom: 8px;
 }
 main .title {
   flex: 1;
@@ -506,6 +505,7 @@ main .title {
   font-size: 18px;
   font-weight: 600;
   line-height: 1.6;
+  padding-left: 4px;
 }
 .board_top a {
   @include flex-start;
@@ -513,7 +513,7 @@ main .title {
   font-size: 13px;
   font-weight: 400;
   line-height: 1.6;
-  padding: 4px 12px;
+  padding: 4px;
   border-radius: 4px;
   height: 34px;
   border: $border-grey;
@@ -544,14 +544,21 @@ main .title {
   @include flex-start;
   flex-direction: column;
   column-gap: 16px;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
+  padding-bottom: 12px;
+  overflow: hidden;
 }
 .board_list li {
   cursor: pointer;
 }
 main .board_list {
-  min-height: 133px;
+  min-height: 136.8px;
   border-bottom: $border-grey;
-  padding-bottom: 12px;
+  padding: 8px 0;
+}
+main .board_list li a {
+  padding: 4px 12px;
 }
 sub .board_list {
   position: relative;
@@ -565,8 +572,8 @@ sub .board_list {
   @include space-between;
   align-items: center;
   width: 100%;
-  margin-bottom: 4px;
-  border-bottom: $border-grey;
+  padding: 12px;
+  background-color: $grey2-color;
 }
 .board_list .writer {
   @include ellipsis;
@@ -590,10 +597,9 @@ sub .board_list {
   position: relative;
   @include space-between;
 
-  padding: 4px;
+  padding: 4px 12px;
   align-items: center;
   width: 100%;
-  border-radius: 4px;
 }
 .board_list li a:hover {
   background-color: $grey4-color;
@@ -677,6 +683,11 @@ sub .board_list {
   width: 16px;
   height: 16px;
   margin-right: 3px;
+  top: -1px;
+}
+.icon_text {
+  position: relative;
+  top: -2px;
 }
 
 .message {
@@ -845,8 +856,7 @@ sub .board_list {
   justify-content: center;
   align-items: center;
   column-gap: 4px;
-  border-top: $border-grey;
-  padding: 12px 0;
+  padding: 4px 0;
   gap: 8px;
 }
 .pagination a {

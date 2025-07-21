@@ -9,6 +9,14 @@ export async function generateMetadata({ params }: { params: Promise<{ url_slug:
   const { url_slug, id } = await params;
 
   const postData = await fetchPostDetail(url_slug, id);
+
+  if (!postData || !postData.post) {
+    return {
+      title: "게시글을 찾을 수 없음",
+      description: "존재하지 않거나 삭제된 게시글입니다.",
+    };
+  }
+
   const post = postData.post;
 
   return {
@@ -50,5 +58,5 @@ export default async function Page({
 
   const post = await fetchPostDetail(url_slug, id);
 
-  return <View post={post.post} page={Number(page)} />;
+  return <View post={post.post} comment={post.comments} page={Number(page)} />;
 }

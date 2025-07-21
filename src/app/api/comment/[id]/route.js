@@ -7,32 +7,31 @@ export async function GET(req, context) {
   const client = await pool.connect();
 
   try {
-    const query = `
-            WITH RECURSIVE comment_tree AS (
-            SELECT 
-              c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, 0 AS depth,
-              m.profile,
-              ARRAY[]::JSONB[] AS children
-            FROM comments c
-            LEFT JOIN members m ON c.user_id = m.id
-            WHERE c.post_id = $1 AND c.parent_id IS NULL
+    const commentQuery = `
+      WITH RECURSIVE comment_tree AS (
+      SELECT 
+        c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, 0 AS depth,
+        m.profile,
+        ARRAY[]::JSONB[] AS children
+      FROM comments c
+      LEFT JOIN members m ON c.user_id = m.id
+      WHERE c.post_id = $1 AND c.parent_id IS NULL
 
-            UNION ALL
+      UNION ALL
 
-            SELECT 
-              c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, c.depth,
-              m.profile,
-              ARRAY_APPEND(ct.children, to_jsonb(c))
-            FROM comments c
-            INNER JOIN comment_tree ct ON c.parent_id = ct.id
-            LEFT JOIN members m ON c.user_id = m.id
-          )
-          SELECT *
-          FROM comment_tree
-          ORDER BY depth ASC, created_at ASC;
-        `;
+      SELECT 
+        c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, c.depth,
+        m.profile,
+        ARRAY_APPEND(ct.children, to_jsonb(c))
+      FROM comments c
+      INNER JOIN comment_tree ct ON c.parent_id = ct.id
+      LEFT JOIN members m ON c.user_id = m.id
+    )
+    SELECT *
+    FROM comment_tree
+    ORDER BY depth ASC, created_at ASC;`;
 
-    const comments = await client.query(query, [id]);
+    const comments = await client.query(commentQuery, [id]);
 
     return NextResponse.json({ comments: comments.rows });
   } finally {
