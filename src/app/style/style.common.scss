@@ -228,6 +228,9 @@ button {
   font-size: 15px;
   color: #000;
 }
+.checkbox .custom_checkbox b {
+  font-weight: 500;
+}
 .checkbox:hover .custom_checkbox span {
   text-decoration: underline;
 }

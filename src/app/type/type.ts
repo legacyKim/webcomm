@@ -89,4 +89,6 @@ export interface AuthContextType {
   setRedirectPath: (path: string | null) => void;
   initData: { posts: Posts[] } | null;
   setInitData: (data: { posts: Posts[] } | null) => void;
+  agreeCheck: boolean | null;
+  setAgreeCheck: (agreeCheck: boolean | null) => void;
 }

@@ -47,6 +47,8 @@ export function AuthProvider({
 
   const [initData, setInitData] = useState<{ posts: Posts[] } | null>(null);
 
+  const [agreeCheck, setAgreeCheck] = useState<boolean | null>(null);
+
   // useEffect(() => {
   //   setIsUsername(username);
   //   setIsUserId(userId);
@@ -87,6 +89,8 @@ export function AuthProvider({
         setRedirectPath,
         initData,
         setInitData,
+        agreeCheck,
+        setAgreeCheck,
       }}>
       {children}
     </AuthContext.Provider>

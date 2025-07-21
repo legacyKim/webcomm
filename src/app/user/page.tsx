@@ -4,8 +4,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
-import "../style/style.common.scss";
-import styles from "../style/Login.module.scss";
+import styles from "@/style/Login.module.scss";
+import { useAuth } from "@/AuthContext";
 
 import { handleBlur, handleFocus } from "@/func/inputActive";
 import { useLoadRecaptcha } from "@/func/hook/useLoadRecaptcha";
@@ -23,6 +23,28 @@ const idRegex = /^[a-z0-9]{4,16}$/;
 const nickRegex = /^[a-zA-Z0-9가-힣]{2,12}$/;
 
 export default function User() {
+  const { agreeCheck } = useAuth();
+  useEffect(() => {
+    if (!agreeCheck) {
+      alert("회원가입을 위해서는 약관에 동의해야 합니다.");
+      window.location.href = "/agree";
+      return;
+    }
+  }, [agreeCheck]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   const router = useRouter();
   const boxIdRef = useRef<HTMLDivElement | null>(null);
   const boxNickRef = useRef<HTMLDivElement | null>(null);
@@ -118,8 +140,26 @@ export default function User() {
     "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.",
   );
 
+  //caps lock
+  const [capsLockOn, setCapsLockOn] = useState(false);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isCapsLock = e.getModifierState("CapsLock");
+    setCapsLockOn(isCapsLock);
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isCapsLock = e.getModifierState("CapsLock");
+    setCapsLockOn(isCapsLock);
+  };
+
   useEffect(() => {
     const regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
+
+    if (capsLockOn) {
+      setUserPasswordNotice("Caps Lock이 켜져 있습니다.");
+      return;
+    }
 
     if (userPassword !== "" && userPasswordCheck !== "") {
       if (userPassword !== userPasswordCheck) {
@@ -130,7 +170,7 @@ export default function User() {
     } else if (!regex.test(userPassword)) {
       setUserPasswordNotice("영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.");
     }
-  }, [userPassword, userPasswordCheck]);
+  }, [userPassword, userPasswordCheck, capsLockOn]);
 
   // email
   const [userEmail, setUserEmail] = useState<string>("");
@@ -385,6 +425,8 @@ export default function User() {
                     onBlur={() => {
                       if (inputPwRef.current && inputPwRef.current.value === "") handleBlur(labelPwRef, boxPwRef);
                     }}
+                    onKeyDown={handleKeyDown}
+                    onKeyUp={handleKeyUp}
                     type='password'
                     id='user_password'
                     name='user_password'
@@ -407,6 +449,8 @@ export default function User() {
                     onBlur={() => {
                       if (inputPwcRef.current && inputPwcRef.current.value === "") handleBlur(labelPwcRef, boxPwcRef);
                     }}
+                    onKeyDown={handleKeyDown}
+                    onKeyUp={handleKeyUp}
                     type='password'
                     id='user_password_check'
                     name='user_password_check'
@@ -421,8 +465,8 @@ export default function User() {
                   userPasswordNotice === "비밀번호가 일치하지 않습니다!"
                     ? styles.notice_false
                     : userPasswordNotice === "비밀번호가 일치합니다."
-                    ? styles.notice_true
-                    : ""
+                      ? styles.notice_true
+                      : ""
                 }`}>
                 {userPasswordNotice}
               </span>

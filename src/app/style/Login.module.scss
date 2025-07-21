@@ -224,10 +224,10 @@
   font-weight: 400;
   line-height: 1.6;
 }
-.notice.red {
+.red {
   color: $red-color;
 }
-.notice.blue {
+.blue {
   color: $blue-color;
 }
 .notice_true {
@@ -245,7 +245,9 @@
 .membership {
   position: relative;
   display: block;
-  margin-bottom: 32px;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  border-bottom: $border-grey;
 }
 .membership_tit {
   position: relative;
@@ -256,7 +258,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 1.6;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 .membership_tit svg {
   color: $main-color;
@@ -266,9 +268,10 @@
   padding: 16px;
   border: $border-grey;
   border-radius: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   overflow-y: scroll;
   background-color: #fafafa;
+  box-shadow: $box-shadow;
 }
 .membership_box::-webkit-scrollbar {
   width: 4px;

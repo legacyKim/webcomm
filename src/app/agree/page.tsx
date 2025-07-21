@@ -1,18 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import "@/style/style.common.scss";
 import styles from "@/style/Login.module.scss";
 
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "@/AuthContext";
 
 export default function Member() {
+  const { setAgreeCheck } = useAuth();
+
   const [agree01, setAgree01] = useState(false);
   const [agree02, setAgree02] = useState(false);
+  const setAgreeAll: (value: boolean) => void = (value: boolean) => {
+    setAgree01(value);
+    setAgree02(value);
+  };
 
+  // 전체 동의 체크
   const allChecked = agree01 && agree02;
+  useEffect(() => {
+    if (allChecked) {
+      setAgreeCheck(true);
+    }
+  }, [allChecked]);
 
   return (
     <div className={styles.page}>
@@ -266,6 +279,35 @@ export default function Member() {
             </label>
           </div>
         </div>
+
+        {/* 체크박스 */}
+        <div className='checkbox'>
+          <input
+            type='checkbox'
+            id='member_agree_all'
+            name='member_agree_all'
+            className='hidden_checkbox'
+            checked={allChecked}
+            onChange={() => setAgreeAll(!allChecked)}
+          />
+          <label htmlFor='member_agree_all' className='custom_checkbox'>
+            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='24' height='24' className='svg_checkbox'>
+              <rect
+                className='svg_box'
+                x='2'
+                y='2'
+                width='20'
+                height='20'
+                rx='4'
+                fill='none'
+                stroke='#ccc'
+                strokeWidth='1'
+              />
+              <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
+            </svg>
+            <b>모두 동의합니다.</b>
+          </label>
+        </div>
       </div>
       <div className='btn_wrap'>
         <Link
@@ -274,7 +316,9 @@ export default function Member() {
           tabIndex={allChecked ? 0 : -1}
           aria-disabled={!allChecked}
           onClick={(e) => {
-            if (!allChecked) e.preventDefault();
+            if (!allChecked) {
+              e.preventDefault();
+            }
           }}>
           회원가입
         </Link>

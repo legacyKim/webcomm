@@ -1,32 +1,20 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+// import nodemailer from "nodemailer";
+
+import { Resend } from "resend";
 
 export async function POST(req) {
   const { userEmail } = await req.json();
   const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const mailOptions = {
+    await resend.emails.send({
       from: process.env.EMAIL_USER,
       to: userEmail,
       subject: "인증번호 이메일입니다.",
-      text: verifyCode,
-    };
-
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
+      html: "<p>인증번호: <strong>" + verifyCode + "</strong></p>",
     });
 
     return NextResponse.json({ success: true, verifyCode }, { status: 200 });
