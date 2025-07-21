@@ -7,7 +7,7 @@ export function useCommentResizeObserver(
   setHeights: (
     heights: { [key: number]: number } | ((prev: { [key: number]: number }) => { [key: number]: number }),
   ) => void,
-  commentList: CommentTreeNode | null,
+  commentList: CommentTreeNode[] | null,
 ) {
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
