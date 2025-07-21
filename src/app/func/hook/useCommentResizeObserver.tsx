@@ -1,11 +1,13 @@
 // 높이 자동 측정 Hook
 import { useEffect } from "react";
+import { CommentTreeNodeArr } from "@/type/commentType";
 
 export function useCommentResizeObserver(
   refs: React.MutableRefObject<{ [key: number]: HTMLDivElement | null }>,
   setHeights: (
     heights: { [key: number]: number } | ((prev: { [key: number]: number }) => { [key: number]: number }),
   ) => void,
+  commentList: CommentTreeNodeArr | null,
 ) {
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
@@ -33,5 +35,5 @@ export function useCommentResizeObserver(
     return () => {
       observer.disconnect();
     };
-  }, [refs, setHeights]);
+  }, [refs, setHeights, commentList]);
 }

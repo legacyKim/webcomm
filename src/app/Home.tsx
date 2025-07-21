@@ -6,7 +6,6 @@ import Link from "next/link";
 
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchHome } from "./api/api";
 import { Posts, initDataPosts } from "./type/type";
 
 import { useAuth } from "@/AuthContext";
@@ -14,24 +13,35 @@ import { useDropDown } from "@/func/hook/useDropDown";
 import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 
+import { fetchHome } from "@/api/api";
+
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react/24/outline";
 // import { SSE_BASE_URL } from "@/lib/sse";
 
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
 
-export default function Home(initData: initDataPosts) {
+export default function Home({
+  popBoardposts,
+  eachBoardPosts,
+}: {
+  popBoardposts: initDataPosts;
+  eachBoardPosts: initDataPosts;
+}) {
   const { isUserId, setBoardType, messageToUser } = useAuth();
 
   const { data: homeData } = useQuery({
     queryKey: ["home", isUserId],
     queryFn: () => fetchHome(isUserId),
+    initialData: eachBoardPosts,
+    enabled: !!isUserId,
+    staleTime: 1000 * 60,
   });
 
   // 인기글 로딩 상태
   const [isLoadingPop, setIsLoadingPop] = useState(true);
   useEffect(() => {
-    if (initData) {
+    if (popBoardposts) {
       setIsLoadingPop(false);
     }
   }, []);
@@ -108,10 +118,10 @@ export default function Home(initData: initDataPosts) {
                     <span className='dot dot3'>.</span>
                   </div>
                 </div>
-              ) : initData?.posts.length !== 0 ? (
-                initData?.posts.map((post: Posts) => (
+              ) : popBoardposts?.posts.length !== 0 ? (
+                popBoardposts?.posts.map((post: Posts) => (
                   <li key={post.id}>
-                    <Link href={`/board/${post.url_slug}/${post.id}`}>
+                    <Link href={`/board/popular/${post.id}`} onClick={() => setBoardType("popular")}>
                       <div className='title'>
                         <b className='category'>{post.board_name}</b>
                         <span>{post.title}</span>
@@ -190,7 +200,7 @@ export default function Home(initData: initDataPosts) {
                     {posts.length > 0 ? (
                       posts.map((post: Posts) => (
                         <li key={`${boardName}${post.id}`}>
-                          <Link href={`/board/${board.url_slug}/${post.id}`}>
+                          <Link href={`/board/${board.url_slug}/${post.id}`} onClick={() => setBoardType("board")}>
                             <span className='title'>{post.title}</span>
                             <div className='view flex-start'>
                               <EyeIcon className='icon' />

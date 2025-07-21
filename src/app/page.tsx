@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 
 import Home from "@/Home";
 import { fetchHomePop } from "@/api/api";
+import { fetchHome } from "@/api/api";
 
 export const revalidate = 600;
 
@@ -25,7 +26,9 @@ export default async function Page() {
     }
   }
 
-  const data = await fetchHomePop(1, 10, userId);
+  // 인기 게시글 ISR
+  const popBoardData = await fetchHomePop(1, 10, userId);
+  const eachBoardData = await fetchHome(userId);
 
-  return <Home posts={data} />;
+  return <Home popBoardposts={{ posts: popBoardData }} eachBoardPosts={eachBoardData} />;
 }

@@ -25,6 +25,7 @@ interface MentionUser {
 
 export interface CommentTreeProps {
   params: { id: string; url_slug: string };
+  commentList: CommentTreeNodeArr | null;
   setCommentList: React.Dispatch<React.SetStateAction<CommentTreeNodeArr | null>>;
 
   comments: CommentTreeNode[];

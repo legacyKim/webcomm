@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { fetchBoardData, fetchUserPostData, fetchUserCommentData, fetchSearchData, fetchBoardPop } from "@/api/api";
 import { Posts, initDataPosts } from "@/type/type";
 import { useAuth } from "@/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 
 import Link from "next/link";
 
@@ -32,71 +33,100 @@ interface BoardlistProps {
   initData?: initDataPosts;
 }
 
+// BoardList React Query CSR
+const getBoardQueryFn = (boardType: string) => {
+  return async ({ queryKey }: { queryKey: any[] }) => {
+    const [_key, url_slug, page, limit, userId] = queryKey;
+
+    if (boardType === "popular") {
+      return await fetchBoardPop(page, limit, userId);
+    } else if (boardType === "userPost") {
+      return await fetchUserPostData(url_slug, page, limit);
+    } else if (boardType === "userComment") {
+      return await fetchUserCommentData(url_slug, page, limit);
+    } else if (boardType === "search") {
+      return await fetchSearchData(url_slug, page, limit, userId);
+    } else {
+      return await fetchBoardData(url_slug, page, limit, userId);
+    }
+  };
+};
+
 export default function Boardlist({ url_slug, page, boardType, limit, initData }: BoardlistProps) {
   const { isUserId, messageToUser } = useAuth();
-  const [postData, setPostData] = useState<initDataPosts>(initData || { posts: [] });
+  // const [postData, setPostData] = useState<initDataPosts>(initData || { posts: [] });
 
-  useEffect(() => {
-    if (!initData) {
-      const fetchData = async () => {
-        try {
-          let data;
-          if (boardType === "popular") {
-            data = await fetchBoardPop(page, limit, isUserId);
-          } else if (boardType === "userPost") data = await fetchUserPostData(url_slug, page, limit);
-          else if (boardType === "userComment") data = await fetchUserCommentData(url_slug, page, limit);
-          else if (boardType === "search") data = await fetchSearchData(url_slug, page, limit, isUserId);
-          else if (boardType === "board") data = await fetchBoardData(url_slug, page, limit, isUserId);
-          setPostData(data);
-        } catch (err) {
-          console.error("CSR fetch error:", err);
-        }
-      };
+  const {
+    data: postData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["posts", url_slug, page, limit, isUserId],
+    queryFn: getBoardQueryFn(boardType),
+    staleTime: 0,
+    initialData: initData && initData.initUrlSlug === url_slug ? initData : undefined,
+  });
+  // initData.initUrlSlug === url_slug -> 데이터의 url_slug 와 현재 url_slug 가 일치할 때만 초기 데이터 사용
 
-      fetchData();
-    } else {
-      setPostData(initData);
-    }
-  }, [url_slug, page, limit, boardType, isUserId]);
+  // useEffect(() => {
+  //   if (initData?.initUrlSlug !== url_slug || !initData) {
+  //     const fetchData = async () => {
+  //       try {
+  //         let data;
+  //         if (boardType === "popular") {
+  //           data = await fetchBoardPop(page, limit, isUserId);
+  //         } else if (boardType === "userPost") data = await fetchUserPostData(url_slug, page, limit);
+  //         else if (boardType === "userComment") data = await fetchUserCommentData(url_slug, page, limit);
+  //         else if (boardType === "search") data = await fetchSearchData(url_slug, page, limit, isUserId);
+  //         else if (boardType === "board") data = await fetchBoardData(url_slug, page, limit, isUserId);
+  //         setPostData(data);
+  //       } catch (err) {
+  //         console.error("CSR fetch error:", err);
+  //       }
+  //     };
 
-  useEffect(() => {
-    let eventSource: EventSource | undefined;
+  //     fetchData();
+  //   }
+  // }, [url_slug, page, limit, boardType, isUserId]);
 
-    function connectSSE() {
-      eventSource = new EventSource(`${SSE_BASE_URL}/events/${url_slug}`);
+  // useEffect(() => {
+  //   let eventSource: EventSource | undefined;
 
-      // eventSource.onmessage = (event) => {
-      //   const updatedData = JSON.parse(event.data);
-      //   if (updatedData.slug === url_slug) {
-      //     queryClient.invalidateQueries({ queryKey: ["eachBoardData", url_slug] });
-      //   }
-      // };
+  //   function connectSSE() {
+  //     eventSource = new EventSource(`${SSE_BASE_URL}/events/${url_slug}`);
 
-      // eventSource.onerror = () => {
-      //   console.warn("SSE 연결 끊김. 5초 후 재연결...");
-      //   if (eventSource) eventSource.close();
-      //   setTimeout(connectSSE, 5000);
-      // };
+  //     eventSource.onmessage = (event) => {
+  //       const updatedData = JSON.parse(event.data);
+  //       if (updatedData.slug === url_slug) {
+  //         queryClient.invalidateQueries({ queryKey: ["eachBoardData", url_slug] });
+  //       }
+  //     };
 
-      eventSource.onmessage = (event) => {
-        const newPost = JSON.parse(event.data);
-        setPostData((prev: initDataPosts) => ({
-          ...prev,
-          posts: [newPost, ...(prev.posts || [])],
-        }));
-      };
+  //     eventSource.onerror = () => {
+  //       console.warn("SSE 연결 끊김. 5초 후 재연결...");
+  //       if (eventSource) eventSource.close();
+  //       setTimeout(connectSSE, 5000);
+  //     };
 
-      return () => {
-        if (eventSource) eventSource.close();
-      };
-    }
+  //     eventSource.onmessage = (event) => {
+  //       const newPost = JSON.parse(event.data);
+  //       setPostData((prev: initDataPosts) => ({
+  //         ...prev,
+  //         posts: [newPost, ...(prev.posts || [])],
+  //       }));
+  //     };
 
-    connectSSE();
+  //     return () => {
+  //       if (eventSource) eventSource.close();
+  //     };
+  //   }
 
-    return () => {
-      if (eventSource) eventSource.close();
-    };
-  }, [url_slug]);
+  //   connectSSE();
+
+  //   return () => {
+  //     if (eventSource) eventSource.close();
+  //   };
+  // }, [url_slug]);
 
   // writer dropdown
   const writerRef = useRef<HTMLDivElement>(null);

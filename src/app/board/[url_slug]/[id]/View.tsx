@@ -70,9 +70,6 @@ export default function View({ post, page }: { post: Posts; page: number }) {
     const fetchData = async () => {
       try {
         if (params.id) {
-          // const postRes = await axios.get(`/api/post/${params.url_slug}/${params.id}`);
-          // setViewPost(postRes.data);
-
           const commentRes = await axios.get(`/api/comment/${params.id}`);
           setCommentList(commentRes.data);
         }
@@ -85,38 +82,38 @@ export default function View({ post, page }: { post: Posts; page: number }) {
   }, [params.id, params.url_slug]);
 
   // 게시물 실시간 열람
-  useEffect(() => {
-    const eventSource = new EventSource(`${SSE_BASE_URL}/posts/stream`);
+  // useEffect(() => {
+  //   const eventSource = new EventSource(`${SSE_BASE_URL}/posts/stream`);
 
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+  //   eventSource.onmessage = (event) => {
+  //     const data = JSON.parse(event.data);
 
-      setViewPost((prev) => {
-        if (!prev) return null;
+  //     setViewPost((prev) => {
+  //       if (!prev) return null;
 
-        if (data.id !== prev.id) return prev;
+  //       if (data.id !== prev.id) return prev;
 
-        if (data.event === "DELETE") {
-          return null;
-        }
+  //       if (data.event === "DELETE") {
+  //         return null;
+  //       }
 
-        if (data.event === "UPDATE") {
-          return {
-            ...prev,
-            likes: data.likes,
-            content: data.content,
-          };
-        }
+  //       if (data.event === "UPDATE") {
+  //         return {
+  //           ...prev,
+  //           likes: data.likes,
+  //           content: data.content,
+  //         };
+  //       }
 
-        // INSERT 이벤트는 단일 post view에서는 무의미하므로 무시
-        return prev;
-      });
-    };
+  //       // INSERT 이벤트는 단일 post view에서는 무의미하므로 무시
+  //       return prev;
+  //     });
+  //   };
 
-    return () => {
-      eventSource.close();
-    };
-  }, []);
+  //   return () => {
+  //     eventSource.close();
+  //   };
+  // }, []);
 
   // 게시물 삭제
   const postDel = async () => {
@@ -520,6 +517,7 @@ export default function View({ post, page }: { post: Posts; page: number }) {
                 url_slug: params.url_slug as string,
               }}
               comments={commentTree}
+              commentList={commentList}
               setCommentList={setCommentList}
               loginCheck={loginCheck}
               userClick={userClick}
@@ -550,6 +548,7 @@ export default function View({ post, page }: { post: Posts; page: number }) {
         {isUserId !== null ? (
           commentAdd === null ? (
             <div className='comment_add'>
+              <b>댓글 작성</b>
               <CommentEditor
                 singleCommentImageFile={singleCommentImageFile}
                 initialContent={commentCorrect ? commentCorrect.content : ""}

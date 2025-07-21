@@ -1157,7 +1157,7 @@ sub .board_list {
   font-size: 14px;
 }
 .comment_top .comment_num {
-  font-size: 14px;
+  font-size: 15px;
 }
 .comment_top .icon {
   margin-right: 8px;
@@ -1311,6 +1311,11 @@ sub .board_list {
 }
 .comment_add {
   column-gap: 8px;
+  margin-bottom: 8px;
+}
+.comment_add > b {
+  @include re-bl;
+  font-size: 15px;
   margin-bottom: 8px;
 }
 .comment_add > div {

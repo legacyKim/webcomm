@@ -18,6 +18,7 @@ export default function CommentTree({
   params,
 
   comments,
+  commentList,
   setCommentList,
 
   loginCheck,
@@ -146,7 +147,7 @@ export default function CommentTree({
   const commentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const [commentHeights, setCommentHeights] = useState<{ [key: number]: number }>({});
 
-  useCommentResizeObserver(commentRefs, setCommentHeights);
+  useCommentResizeObserver(commentRefs, setCommentHeights, commentList);
 
   if (!comments) {
     return (
@@ -373,6 +374,7 @@ export default function CommentTree({
                       url_slug: params.url_slug as string,
                     }}
                     comments={comment.children}
+                    commentList={commentList}
                     setCommentList={setCommentList}
                     loginCheck={loginCheck}
                     userClick={userClick}

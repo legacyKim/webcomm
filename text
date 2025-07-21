@@ -18,7 +18,7 @@
 ; 작업중
 
 250718
- - SSE 처리해야함.
+ - SSE 처리해야함. + 게시판의 경우 sse 가 아닌 reactQuery hydreate 로 처리.
  - 홈 화면 ISR 처리 + 디자인 변경 - initData 변경에 따른 소스 변경 필요
 ;  - 토큰 만료됐는데, 로그아웃 처리x
 ;  - Home 에서 게시글 클릭시 에러, boardList 에서 initData 가 빈 문제인가...?

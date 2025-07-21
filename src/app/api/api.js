@@ -5,10 +5,8 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 // 메인
 export const fetchHome = async (isUserId) => {
   try {
-    const response = await axios.get(`/api/home`, {
-      params: { userId: isUserId },
-    });
-    return response.data;
+    const response = await fetch(`${baseUrl}/api/home?userId=${isUserId ?? ""}`);
+    return response.json();
   } catch (err) {
     console.error(err);
     return [];

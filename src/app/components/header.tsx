@@ -148,65 +148,65 @@ export default function Header() {
     fetchNotifications();
   }, [isUserId]);
 
-  useEffect(() => {
-    const eventSource = new EventSource(`${SSE_BASE_URL}/notifications/stream/${isUserId}`);
+  // useEffect(() => {
+  //   const eventSource = new EventSource(`${SSE_BASE_URL}/notifications/stream/${isUserId}`);
 
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
+  //   eventSource.onmessage = (event) => {
+  //     try {
+  //       const data = JSON.parse(event.data);
 
-        // 예: 알림의 종류를 구분
-        let type: Notification["type"] = "comment";
-        let message = "새 알림이 도착했습니다.";
-        let link = "/";
+  //       // 예: 알림의 종류를 구분
+  //       let type: Notification["type"] = "comment";
+  //       let message = "새 알림이 도착했습니다.";
+  //       let link = "/";
 
-        if (data.type === "comment") {
-          message = "댓글이 등록되었습니다.";
-          type = "comment";
-          link = `/board/${data.board_name}/${data.post_id}`;
-        } else if (data.type === "reply") {
-          message = `${data.sender_nickname}님이 대댓글을 달았습니다.`;
-          type = "reply";
-          link = `/board/${data.board_name}/${data.post_id}#comment-${data.comment_id}`;
-        } else if (data.type === "like_comment") {
-          message = `${data.sender_nickname}님이 댓글을 공감했습니다.`;
-          type = "like_comment";
-          link = `/board/${data.board_name}/${data.post_id}#comment-${data.comment_id}`;
-        } else if (data.type === "message") {
-          message = "새 쪽지가 도착했습니다.";
-          type = "message";
-          link = `/messages`;
-        } else if (data.type === "mention") {
-          message = `${data.sender_nickname}님이 언급했습니다.`;
-          type = "mention";
-          link = `/board/${data.board_name}/${data.post_id}#comment-${data.comment_id}`;
-        }
+  //       if (data.type === "comment") {
+  //         message = "댓글이 등록되었습니다.";
+  //         type = "comment";
+  //         link = `/board/${data.board_name}/${data.post_id}`;
+  //       } else if (data.type === "reply") {
+  //         message = `${data.sender_nickname}님이 대댓글을 달았습니다.`;
+  //         type = "reply";
+  //         link = `/board/${data.board_name}/${data.post_id}#comment-${data.comment_id}`;
+  //       } else if (data.type === "like_comment") {
+  //         message = `${data.sender_nickname}님이 댓글을 공감했습니다.`;
+  //         type = "like_comment";
+  //         link = `/board/${data.board_name}/${data.post_id}#comment-${data.comment_id}`;
+  //       } else if (data.type === "message") {
+  //         message = "새 쪽지가 도착했습니다.";
+  //         type = "message";
+  //         link = `/messages`;
+  //       } else if (data.type === "mention") {
+  //         message = `${data.sender_nickname}님이 언급했습니다.`;
+  //         type = "mention";
+  //         link = `/board/${data.board_name}/${data.post_id}#comment-${data.comment_id}`;
+  //       }
 
-        setNotifications((prev) => [
-          ...prev,
-          {
-            id: data.id,
-            type,
-            message,
-            link,
-            is_read: false,
-          },
-        ]);
-        setMessageBox(true);
-      } catch (err) {
-        console.error("SSE 메시지 처리 오류:", err);
-      }
-    };
+  //       setNotifications((prev) => [
+  //         ...prev,
+  //         {
+  //           id: data.id,
+  //           type,
+  //           message,
+  //           link,
+  //           is_read: false,
+  //         },
+  //       ]);
+  //       setMessageBox(true);
+  //     } catch (err) {
+  //       console.error("SSE 메시지 처리 오류:", err);
+  //     }
+  //   };
 
-    eventSource.onerror = (err) => {
-      console.error("SSE 연결 오류:", err);
-      eventSource.close();
-    };
+  //   eventSource.onerror = (err) => {
+  //     console.error("SSE 연결 오류:", err);
+  //     eventSource.close();
+  //   };
 
-    return () => {
-      eventSource.close();
-    };
-  }, []);
+  //   return () => {
+  //     eventSource.close();
+  //   };
+  // }, []);
 
   const notifyCheck = async (id: number, link: string) => {
     try {

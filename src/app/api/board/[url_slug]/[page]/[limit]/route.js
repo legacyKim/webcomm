@@ -92,6 +92,7 @@ export async function GET(req, context) {
       posts,
       totalPosts,
       totalPages: Math.ceil(totalPosts / limitNum),
+      initUrlSlug: url_slug,
     });
   } finally {
     client.release();

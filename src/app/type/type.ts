@@ -1,3 +1,5 @@
+import { init } from "next/dist/compiled/webpack/webpack";
+
 export interface BoardData {
   boards: {
     rows: {
@@ -40,6 +42,7 @@ export interface initDataPosts {
   posts: Posts[];
   totalPosts?: number;
   totalPages?: number;
+  initUrlSlug?: string;
 }
 
 export interface Member {
