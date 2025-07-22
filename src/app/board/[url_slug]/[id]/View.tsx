@@ -381,8 +381,8 @@ export default function View({
       {isUserId !== userInfoInDropMenu.userId && writerDrop && (
         <DropDownMenu
           style={{
-            top: `${dropPosition.top}px`,
-            left: `${dropPosition.left + (writerRef.current?.offsetWidth ?? 0) + 8}px`,
+            top: `${dropPosition.top + (writerRef.current?.offsetHeight ?? 0) / 2}px`,
+            left: `${dropPosition.left + (writerRef.current?.offsetWidth ?? 0) / 2}px`,
           }}
           userInfoInDropMenu={userInfoInDropMenu}
         />
@@ -428,7 +428,6 @@ export default function View({
                   <HeartIcon className='icon' />
                   <span>{viewPost?.likes}</span>
                 </span>
-                <div className='bar'></div>
                 <span className='date'>{new Date(viewPost?.created_at).toLocaleDateString()}</span>
               </div>
             </div>

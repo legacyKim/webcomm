@@ -40,11 +40,11 @@ export async function GET(req, context) {
           p.url_slug,
           m.profile AS user_profile,
           COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY p.created_at DESC) + 1 AS post_number,
-          COALESCE(c.comments, 0) AS comments,
+          COALESCE(c.comment_count, 0) AS comment_count,
           (p.likes * 2 + p.views) / POWER(EXTRACT(EPOCH FROM (NOW() - p.created_at)) / 3600 + 2, 1.5) AS score
       FROM posts p
       LEFT JOIN (
-          SELECT post_id, COUNT(*) AS comments
+          SELECT post_id, COUNT(*) AS comment_count
           FROM comments
           GROUP BY post_id
       ) c ON p.id = c.post_id

@@ -60,67 +60,8 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
     staleTime: 0,
     initialData: initData && initData.initUrlSlug === url_slug ? initData : undefined,
   });
-  // initData.initUrlSlug === url_slug -> 데이터의 url_slug 와 현재 url_slug 가 일치할 때만 초기 데이터 사용
 
-  // useEffect(() => {
-  //   if (initData?.initUrlSlug !== url_slug || !initData) {
-  //     const fetchData = async () => {
-  //       try {
-  //         let data;
-  //         if (boardType === "popular") {
-  //           data = await fetchBoardPop(page, limit, isUserId);
-  //         } else if (boardType === "userPost") data = await fetchUserPostData(url_slug, page, limit);
-  //         else if (boardType === "userComment") data = await fetchUserCommentData(url_slug, page, limit);
-  //         else if (boardType === "search") data = await fetchSearchData(url_slug, page, limit, isUserId);
-  //         else if (boardType === "board") data = await fetchBoardData(url_slug, page, limit, isUserId);
-  //         setPostData(data);
-  //       } catch (err) {
-  //         console.error("CSR fetch error:", err);
-  //       }
-  //     };
-
-  //     fetchData();
-  //   }
-  // }, [url_slug, page, limit, boardType, isUserId]);
-
-  // useEffect(() => {
-  //   let eventSource: EventSource | undefined;
-
-  //   function connectSSE() {
-  //     eventSource = new EventSource(`${SSE_BASE_URL}/events/${url_slug}`);
-
-  //     eventSource.onmessage = (event) => {
-  //       const updatedData = JSON.parse(event.data);
-  //       if (updatedData.slug === url_slug) {
-  //         queryClient.invalidateQueries({ queryKey: ["eachBoardData", url_slug] });
-  //       }
-  //     };
-
-  //     eventSource.onerror = () => {
-  //       console.warn("SSE 연결 끊김. 5초 후 재연결...");
-  //       if (eventSource) eventSource.close();
-  //       setTimeout(connectSSE, 5000);
-  //     };
-
-  //     eventSource.onmessage = (event) => {
-  //       const newPost = JSON.parse(event.data);
-  //       setPostData((prev: initDataPosts) => ({
-  //         ...prev,
-  //         posts: [newPost, ...(prev.posts || [])],
-  //       }));
-  //     };
-
-  //     return () => {
-  //       if (eventSource) eventSource.close();
-  //     };
-  //   }
-
-  //   connectSSE();
-
-  //   return () => {
-  //     if (eventSource) eventSource.close();
-  //   };
-  // }, [url_slug]);
+  console.log(postData);
 
   // writer dropdown
   const writerRef = useRef<HTMLDivElement>(null);
@@ -132,18 +73,6 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
     userId: 0,
     userNickname: "",
   });
-
-  // if (isLoading)
-  //   return (
-  //     <div className='data_wait'>
-  //       <span>잠시만 기다려 주세요.</span>
-  //       <div className='dots'>
-  //         <span className='dot dot1'>.</span>
-  //         <span className='dot dot2'>.</span>
-  //         <span className='dot dot3'>.</span>
-  //       </div>
-  //     </div>
-  //   );
 
   const totalPage = postData?.totalPages || 1;
 
@@ -195,7 +124,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
                 </span>
                 <div className='comment'>
                   <i></i>
-                  {b.comments}
+                  {b.comment_count}
                 </div>
                 <span
                   className='writer'

@@ -82,8 +82,10 @@ button {
   width: 100%;
   text-align: center;
   font-size: 14px;
+  font-weight: 500;
 
   flex: 1;
+  color: #333;
 }
 /* page common */
 
@@ -99,8 +101,8 @@ button {
   margin-bottom: 0;
 }
 .btn_wrap a .icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
 }
 .btn {
   text-align: center;
@@ -240,12 +242,12 @@ button {
 header {
   height: $header-height;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  border-bottom: $border-grey;
 }
 .header_top {
   @include space-between;
   align-items: center;
+  min-width: 1200px;
 }
 .logo img {
   object-fit: contain;
@@ -253,6 +255,10 @@ header {
 .header_info {
   @include flex-center;
   gap: 12px;
+}
+.header_info .icon {
+  width: 20px;
+  height: 20px;
 }
 .header_info .userinfo {
   @include flex-start;
@@ -398,6 +404,7 @@ footer {
   padding: 3px 0 2px;
   width: 100%;
   border-radius: 4px;
+  transition: all 0.3s ease-in-out;
 }
 .menu_list li a:hover {
   color: $main-color;
@@ -454,7 +461,8 @@ sub {
   justify-content: flex-start;
   align-items: stretch;
   column-gap: 16px;
-  min-height: calc(100vh - $header-height - $footer-height);
+  min-height: calc(100vh - $header-height - $footer-height + 200px);
+  padding-top: 20px;
 }
 .right_ad {
   position: sticky;
@@ -471,6 +479,7 @@ sub {
 }
 main .board_top {
   border-color: $grey6-color;
+  border-bottom: $border-grey;
 }
 main .title {
   flex: 1;
@@ -516,13 +525,17 @@ main .title {
   font-size: 13px;
   font-weight: 400;
   line-height: 1.6;
-  padding: 4px;
+  padding: 4px 10px 4px 7px;
   border-radius: 4px;
   height: 34px;
   border: $border-grey;
 }
 .board_top a.more {
   border: none;
+}
+.board_top a.more span {
+  font-size: 14px;
+  color: $grey5-color;
 }
 .board_top a svg {
   width: 16px;
@@ -532,7 +545,8 @@ main .title {
 .board_top a:hover {
   color: $main-hover-color;
 }
-.board_top a:hover svg {
+.board_top a:hover svg,
+.board_top a:hover span {
   color: $main-hover-color;
 }
 .board_top select {
@@ -556,12 +570,13 @@ main .title {
   cursor: pointer;
 }
 main .board_list {
-  min-height: 136.8px;
+  min-height: 148.8px;
   border-bottom: $border-grey;
+  box-shadow: none !important;
   padding: 8px 0;
 }
 main .board_list li a {
-  padding: 4px 12px;
+  padding: 5px 12px;
 }
 sub .board_list {
   position: relative;
@@ -571,17 +586,26 @@ sub .board_list {
   width: calc(50% - 12px);
 }
 .board_list_header {
-  padding: 4px;
   @include space-between;
   align-items: center;
   width: 100%;
   padding: 12px;
-  background-color: $grey2-color;
+  margin-bottom: 5px;
+  background-color: $grey4-color;
 }
 .board_list .writer {
+  @include flex-start;
+  gap: 4px;
+  min-width: 120px;
+  max-width: 120px;
+}
+.board_list .writer > .writer_name {
   @include ellipsis;
-  min-width: 76px;
-  max-width: 76px;
+  text-align: left;
+}
+.board_list .profile_img {
+  width: 24px;
+  height: 24px;
 }
 
 .board_list_header .category {
@@ -633,8 +657,8 @@ sub .board_list {
   font-weight: 400;
   line-height: 1.4;
   padding: 1px 6px 2px;
-  border: 1px solid $grey5-color;
-  color: $grey3-color;
+  border: 1px solid $grey-color;
+  color: $grey5-color;
   border-radius: 3px;
   text-align: center;
 }
@@ -677,20 +701,19 @@ sub .board_list {
   min-width: 50px;
   white-space: nowrap;
   font-weight: 400;
-  color: $grey3-color;
+  color: $grey6-color;
 }
+
 .flex-start {
   @include flex-start;
 }
 .flex-start .icon {
   width: 16px;
   height: 16px;
-  margin-right: 3px;
-  top: -1px;
+  margin-right: 4px;
 }
 .icon_text {
   position: relative;
-  top: -2px;
 }
 
 .message {
@@ -724,8 +747,8 @@ sub .board_list {
 }
 
 .message_box_top .profile_img {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
 }
 
 .message_list {
@@ -756,7 +779,7 @@ sub .board_list {
   display: block;
   text-align: center;
   min-width: 55px;
-  color: $grey3-color;
+  color: $grey6-color;
 }
 .board_list_header > * {
   @include flex-center;
@@ -764,7 +787,6 @@ sub .board_list {
 .board_list_header .icon {
   width: 16px;
   height: 16px;
-  opacity: 0.3;
 }
 
 .profile_img {
@@ -859,25 +881,30 @@ sub .board_list {
   justify-content: center;
   align-items: center;
   column-gap: 4px;
-  padding: 4px 0;
-  gap: 8px;
+  padding: 12px 0;
 }
 .pagination a {
-  font-size: 16px;
-  font-weight: 300;
-  line-height: 1.4;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
   color: $grey-color;
+  width: 27px;
+  height: 27px;
+  @include flex-center;
 }
 .pagination a:hover {
-  color: $main-color;
+  color: $main-hover-color;
 }
 .pagination a.active {
   font-weight: 500;
-  color: #000;
+  color: #fff;
+  background-color: $main-color;
+  box-shadow: $box-shadow;
+  border-radius: 50%;
 }
 .pagination a .icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   color: $grey-color;
 }
 .pagination a .icon:hover {
@@ -1036,7 +1063,7 @@ sub .board_list {
 .view_header .category {
   position: relative;
   display: inline-block;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.4;
   border: none;
@@ -1049,7 +1076,6 @@ sub .board_list {
   display: inline-block;
   width: 1px;
   height: 12px;
-  background-color: $grey6-color;
   top: 2px;
 }
 
@@ -1064,12 +1090,13 @@ sub .board_list {
 }
 .view_info_area {
   @include space-between;
-  padding: 10px 14px;
+  padding: 18px 14px;
   padding-left: 16px;
   background-color: $grey4-color;
   box-shadow: $box-shadow;
   border-radius: 4px 4px 0 0;
 }
+
 .view_info {
   position: relative;
   @include space-between;
@@ -1078,8 +1105,18 @@ sub .board_list {
 .view_info .writer {
   @include flex-start;
 }
+.view_info .writer > .writer_name {
+  font-size: 16px;
+  font-weight: 500;
+  margin-right: 8px;
+  color: $grey6-color;
+}
+.view_info .writer .profile_img {
+  width: 36px;
+  height: 36px;
+}
 .view_info span {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
 }
 .view_info span b {
@@ -1095,15 +1132,15 @@ sub .board_list {
 
 .view_info_right {
   @include flex-start;
-  gap: 12px;
+  gap: 15px;
 }
 .view_info_right > * {
   min-width: initial;
 }
 .view_info_right > * > svg.icon {
-  margin-top: 2px;
-  width: 16px;
-  height: 16px;
+  margin-top: 3px;
+  width: 20px;
+  height: 20px;
 }
 
 .view_content {
@@ -1112,6 +1149,7 @@ sub .board_list {
   margin-bottom: 16px;
   min-height: 276px;
   border-radius: 0 0 4px 4px;
+  background-color: #fff;
 }
 .view_btn {
   @include flex-start;
@@ -1127,9 +1165,10 @@ sub .board_list {
   height: 32px;
   width: 60px;
   line-height: 2;
-  background-color: $grey-color;
+  background-color: $grey5-color;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 2px;
+  padding-top: 1px;
 }
 .view_btn a:hover,
 .view_btn button:hover {
@@ -1295,6 +1334,7 @@ sub .board_list {
   border-radius: 4px;
   margin-bottom: 12px;
   box-shadow: $box-shadow;
+  background-color: #fff;
 }
 .comment_content {
   @include flex-start;
@@ -1724,7 +1764,7 @@ sub .board_list {
 
   border: $border-grey;
   background-color: #fff;
-  padding: 8px 6px;
+  padding: 6px 8px;
   border-radius: 4px;
   box-shadow: 0 2px 12px 4px rgba(67, 67, 67, 0.07);
 }

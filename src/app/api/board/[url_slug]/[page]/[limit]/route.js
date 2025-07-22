@@ -26,7 +26,7 @@ export async function GET(req, context) {
         p.likes,
         p.notice,
         p.created_at,
-        0 AS comments,
+        0 AS comment_count,
         0 AS post_number
       FROM posts p
       WHERE p.url_slug = $1
@@ -68,7 +68,7 @@ export async function GET(req, context) {
         p.views,
         p.likes,
         p.created_at,
-        COUNT(c.id) AS comments,
+        COUNT(c.id) AS comment_count,
         COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY p.created_at DESC) + 1 AS post_number
       FROM posts p
       LEFT JOIN comments c ON p.id = c.post_id

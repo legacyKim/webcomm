@@ -105,6 +105,7 @@ export default function Home({
                 onClick={() => {
                   setBoardType("popular");
                 }}>
+                <span>더 보기</span>
                 <ChevronRightIcon />
               </Link>
             </div>
@@ -144,6 +145,11 @@ export default function Home({
                               userNickname: post.user_nickname,
                             });
                           }}>
+                          <img
+                            className='profile_img'
+                            src={post.user_profile ?? "/profile/basic.png"}
+                            alt={`${post.user_nickname}의 프로필`}
+                          />
                           <span className='writer_name'>{post.user_nickname}</span>
                         </div>
                         <div className='like flex-start'>
@@ -192,6 +198,7 @@ export default function Home({
                   <div className='board_top'>
                     <h2>{boardName}</h2>
                     <Link className='more' href={`/board/${board.url_slug}`} onClick={() => setBoardType("board")}>
+                      <span>더 보기</span>
                       <ChevronRightIcon />
                     </Link>
                   </div>

@@ -41,12 +41,17 @@ export async function GET(req, context) {
     // 4. 페이지네이션 적용된 게시글 조회
     const postQuery = `
       SELECT 
-        *, 
-        COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY created_at DESC) + 1 AS post_number
-      FROM posts 
-      WHERE id = ANY($1)
-      ORDER BY created_at DESC
-      LIMIT $2 OFFSET $3
+        p.*, 
+        COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY p.created_at DESC) + 1 AS post_number,
+        COALESCE(c.comment_count, 0) AS comment_count
+      FROM (
+        SELECT * FROM posts WHERE id = ANY($1) ORDER BY created_at DESC LIMIT $2 OFFSET $3
+      ) p
+      LEFT JOIN (
+        SELECT post_id, COUNT(*) AS comment_count 
+        FROM comments 
+        GROUP BY post_id
+      ) c ON p.id = c.post_id
     `;
     const postResult = await client.query(postQuery, [postIds, limit, offset]);
 

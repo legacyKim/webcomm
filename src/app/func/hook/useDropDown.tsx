@@ -8,7 +8,7 @@ export function useDropDown({ messageToUser }: { messageToUser: number | null })
   const [dropPosition, setDropPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-    if (loginStatus) return;
+    if (!loginStatus) return;
 
     const clickOutSide = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
