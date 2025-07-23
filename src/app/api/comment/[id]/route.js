@@ -84,7 +84,7 @@ export async function POST(req, context) {
     await client.query("COMMIT");
 
     try {
-      const response = await fetch("https://comm-sse.onrender.com/api/comment/notify", {
+      const response = await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
