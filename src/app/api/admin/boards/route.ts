@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { serverTokenCheck } from "../../../lib/serverTokenCheck";
+import { serverTokenCheck } from "@/lib/serverTokenCheck";
 
 export async function GET() {
   try {

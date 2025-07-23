@@ -4,13 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import axios from "axios";
-import Link from "next/link";
 
 import MyHeader from "../myHeader";
 import { useAuth } from "@/AuthContext";
-import NotificationList from "../../../components/NotificationList";
-import NotificationManager from "../../../components/NotificationManager";
-import "../../../style/notification.css";
+import NotificationList from "@/components/NotificationList";
+import NotificationManager from "@/components/NotificationManager";
+import "@/style/notification.css";
 
 type Notification = {
   id: number;

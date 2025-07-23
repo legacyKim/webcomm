@@ -4,7 +4,7 @@ import { Posts, Board } from "@/type/type";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
 import { useState } from "react";
-import { useInfiniteScroll, InfiniteScrollContainer } from "../../../components/Toast";
+import { useInfiniteScroll, InfiniteScrollContainer } from "@/components/Toast";
 import BoardConManagePopup from "./popup/boardConManagePopup";
 
 export default function BoardConManage() {

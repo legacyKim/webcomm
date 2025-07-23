@@ -2,7 +2,7 @@
 
 import { Member } from "@/type/type";
 import { useState } from "react";
-import { useInfiniteScroll, InfiniteScrollContainer } from "../../../components/Toast";
+import { useInfiniteScroll, InfiniteScrollContainer } from "@/components/Toast";
 
 export default function MemberManage() {
   const [searchTerm, setSearchTerm] = useState("");
