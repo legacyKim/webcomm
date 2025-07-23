@@ -181,6 +181,8 @@ export default function View({
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data) as CommentTreeNode & { event: string };
 
+      console.log(data);
+
       if (data.event === "INSERT") {
         setCommentList((prev: CommentTreeNode[] | null) => {
           if (!prev) {
