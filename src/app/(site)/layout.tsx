@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import QueryProvider from "@/QueryProvider";
 import { AuthProvider } from "@/AuthContext";
 
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
 import LayoutWrapper from "@/(site)/layoutWrapper";
