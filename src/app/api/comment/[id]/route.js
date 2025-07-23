@@ -97,6 +97,7 @@ export async function POST(req, context) {
           user_nickname: isUserNick,
           content: comment,
           parent_id: parentId,
+          profile: user.profile,
           likes: 0,
           depth: depth,
           created_at: new Date().toISOString(),

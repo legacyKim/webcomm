@@ -241,6 +241,15 @@ export default function View({
 
   // 댓글 등록
   const commentPost = async (commentContent: string, id?: number, depth?: number) => {
+    console.log("=== commentPost 함수 호출됨 ===");
+    console.log("전달받은 매개변수들:", {
+      commentContent,
+      id,
+      depth,
+      "typeof id": typeof id,
+      "id === undefined": id === undefined,
+    });
+
     const comment = commentContent.trim();
     const parentId = id;
     const commentDepth = depth ?? null;
