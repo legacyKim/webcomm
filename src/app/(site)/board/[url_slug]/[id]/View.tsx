@@ -177,8 +177,12 @@ export default function View({
   // 댓글 실시간 열람
   useEffect(() => {
     const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
+    console.log("SSE 연결됨");
+    console.log(`${SSE_BASE_URL}/comments/stream`);
 
     eventSource.onmessage = (event) => {
+      console.log("SSE 메시지 수신됨");
+
       const data = JSON.parse(event.data) as CommentTreeNode & { event: string };
 
       console.log(data);
