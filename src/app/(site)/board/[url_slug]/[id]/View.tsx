@@ -144,7 +144,11 @@ export default function View({
       console.log("Raw event data:", event.data);
 
       try {
-        const data = JSON.parse(event.data) as CommentTreeNode & { event: string };
+        const data = JSON.parse(event.data) as CommentTreeNode & {
+          event: string;
+          post_id: string;
+          parent_id: number | null;
+        };
         console.log("Parsed data:", data);
 
         // 연결 확인 메시지는 무시
@@ -153,12 +157,35 @@ export default function View({
           return;
         }
 
+        // 현재 게시글이 아닌 댓글은 무시
+        console.log("댓글 업데이트 시작:", data.event);
+
         if (data.event === "INSERT") {
           setCommentList((prev: CommentTreeNode[] | null) => {
+            console.log("이전 댓글 목록:", prev);
+
+            // 누락된 필드들 추가
+            const newComment: CommentTreeNode = {
+              id: data.id,
+              parent_id: data.parent_id || null,
+              user_id: data.user_id,
+              user_nickname: data.user_nickname,
+              content: data.content,
+              profile: data.profile,
+              likes: data.likes || 0,
+              depth: data.depth || 0,
+              created_at: data.created_at,
+              updated_at: data.updated_at,
+              children: [],
+            };
+
             if (!prev) {
-              return [data];
+              console.log("새 댓글 목록 생성:", [newComment]);
+              return [newComment];
             }
-            return [...prev, data];
+            const newList = [...prev, newComment];
+            console.log("업데이트된 댓글 목록:", newList);
+            return newList;
           });
         } else if (data.event === "DELETE") {
           setCommentList((prev: CommentTreeNode[] | null) => {
