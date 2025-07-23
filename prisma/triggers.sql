@@ -123,6 +123,20 @@ BEGIN
       NEW.id
     FROM comments c
     WHERE c.id = NEW.parent_id AND c.user_id != NEW.user_id;
+    
+    -- 대댓글의 경우 게시글 작성자에게도 알림 (댓글 작성자와 다른 경우에만)
+    INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id)
+    SELECT
+      'comment',
+      NEW.user_id,
+      p.user_id,
+      NEW.post_id,
+      NEW.id
+    FROM posts p, comments c
+    WHERE p.id = NEW.post_id 
+      AND c.id = NEW.parent_id 
+      AND p.user_id != NEW.user_id 
+      AND p.user_id != c.user_id;
   END IF;
 
   PERFORM pg_notify('new_notification', 'new_comment');
@@ -144,7 +158,7 @@ BEGIN
   IF NEW.action_type = 'like' THEN
     INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id)
     SELECT
-      'like',
+      'like_comment',
       NEW.user_id,
       c.user_id,
       c.post_id,
@@ -196,7 +210,7 @@ WHEN (NEW.action_type = 'like')
 EXECUTE FUNCTION insert_notification_for_post_like();
 
 
-// 쪽지를 받을 때 알림.
+// 쪽지를 받을 때 알림
 
 CREATE OR REPLACE FUNCTION insert_notification_for_message()
 RETURNS TRIGGER AS $$
@@ -209,3 +223,8 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_notification_for_message
+AFTER INSERT ON messages
+FOR EACH ROW
+EXECUTE FUNCTION insert_notification_for_message();

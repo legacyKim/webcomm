@@ -105,11 +105,9 @@ export async function POST(req, context) {
         }),
       });
 
-      if (response.ok) {
-        console.log("실시간 댓글 알림 전송 성공");
-      }
+      // SSE 알림 전송 성공/실패는 댓글 등록에 영향을 주지 않음
     } catch (err) {
-      console.error("실시간 댓글 알림 전송 실패:", err);
+      // SSE 서버 오류는 무시 (댓글 등록 자체는 성공)
     }
 
     return NextResponse.json({ success: true, message: "댓글이 추가되었습니다." }, { status: 201 });

@@ -26,7 +26,7 @@ export async function GET(req) {
         FROM comments
         GROUP BY post_id
       ) c ON p.id = c.post_id
-      ${url_slug ? `WHERE p.board_name = $1` : ""}
+      WHERE p.deleted = false ${url_slug ? `AND p.board_name = $1` : ""}
       ORDER BY p.created_at DESC;
     `;
 

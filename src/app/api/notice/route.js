@@ -43,20 +43,43 @@ export async function POST(req) {
   }
 }
 
-export async function GET() {
+export async function GET(req) {
   const client = await pool.connect();
 
   try {
+    const { searchParams } = new URL(req.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const offset = (page - 1) * limit;
+
     const query = `
       SELECT id, title, content, created_at, user_nickname, url_slug
       FROM posts
       WHERE notice = true
       ORDER BY created_at DESC
+      LIMIT $1 OFFSET $2
     `;
 
-    const result = await client.query(query);
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM posts
+      WHERE notice = true
+    `;
 
-    return NextResponse.json({ success: true, data: result.rows });
+    const [result, countResult] = await Promise.all([
+      client.query(query, [limit + 1, offset]), // +1로 다음 페이지 존재 여부 확인
+      client.query(countQuery),
+    ]);
+
+    const hasMore = result.rows.length > limit;
+    const notices = hasMore ? result.rows.slice(0, limit) : result.rows;
+
+    return NextResponse.json({
+      success: true,
+      data: notices,
+      hasMore,
+      total: parseInt(countResult.rows[0].total),
+    });
   } catch (error) {
     console.error("공지 불러오기 오류:", error);
     return NextResponse.json({ success: false, message: "공지 불러오기 실패" }, { status: 500 });

@@ -127,55 +127,30 @@ export default function View({
   // 댓글 실시간 열람
   useEffect(() => {
     const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
-    console.log("SSE 연결 시도 중...");
-    console.log(`${SSE_BASE_URL}/comments/stream`);
-
-    eventSource.onopen = () => {
-      console.log("SSE 연결이 열렸습니다");
-    };
 
     eventSource.onerror = (error) => {
       console.error("SSE 연결 오류:", error);
-      console.log("EventSource readyState:", eventSource.readyState);
     };
 
     eventSource.onmessage = (event) => {
-      console.log("SSE 메시지 수신됨");
-      console.log("Raw event data:", event.data);
-
       try {
         const data = JSON.parse(event.data) as CommentTreeNode & {
           event: string;
           post_id: string;
         };
-        console.log("Parsed data:", data);
 
         // 연결 확인 메시지는 무시
         if (data.event === "connected") {
-          console.log("SSE 연결 확인됨:", data);
           return;
         }
 
         // 현재 게시글이 아닌 댓글은 무시
         if (data.post_id !== params.id) {
-          console.log("다른 게시글의 댓글입니다. 무시합니다.", data.post_id, params.id);
           return;
         }
 
-        console.log("댓글 업데이트 시작:", data.event);
-
         if (data.event === "INSERT") {
-          console.log("댓글 INSERT 이벤트 처리 중...");
-          console.log("받은 댓글 데이터:", {
-            id: data.id,
-            parent_id: data.parent_id,
-            depth: data.depth,
-            content: data.content,
-          });
-
           setCommentList((prev: CommentTreeNode[] | null) => {
-            console.log("이전 댓글 목록:", prev);
-
             // 누락된 필드들 추가
             const newComment: CommentTreeNode = {
               id: data.id,
@@ -194,12 +169,9 @@ export default function View({
             };
 
             if (!prev) {
-              console.log("새 댓글 목록 생성:", [newComment]);
               return [newComment];
             }
-            const newList = [...prev, newComment];
-            console.log("업데이트된 댓글 목록:", newList);
-            return newList;
+            return [...prev, newComment];
           });
         } else if (data.event === "DELETE") {
           setCommentList((prev: CommentTreeNode[] | null) => {
@@ -214,12 +186,10 @@ export default function View({
         }
       } catch (error) {
         console.error("JSON 파싱 오류:", error);
-        console.log("Failed to parse:", event.data);
       }
     };
 
     return () => {
-      console.log("SSE 연결 종료");
       eventSource.close();
     };
   }, []);
@@ -241,26 +211,9 @@ export default function View({
 
   // 댓글 등록
   const commentPost = async (commentContent: string, id?: number, depth?: number) => {
-    console.log("=== commentPost 함수 호출됨 ===");
-    console.log("전달받은 매개변수들:", {
-      commentContent,
-      id,
-      depth,
-      "typeof id": typeof id,
-      "id === undefined": id === undefined,
-    });
-
     const comment = commentContent.trim();
     const parentId = id;
     const commentDepth = depth ?? null;
-
-    console.log("댓글 등록 시작:", {
-      commentContent: comment,
-      parentId,
-      commentDepth,
-      isUserId,
-      isUserNick,
-    });
 
     if (comment === "") {
       alert("댓글을 입력해 주세요.");

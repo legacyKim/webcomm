@@ -8,10 +8,10 @@ export default function Footer() {
       <div className='page'>
         <ul className='footer_list'>
           <li>
-            <Link href='/'>개인정보처리방침</Link>
+            <Link href='/privacy'>개인정보처리방침</Link>
           </li>
           <li>
-            <Link href='/'>이용약관</Link>
+            <Link href='/terms'>이용약관</Link>
           </li>
         </ul>
       </div>

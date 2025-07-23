@@ -48,6 +48,7 @@ model Member {
 
   sentNotifications     Notification[] @relation("NotificationSender")
   receivedNotifications Notification[] @relation("NotificationReceiver")
+  pushSubscriptions     PushSubscription[]
 
   @@map("members")
 }
@@ -213,4 +214,18 @@ model Notification {
   comment  Comment? @relation(fields: [comment_id], references: [id])
 
   @@map("notifications")
+}
+
+model PushSubscription {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  created_at DateTime @default(now())
+
+  // Relations
+  user Member @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("push_subscriptions")
 }

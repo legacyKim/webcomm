@@ -48,6 +48,7 @@ export interface Member {
   userid: number;
   email: string;
   all_posts: number;
+  comment_count?: number;
   all_views: number;
   authority: number;
 }
