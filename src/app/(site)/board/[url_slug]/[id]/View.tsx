@@ -63,56 +63,6 @@ export default function View({
 
   const [viewPost] = useState<Posts | null>(post);
 
-  // 댓글 패치
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       if (params.id) {
-  //         const commentRes = await axios.get(`/api/comment/${params.id}`);
-  //         setCommentList(commentRes.data);
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [params.id, params.url_slug]);
-
-  // 게시물 실시간 열람
-  // useEffect(() => {
-  //   const eventSource = new EventSource(`${SSE_BASE_URL}/posts/stream`);
-
-  //   eventSource.onmessage = (event) => {
-  //     const data = JSON.parse(event.data);
-
-  //     setViewPost((prev) => {
-  //       if (!prev) return null;
-
-  //       if (data.id !== prev.id) return prev;
-
-  //       if (data.event === "DELETE") {
-  //         return null;
-  //       }
-
-  //       if (data.event === "UPDATE") {
-  //         return {
-  //           ...prev,
-  //           likes: data.likes,
-  //           content: data.content,
-  //         };
-  //       }
-
-  //       // INSERT 이벤트는 단일 post view에서는 무의미하므로 무시
-  //       return prev;
-  //     });
-  //   };
-
-  //   return () => {
-  //     eventSource.close();
-  //   };
-  // }, []);
-
   // 게시물 삭제
   const postDel = async () => {
     const isConfirmed = confirm("삭제하시겠습니까?");
@@ -177,37 +127,58 @@ export default function View({
   // 댓글 실시간 열람
   useEffect(() => {
     const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
-    console.log("SSE 연결됨");
+    console.log("SSE 연결 시도 중...");
     console.log(`${SSE_BASE_URL}/comments/stream`);
+
+    eventSource.onopen = () => {
+      console.log("SSE 연결이 열렸습니다");
+    };
+
+    eventSource.onerror = (error) => {
+      console.error("SSE 연결 오류:", error);
+      console.log("EventSource readyState:", eventSource.readyState);
+    };
 
     eventSource.onmessage = (event) => {
       console.log("SSE 메시지 수신됨");
+      console.log("Raw event data:", event.data);
 
-      const data = JSON.parse(event.data) as CommentTreeNode & { event: string };
+      try {
+        const data = JSON.parse(event.data) as CommentTreeNode & { event: string };
+        console.log("Parsed data:", data);
 
-      console.log(data);
+        // 연결 확인 메시지는 무시
+        if (data.event === "connected") {
+          console.log("SSE 연결 확인됨:", data);
+          return;
+        }
 
-      if (data.event === "INSERT") {
-        setCommentList((prev: CommentTreeNode[] | null) => {
-          if (!prev) {
-            return [data];
-          }
-          return [...prev, data];
-        });
-      } else if (data.event === "DELETE") {
-        setCommentList((prev: CommentTreeNode[] | null) => {
-          if (!prev) return prev;
-          return prev.filter((c) => c.id !== data.id);
-        });
-      } else if (data.event === "UPDATE") {
-        setCommentList((prev: CommentTreeNode[] | null) => {
-          if (!prev) return prev;
-          return prev.map((c) => (c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c));
-        });
+        if (data.event === "INSERT") {
+          setCommentList((prev: CommentTreeNode[] | null) => {
+            if (!prev) {
+              return [data];
+            }
+            return [...prev, data];
+          });
+        } else if (data.event === "DELETE") {
+          setCommentList((prev: CommentTreeNode[] | null) => {
+            if (!prev) return prev;
+            return prev.filter((c) => c.id !== data.id);
+          });
+        } else if (data.event === "UPDATE") {
+          setCommentList((prev: CommentTreeNode[] | null) => {
+            if (!prev) return prev;
+            return prev.map((c) => (c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c));
+          });
+        }
+      } catch (error) {
+        console.error("JSON 파싱 오류:", error);
+        console.log("Failed to parse:", event.data);
       }
     };
 
     return () => {
+      console.log("SSE 연결 종료");
       eventSource.close();
     };
   }, []);
