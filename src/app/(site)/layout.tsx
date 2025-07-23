@@ -6,7 +6,7 @@ import { AuthProvider } from "@/AuthContext";
 import { cookies, headers } from "next/headers";
 import jwt from "jsonwebtoken";
 
-import LayoutWrapper from "@/layoutWrapper";
+import LayoutWrapper from "@/(site)/layoutWrapper";
 
 import "@/style/base.css";
 import "@/style/font.css";
@@ -74,7 +74,7 @@ export default async function RootLayout({
   const pathname = (await headers()).get("x-next-url") || "/";
 
   return (
-    <html lang='en'>
+    <html lang='kor'>
       <body>
         <AuthProvider
           username={username}
@@ -87,7 +87,7 @@ export default async function RootLayout({
           userNickUpdatedAt={userNickUpdatedAt}
           loginStatusCheck={loginStatusCheck}>
           <QueryProvider>
-            <LayoutWrapper pathname={pathname}>{children}</LayoutWrapper>
+            <LayoutWrapper>{children}</LayoutWrapper>
           </QueryProvider>
         </AuthProvider>
       </body>

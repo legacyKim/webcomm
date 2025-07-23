@@ -1,5 +1,5 @@
 import React from "react";
-import Board from "@/board/board";
+import Board from "@/(site)/board/board";
 
 export default function Page({ params }: { params: Promise<{ keyword: string }> }) {
   const unwrappedParams = React.use(params);

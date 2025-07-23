@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
-import Boardlist from "@/board/boardlist";
+import Boardlist from "@/(site)/board/boardlist";
 
 import { useAuth } from "@/AuthContext";
 import { useDropDown } from "@/func/hook/useDropDown";

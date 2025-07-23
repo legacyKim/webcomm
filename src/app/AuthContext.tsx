@@ -47,7 +47,7 @@ export function AuthProvider({
 
   const [initData, setInitData] = useState<{ posts: Posts[] } | null>(null);
 
-  const [agreeCheck, setAgreeCheck] = useState<boolean | null>(null);
+  const [agreeCheck, setAgreeCheck] = useState<boolean | null>(false);
 
   // useEffect(() => {
   //   setIsUsername(username);

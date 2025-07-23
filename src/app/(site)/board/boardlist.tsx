@@ -61,8 +61,6 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
     initialData: initData && initData.initUrlSlug === url_slug ? initData : undefined,
   });
 
-  console.log(postData);
-
   // writer dropdown
   const writerRef = useRef<HTMLDivElement>(null);
   const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });

@@ -3,8 +3,9 @@ import React from "react";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-import { fetchBoardPop } from "@/api/api";
-import Board from "@/board/board";
+import { fetchBoardData } from "@/api/api";
+
+import Board from "@/(site)/board/board";
 
 interface CustomJwtPayload {
   id: number;
@@ -12,15 +13,16 @@ interface CustomJwtPayload {
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ url_slug: string }> }) {
+  const { url_slug } = await params;
   return {
-    title: `Tokti 인기 게시판`,
-    description: `Tokti 인기 게시판의 최신 글 목록입니다.`,
+    title: `${url_slug} 게시판`,
+    description: `${url_slug} 게시판의 최신 글 목록입니다.`,
 
     openGraph: {
-      title: `Tokti 인기 게시판`,
-      description: `Tokti 인기 게시판의 최신 글 목록입니다.`,
-      url: `https://www.tokti.net/board/popular`,
+      title: `tokti ${url_slug} 게시판`,
+      description: `tokti ${url_slug} 게시판의 최신 글 목록입니다.`,
+      url: `https://www.tokti.net/board/${url_slug}`,
       type: "website",
       images: [
         {
@@ -33,8 +35,8 @@ export async function generateMetadata() {
 
     twitter: {
       card: "summary_large_image",
-      title: `Tokti 인기 게시판`,
-      description: `Tokti 인기 게시판의 최신 글 목록입니다.`,
+      title: `tokti ${url_slug} 게시판`,
+      description: `tokti ${url_slug} 게시판의 최신 글 목록입니다.`,
       images: ["https://www.tokti.net/default-thumbnail.jpg"],
     },
   };
@@ -63,7 +65,7 @@ export default async function Page({
     }
   }
 
-  const data = await fetchBoardPop(page, 10, userId);
+  const data = await fetchBoardData(url_slug, page, 20, userId);
 
-  return <Board url_slug={url_slug} page={Number(page)} boardType={"popular"} initData={data} />;
+  return <Board url_slug={url_slug} page={Number(page)} boardType='board' initData={data} />;
 }

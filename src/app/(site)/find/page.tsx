@@ -53,7 +53,7 @@ export default function Info() {
               <div className={styles.header_login}>
                 <h2 className={styles.header_text}>ID/PW 찾기</h2>
                 <p className={styles.header_subtext}>
-                  회원가입 시 입력한 이메일로 새로운 아이디와 비밀번호를 보내 드립니다.
+                  회원가입 시 입력한 이메일로 새로운 비밀번호를 <br /> 보내 드립니다.
                 </p>
               </div>
 

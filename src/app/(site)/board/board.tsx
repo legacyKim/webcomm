@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 import Search from "@/components/search";
-import Boardlist from "@/board/boardlist";
+import Boardlist from "@/(site)/board/boardlist";
 
 import { useAuth } from "@/AuthContext";
 

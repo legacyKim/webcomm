@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
-import Home from "@/Home";
+import Home from "@/(site)/Home";
 import { fetchHomePop } from "@/api/api";
 import { fetchHome } from "@/api/api";
 

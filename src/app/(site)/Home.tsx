@@ -1,12 +1,12 @@
 "use client";
 
-import Search from "./components/search";
+import Search from "@/components/search";
 
 import Link from "next/link";
 
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Posts, initDataPosts } from "./type/type";
+import { Posts, initDataPosts } from "@/type/type";
 
 import { useAuth } from "@/AuthContext";
 import { useDropDown } from "@/func/hook/useDropDown";

@@ -633,6 +633,7 @@ sub .board_list {
 }
 .board_list_info_wrap {
   @include space-between;
+  align-items: center;
 }
 .message_list li {
   justify-content: flex-start;
