@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import formatPostDate from "@/components/formatDate";
+import { useInfiniteScroll, InfiniteScrollContainer } from "@/components/Toast";
 
 import BoardNoticePopup from "./popup/boardNoticePopup";
 import TiptapViewer from "@/components/tiptapViewer";
@@ -19,14 +20,16 @@ interface Notice {
 }
 
 export default function BoardNoticeManage() {
-  const { data } = useQuery({
-    queryKey: ["notices"],
-    queryFn: async () => {
-      const { data } = await axios.get("/api/notice");
-      if (!data.success) throw new Error("공지 불러오기 실패");
-      return data.data;
-    },
-  });
+  const fetchNotices = async (page: number, limit: number = 10) => {
+    const { data } = await axios.get(`/api/notice?page=${page}&limit=${limit}`);
+    if (!data.success) throw new Error("공지 불러오기 실패");
+    return {
+      data: data.data as Notice[],
+      hasMore: data.hasMore || false,
+    };
+  };
+
+  const { data, loading, hasMore, lastElementRef, refresh, error } = useInfiniteScroll<Notice>(fetchNotices, 10);
 
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
 
@@ -59,27 +62,34 @@ export default function BoardNoticeManage() {
           </button>
         </div>
       </div>
-      <div className='admin_content'>{/* Content for managing notices will go here */}</div>
-
-      {data &&
-        data.map((notice: Notice) => (
-          <div key={notice.id} className='admin_notice_item'>
-            <span className='category'>{notice.url_slug}</span>
-            <h5 className='title'>{notice.title}</h5>
-            <TiptapViewer content={notice.content ?? ""} />
-            <span className='date'>{formatPostDate(notice.created_at)}</span>
-            <div className='btn_wrap'>
-              <button
-                onClick={() => {
-                  setEditingNotice(notice);
-                  setPopupOpen(true);
-                }}>
-                수정
-              </button>
-              <button onClick={() => noticeDelete(notice.id)}>삭제</button>
+      <div className='admin_content'>
+        <InfiniteScrollContainer
+          data={data}
+          loading={loading}
+          hasMore={hasMore}
+          lastElementRef={lastElementRef}
+          error={error}
+          onRetry={refresh}
+          renderItem={(notice: Notice) => (
+            <div key={notice.id} className='admin_notice_item'>
+              <span className='category'>{notice.url_slug}</span>
+              <h5 className='title'>{notice.title}</h5>
+              <TiptapViewer content={notice.content ?? ""} />
+              <span className='date'>{formatPostDate(notice.created_at)}</span>
+              <div className='btn_wrap'>
+                <button
+                  onClick={() => {
+                    setEditingNotice(notice);
+                    setPopupOpen(true);
+                  }}>
+                  수정
+                </button>
+                <button onClick={() => noticeDelete(notice.id)}>삭제</button>
+              </div>
             </div>
-          </div>
-        ))}
+          )}
+        />
+      </div>
 
       {popupOpen && (
         <BoardNoticePopup
