@@ -94,7 +94,6 @@ export default function Header() {
       } else {
         const timer = setTimeout(() => {
           logout(msUntilExpire);
-          console.log("토큰이 만료되어 로그아웃합니다.");
         }, msUntilExpire);
 
         return () => clearTimeout(timer);

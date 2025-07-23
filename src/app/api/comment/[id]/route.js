@@ -83,6 +83,34 @@ export async function POST(req, context) {
 
     await client.query("COMMIT");
 
+    try {
+      const response = await fetch("https://comm-sse.onrender.com/api/comment/notify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: commentId,
+          event: "INSERT",
+          post_id: id,
+          user_id: isUserId,
+          user_nickname: isUserNick,
+          content: comment,
+          parent_id: parentId,
+          likes: 0,
+          depth: depth,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }),
+      });
+
+      if (response.ok) {
+        console.log("실시간 댓글 알림 전송 성공");
+      }
+    } catch (err) {
+      console.error("실시간 댓글 알림 전송 실패:", err);
+    }
+
     return NextResponse.json({ success: true, message: "댓글이 추가되었습니다." }, { status: 201 });
   } finally {
     client.release();
