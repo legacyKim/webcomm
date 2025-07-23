@@ -5,7 +5,7 @@ import { mypageLikeComments } from "@/api/api";
 import { useAuth } from "@/AuthContext";
 import { useSearchParams } from "next/navigation";
 
-import MyHeader from "@/my/myHeader";
+import MyHeader from ""@/(site)/my/myHeader";
 import MyActivity from "../myActivity";
 
 import formatPostDate from "@/components/formatDate";
