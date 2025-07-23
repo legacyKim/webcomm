@@ -71,8 +71,6 @@ export default async function RootLayout({
     loginStatusCheck = false;
   }
 
-  const pathname = (await headers()).get("x-next-url") || "/";
-
   return (
     <html lang='kor'>
       <body>

@@ -17,7 +17,7 @@ export async function POST(req) {
       return NextResponse.json({ success: false, message: "이메일이 존재하지 않습니다." }, { status: 404 });
     }
 
-    const { id, username } = result.rows[0];
+    const { id } = result.rows[0];
 
     const generateRandomPassword = () => {
       const digits = "0123456789";
