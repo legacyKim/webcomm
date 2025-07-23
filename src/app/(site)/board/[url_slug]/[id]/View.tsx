@@ -147,7 +147,6 @@ export default function View({
         const data = JSON.parse(event.data) as CommentTreeNode & {
           event: string;
           post_id: string;
-          parent_id: number | null;
         };
         console.log("Parsed data:", data);
 
@@ -158,9 +157,22 @@ export default function View({
         }
 
         // 현재 게시글이 아닌 댓글은 무시
+        if (data.post_id !== params.id) {
+          console.log("다른 게시글의 댓글입니다. 무시합니다.", data.post_id, params.id);
+          return;
+        }
+
         console.log("댓글 업데이트 시작:", data.event);
 
         if (data.event === "INSERT") {
+          console.log("댓글 INSERT 이벤트 처리 중...");
+          console.log("받은 댓글 데이터:", {
+            id: data.id,
+            parent_id: data.parent_id,
+            depth: data.depth,
+            content: data.content,
+          });
+
           setCommentList((prev: CommentTreeNode[] | null) => {
             console.log("이전 댓글 목록:", prev);
 
@@ -176,6 +188,8 @@ export default function View({
               depth: data.depth || 0,
               created_at: data.created_at,
               updated_at: data.updated_at,
+              event: data.event,
+              post_id: data.post_id,
               children: [],
             };
 
@@ -230,6 +244,14 @@ export default function View({
     const comment = commentContent.trim();
     const parentId = id;
     const commentDepth = depth ?? null;
+
+    console.log("댓글 등록 시작:", {
+      commentContent: comment,
+      parentId,
+      commentDepth,
+      isUserId,
+      isUserNick,
+    });
 
     if (comment === "") {
       alert("댓글을 입력해 주세요.");

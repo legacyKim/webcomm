@@ -16,6 +16,8 @@ export type CommentTreeNode = {
   depth: number;
   created_at: string;
   updated_at: string;
+  event: string;
+  post_id: string;
   children: CommentTreeNode[];
 };
 
