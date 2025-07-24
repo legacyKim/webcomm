@@ -86,3 +86,4 @@ export const config = {
 16. promise 에 대해 알아보자.
 17. 서버 컴포넌트에서 await?
 18. 옵티미스틱 업데이트 설명
+19.
