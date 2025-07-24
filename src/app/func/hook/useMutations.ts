@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 
 // 타입 정의
 interface InfiniteQueryData<T> {
@@ -10,13 +9,6 @@ interface InfiniteQueryData<T> {
     [key: string]: unknown;
   }>;
   pageParams: unknown[];
-}
-
-// 옵티미스틱 업데이트를 위한 타입
-interface OptimisticUpdateConfig<T> {
-  queryKey: (string | number)[];
-  updateData?: (oldData: T[], updatedItem: Partial<T> & { id: number }) => T[];
-  removeData?: (oldData: T[], removedId: number) => T[];
 }
 
 // 멤버 권한 변경 뮤테이션
