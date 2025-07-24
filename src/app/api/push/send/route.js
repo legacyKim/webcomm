@@ -1,6 +1,5 @@
 import webpush from "web-push";
 import { NextResponse } from "next/server";
-import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import prisma from "@/lib/prisma";
 
 // VAPID 키 설정 (환경변수에서 가져옴)

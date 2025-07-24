@@ -105,7 +105,7 @@ export default function Header() {
               // Fallback to system preference
               shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
             }
-          } catch (error) {
+          } catch {
             // Fallback to system preference
             shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
           }

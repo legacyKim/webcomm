@@ -93,7 +93,7 @@ export async function POST(req, context) {
     await client.query("COMMIT");
 
     try {
-      const response = await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
+      await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export async function POST(req, context) {
       });
 
       // SSE 알림 전송 성공/실패는 댓글 등록에 영향을 주지 않음
-    } catch (err) {
+    } catch {
       // SSE 서버 오류는 무시 (댓글 등록 자체는 성공)
     }
 

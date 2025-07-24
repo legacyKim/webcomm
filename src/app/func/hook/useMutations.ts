@@ -1,7 +1,16 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import axios from "axios";
+
+// 타입 정의
+interface InfiniteQueryData<T> {
+  pages: Array<{
+    data: T[];
+    [key: string]: unknown;
+  }>;
+  pageParams: unknown[];
+}
 
 // 옵티미스틱 업데이트를 위한 타입
 interface OptimisticUpdateConfig<T> {
@@ -37,12 +46,12 @@ export function useMemberAuthorityMutation<T extends { id: number; authority: nu
       const previousData = queryClient.getQueryData(["members"]);
 
       // 옵티미스틱 업데이트
-      queryClient.setQueriesData({ queryKey: ["members"] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: ["members"] }, (old: InfiniteQueryData<T> | undefined) => {
         if (!old?.pages) return old;
 
         return {
           ...old,
-          pages: old.pages.map((page: any) => ({
+          pages: old.pages.map((page) => ({
             ...page,
             data: page.data.map((member: T) => (member.id === memberId ? { ...member, authority } : member)),
           })),
@@ -124,12 +133,12 @@ export function useMemberRestrictionMutation<
       const previousData = queryClient.getQueryData(["members"]);
 
       // 옵티미스틱 업데이트
-      queryClient.setQueriesData({ queryKey: ["members"] }, (old: any) => {
+      queryClient.setQueriesData({ queryKey: ["members"] }, (old: InfiniteQueryData<T> | undefined) => {
         if (!old?.pages) return old;
 
         return {
           ...old,
-          pages: old.pages.map((page: any) => ({
+          pages: old.pages.map((page) => ({
             ...page,
             data: page.data.map((member: T) =>
               member.id === memberId

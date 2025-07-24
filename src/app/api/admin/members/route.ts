@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     const offset = (page - 1) * limit;
 
     // 검색 조건 구성
-    const whereCondition: any = {};
+    const whereCondition: Record<string, unknown> = {};
 
     if (authority && authority !== "all") {
       whereCondition.authority = parseInt(authority);

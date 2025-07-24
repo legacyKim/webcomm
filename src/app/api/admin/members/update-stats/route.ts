@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 
 // 회원 통계 업데이트 API
-export async function POST(req: Request) {
+export async function POST() {
   try {
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
@@ -40,10 +40,10 @@ export async function POST(req: Request) {
 
     await Promise.all(updatePromises);
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: `${members.length}명의 회원 통계가 업데이트되었습니다.`,
-      updatedCount: members.length 
+      updatedCount: members.length,
     });
   } catch (error) {
     console.error("Member stats update error:", error);

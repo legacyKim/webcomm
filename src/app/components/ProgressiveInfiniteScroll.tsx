@@ -28,7 +28,7 @@ export const useProgressiveInfiniteScroll = <T,>({
 }: UseProgressiveInfiniteScrollProps<T>) => {
   // 점진적으로 관리할 로컬 상태
   const [localData, setLocalData] = useState<T[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  // const [currentPage, setCurrentPage] = useState(1); // 현재 미사용
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +98,6 @@ export const useProgressiveInfiniteScroll = <T,>({
       observer.current = new IntersectionObserver(
         (entries) => {
           if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-            setCurrentPage((prev) => prev + 1);
             fetchNextPage();
           }
         },
@@ -116,7 +115,6 @@ export const useProgressiveInfiniteScroll = <T,>({
   // 새로고침 함수
   const refresh = useCallback(() => {
     setLocalData([]);
-    setCurrentPage(1);
     setHasMore(true);
     setError(null);
     refetch();
@@ -142,7 +140,7 @@ export const useProgressiveInfiniteScroll = <T,>({
 export const useInfiniteScroll = <T,>(
   fetchFunction: (page: number, limit: number) => Promise<{ data: T[]; hasMore: boolean }>,
   limit: number = 20,
-  queryKey?: string[],
+  // queryKey?: string[], // 현재 미사용
 ) => {
   const [data, setData] = useState<T[]>([]);
   const [page, setPage] = useState(1);
@@ -355,7 +353,10 @@ export const InfiniteScrollContainer = <T,>({
       {data.map((item, index) => {
         const isLast = index === data.length - 1;
         // 안정적인 key 생성 (id가 있으면 사용, 없으면 index)
-        const itemKey = (item as any)?.id !== undefined ? `item-${(item as any).id}` : `index-${index}`;
+        const itemKey =
+          (item as Record<string, unknown>)?.id !== undefined
+            ? `item-${(item as Record<string, unknown>).id}`
+            : `index-${index}`;
         return (
           <div key={itemKey} ref={isLast ? lastElementRef : null} className='scroll-item'>
             {renderItem(item, index)}

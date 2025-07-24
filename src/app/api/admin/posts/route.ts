@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     const offset = (page - 1) * limit;
 
     // 검색 조건 구성
-    const whereCondition: any = {
+    const whereCondition: Record<string, unknown> = {
       deleted: archived, // archived가 true면 삭제된 것(보관된 것), false면 일반 게시물
     };
 

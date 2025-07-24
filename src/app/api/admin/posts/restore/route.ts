@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     }
 
     // 게시물 복원
-    const posts = await prisma.post.updateMany({
+    await prisma.post.updateMany({
       where: {
         id: { in: idsToRestore },
       },

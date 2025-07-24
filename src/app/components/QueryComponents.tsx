@@ -163,7 +163,10 @@ export const QueryInfiniteScrollContainer = <T,>({
       {data.map((item, index) => {
         const isLast = index === data.length - 1;
         // 안정적인 key 생성
-        const itemKey = (item as any)?.id !== undefined ? `item-${(item as any).id}` : `index-${index}`;
+        const itemKey =
+          (item as Record<string, unknown>)?.id !== undefined
+            ? `item-${(item as Record<string, unknown>).id}`
+            : `index-${index}`;
         return (
           <div
             key={itemKey}

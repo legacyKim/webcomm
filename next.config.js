@@ -9,7 +9,15 @@ const nextConfig = {
     ];
   },
   experimental: {
-    serverActions: false, // 혹시 사용하고 있다면 안전하게 비활성화
+    serverActions: {
+      allowedOrigins: ["localhost:3000", "*.vercel.app"],
+    },
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  eslint: {
+    ignoreDuringBuilds: false,
   },
 };
 

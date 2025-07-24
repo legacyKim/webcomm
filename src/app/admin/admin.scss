@@ -1,4 +1,5 @@
 @use "../style/var.scss" as *; /* var css */
+@use "sass:color";
 
 /* admin header */
 .admin {
@@ -480,7 +481,7 @@
         border-color: $main-color;
 
         &:hover {
-          background: darken($main-color, 10%);
+          background: color.adjust($main-color, $lightness: -10%);
         }
       }
 
@@ -583,7 +584,7 @@
         transition: all 0.2s ease;
 
         &:hover:not(:disabled) {
-          background: darken($main-color, 10%);
+          background: color.adjust($main-color, $lightness: -10%);
         }
 
         &:disabled {
@@ -651,7 +652,7 @@
       transition: all 0.2s ease;
 
       &:hover:not(:disabled) {
-        background: darken($main-color, 10%);
+        background: color.adjust($main-color, $lightness: -10%);
       }
 
       &:disabled {

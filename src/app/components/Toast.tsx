@@ -110,7 +110,7 @@ export const useInfiniteScroll = <T,>(
               return; // 캐시 데이터 사용 시 초기 로딩 건너뛰기
             }
           }
-        } catch (e) {
+        } catch {
           // 파싱 에러 시 무시하고 일반 로딩 진행
         }
       }

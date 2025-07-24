@@ -1,55 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-import axios from "axios";
+import { useEffect } from "react";
 
 import MyHeader from "../myHeader";
 import { useAuth } from "@/AuthContext";
 import NotificationList from "@/components/NotificationList";
 import NotificationManager from "@/components/NotificationManager";
 
-type Notification = {
-  id: number;
-  type: "comment" | "reply" | "message" | "mention";
-  message: string;
-  link: string;
-  is_read: boolean;
-};
-
 export default function MyNotice() {
-  const router = useRouter();
   const { isUserId } = useAuth();
 
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-
+  // 기본 인증 체크만 수행
   useEffect(() => {
     if (!isUserId) return;
-
-    const fetchNotifications = async () => {
-      try {
-        const { data } = await axios.get(`/api/notifications`);
-        setNotifications(data);
-      } catch (err) {
-        console.error("알림 가져오기 실패:", err);
-      }
-    };
-
-    fetchNotifications();
   }, [isUserId]);
-
-  const notifyCheck = async (id: number, link: string) => {
-    try {
-      await axios.patch(`/api/notifications`, {
-        notificationIds: [id.toString()],
-      });
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
-      router.push(link);
-    } catch (err) {
-      console.error("알림 읽음 처리 실패", err);
-    }
-  };
 
   return (
     <sub className='sub'>

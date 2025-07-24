@@ -95,12 +95,6 @@ export default function BoardConManage() {
     refresh();
   };
 
-  // 조회하기 버튼
-  const handleViewPost = (post: Posts) => {
-    setBoardContent(post);
-    setPopupOpen(true);
-  };
-
   return (
     <div className='admin_content_wrap'>
       <div className='admin_title'>

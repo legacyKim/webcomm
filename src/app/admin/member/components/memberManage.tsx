@@ -24,7 +24,7 @@ export default function MemberManage() {
   // React Query 뮤테이션 훅들
   const authorityMutation = useMemberAuthorityMutation<Member>();
   const deleteMutation = useMemberDeleteMutation();
-  const restrictionMutation = useMemberRestrictionMutation<Member>();
+  // const restrictionMutation = useMemberRestrictionMutation<Member>(); // 현재 미사용
   const statsUpdateMutation = useStatsUpdateMutation();
 
   // 멤버 목록을 가져오는 함수
