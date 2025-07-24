@@ -17,10 +17,18 @@ export async function POST(request: NextRequest) {
     }
 
     // 게시물을 삭제 상태로 업데이트 (보관의 의미)
-    await prisma.post.update({
+    const post = await prisma.post.update({
       where: { id: postId },
       data: { deleted: true },
     });
+
+    // 작성자의 all_posts 감소
+    if (post.user_id) {
+      await prisma.member.update({
+        where: { id: post.user_id },
+        data: { all_posts: { decrement: 1 } },
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

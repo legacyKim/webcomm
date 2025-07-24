@@ -9,7 +9,6 @@ import { useRouter, usePathname } from "next/navigation";
 
 import { useAuth } from "@/AuthContext";
 import Logo from "@/components/Logo";
-import "../style/notification.css";
 
 import {
   ArrowRightStartOnRectangleIcon,
@@ -18,6 +17,8 @@ import {
   UserCircleIcon,
   BellIcon,
   WrenchScrewdriverIcon,
+  SunIcon,
+  MoonIcon,
 } from "@heroicons/react/24/outline";
 
 type Notification = {
@@ -50,6 +51,78 @@ export default function Header() {
     setTokenExpiration,
     setIsUserNickUpdatedAt,
   } = useAuth();
+
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Dark mode toggle function
+  const toggleDarkMode = async () => {
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+
+    // Save to sessionStorage
+    sessionStorage.setItem("darkMode", newDarkMode.toString());
+
+    // Save to localStorage as fallback
+    localStorage.setItem("darkMode", newDarkMode.toString());
+
+    // Apply theme
+    document.documentElement.setAttribute("data-theme", newDarkMode ? "dark" : "light");
+
+    // Save to server session if user is logged in
+    if (loginStatus) {
+      try {
+        await axios.post("/api/user/theme", {
+          darkMode: newDarkMode,
+        });
+      } catch (error) {
+        console.error("Failed to save theme to server:", error);
+      }
+    }
+  };
+
+  // Initialize dark mode from sessionStorage, localStorage, or server
+  useEffect(() => {
+    const initializeDarkMode = async () => {
+      let shouldUseDark = false;
+
+      // Check sessionStorage first
+      const sessionDarkMode = sessionStorage.getItem("darkMode");
+      if (sessionDarkMode !== null) {
+        shouldUseDark = sessionDarkMode === "true";
+      } else {
+        // Check localStorage
+        const localDarkMode = localStorage.getItem("darkMode");
+        if (localDarkMode !== null) {
+          shouldUseDark = localDarkMode === "true";
+        } else if (loginStatus) {
+          // If logged in, try to get from server
+          try {
+            const response = await axios.get("/api/user/theme");
+            if (response.data.success) {
+              shouldUseDark = response.data.darkMode;
+            } else {
+              // Fallback to system preference
+              shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            }
+          } catch (error) {
+            // Fallback to system preference
+            shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          }
+        } else {
+          // Fallback to system preference
+          shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        }
+      }
+
+      setIsDarkMode(shouldUseDark);
+      sessionStorage.setItem("darkMode", shouldUseDark.toString());
+      localStorage.setItem("darkMode", shouldUseDark.toString());
+      document.documentElement.setAttribute("data-theme", shouldUseDark ? "dark" : "light");
+    };
+
+    initializeDarkMode();
+  }, [loginStatus]);
 
   const logout = async (exp?: number) => {
     const response = await axios.post("/api/logout");
@@ -243,6 +316,20 @@ export default function Header() {
                 </div>
               </div>
 
+              {/* Dark Mode Toggle */}
+              <div className='dark-mode-toggle'>
+                <button
+                  onClick={toggleDarkMode}
+                  className='dark-mode-btn'
+                  aria-label={`${isDarkMode ? "라이트" : "다크"} 모드로 전환`}>
+                  <div className={`toggle-slider ${isDarkMode ? "dark" : "light"}`}>
+                    <div className='toggle-icon'>
+                      {isDarkMode ? <MoonIcon className='icon' /> : <SunIcon className='icon' />}
+                    </div>
+                  </div>
+                </button>
+              </div>
+
               <div className='notice_popup'>
                 <button
                   className='header_btn'
@@ -310,6 +397,20 @@ export default function Header() {
             </>
           ) : (
             <>
+              {/* Dark Mode Toggle */}
+              <div className='dark-mode-toggle'>
+                <button
+                  onClick={toggleDarkMode}
+                  className='dark-mode-btn'
+                  aria-label={`${isDarkMode ? "라이트" : "다크"} 모드로 전환`}>
+                  <div className={`toggle-slider ${isDarkMode ? "dark" : "light"}`}>
+                    <div className='toggle-icon'>
+                      {isDarkMode ? <MoonIcon className='icon' /> : <SunIcon className='icon' />}
+                    </div>
+                  </div>
+                </button>
+              </div>
+
               <Link href='/login' className=''>
                 <ArrowRightEndOnRectangleIcon className='icon icon_space' />
                 <span>로그인</span>

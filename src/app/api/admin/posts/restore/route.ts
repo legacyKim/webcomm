@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     }
 
     // 게시물 복원
-    await prisma.post.updateMany({
+    const posts = await prisma.post.updateMany({
       where: {
         id: { in: idsToRestore },
       },
@@ -27,6 +27,21 @@ export async function POST(req: Request) {
         deleted: false,
       },
     });
+
+    // 복원된 게시물의 작성자들의 all_posts 증가
+    const restoredPosts = await prisma.post.findMany({
+      where: { id: { in: idsToRestore } },
+      select: { user_id: true },
+    });
+
+    for (const post of restoredPosts) {
+      if (post.user_id) {
+        await prisma.member.update({
+          where: { id: post.user_id },
+          data: { all_posts: { increment: 1 } },
+        });
+      }
+    }
 
     return NextResponse.json({ success: true, message: "게시물이 복원되었습니다." });
   } catch (error) {

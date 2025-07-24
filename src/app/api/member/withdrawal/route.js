@@ -16,10 +16,43 @@ export async function POST(req) {
     const client = await pool.connect();
 
     try {
-      // 실제 탈퇴 처리 (회원 삭제)
-      await client.query("DELETE FROM members WHERE id = $1", [userId]);
+      const { reason = "개인사유" } = await req.json();
 
-      const res = NextResponse.json({ success: true, message: "탈퇴 완료" });
+      await client.query("BEGIN");
+
+      // 회원 탈퇴 처리 (숨김 처리)
+      const withdrawalDate = new Date();
+      await client.query(
+        `UPDATE members 
+         SET 
+           deleted = true,
+           deleted_at = $1,
+           withdrawal_reason = $2,
+           authority = 4,
+           email = CONCAT('withdrawn_', id, '@deleted.com'),
+           userid = CONCAT('withdrawn_', id)
+         WHERE id = $3`,
+        [withdrawalDate, reason, userId],
+      );
+
+      // 게시물들도 숨김 처리
+      await client.query("UPDATE posts SET deleted = true, deleted_at = $1 WHERE user_id = $2", [
+        withdrawalDate,
+        userId,
+      ]);
+
+      // 댓글들도 숨김 처리
+      await client.query("UPDATE comments SET deleted = true, deleted_at = $1 WHERE user_id = $2", [
+        withdrawalDate,
+        userId,
+      ]);
+
+      await client.query("COMMIT");
+
+      const res = NextResponse.json({
+        success: true,
+        message: "회원 탈퇴가 완료되었습니다. 그동안 이용해 주셔서 감사합니다.",
+      });
       res.cookies.set("authToken", "", { maxAge: 0, path: "/" });
 
       return res;

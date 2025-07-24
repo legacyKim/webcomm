@@ -45,12 +45,14 @@ export interface initDataPosts {
 
 export interface Member {
   id: number;
-  userid: number;
+  userid: string;
+  user_nickname: string;
   email: string;
   all_posts: number;
   comment_count?: number;
   all_views: number;
   authority: number;
+  restriction_until?: string | null;
 }
 
 export type ImageWithBlob = {

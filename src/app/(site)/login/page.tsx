@@ -39,9 +39,22 @@ export default function LoginPage() {
     const savedUserid = Cookies.get("savedUserid");
     if (savedUserid) {
       setUserid(savedUserid);
-      setRemember(true);
+      setRemember(true); // 저장된 아이디가 있으면 체크박스도 체크
     }
   }, []);
+
+  // 아이디 저장 체크박스 변경 핸들러
+  const handleRememberChange = (newRemember: boolean) => {
+    setRemember(newRemember);
+
+    if (!newRemember) {
+      // 체크 해제 시 저장된 아이디 쿠키 삭제
+      Cookies.remove("savedUserid");
+    } else if (userid) {
+      // 체크 시 현재 아이디가 있으면 저장
+      Cookies.set("savedUserid", userid, { expires: 7 });
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,8 +231,15 @@ export default function LoginPage() {
 
             {/* checkbox */}
             <div className='checkbox'>
-              <input type='checkbox' id='remember' name='remember' className='hidden_checkbox' />
-              <label htmlFor='remember' className='custom_checkbox' onClick={() => setRemember(!remember)}>
+              <input
+                type='checkbox'
+                id='remember'
+                name='remember'
+                className='hidden_checkbox'
+                checked={remember}
+                readOnly
+              />
+              <label htmlFor='remember' className='custom_checkbox' onClick={() => handleRememberChange(!remember)}>
                 <svg
                   xmlns='http://www.w3.org/2000/svg'
                   viewBox='0 0 24 24'

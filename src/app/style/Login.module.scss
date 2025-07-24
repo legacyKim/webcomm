@@ -297,3 +297,149 @@
 .membership_contents h2:first-child {
   padding-top: 12px;
 }
+
+/* Dark Mode Styles */
+:global([data-theme="dark"]) {
+  .login_page {
+    background-color: $dark-bg;
+    color: #ffffff;
+  }
+
+  .header_text {
+    color: #ffffff;
+  }
+
+  .header_subtext {
+    color: #b0b0b0;
+  }
+
+  .error {
+    color: #ff6b6b;
+  }
+
+  .input_box {
+    border: 1px solid #404040;
+    background-color: #2d2d2d;
+  }
+
+  .input_box .input_bg {
+    background-color: #2d2d2d;
+  }
+
+  .input_common {
+    color: #ffffff;
+  }
+
+  .input_common:-webkit-autofill {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px #2d2d2d inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  .input_common:-webkit-autofill:focus {
+    background-color: #2d2d2d !important;
+    color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0 1000px #2d2d2d inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+  }
+
+  .label_common {
+    color: #b0b0b0;
+  }
+
+  .input_box:focus-within {
+    border-color: #4fc3f7;
+  }
+
+  .input_box:focus-within .label_common {
+    color: #fff;
+  }
+
+  .file_name {
+    background-color: #2d2d2d !important;
+    color: #ffffff;
+  }
+
+  .file_name_label {
+    color: #b0b0b0;
+  }
+
+  .file_name_label.after {
+    color: #4fc3f7 !important;
+  }
+
+  .input_img .label_img {
+    background-color: #2d2d2d;
+    border: 1px solid #404040;
+  }
+
+  .input_img:hover .label_img {
+    border-color: #4fc3f7;
+    color: #4fc3f7;
+  }
+
+  .img_preview {
+    background-color: #2d2d2d;
+    border: 1px solid #404040;
+  }
+
+  .find_info a {
+    color: #b0b0b0;
+  }
+
+  .find_info a:hover {
+    color: #4fc3f7;
+  }
+
+  .notice {
+    color: #b0b0b0;
+  }
+
+  .notice_true {
+    color: #4fc3f7;
+  }
+
+  .notice_false {
+    color: #ff6b6b;
+  }
+
+  .blue {
+    color: #4fc3f7;
+  }
+
+  .red {
+    color: #ff6b6b;
+  }
+
+  .membership_box {
+    background-color: #1e1e1e;
+    border: 1px solid #404040;
+    color: #ffffff;
+  }
+
+  .membership_box::-webkit-scrollbar-thumb {
+    background-color: #4fc3f7;
+  }
+
+  .membership_contents p,
+  .membership_contents li {
+    color: #ffffff;
+  }
+
+  .membership_contents h2 {
+    color: #ffffff;
+  }
+
+  .membership_tit {
+    color: #ffffff;
+  }
+
+  .membership_tit svg {
+    color: #4fc3f7;
+  }
+
+  .login_ad {
+    background-color: #2d2d2d;
+  }
+}

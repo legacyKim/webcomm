@@ -69,6 +69,8 @@ export default function BoardNoticePopup({
       if (res.data.success) {
         alert("공지사항이 등록되었습니다.");
         setPopupOpen(false);
+        setTitle(""); // 제목 초기화
+        editor?.commands.clearContent(); // 에디터 내용 초기화
       } else {
         alert("등록 실패: " + res.data.message);
       }
@@ -96,6 +98,9 @@ export default function BoardNoticePopup({
       if (res.data.success) {
         alert("공지사항이 수정되었습니다.");
         setPopupOpen(false);
+        setEditingNotice(null); // 편집 상태 초기화
+        setTitle(""); // 제목 초기화
+        editor?.commands.clearContent(); // 에디터 내용 초기화
       } else {
         alert("수정 실패: " + res.data.message);
       }

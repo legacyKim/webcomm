@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
+import { serverTokenCheck } from "@/lib/serverTokenCheck";
 
 export async function POST(req) {
   const client = await pool.connect();
   const { isUserId, id: postId, reason } = await req.json();
 
   try {
+    const user = await serverTokenCheck();
+    if (!user) {
+      return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
+    }
+
+    // 권한 확인: 정지회원(authority: 3)은 신고 불가
+    if (user.userAuthority === 3) {
+      return NextResponse.json({ success: false, message: "정지회원은 신고할 수 없습니다." }, { status: 403 });
+    }
+
     await client.query("BEGIN");
 
     // 이미 신고한 내역이 있는지 확인

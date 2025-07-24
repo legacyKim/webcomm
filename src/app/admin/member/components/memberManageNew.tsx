@@ -3,7 +3,7 @@
 import { Member } from "@/type/type";
 import { useState } from "react";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
-import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
+import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 import {
   useMemberAuthorityMutation,
   useMemberDeleteMutation,
@@ -14,7 +14,7 @@ import RestrictionPopup from "./popup/RestrictionPopup";
 
 export default function MemberManage() {
   const [searchTerm, setSearchTerm] = useState("");
-  // const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  //   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   const [filterAuthority, setFilterAuthority] = useState("all");
   const [restrictionPopup, setRestrictionPopup] = useState<{
     isOpen: boolean;
@@ -48,7 +48,7 @@ export default function MemberManage() {
     };
   };
 
-  // 무한 스크롤 훅 사용
+  // React Query 무한 스크롤 훅 사용
   const {
     data: members,
     loading,
@@ -68,7 +68,7 @@ export default function MemberManage() {
     refresh();
   };
 
-  // 멤버 권한 변경
+  // 멤버 권한 변경 - React Query 뮤테이션 사용
   const handleAuthorityChange = async (memberId: number, newAuthority: number, selectElement: HTMLSelectElement) => {
     const originalValue = selectElement.getAttribute("data-original-value") || "1";
 
@@ -84,7 +84,6 @@ export default function MemberManage() {
       await authorityMutation.mutateAsync({ memberId, authority: newAuthority });
       alert("권한이 변경되었습니다.");
       selectElement.setAttribute("data-original-value", newAuthority.toString());
-      refresh(); // 전체 목록 새로고침
     } catch (error) {
       console.error("권한 변경 오류:", error);
       alert(`권한 변경 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
@@ -92,7 +91,7 @@ export default function MemberManage() {
     }
   };
 
-  // 멤버 삭제
+  // 멤버 삭제 - React Query 뮤테이션 사용
   const handleDeleteMember = async (memberId: number, memberNickname: string) => {
     if (
       !confirm(
@@ -104,14 +103,13 @@ export default function MemberManage() {
     try {
       await deleteMutation.mutateAsync(memberId);
       alert("회원이 삭제되었습니다.");
-      refresh(); // 전체 목록 새로고침
     } catch (error) {
       console.error("회원 삭제 오류:", error);
       alert(`회원 삭제 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
     }
   };
 
-  // 회원 통계 업데이트
+  // 회원 통계 업데이트 - React Query 뮤테이션 사용
   const handleUpdateStats = async () => {
     if (!confirm("모든 회원의 게시물 수와 조회수를 다시 계산하시겠습니까? 시간이 오래 걸릴 수 있습니다.")) return;
 
@@ -124,9 +122,9 @@ export default function MemberManage() {
     }
   };
 
-  // 제한 설정 성공 처리
-  const handleRestrictionSuccess = (memberId: number, restrictionUntil: string | null) => {
-    refresh(); // 전체 목록 새로고침
+  // 제한 설정 성공 처리 - React Query에서 자동으로 처리됨
+  const handleRestrictionSuccess = () => {
+    // 뮤테이션에서 자동으로 옵티미스틱 업데이트 처리되므로 별도 로직 불필요
   };
 
   const getAuthorityText = (authority: number) => {
@@ -243,7 +241,7 @@ export default function MemberManage() {
             hasMore={hasMore}
             error={error}
             lastElementRef={lastElementRef}
-            onRetry={() => refresh()}
+            onRetry={refresh}
             renderItem={renderMember}
             emptyMessage='회원이 없습니다.'
           />

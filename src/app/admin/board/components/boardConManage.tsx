@@ -4,7 +4,8 @@ import { Posts, Board } from "@/type/type";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
 import { useState } from "react";
-import { useInfiniteScroll, InfiniteScrollContainer } from "@/components/Toast";
+import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
+import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
 import BoardConManagePopup from "./popup/boardConManagePopup";
 
 export default function BoardConManage() {
@@ -18,7 +19,7 @@ export default function BoardConManage() {
     queryFn: fetchBoard,
   });
 
-  // 게시물 보관 처리
+  // 게시물 보관 처리 (최적화)
   const handleArchivePost = async (postId: number) => {
     if (!confirm("이 게시물을 보관하시겠습니까?")) return;
 
@@ -36,7 +37,9 @@ export default function BoardConManage() {
       }
 
       alert("게시물이 보관되었습니다.");
-      refresh(); // 목록 새로고침
+
+      // 전체 목록 새로고침
+      refresh();
     } catch (error) {
       console.error("보관 처리 오류:", error);
       alert("보관 처리에 실패했습니다.");
@@ -45,10 +48,17 @@ export default function BoardConManage() {
 
   // 무한 스크롤 게시물 가져오기 함수
   const fetchPosts = async (page: number, limit: number) => {
+    // url_slug를 통해 board_name 찾기
+    let boardName = "";
+    if (selectedSlug) {
+      const selectedBoard = boardData?.boards?.find((b: Board) => b.url_slug === selectedSlug);
+      boardName = selectedBoard?.board_name || "";
+    }
+
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
-      board: selectedSlug,
+      board: boardName,
       search: searchTerm,
       archived: "false", // 일반 게시물만
     });
@@ -65,10 +75,23 @@ export default function BoardConManage() {
     };
   };
 
-  const { data: posts, loading, hasMore, error, lastElementRef, refresh } = useInfiniteScroll<Posts>(fetchPosts, 20);
+  const {
+    data: posts,
+    loading,
+    loadingMore,
+    hasMore,
+    error,
+    lastElementRef,
+    refresh,
+  } = useInfiniteScrollQuery<Posts>({
+    queryKey: ["posts", selectedSlug, searchTerm],
+    queryFn: fetchPosts,
+    limit: 20,
+  });
 
   // 검색 조건이 변경될 때 새로고침
   const handleSearch = () => {
+    console.log("?????");
     refresh();
   };
 
@@ -87,10 +110,16 @@ export default function BoardConManage() {
         {/* 검색 및 필터 */}
         <div className='search-filters'>
           <div className='filter-group'>
-            <select value={selectedSlug} onChange={(e) => setSelectedSlug(e.target.value)}>
+            <select
+              value={selectedSlug}
+              onChange={(e) => {
+                setSelectedSlug(e.target.value);
+                // 게시판 선택 시 즉시 새로고침
+                setTimeout(() => refresh(), 0);
+              }}>
               <option value=''>전체 게시판</option>
               {boardData?.boards?.map((b: Board) => (
-                <option key={b.id} value={b.board_name}>
+                <option key={b.id} value={b.url_slug}>
                   {b.board_name}
                 </option>
               ))}
@@ -107,7 +136,7 @@ export default function BoardConManage() {
             <button onClick={handleSearch} className='search-btn'>
               검색
             </button>
-            <button onClick={refresh} className='reset-btn'>
+            <button onClick={() => refresh()} className='reset-btn'>
               새로고침
             </button>
           </div>
@@ -127,13 +156,14 @@ export default function BoardConManage() {
             <span className='table_btn'>관리</span>
           </li>
           {!loading ? (
-            <InfiniteScrollContainer
+            <QueryInfiniteScrollContainer
               data={posts}
               loading={loading}
+              loadingMore={loadingMore}
               hasMore={hasMore}
               error={error}
               lastElementRef={lastElementRef}
-              onRetry={refresh}
+              onRetry={() => refresh()}
               renderItem={(post: Posts, index: number) => (
                 <li key={post.id}>
                   <span>{index + 1}</span>

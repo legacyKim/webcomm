@@ -180,21 +180,31 @@ export default function BoardManagePopup({
 
         <div className='admin_popup_footer'>
           {popupOption === "save" ? (
-            <button
-              onClick={() => {
-                postBoard({ boardName, urlSlug });
-              }}>
-              저장
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  postBoard({ boardName, urlSlug });
+                }}>
+                저장
+              </button>
+              <button onClick={() => setPopupOpen(false)} className='cancel-btn'>
+                취소
+              </button>
+            </>
           ) : (
-            <button
-              onClick={() => {
-                if (id && seq) {
-                  putBoard({ id, seq, boardName, urlSlug });
-                }
-              }}>
-              저장
-            </button>
+            <>
+              <button
+                onClick={() => {
+                  if (id && seq) {
+                    putBoard({ id, seq, boardName, urlSlug });
+                  }
+                }}>
+                저장
+              </button>
+              <button onClick={() => setPopupOpen(false)} className='cancel-btn'>
+                취소
+              </button>
+            </>
           )}
         </div>
       </div>

@@ -18,7 +18,7 @@ export async function GET(request, context) {
   const rawSize = searchParams.get("size");
   const fileSize = Number(rawSize);
 
-  const MAX_SIZE = 2 * 1024 * 1024;
+  const MAX_SIZE = 5 * 1024 * 1024; // 댓글 이미지 5MB
 
   if (fileSize > MAX_SIZE) {
     return NextResponse.json({ error: `파일 용량 초과 (최대 ${MAX_SIZE / 1024 / 1024}MB)` }, { status: 400 });

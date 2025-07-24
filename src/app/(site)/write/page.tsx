@@ -13,8 +13,19 @@ import { replaceBlobsWithS3Urls } from "@/func/replaceBlobsWithS3Urls";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
 
 export default function Write() {
-  const { isUserId, isUserNick } = useAuth();
+  const { isUserId, isUserNick, isUserAuthority } = useAuth();
   const router = useRouter();
+
+  // 권한 확인
+  useEffect(() => {
+    if (isUserAuthority === 2) {
+      alert("정지된 회원은 게시글을 작성할 수 없습니다.");
+      router.back();
+      return;
+    }
+
+    // 주의회원인 경우 제한 기간 확인은 서버에서 처리
+  }, [isUserAuthority, router]);
 
   const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
 

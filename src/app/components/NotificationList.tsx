@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 // 날짜 포맷 함수
 const formatDate = (dateString: string) => {
@@ -38,6 +39,7 @@ interface NotificationListProps {
 
 export default function NotificationList({ limit = 20, showOnlyUnread = false }: NotificationListProps) {
   const { data: session } = useSession();
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -131,8 +133,10 @@ export default function NotificationList({ limit = 20, showOnlyUnread = false }:
       markAsRead([notification.id]);
     }
 
-    // 링크로 이동
-    window.location.href = notification.link;
+    // Next.js router로 이동
+    if (notification.link) {
+      router.push(notification.link);
+    }
   };
 
   const updateNotificationBadge = (count: number) => {

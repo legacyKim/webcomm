@@ -28,7 +28,6 @@ button {
 .active_label {
   transform: translateY(-145%) !important;
   font-size: 12px !important;
-  color: $font-color !important;
   opacity: 1 !important;
 }
 .active_box {
@@ -297,6 +296,76 @@ header {
   font-weight: 400;
 }
 
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+  @include flex-center;
+}
+
+.dark-mode-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.toggle-slider {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: linear-gradient(135deg, #87ceeb 0%, #1e90ff 100%);
+  border-radius: 50px;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toggle-slider.dark {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.toggle-icon {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  background: white;
+  border-radius: 50%;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  @include flex-center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-slider.dark .toggle-icon {
+  transform: translateX(24px);
+  background: #2c3e50;
+}
+
+.toggle-icon .icon {
+  width: 14px;
+  height: 14px;
+  color: #f39c12;
+  transition: all 0.3s ease;
+}
+
+.toggle-slider.dark .toggle-icon .icon {
+  color: #f1c40f;
+}
+
+.dark-mode-btn:hover .toggle-slider {
+  transform: scale(1.05);
+}
+
+.dark-mode-btn:active .toggle-slider {
+  transform: scale(0.95);
+}
+
 .header .message {
   position: absolute;
   top: 32px;
@@ -307,7 +376,7 @@ header {
   border: $border-grey;
   background-color: #fff;
   border-radius: 8px;
-  padding: 16px 12px;
+  padding: 8px 4px 12px 12px;
 
   display: none;
   gap: 8px;
@@ -325,7 +394,7 @@ header {
   text-align: center;
 
   width: 100%;
-  height: 40px;
+  height: 34px;
   line-height: 2.8;
   color: $grey3-color;
   background-color: $grey-color;
@@ -395,7 +464,6 @@ footer {
 }
 
 .menu_list li a {
-  border: 1px solid #fff;
   position: relative;
   display: block;
   font-size: 16px;
@@ -525,7 +593,7 @@ main .title {
   font-size: 13px;
   font-weight: 400;
   line-height: 1.6;
-  padding: 4px 10px 4px 7px;
+  padding: 4px 4px 4px 7px;
   border-radius: 4px;
   height: 34px;
   border: $border-grey;
@@ -1059,8 +1127,7 @@ sub .board_list {
 .view_page {
   margin-bottom: 16px;
 }
-.view_header {
-}
+
 .view_header .category {
   position: relative;
   display: inline-block;
@@ -1538,11 +1605,475 @@ sub .board_list {
 .notice_box.unread {
   opacity: 1;
 }
+
+/* 알림 아이콘 컨테이너 */
+.notification-icon-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 알림 뱃지 */
+.notification-badge {
+  position: absolute;
+  top: -9px;
+  left: 39px;
+  background-color: #ff4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(255, 68, 68, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 읽지 않은 알림 표시 점 */
+.unread-dot {
+  position: absolute;
+  top: 6px;
+  right: -10px;
+  width: 8px;
+  height: 8px;
+  background-color: #1976d2;
+  border-radius: 50%;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* 알림 드롭다운 스타일 개선 */
+.message {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 300px;
+  max-width: 400px;
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease-in-out;
+}
+
+.message.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.message_box {
+  padding: 12px 12px 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.message_box:hover {
+  background-color: #f8f9fa;
+}
+
+.message_box a {
+  display: block;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+}
+
+.message_box.read a {
+  color: #666;
+}
+
+.no-notifications {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.notice_btn {
+  display: block;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  color: #1976d2;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+.notice_btn:hover {
+  background-color: #e8f2ff;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .message {
+    min-width: 280px;
+    right: -20px;
+  }
+
+  .notification-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+    min-width: 14px;
+    height: 14px;
+  }
+
+  .message_box {
+    padding: 10px 12px;
+  }
+
+  .message_box a {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .message {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: white;
+  }
+
+  .message_box {
+    border-bottom-color: #404040;
+  }
+
+  .message_box:hover {
+    background-color: #383838;
+  }
+
+  .message_box.unread {
+    background-color: #1a2332;
+    border-left-color: #4fc3f7;
+  }
+
+  .message_box.unread:hover {
+    background-color: #243447;
+  }
+
+  .message_box a {
+    color: #e0e0e0;
+  }
+
+  .message_box.read a {
+    color: #999;
+  }
+
+  .notice_btn {
+    background-color: #383838;
+    color: #4fc3f7;
+    border-top-color: #404040;
+  }
+
+  .notice_btn:hover {
+    background-color: #1a2332;
+  }
+
+  .no-notifications {
+    color: #999;
+  }
+}
+
 /* send message */
 
-/* mypage */
-.mypage {
+/* Dark Mode Styles */
+[data-theme="dark"] {
+  /* Base colors */
+  html,
+  body {
+    background-color: $dark-bg !important;
+    color: $dark-text !important;
+  }
+
+  /* Header */
+  header {
+    background-color: $dark-bg-secondary !important;
+    border-bottom: 1px solid $dark-border !important;
+  }
+
+  /* Navigation and links */
+  a {
+    color: $dark-text !important;
+  }
+
+  a:hover {
+    color: $dark-main-color !important;
+  }
+
+  /* Buttons */
+  .btn {
+    background-color: $dark-main-color !important;
+    color: $dark-text !important;
+  }
+
+  .btn:hover {
+    background-color: $dark-main-hover !important;
+  }
+
+  .btn_line_grey {
+    color: $dark-text-secondary !important;
+    border: 1px solid $dark-border !important;
+    background-color: $dark-bg-secondary !important;
+  }
+
+  .btn_line_grey:hover {
+    color: $dark-text !important;
+    background-color: $dark-bg-tertiary !important;
+  }
+
+  /* Board and content areas */
+  .board_list {
+    background-color: $dark-bg-secondary !important;
+    border: 1px solid $dark-border !important;
+  }
+
+  .board_list li a:hover {
+    background-color: $dark-bg-tertiary !important;
+  }
+
+  .board_list_header {
+    background-color: $dark-bg-tertiary !important;
+  }
+
+  /* Form elements */
+  input,
+  textarea,
+  select {
+    color: $dark-text !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: $dark-text-secondary !important;
+  }
+
+  /* Search */
+  .search {
+    border: 2px solid $dark-border !important;
+    background-color: $dark-bg-secondary !important;
+  }
+
+  .search input {
+    background-color: transparent !important;
+    border: none !important;
+    color: $dark-text !important;
+  }
+
+  .search button {
+    background-color: $dark-bg-tertiary !important;
+    color: $dark-text-secondary !important;
+  }
+
+  /* View content */
+  .view_content,
+  .view_info_area {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text !important;
+    border: 1px solid $dark-border !important;
+  }
+
+  /* Comments */
+  .comment_box_inner {
+    background-color: $dark-bg-secondary !important;
+    border: 1px solid $dark-border !important;
+  }
+
+  .comment_add .tiptap {
+    background-color: $dark-bg-tertiary !important;
+    color: $dark-text !important;
+  }
+
+  /* Footer */
+  footer {
+    background-color: $dark-bg-secondary !important;
+  }
+
+  /* Categories and badges */
+  .category {
+    border: 1px solid $dark-border !important;
+    color: $dark-text-secondary !important;
+  }
+
+  /* Notification styles */
+  .message {
+    background-color: $dark-bg-secondary !important;
+    border: 1px solid $dark-border !important;
+    color: $dark-text !important;
+  }
+
+  .message_box:hover {
+    background-color: $dark-bg-tertiary !important;
+  }
+
+  .notice_btn {
+    background-color: $dark-bg-tertiary !important;
+    color: $dark-main-color !important;
+  }
+
+  .notice_btn:hover {
+    background-color: $dark-main-color !important;
+    color: $dark-text !important;
+  }
+
+  /* MyPage */
+  .mypage_content {
+    background-color: $dark-bg-secondary !important;
+    border: 1px solid $dark-border !important;
+  }
+
+  .mypage_list a {
+    color: $dark-text-secondary !important;
+  }
+
+  .mypage_list a:hover {
+    background-color: $dark-bg-tertiary !important;
+    color: $dark-text !important;
+  }
+
+  .mypage_list a.active {
+    background-color: $dark-main-color !important;
+    color: $dark-text !important;
+  }
+
+  /* Write editor */
+  .write .write_box {
+    background-color: $dark-bg-secondary !important;
+    border: 1px solid $dark-border !important;
+  }
+
+  .write .write_box > div {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text !important;
+  }
+
+  /* Dropdowns and modals */
+  .dropDownMenu {
+    background-color: $dark-bg-secondary !important;
+    border: 1px solid $dark-border !important;
+  }
+
+  .dropDownMenu li button {
+    color: $dark-text !important;
+  }
+
+  .send_message_box {
+    background-color: $dark-bg-secondary !important;
+    border: 1px solid $dark-border !important;
+  }
+
+  /* Pagination */
+  .pagination a {
+    color: $dark-text-secondary !important;
+  }
+
+  .pagination a:hover {
+    color: $dark-main-color !important;
+  }
+
+  .pagination a.active {
+    background-color: $dark-main-color !important;
+    color: $dark-text !important;
+  }
+
+  /* Text colors */
+  .title > span,
+  .date,
+  .like,
+  .view,
+  .comment {
+    color: $dark-text-secondary !important;
+  }
+
+  .writer > .writer_name {
+    color: $dark-text !important;
+  }
+
+  /* Special elements */
+  .view_header .category {
+    color: $dark-main-color !important;
+  }
+
+  .icon.notice {
+    color: $dark-main-color !important;
+  }
+
+  /* Admin styles */
+  .admin_content {
+    background-color: $dark-bg-secondary !important;
+  }
+
+  /* Error and success states */
+  .red {
+    color: #ff6b6b !important;
+  }
+
+  .blue {
+    color: $dark-main-color !important;
+  }
+
+  /* Shadows for dark mode */
+  .board_list,
+  .view_content,
+  .comment_box_inner {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  /* Data states */
+  .data_wait,
+  .data_none {
+    color: $dark-text-secondary !important;
+  }
+
+  .data_wait svg,
+  .data_none svg {
+    color: $dark-text-secondary !important;
+  }
+
+  .checkbox .custom_checkbox span {
+    font-size: 15px;
+    color: #fff;
+  }
 }
+
+/* mypage styles */
 .mypage_list {
   @include flex-start;
   column-gap: 8px;

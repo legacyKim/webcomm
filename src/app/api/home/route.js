@@ -29,6 +29,7 @@ export async function GET(req) {
             SELECT 
                 b.board_name,
                 b.url_slug,
+                b.seq,
                 p.id AS post_id,
                 p.title,
                 p.user_id,
@@ -46,6 +47,7 @@ export async function GET(req) {
         SELECT 
             board_name, 
             url_slug,
+            seq,
             JSON_AGG(
                 JSON_BUILD_OBJECT(
                     'id', post_id,
@@ -58,8 +60,8 @@ export async function GET(req) {
             ) FILTER (WHERE post_id IS NOT NULL) AS posts
         FROM RankedPosts
         WHERE row_num <= 5 OR row_num IS NULL
-        GROUP BY board_name, url_slug
-        ORDER BY board_name;
+        GROUP BY board_name, url_slug, seq
+        ORDER BY seq;
       `,
       [userId],
     );

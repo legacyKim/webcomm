@@ -4,8 +4,10 @@ import { Posts, Board } from "@/type/type";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
-import { useInfiniteScroll, InfiniteScrollContainer } from "@/components/Toast";
+import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
+import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
 import formatPostDate from "@/components/formatDate";
+import TiptapViewer from "@/components/tiptapViewer";
 
 export default function BoardConManage() {
   const [selectedBoard, setSelectedBoard] = useState<string>("");
@@ -18,10 +20,17 @@ export default function BoardConManage() {
 
   // 보관된 게시물 가져오기 함수
   const fetchArchivedPosts = async (page: number, limit: number = 20) => {
+    // url_slug를 통해 board_name 찾기
+    let boardName = "";
+    if (selectedBoard) {
+      const selectedBoardData = boardData?.boards?.find((b: Board) => b.url_slug === selectedBoard);
+      boardName = selectedBoardData?.board_name || "";
+    }
+
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
-      board: selectedBoard,
+      board: boardName,
       search: searchTerm,
       archived: "true", // 보관된 게시물만
     });
@@ -41,11 +50,16 @@ export default function BoardConManage() {
   const {
     data: posts,
     loading,
+    loadingMore,
     hasMore,
     error,
     lastElementRef,
     refresh,
-  } = useInfiniteScroll<Posts>(fetchArchivedPosts, 20);
+  } = useInfiniteScrollQuery<Posts>({
+    queryKey: ["archived-posts", selectedBoard, searchTerm],
+    queryFn: fetchArchivedPosts,
+    limit: 20,
+  });
 
   // 검색 조건이 변경될 때 새로고침
   const handleSearch = () => {
@@ -70,7 +84,15 @@ export default function BoardConManage() {
       }
 
       alert("게시물이 복구되었습니다.");
-      refresh(); // 목록 새로고침
+
+      // 강제로 페이지를 새로고침하여 데이터 갱신
+      refresh();
+      // 추가로 검색 조건을 리셋하여 완전히 새로고침
+      setSearchTerm("");
+      setSelectedBoard("");
+      setTimeout(() => {
+        refresh();
+      }, 100);
     } catch (error) {
       console.error("복구 처리 오류:", error);
       alert("복구 처리에 실패했습니다.");
@@ -111,10 +133,16 @@ export default function BoardConManage() {
         {/* 검색 및 필터 */}
         <div className='search-filters'>
           <div className='filter-group'>
-            <select value={selectedBoard} onChange={(e) => setSelectedBoard(e.target.value)}>
+            <select
+              value={selectedBoard}
+              onChange={(e) => {
+                setSelectedBoard(e.target.value);
+                // 게시판 선택 시 즉시 새로고침
+                setTimeout(() => refresh(), 0);
+              }}>
               <option value=''>전체 게시판</option>
               {boardData?.boards?.map((b: Board) => (
-                <option key={b.id} value={b.board_name}>
+                <option key={b.id} value={b.url_slug}>
                   {b.board_name}
                 </option>
               ))}
@@ -131,7 +159,7 @@ export default function BoardConManage() {
             <button onClick={handleSearch} className='search-btn'>
               검색
             </button>
-            <button onClick={refresh} className='reset-btn'>
+            <button onClick={() => refresh()} className='reset-btn'>
               새로고침
             </button>
           </div>
@@ -152,19 +180,23 @@ export default function BoardConManage() {
             <span className='table_btn'>관리</span>
           </li>
 
-          <InfiniteScrollContainer
+          <QueryInfiniteScrollContainer
             data={posts}
             loading={loading}
+            loadingMore={loadingMore}
             hasMore={hasMore}
             error={error}
             lastElementRef={lastElementRef}
-            onRetry={refresh}
+            onRetry={() => refresh()}
             renderItem={(post: Posts, index: number) => (
               <li key={post.id}>
                 <span>{index + 1}</span>
                 <span className='table_board'>{post.board_name}</span>
                 <span className='table_title'>{post.title}</span>
-                <span className='table_content'>{post.content.substring(0, 50)}...</span>
+
+                <span className='table_content'>
+                  <TiptapViewer content={post.content.substring(0, 50)} />
+                </span>
                 <span>{post.user_nickname}</span>
                 <span>{post.views}</span>
                 <span>{post.likes}</span>

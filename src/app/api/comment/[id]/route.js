@@ -51,6 +51,15 @@ export async function POST(req, context) {
       return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
     }
 
+    // 권한 확인: 경고회원(authority: 2)과 정지회원(authority: 3)은 댓글 작성 불가
+    if (user.userAuthority === 2) {
+      return NextResponse.json({ success: false, message: "경고회원은 댓글을 작성할 수 없습니다." }, { status: 403 });
+    }
+
+    if (user.userAuthority === 3) {
+      return NextResponse.json({ success: false, message: "정지회원은 댓글을 쓸 수 없습니다!" }, { status: 403 });
+    }
+
     await client.query("BEGIN");
 
     let depth = 0;

@@ -192,23 +192,62 @@ export default function Mypage() {
     }
   };
 
-  /*
   const memberWithdrawal = async () => {
+    const reasons = ["서비스 불만족", "개인정보 보호", "사용 빈도 낮음", "다른 서비스 이용", "개인사유", "기타"];
+
+    const reason = prompt(
+      `탈퇴 사유를 선택해주세요:\n\n` +
+        reasons.map((r, i) => `${i + 1}. ${r}`).join("\n") +
+        `\n\n숫자를 입력하세요 (1-${reasons.length}):`,
+    );
+
+    if (!reason) return;
+
+    const reasonIndex = parseInt(reason) - 1;
+    if (reasonIndex < 0 || reasonIndex >= reasons.length) {
+      alert("올바른 번호를 선택해주세요.");
+      return;
+    }
+
+    const selectedReason = reasons[reasonIndex];
+
+    if (
+      !confirm(
+        `정말로 탈퇴하시겠습니까?\n\n` +
+          `선택한 사유: ${selectedReason}\n\n` +
+          `탈퇴 시 다음 사항에 동의하신 것으로 간주됩니다:\n` +
+          `• 회원 정보 및 게시물이 숨김 처리됩니다\n` +
+          `• 탈퇴 후 동일한 아이디로 재가입이 불가능합니다\n` +
+          `• 작성하신 게시물과 댓글은 복구되지 않습니다\n\n` +
+          `이에 동의하고 탈퇴하시겠습니까?`,
+      )
+    ) {
+      return;
+    }
+
     try {
-      const response = await axios.post("/api/member/withdrawal");
+      const response = await axios.post("/api/member/withdrawal", {
+        reason: selectedReason,
+      });
+
       if (response.data.success) {
-        alert("회원 탈퇴가 완료되었습니다.");
-        // 예: 로그아웃 처리, 리다이렉트
-        window.location.href = "/";
+        alert(response.data.message);
+
+        // 로그아웃 처리
+        setIsUsername("");
+        setLoginStatus(false);
+        setIsUserAuthority(null);
+        setIsUserNickUpdatedAt(null);
+
+        router.push("/");
       } else {
-        alert("회원 탈퇴에 실패했습니다.");
+        alert(response.data.message || "회원 탈퇴에 실패했습니다.");
       }
     } catch (error) {
       console.error("회원 탈퇴 중 오류:", error);
       alert("서버 오류로 회원 탈퇴가 실패했습니다.");
     }
   };
-  */
 
   return (
     <sub className='sub'>
@@ -349,23 +388,21 @@ export default function Mypage() {
               </div>
             </div>
 
-            <div className='btn_wrap'>
+            <div className='mypage_btn'>
               <button
                 type='submit'
                 onClick={(e) => {
                   userChangePost(e);
                 }}
-                className='btn'>
-                저장
+                className='btn_primary'>
+                정보 수정
+              </button>
+
+              <button type='button' onClick={memberWithdrawal} className='btn_danger'>
+                회원 탈퇴
               </button>
             </div>
           </form>
-          {/* <div className='withdrawal'>
-            <button
-              onClick={() => {
-                memberWithdrawal();
-              }}></button>
-          </div> */}
         </div>
       </div>
     </sub>

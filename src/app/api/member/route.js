@@ -15,10 +15,11 @@ export async function GET() {
         COUNT(*) FILTER (WHERE ur.type = 'comment') AS comment_report_count,
         COUNT(*) FILTER (WHERE ur.type = 'message') AS message_report_count
       FROM members u
-      LEFT JOIN posts p ON p.user_id = u.id
-      LEFT JOIN comments c ON c.user_id = u.id
+      LEFT JOIN posts p ON p.user_id = u.id AND (p.deleted = FALSE OR p.deleted IS NULL)
+      LEFT JOIN comments c ON c.user_id = u.id AND (c.deleted = FALSE OR c.deleted IS NULL)
       LEFT JOIN blocked_users b ON b."blockedId" = u.id
       LEFT JOIN user_reports ur ON ur."reportedId" = u.id
+      WHERE (u.deleted = FALSE OR u.deleted IS NULL)
       GROUP BY u.id
       ORDER BY u.id;
     `;

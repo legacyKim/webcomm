@@ -9,7 +9,6 @@ import MyHeader from "../myHeader";
 import { useAuth } from "@/AuthContext";
 import NotificationList from "@/components/NotificationList";
 import NotificationManager from "@/components/NotificationManager";
-import "@/style/notification.css";
 
 type Notification = {
   id: number;

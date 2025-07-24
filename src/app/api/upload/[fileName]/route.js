@@ -23,16 +23,16 @@ export async function GET(request, context) {
 
   let folder = "posts/others";
   let contentType = "application/octet-stream";
-  let maxSize = 5 * 1024 * 1024;
+  let maxSize = 10 * 1024 * 1024; // 일반 파일 10MB
 
   if (isImage) {
     folder = "posts/images";
     contentType = `image/${extension === "jpg" ? "jpeg" : extension}`;
-    maxSize = 5 * 1024 * 1024;
+    maxSize = 10 * 1024 * 1024; // 이미지 10MB
   } else if (isVideo) {
     folder = "posts/videos";
     contentType = `video/${extension}`;
-    maxSize = 50 * 1024 * 1024;
+    maxSize = 100 * 1024 * 1024; // 동영상 100MB
   }
 
   if (fileSize > maxSize) {

@@ -68,6 +68,8 @@ export default function BoardManage() {
   };
 
   const openEditPopup = (board: Board) => {
+    if (popupOpen) return; // 이미 팝업이 열려있으면 무시
+
     setPopupCorr({
       id: board.id,
       seq: board.seq,
@@ -79,6 +81,8 @@ export default function BoardManage() {
   };
 
   const openAddPopup = () => {
+    if (popupOpen) return; // 이미 팝업이 열려있으면 무시
+
     setPopupCorr({ id: 0, seq: 0, board_name: "", url_slug: "" });
     setPopupOption("save");
     setPopupOpen(true);

@@ -87,7 +87,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
           />
         )}
         <li className='board_list_header'>
-          {boardType === "popular" ? <span className='category'></span> : <span className='num'></span>}
+          {boardType === "popular" ? <span className=''></span> : <span className='num'></span>}
           <span className='title'></span>
           <div className='comment'>
             <ChatBubbleLeftEllipsisIcon className='icon' />

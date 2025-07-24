@@ -1,8 +1,144 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
-// 무한 스크롤 훅
+interface InfiniteQueryResult<T> {
+  data: T[];
+  hasMore: boolean;
+}
+
+interface UseProgressiveInfiniteScrollProps<T> {
+  queryKey: (string | number)[];
+  queryFn: (page: number, limit: number) => Promise<InfiniteQueryResult<T>>;
+  limit?: number;
+  staleTime?: number;
+  gcTime?: number;
+  enabled?: boolean;
+}
+
+// 점진적 DOM 추가를 위한 무한 스크롤 훅
+export const useProgressiveInfiniteScroll = <T,>({
+  queryKey,
+  queryFn,
+  limit = 20,
+  staleTime = 5 * 60 * 1000,
+  gcTime = 10 * 60 * 1000,
+  enabled = true,
+}: UseProgressiveInfiniteScrollProps<T>) => {
+  // 점진적으로 관리할 로컬 상태
+  const [localData, setLocalData] = useState<T[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // React Query의 장점을 살리기 위한 백그라운드 캐싱
+  const {
+    data: queryData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error: queryError,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey,
+    queryFn: ({ pageParam = 1 }) => queryFn(pageParam, limit),
+    getNextPageParam: (lastPage, pages) => (lastPage.hasMore ? pages.length + 1 : undefined),
+    initialPageParam: 1,
+    staleTime,
+    gcTime,
+    enabled,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
+
+  // React Query 데이터를 점진적으로 로컬 상태에 동기화
+  useEffect(() => {
+    if (queryData?.pages) {
+      const allData = queryData.pages.flatMap((page) => page.data);
+
+      // 새로운 데이터만 추가 (기존 데이터는 유지)
+      setLocalData((prevData) => {
+        if (prevData.length === 0) {
+          // 첫 로드이거나 새로고침 시 전체 데이터 설정
+          return allData;
+        } else if (allData.length > prevData.length) {
+          // 새 데이터가 있을 때만 추가
+          const newItems = allData.slice(prevData.length);
+          return [...prevData, ...newItems];
+        }
+        return prevData;
+      });
+
+      // hasMore 상태 업데이트
+      const lastPage = queryData.pages[queryData.pages.length - 1];
+      setHasMore(lastPage?.hasMore ?? false);
+    }
+  }, [queryData]);
+
+  // 에러 상태 동기화
+  useEffect(() => {
+    setError(queryError?.message || null);
+  }, [queryError]);
+
+  // 로딩 상태 동기화
+  useEffect(() => {
+    setLoading(isLoading || isFetchingNextPage);
+  }, [isLoading, isFetchingNextPage]);
+
+  // Intersection Observer 설정
+  const observer = useRef<IntersectionObserver>();
+  const lastElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+            setCurrentPage((prev) => prev + 1);
+            fetchNextPage();
+          }
+        },
+        {
+          rootMargin: "100px",
+          threshold: 0.1,
+        },
+      );
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasNextPage, isFetchingNextPage, fetchNextPage],
+  );
+
+  // 새로고침 함수
+  const refresh = useCallback(() => {
+    setLocalData([]);
+    setCurrentPage(1);
+    setHasMore(true);
+    setError(null);
+    refetch();
+  }, [refetch]);
+
+  // setData 함수 (기존 코드와의 호환성을 위해)
+  const setData = useCallback((updater: (prevData: T[]) => T[]) => {
+    setLocalData(updater);
+  }, []);
+
+  return {
+    data: localData,
+    loading,
+    hasMore,
+    error,
+    lastElementRef,
+    refresh,
+    setData,
+  };
+};
+
+// 기존 useInfiniteScroll 훅 (Toast.tsx 방식 - sessionStorage 제거)
 export const useInfiniteScroll = <T,>(
   fetchFunction: (page: number, limit: number) => Promise<{ data: T[]; hasMore: boolean }>,
   limit: number = 20,
@@ -13,9 +149,6 @@ export const useInfiniteScroll = <T,>(
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  console.log(data, "useInfiniteScroll data");
 
   const fetchFunctionRef = useRef(fetchFunction);
   fetchFunctionRef.current = fetchFunction;
@@ -33,7 +166,7 @@ export const useInfiniteScroll = <T,>(
           }
         },
         {
-          rootMargin: "100px", // 요소가 100px 전에 미리 로딩 시작
+          rootMargin: "100px",
           threshold: 0.1,
         },
       );
@@ -56,6 +189,7 @@ export const useInfiniteScroll = <T,>(
         if (page === 1) {
           return result.data;
         }
+        // 점진적으로 새 데이터만 추가
         return [...prevData, ...result.data];
       });
 
@@ -65,76 +199,18 @@ export const useInfiniteScroll = <T,>(
     } finally {
       setLoading(false);
     }
-  }, [page, limit, loading, hasMore]); // fetchFunction 의존성 제거
+  }, [page, limit, loading, hasMore]);
 
   useEffect(() => {
-    // 초기화가 완료된 후에만 로딩 시작
-    if (isInitialized) {
-      loadMore();
-    }
-  }, [page, isInitialized]);
+    loadMore();
+  }, [page]);
 
   const refresh = useCallback(() => {
     setData([]);
     setPage(1);
     setHasMore(true);
     setError(null);
-    setIsInitialized(false); // 초기화 플래그 리셋
-    // 캐시 클리어
-    if (typeof window !== "undefined") {
-      const keys = Object.keys(sessionStorage);
-      keys.forEach((key) => {
-        if (key.startsWith("infiniteScroll-")) {
-          sessionStorage.removeItem(key);
-        }
-      });
-    }
   }, []);
-
-  // 초기 데이터 로딩 및 캐시 복원
-  useEffect(() => {
-    if (typeof window !== "undefined" && queryKey && !isInitialized) {
-      const cacheKey = `infiniteScroll-${queryKey.join("-")}`;
-      const savedData = sessionStorage.getItem(cacheKey);
-
-      if (savedData) {
-        try {
-          const parsed = JSON.parse(savedData);
-          if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 0) {
-            // 캐시된 데이터가 5분 이내인 경우만 사용
-            if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
-              setData(parsed.data);
-              setPage(parsed.page || 1);
-              setHasMore(parsed.hasMore !== false);
-              setIsInitialized(true);
-              return; // 캐시 데이터 사용 시 초기 로딩 건너뛰기
-            }
-          }
-        } catch (e) {
-          // 파싱 에러 시 무시하고 일반 로딩 진행
-        }
-      }
-
-      // 캐시가 없거나 만료된 경우 초기 로딩
-      setIsInitialized(true);
-    }
-  }, [queryKey, isInitialized]);
-
-  // 데이터 변경 시 sessionStorage에 저장
-  useEffect(() => {
-    if (typeof window !== "undefined" && data.length > 0 && queryKey) {
-      const cacheKey = `infiniteScroll-${queryKey.join("-")}`;
-      sessionStorage.setItem(
-        cacheKey,
-        JSON.stringify({
-          data,
-          page,
-          hasMore,
-          timestamp: Date.now(),
-        }),
-      );
-    }
-  }, [data, page, hasMore, queryKey]);
 
   return {
     data,
@@ -227,7 +303,7 @@ export const ErrorMessage = ({ message, onRetry }: { message: string; onRetry?: 
   );
 };
 
-// 무한 스크롤 컨테이너 컴포넌트
+// 무한 스크롤 컨테이너 컴포넌트 (점진적 렌더링)
 interface InfiniteScrollContainerProps<T> {
   data: T[];
   loading: boolean;
@@ -278,8 +354,10 @@ export const InfiniteScrollContainer = <T,>({
     <div className='infinite-scroll-container'>
       {data.map((item, index) => {
         const isLast = index === data.length - 1;
+        // 안정적인 key 생성 (id가 있으면 사용, 없으면 index)
+        const itemKey = (item as any)?.id !== undefined ? `item-${(item as any).id}` : `index-${index}`;
         return (
-          <div key={index} ref={isLast ? lastElementRef : null} className='scroll-item'>
+          <div key={itemKey} ref={isLast ? lastElementRef : null} className='scroll-item'>
             {renderItem(item, index)}
           </div>
         );
