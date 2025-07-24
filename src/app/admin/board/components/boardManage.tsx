@@ -62,7 +62,7 @@ export default function BoardManage() {
       } else {
         throw new Error("순서 변경 실패");
       }
-    } catch (error) {
+    } catch {
       alert("게시판 순서 변경 중 오류가 발생했습니다.");
     }
   };

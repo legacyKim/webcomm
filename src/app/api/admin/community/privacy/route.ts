@@ -12,7 +12,7 @@ export async function GET() {
     let content = "";
     try {
       content = await readFile(PRIVACY_FILE_PATH, "utf-8");
-    } catch (error) {
+    } catch {
       // 파일이 없으면 빈 문자열 반환
       content = "";
     }

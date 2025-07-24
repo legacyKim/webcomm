@@ -4,12 +4,7 @@ import { Member } from "@/type/type";
 import { useState } from "react";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
 import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
-import {
-  useMemberAuthorityMutation,
-  useMemberDeleteMutation,
-  useMemberRestrictionMutation,
-  useStatsUpdateMutation,
-} from "@/func/hook/useMutations";
+import { useMemberAuthorityMutation, useMemberDeleteMutation, useStatsUpdateMutation } from "@/func/hook/useMutations";
 import RestrictionPopup from "./popup/RestrictionPopup";
 
 export default function MemberManage() {
@@ -125,7 +120,7 @@ export default function MemberManage() {
   };
 
   // 제한 설정 성공 처리
-  const handleRestrictionSuccess = (memberId: number, restrictionUntil: string | null) => {
+  const handleRestrictionSuccess = () => {
     refresh(); // 전체 목록 새로고침
   };
 

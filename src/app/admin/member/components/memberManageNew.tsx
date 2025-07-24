@@ -4,12 +4,7 @@ import { Member } from "@/type/type";
 import { useState } from "react";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
 import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
-import {
-  useMemberAuthorityMutation,
-  useMemberDeleteMutation,
-  useMemberRestrictionMutation,
-  useStatsUpdateMutation,
-} from "@/func/hook/useMutations";
+import { useMemberAuthorityMutation, useMemberDeleteMutation, useStatsUpdateMutation } from "@/func/hook/useMutations";
 import RestrictionPopup from "./popup/RestrictionPopup";
 
 export default function MemberManage() {
