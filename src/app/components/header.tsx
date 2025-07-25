@@ -29,7 +29,11 @@ type Notification = {
   is_read: boolean;
 };
 
-export default function Header() {
+interface HeaderProps {
+  siteSettings?: any;
+}
+
+export default function Header({ siteSettings }: HeaderProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -294,7 +298,7 @@ export default function Header() {
     <header className='header'>
       <div className='header_top page'>
         <Link href='/' className='logo'>
-          <Logo />
+          <Logo siteSettings={siteSettings} />
         </Link>
 
         <div className='header_info'>

@@ -3,32 +3,41 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-export default function Logo() {
-  const [logoUrl, setLogoUrl] = useState<string>("");
-  const [siteName, setSiteName] = useState<string>("Tokti");
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+interface LogoProps {
+  siteSettings?: any;
+}
+
+export default function Logo({ siteSettings }: LogoProps) {
   const [imageError, setImageError] = useState<boolean>(false);
 
+  // SSR로 받은 데이터가 있으면 사용하고, 없으면 클라이언트에서 로딩
+  const [logoUrl, setLogoUrl] = useState<string>(siteSettings?.logo_url || "");
+  const [siteName, setSiteName] = useState<string>(siteSettings?.site_name || "Tokti");
+  const [isLoading, setIsLoading] = useState<boolean>(!siteSettings);
+
   useEffect(() => {
-    const fetchSiteSettings = async () => {
-      try {
-        const response = await fetch("/api/site/settings");
-        const result = await response.json();
+    // SSR 데이터가 없는 경우에만 클라이언트에서 로딩
+    if (!siteSettings) {
+      const fetchSiteSettings = async () => {
+        try {
+          const response = await fetch("/api/site/settings");
+          const result = await response.json();
 
-        if (result.success && result.data) {
-          setLogoUrl(result.data.logo_url || "");
-          setSiteName(result.data.site_name || "Tokti");
+          if (result.success && result.data) {
+            setLogoUrl(result.data.logo_url || "");
+            setSiteName(result.data.site_name || "Tokti");
+          }
+        } catch (error) {
+          console.error("사이트 설정 로딩 실패:", error);
+          setLogoUrl("");
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("사이트 설정 로딩 실패:", error);
-        setLogoUrl("");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      };
 
-    fetchSiteSettings();
-  }, []);
+      fetchSiteSettings();
+    }
+  }, [siteSettings]);
 
   // 로딩 중이거나 로고 URL이 없거나 이미지 에러가 있으면 빈 공간 또는 사이트명 표시
   if (isLoading || !logoUrl || imageError) {

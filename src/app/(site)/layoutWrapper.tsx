@@ -3,10 +3,15 @@ import Footer from "../components/footer";
 import MenuServer from "../components/menu.server";
 import Right_ad from "../components/right_ad";
 
-export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
+interface LayoutWrapperProps {
+  children: React.ReactNode;
+  siteSettings?: any;
+}
+
+export default function LayoutWrapper({ children, siteSettings }: LayoutWrapperProps) {
   return (
     <>
-      <Header />
+      <Header siteSettings={siteSettings} />
       <div className='page main'>
         <MenuServer />
         {children}
