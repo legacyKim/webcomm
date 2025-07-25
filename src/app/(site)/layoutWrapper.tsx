@@ -5,7 +5,12 @@ import Right_ad from "../components/right_ad";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
-  siteSettings?: any;
+  siteSettings?: {
+    logo_url?: string;
+    site_name?: string;
+    site_description?: string;
+    favicon_url?: string;
+  };
 }
 
 export default function LayoutWrapper({ children, siteSettings }: LayoutWrapperProps) {

@@ -30,7 +30,12 @@ type Notification = {
 };
 
 interface HeaderProps {
-  siteSettings?: any;
+  siteSettings?: {
+    logo_url?: string;
+    site_name?: string;
+    site_description?: string;
+    favicon_url?: string;
+  };
 }
 
 export default function Header({ siteSettings }: HeaderProps) {
