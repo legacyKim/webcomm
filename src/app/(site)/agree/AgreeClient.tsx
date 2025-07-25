@@ -9,8 +9,8 @@ import "@/style/style.common.scss";
 import styles from "@/style/Login.module.scss";
 
 interface AgreeClientProps {
-  termsContent: string;
-  privacyContent: string;
+  termsContent?: string;
+  privacyContent?: string;
 }
 
 export default function AgreeClient({ termsContent, privacyContent }: AgreeClientProps) {
@@ -42,7 +42,7 @@ export default function AgreeClient({ termsContent, privacyContent }: AgreeClien
           </h4>
           <div className={styles.membership_box}>
             <div className={styles.membership_contents}>
-              <div dangerouslySetInnerHTML={{ __html: termsContent }} />
+              <div dangerouslySetInnerHTML={{ __html: termsContent || "이용약관을 불러오는 중..." }} />
             </div>
           </div>
 
@@ -86,7 +86,7 @@ export default function AgreeClient({ termsContent, privacyContent }: AgreeClien
           </h4>
           <div className={styles.membership_box}>
             <div className={styles.membership_contents}>
-              <div dangerouslySetInnerHTML={{ __html: privacyContent }} />
+              <div dangerouslySetInnerHTML={{ __html: privacyContent || "개인정보처리방침을 불러오는 중..." }} />
             </div>
           </div>
 
