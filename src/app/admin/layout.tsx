@@ -18,7 +18,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link href='/admin/board'>게시판 관리</Link>
                 <Link href='/admin/member'>회원 관리</Link>
                 <Link href='/admin/ad'>광고 관리</Link>
-                <Link href='/admin/community'>커뮤니티 관리</Link>
                 <Link href='/admin/site'>사이트 설정</Link>
               </menu>
             </header>
