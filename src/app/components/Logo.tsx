@@ -12,7 +12,7 @@ interface LogoProps {
   };
 }
 
-export default function Logo({ className = "", onClick, siteSettings }: LogoProps) {
+export default function Logo({ siteSettings }: LogoProps) {
   const [imageError, setImageError] = useState<boolean>(false);
 
   // SSR로 받은 데이터가 있으면 사용하고, 없으면 클라이언트에서 로딩
