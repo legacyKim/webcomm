@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 import { useAuth } from "@/AuthContext";
+import MyHeader from "../myHeader";
 
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
 
@@ -50,6 +51,7 @@ export default function MyBlocked() {
   return (
     <sub className='sub'>
       <div className='mypage'>
+        <MyHeader />
         <div className='mypage_content'>
           <div className='mypage_inner'>
             {isLoading ? (

@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import MyHeader from "../myHeader";
 import { useAuth } from "@/AuthContext";
 import NotificationList from "@/components/NotificationList";
 import NotificationManager from "@/components/NotificationManager";
@@ -17,6 +18,7 @@ export default function MyNotice() {
   return (
     <sub className='sub'>
       <div className='mypage'>
+        <MyHeader />
         <div className='mypage_content'>
           <div className='mypage_inner'>
             <div className='notice-page-content'>

@@ -5,6 +5,7 @@ import { mypageComments } from "@/api/api";
 import { useAuth } from "@/AuthContext";
 import { useSearchParams } from "next/navigation";
 
+import MyHeader from "@/(site)/my/myHeader";
 import MyActivity from "../myActivity";
 
 import formatPostDate from "@/components/formatDate";
@@ -38,6 +39,7 @@ export default function MyComment() {
   return (
     <sub className='sub'>
       <div className='mypage'>
+        <MyHeader />
         <div className='mypage_content'>
           {/* 내가 쓴 댓글 */}
           <div className='mypage_boardlist_common'>

@@ -1883,7 +1883,10 @@ sub .board_list {
 
   /* Form elements */
   input,
-  textarea,
+  textarea {
+    color: $dark-text !important;
+  }
+
   select {
     color: $dark-text !important;
     background-color: $dark-bg-secondary !important;
