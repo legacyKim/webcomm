@@ -4,13 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 interface LogoProps {
-  siteSettings?: {
-    id: number;
-    logo_url: string | null;
-    site_name: string | null;
-    created_at: Date;
-    updated_at: Date;
-  } | null;
+  siteSettings?: any;
 }
 
 export default function Logo({ siteSettings }: LogoProps) {
