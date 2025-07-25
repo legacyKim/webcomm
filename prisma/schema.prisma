@@ -248,3 +248,13 @@ model Policy {
 
   @@map("policy")
 }
+
+model SiteSettings {
+  id         Int      @id @default(autoincrement())
+  logo_url   String?  @db.VarChar(255)
+  site_name  String?  @db.VarChar(100)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("site_settings")
+}
