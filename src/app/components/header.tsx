@@ -57,6 +57,14 @@ export default function Header({ siteSettings }: HeaderProps) {
   } = useAuth();
 
   // Dark mode state
+  useState<{
+    isLoggedIn: boolean;
+    nickname?: string;
+    profile_img?: string;
+  }>({
+    isLoggedIn: false,
+  });
+
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Dark mode toggle function

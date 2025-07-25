@@ -626,6 +626,13 @@ main .title {
   border-radius: 4px;
   min-width: 65px;
   height: 34px;
+  background-color: white;
+  color: #333;
+}
+
+.board_top select option {
+  background-color: white;
+  color: #333;
 }
 
 .board_list {
@@ -1878,6 +1885,26 @@ sub .board_list {
   input,
   textarea,
   select {
+    color: $dark-text !important;
+    background-color: $dark-bg-secondary !important;
+    border-color: $dark-border !important;
+  }
+
+  /* Select options */
+  select option {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text !important;
+  }
+
+  /* Board top select */
+  .board_top select {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text !important;
+    border-color: $dark-border !important;
+  }
+
+  .board_top select option {
+    background-color: $dark-bg-secondary !important;
     color: $dark-text !important;
   }
 

@@ -3,7 +3,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
-import MyHeader from "../myHeader";
 
 import { useAuth } from "@/AuthContext";
 import Message from "@/components/message";
@@ -92,7 +91,6 @@ export default function MyMessage() {
   return (
     <sub className='sub'>
       <div className='mypage'>
-        <MyHeader />
         <div className='mypage_content'>
           <div className='mypage_message'>
             <div className='mypage_list_sub'>

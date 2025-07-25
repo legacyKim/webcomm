@@ -4,10 +4,15 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 interface LogoProps {
-  siteSettings?: any;
+  className?: string;
+  onClick?: () => void;
+  siteSettings?: {
+    logo_url?: string;
+    site_name?: string;
+  };
 }
 
-export default function Logo({ siteSettings }: LogoProps) {
+export default function Logo({ className = "", onClick, siteSettings }: LogoProps) {
   const [imageError, setImageError] = useState<boolean>(false);
 
   // SSR로 받은 데이터가 있으면 사용하고, 없으면 클라이언트에서 로딩

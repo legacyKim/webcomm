@@ -7,7 +7,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/AuthContext";
-import MyHeader from "./myHeader";
 
 import { useLoadRecaptcha } from "@/func/hook/useLoadRecaptcha";
 
@@ -252,8 +251,6 @@ export default function Mypage() {
   return (
     <sub className='sub'>
       <div className='mypage'>
-        <MyHeader />
-
         {/* 계정 정보 */}
         <div className='mypage_content'>
           <form className='mypage_inner'>
@@ -394,7 +391,7 @@ export default function Mypage() {
                 onClick={(e) => {
                   userChangePost(e);
                 }}
-                className='btn_primary'>
+                className='btn'>
                 정보 수정
               </button>
 
