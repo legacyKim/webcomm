@@ -11,8 +11,8 @@ const s3Client = new S3Client({
   },
 });
 
-const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
-const CLOUDFRONT_DOMAIN = process.env.CLOUDFRONT_DOMAIN;
+const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+const CLOUDFRONT_DOMAIN = process.env.AWS_CLOUD_FRONT_URL;
 
 export async function POST(request) {
   try {
