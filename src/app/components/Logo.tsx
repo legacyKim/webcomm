@@ -3,12 +3,6 @@
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
-interface SiteSettings {
-  id: number;
-  logo_url: string | null;
-  site_name: string | null;
-}
-
 export default function Logo() {
   const [logoUrl, setLogoUrl] = useState<string>("/logo.png");
   const [siteName, setSiteName] = useState<string>("Tokti");
