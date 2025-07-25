@@ -9,39 +9,33 @@ const TiptapEditor = dynamic(() => import("../adminEditor"), {
   loading: () => <p>에디터 로딩 중...</p>,
 });
 
-interface TiptapEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  placeholder?: string;
-}
-
-const commUseTerm: React.FC = () => {
+const commUsePolicy: React.FC = () => {
   const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   useEffect(() => {
-    const fetchTerms = async () => {
+    const fetchPolicy = async () => {
       try {
-        const response = await fetch("/api/admin/community/terms");
+        const response = await fetch("/api/admin/community/policy");
         if (response.ok) {
           const data = await response.json();
           setContent(data.content || "");
         }
       } catch (error) {
-        console.error("이용약관 로드 실패:", error);
+        console.error("개인정보처리방침 로드 실패:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchTerms();
+    fetchPolicy();
   }, []);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch("/api/admin/community/terms", {
+      const response = await fetch("/api/admin/community/policy", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +44,7 @@ const commUseTerm: React.FC = () => {
       });
 
       if (response.ok) {
-        alert("이용약관이 저장되었습니다.");
+        alert("개인정보처리방침이 저장되었습니다.");
       } else {
         alert("저장에 실패했습니다.");
       }
@@ -68,13 +62,13 @@ const commUseTerm: React.FC = () => {
       previewWindow.document.write(`
         <html>
           <head>
-            <title>이용약관 미리보기</title>
+            <title>개인정보처리방침 미리보기</title>
             <style>
               body { font-family: Arial, sans-serif; padding: 20px; }
             </style>
           </head>
           <body>
-            <h1>이용약관 미리보기</h1>
+            <h1>개인정보처리방침 미리보기</h1>
             <div>${content}</div>
           </body>
         </html>
@@ -90,8 +84,7 @@ const commUseTerm: React.FC = () => {
   return (
     <div className='admin_content_wrap'>
       <div className='admin_title'>
-        <h4 className=''>이용약관 관리</h4>
-
+        <h4 className=''>개인정보처리방침 관리</h4>
         <div className='admin_btn_wrap'>
           <button
             onClick={handleSave}
@@ -106,9 +99,9 @@ const commUseTerm: React.FC = () => {
         </div>
       </div>
 
-      <TiptapEditor content={content} onChange={setContent} placeholder='이용약관 내용을 입력하세요...' />
+      <TiptapEditor content={content} onChange={setContent} placeholder='개인정보처리방침 내용을 입력하세요...' />
     </div>
   );
 };
 
-export default commUseTerm;
+export default commUsePolicy;

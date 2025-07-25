@@ -59,7 +59,7 @@ export default function View({
   const loginCheck = useLoginCheck();
 
   const { isUserId, isUserNick, messageToUser, boardType, setRedirectPath, initData } = useAuth();
-  const [limit, setLimit] = useState(10);
+  // const [limit, setLimit] = useState(10);
 
   const [viewPost] = useState<Posts | null>(post);
 
@@ -227,48 +227,36 @@ export default function View({
 
     setReset(true);
 
-    const replaceBlobsWithS3Urls = async (html: string, images: CommentImage[]): Promise<string> => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, "text/html");
+    try {
+      // FormData로 댓글과 이미지를 함께 전송
+      const formData = new FormData();
+      formData.append("comment", comment);
+      formData.append("isUserId", (isUserId || 0).toString());
+      formData.append("isUserNick", isUserNick || "");
+      formData.append("parentId", parentId ? parentId.toString() : "");
+      formData.append("mentionedUserIds", JSON.stringify(commentMentionUser));
+      formData.append("commentDepth", (commentDepth || 0).toString());
 
-      const imgTags = Array.from(doc.querySelectorAll("img"));
-
-      for (const tag of imgTags) {
-        const src = tag.getAttribute("src");
-        const match = images.find((img) => img.blobUrl === src);
-
-        if (match) {
-          const file = match.file;
-          const fileName = encodeURIComponent(file.name);
-          const presignedRes = await axios.get(`/api/comment/upload/${fileName}?size=${file.size}`);
-          const { url, fileUrl } = presignedRes.data;
-          try {
-            await fetch(url, {
-              method: "PUT",
-              headers: { "Content-Type": file.type },
-              body: file,
-            });
-
-            tag.setAttribute("src", fileUrl);
-          } catch (err) {
-            console.error("이미지 업로드 실패:", err);
-            throw new Error("이미지 업로드 중 문제가 발생했습니다.");
-          }
-        }
+      // 이미지 파일이 있는 경우 base64로 변환하여 전송
+      if (commentImagesFile.length > 0) {
+        const imageFilesData = await Promise.all(
+          commentImagesFile.map(async (img) => {
+            const base64 = await fileToBase64(img.file);
+            return {
+              name: img.file.name,
+              type: img.file.type,
+              data: base64.split(",")[1], // data:image/... 부분 제거
+              blobUrl: img.blobUrl,
+            };
+          }),
+        );
+        formData.append("imageFiles", JSON.stringify(imageFilesData));
       }
 
-      return doc.body.innerHTML;
-    };
-
-    try {
-      const finalComment = await replaceBlobsWithS3Urls(comment, commentImagesFile);
-      const response = await axios.post(`/api/comment/${params.id}`, {
-        comment: finalComment,
-        isUserId,
-        isUserNick,
-        parentId,
-        mentionedUserIds: commentMentionUser,
-        commentDepth,
+      const response = await axios.post(`/api/comment/${params.id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       if (response.data.success) {
@@ -297,6 +285,16 @@ export default function View({
       console.error("댓글 등록 실패:", error);
       alert("댓글 등록에 실패했습니다. 다시 시도해 주세요.");
     }
+  };
+
+  // 파일을 base64로 변환하는 헬퍼 함수
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   // 에디터 초기화
@@ -576,14 +574,15 @@ export default function View({
       </div>
 
       <div className='board_top'>
-        {isUserId !== null && (
+        {/* {isUserId !== null && (
           <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
             <option value={10}>10</option>
             <option value={20}>20</option>
             <option value={30}>30</option>
             <option value={50}>50</option>
           </select>
-        )}
+        )} */}
+        <div></div>
         <div className='btn_wrap btn_wrap_mb0'>
           <Link href={`/board/${params.url_slug}`}>
             <ListBulletIcon className='icon' />
@@ -602,7 +601,7 @@ export default function View({
         url_slug={params.url_slug as string}
         page={page}
         boardType={boardType as string}
-        limit={limit as number}
+        limit={20 as number}
         initData={initData as initDataPosts}
       />
     </sub>

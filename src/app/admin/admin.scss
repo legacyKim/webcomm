@@ -689,3 +689,34 @@
     }
   }
 }
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.admin-editor-content {
+  height: calc(100vh - $admin_header_height - 166px);
+  outline: none;
+}
+
+.admin_editor_wrap {
+  overflow-y: scroll;
+  padding: 16px;
+}
+
+.admin_editor_wrap p,
+.admin_editor_wrap li {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.admin_editor_wrap h2 {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 24px 0 12px;
+}
+
+.admin_editor_wrap h2:first-child {
+  padding-top: 12px;
+}

@@ -1,6 +1,48 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+// 서버에서 댓글의 blob URL을 S3 URL로 교체하는 함수
+const replaceBlobsWithS3UrlsServer = async (html, imageFiles = []) => {
+  let processedHtml = html;
+
+  // 이미지 파일 처리
+  for (const imageFile of imageFiles) {
+    try {
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const extension = imageFile.name.split(".").pop();
+      const fileName = `comment/${timestamp}_${randomString}.${extension}`;
+
+      const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: fileName,
+        Body: Buffer.from(imageFile.data, "base64"),
+        ContentType: imageFile.type,
+      };
+
+      const command = new PutObjectCommand(uploadParams);
+      await s3.send(command);
+
+      const fileUrl = `${process.env.AWS_CLOUD_FRONT_URL}/${fileName}`;
+      processedHtml = processedHtml.replace(imageFile.blobUrl, fileUrl);
+    } catch (error) {
+      console.error("이미지 업로드 실패:", error);
+      throw new Error("이미지 업로드 중 문제가 발생했습니다.");
+    }
+  }
+
+  return processedHtml;
+};
 
 export async function GET(req, context) {
   const { id } = await context.params;
@@ -43,7 +85,6 @@ export async function POST(req, context) {
   const client = await pool.connect();
 
   const { id } = await context.params;
-  const { isUserId, isUserNick, parentId, comment, mentionedUserIds = [], commentDepth } = await req.json();
 
   try {
     const user = await serverTokenCheck();
@@ -60,6 +101,31 @@ export async function POST(req, context) {
       return NextResponse.json({ success: false, message: "정지회원은 댓글을 쓸 수 없습니다!" }, { status: 403 });
     }
 
+    // FormData 또는 JSON 처리
+    let isUserId, isUserNick, parentId, comment, mentionedUserIds, commentDepth, imageFiles;
+
+    const contentType = req.headers.get("content-type");
+
+    if (contentType && contentType.includes("multipart/form-data")) {
+      // FormData 방식 (이미지가 포함된 경우)
+      const formData = await req.formData();
+      isUserId = parseInt(formData.get("isUserId"));
+      isUserNick = formData.get("isUserNick");
+      parentId = formData.get("parentId") ? parseInt(formData.get("parentId")) : null;
+      comment = formData.get("comment");
+      mentionedUserIds = formData.get("mentionedUserIds") ? JSON.parse(formData.get("mentionedUserIds")) : [];
+      commentDepth = parseInt(formData.get("commentDepth") || "0");
+
+      // 이미지 파일 데이터 가져오기
+      const imageFilesData = formData.get("imageFiles");
+      imageFiles = imageFilesData ? JSON.parse(imageFilesData) : [];
+    } else {
+      // JSON 방식 (기존 방식, 이미지 없는 경우)
+      const body = await req.json();
+      ({ isUserId, isUserNick, parentId, comment, mentionedUserIds = [], commentDepth } = body);
+      imageFiles = [];
+    }
+
     await client.query("BEGIN");
 
     let depth = 0;
@@ -72,11 +138,14 @@ export async function POST(req, context) {
       depth = 1;
     }
 
+    // 서버에서 파일 업로드 및 HTML 처리
+    const processedComment = await replaceBlobsWithS3UrlsServer(comment, imageFiles);
+
     // 댓글 저장 후 commentId 받아오기
     const insertResult = await client.query(
       `INSERT INTO comments (post_id, user_id, user_nickname, parent_id, content, depth)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [id, isUserId, isUserNick, parentId, comment, depth],
+      [id, isUserId, isUserNick, parentId, processedComment, depth],
     );
 
     const commentId = insertResult.rows[0].id;
@@ -104,7 +173,7 @@ export async function POST(req, context) {
           post_id: id,
           user_id: isUserId,
           user_nickname: isUserNick,
-          content: comment,
+          content: processedComment,
           parent_id: parentId,
           profile: user.profile,
           likes: 0,

@@ -6,12 +6,19 @@ import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
 import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
 import { useMemberAuthorityMutation, useMemberDeleteMutation, useStatsUpdateMutation } from "@/func/hook/useMutations";
 import RestrictionPopup from "./popup/RestrictionPopup";
+import MemberDetailModal from "./MemberDetailModal";
 
 export default function MemberManage() {
   const [searchTerm, setSearchTerm] = useState("");
   // const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   const [filterAuthority, setFilterAuthority] = useState("all");
   const [restrictionPopup, setRestrictionPopup] = useState<{
+    isOpen: boolean;
+    member: Member | null;
+  }>({ isOpen: false, member: null });
+
+  // 회원 상세 모달 상태 추가
+  const [memberDetailModal, setMemberDetailModal] = useState<{
     isOpen: boolean;
     member: Member | null;
   }>({ isOpen: false, member: null });
@@ -157,8 +164,16 @@ export default function MemberManage() {
   const renderMember = (member: Member, index: number) => (
     <li key={member.id}>
       <span>{index + 1}</span>
-      <span>{member.userid}</span>
-      <span>{member.email}</span>
+      <span
+        onClick={() => setMemberDetailModal({ isOpen: true, member })}
+        style={{ cursor: "pointer", color: "#007bff", textDecoration: "underline" }}>
+        {member.userid}
+      </span>
+      <span
+        onClick={() => setMemberDetailModal({ isOpen: true, member })}
+        style={{ cursor: "pointer", color: "#007bff", textDecoration: "underline" }}>
+        {member.email}
+      </span>
       <span>{member.all_posts}</span>
       <span>{member.comment_count || 0}</span>
       <span className={getAuthorityClass(member.authority)}>{getAuthorityText(member.authority)}</span>
@@ -373,6 +388,15 @@ export default function MemberManage() {
           isOpen={restrictionPopup.isOpen}
           onClose={() => setRestrictionPopup({ isOpen: false, member: null })}
           onSuccess={handleRestrictionSuccess}
+        />
+      )}
+
+      {/* 회원 상세 정보 모달 */}
+      {memberDetailModal.member && (
+        <MemberDetailModal
+          member={memberDetailModal.member}
+          isOpen={memberDetailModal.isOpen}
+          onClose={() => setMemberDetailModal({ isOpen: false, member: null })}
         />
       )}
     </div>

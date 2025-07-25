@@ -9,7 +9,6 @@ import { fetchBoard } from "@/api/api";
 
 import Editor from "./Editor";
 import { useAuth } from "@/AuthContext";
-import { replaceBlobsWithS3Urls } from "@/func/replaceBlobsWithS3Urls";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
 
 export default function Write() {
@@ -57,20 +56,53 @@ export default function Write() {
     }
 
     try {
-      const content = await replaceBlobsWithS3Urls(editorContent, imageFiles, videoFiles);
+      // FormData로 파일과 데이터를 함께 전송
+      const formData = new FormData();
+      formData.append("boardname", boardname);
+      formData.append("url_slug", url_slug);
+      formData.append("user_id", (user_id || 0).toString());
+      formData.append("user_nickname", user_nickname || "");
+      formData.append("title", title || "");
+      formData.append("content", editorContent);
 
-      const response = await axios.post("/api/write", {
-        boardname,
-        url_slug,
-        user_id,
-        user_nickname,
-        title,
-        content,
+      // 이미지 파일 데이터를 base64로 변환하여 전송
+      const imageFilesData = await Promise.all(
+        imageFiles.map(async (img) => {
+          const base64 = await fileToBase64(img.file);
+          return {
+            name: img.file.name,
+            type: img.file.type,
+            data: base64.split(",")[1], // data:image/... 부분 제거
+            blobUrl: img.blobUrl,
+          };
+        }),
+      );
+
+      // 비디오 파일 데이터를 base64로 변환하여 전송
+      const videoFilesData = await Promise.all(
+        videoFiles.map(async (vid) => {
+          const base64 = await fileToBase64(vid.file);
+          return {
+            name: vid.file.name,
+            type: vid.file.type,
+            data: base64.split(",")[1], // data:video/... 부분 제거
+            blobUrl: vid.blobUrl,
+          };
+        }),
+      );
+
+      formData.append("imageFiles", JSON.stringify(imageFilesData));
+      formData.append("videoFiles", JSON.stringify(videoFilesData));
+
+      const response = await axios.post("/api/write", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       if (response.data.success) {
         alert("게시글 등록 성공!");
-        const postId = response.data.postId;
+        const postId = response.data.data.id;
         router.push(`/board/${url_slug}/${postId}`);
       } else {
         throw new Error("DB 저장 실패");
@@ -79,6 +111,16 @@ export default function Write() {
       console.error("전체 포스팅 실패:", error);
       alert("게시글 작성에 실패했습니다. 다시 시도해 주세요.");
     }
+  };
+
+  // 파일을 base64로 변환하는 헬퍼 함수
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   useEffect(() => {

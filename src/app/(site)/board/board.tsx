@@ -37,7 +37,7 @@ export default function Board({
     setBoardType(boardType);
   }, [boardType]);
 
-  const [limit, setLimit] = useState(20);
+  // const [limit, setLimit] = useState(20);
 
   return (
     <sub className='sub'>
@@ -47,14 +47,16 @@ export default function Board({
         {/* board best */}
         <div className='board'>
           <div className='board_top'>
-            {isUserId !== null && (
+            {/* {isUserId !== null && (
               <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
                 <option value={10}>10개씩</option>
                 <option value={20}>20개씩</option>
                 <option value={30}>30개씩</option>
                 <option value={50}>50개씩</option>
               </select>
-            )}
+            )} */}
+
+            <div></div>
 
             {isUserId !== null && (
               <div>
@@ -70,7 +72,7 @@ export default function Board({
             url_slug={url_slug as string}
             page={page}
             boardType={boardType}
-            limit={limit as number}
+            limit={20 as number}
             initData={initData}
           />
         </div>

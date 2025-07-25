@@ -1,7 +1,74 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
-
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
+
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+// 서버에서 blob URL을 S3 URL로 교체하는 함수
+const replaceBlobsWithS3UrlsServer = async (html, imageFiles, videoFiles) => {
+  let processedHtml = html;
+
+  // 이미지 파일 처리
+  for (const imageFile of imageFiles) {
+    try {
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const extension = imageFile.name.split(".").pop();
+      const fileName = `post/${timestamp}_${randomString}.${extension}`;
+
+      const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: fileName,
+        Body: Buffer.from(imageFile.data, "base64"),
+        ContentType: imageFile.type,
+      };
+
+      const command = new PutObjectCommand(uploadParams);
+      await s3.send(command);
+
+      const fileUrl = `${process.env.AWS_CLOUD_FRONT_URL}/${fileName}`;
+      processedHtml = processedHtml.replace(imageFile.blobUrl, fileUrl);
+    } catch (error) {
+      console.error("이미지 업로드 실패:", error);
+      throw new Error("이미지 업로드 중 문제가 발생했습니다.");
+    }
+  }
+
+  // 비디오 파일 처리
+  for (const videoFile of videoFiles) {
+    try {
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const extension = videoFile.name.split(".").pop();
+      const fileName = `video/${timestamp}_${randomString}.${extension}`;
+
+      const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: fileName,
+        Body: Buffer.from(videoFile.data, "base64"),
+        ContentType: videoFile.type,
+      };
+
+      const command = new PutObjectCommand(uploadParams);
+      await s3.send(command);
+
+      const fileUrl = `${process.env.AWS_CLOUD_FRONT_URL}/${fileName}`;
+      processedHtml = processedHtml.replace(videoFile.blobUrl, fileUrl);
+    } catch (error) {
+      console.error("비디오 업로드 실패:", error);
+      throw new Error("비디오 업로드 중 문제가 발생했습니다.");
+    }
+  }
+
+  return processedHtml;
+};
 
 export async function GET(req, context) {
   const { id } = await context.params;
@@ -19,19 +86,38 @@ export async function GET(req, context) {
 
 export async function PUT(req) {
   const client = await pool.connect();
-  const { id, boardname, url_slug, user_id, user_nickname, title, content } = await req.json();
 
   try {
     const user = await serverTokenCheck();
     if (!user) {
       return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
     }
+
+    const formData = await req.formData();
+    const id = formData.get("id");
+    const boardname = formData.get("boardname");
+    const url_slug = formData.get("url_slug");
+    const user_id = formData.get("user_id");
+    const user_nickname = formData.get("user_nickname");
+    const title = formData.get("title");
+    const content = formData.get("content");
+
+    // 파일 데이터 가져오기
+    const imageFilesData = formData.get("imageFiles");
+    const videoFilesData = formData.get("videoFiles");
+
+    const imageFiles = imageFilesData ? JSON.parse(imageFilesData) : [];
+    const videoFiles = videoFilesData ? JSON.parse(videoFilesData) : [];
+
+    // 서버에서 파일 업로드 및 HTML 처리
+    const processedContent = await replaceBlobsWithS3UrlsServer(content, imageFiles, videoFiles);
+
     const result = await client.query(
       `UPDATE posts SET board_name = $1, url_slug = $2, user_id = $3, user_nickname = $4, title = $5, content = $6 WHERE id = $7 RETURNING * `,
-      [boardname, url_slug, user_id, user_nickname, title, content, id],
+      [boardname, url_slug, user_id, user_nickname, title, processedContent, id],
     );
-    await client.query("UPDATE members SET all_posts = all_posts - 1 WHERE id = $1 AND all_posts > 0", [user_id]);
-    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 201 });
+
+    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

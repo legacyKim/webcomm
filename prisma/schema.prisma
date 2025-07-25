@@ -230,3 +230,21 @@ model PushSubscription {
 
   @@map("push_subscriptions")
 }
+
+model Terms {
+  id         Int      @id @default(autoincrement())
+  content    String   @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("terms")
+}
+
+model Policy {
+  id         Int      @id @default(autoincrement())
+  content    String   @db.Text
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("policy")
+}

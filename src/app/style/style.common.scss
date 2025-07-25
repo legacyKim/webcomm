@@ -194,7 +194,7 @@ button {
 .checkbox {
   position: relative;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 .checkbox,
 .checkbox label {
@@ -202,6 +202,10 @@ button {
   display: flex;
   justify-content: flex-start;
   cursor: pointer;
+}
+.checkbox_all {
+  border-top: 1px solid $grey-color;
+  padding-top: 12px;
 }
 .checkbox label {
   display: flex;
@@ -369,7 +373,7 @@ header {
 .header .message {
   position: absolute;
   top: 32px;
-  left: 100px;
+  left: 0;
   transform: translateX(-50%);
   min-width: 200px;
   z-index: $zIndexFirst;
@@ -385,7 +389,6 @@ header {
 .header .message.active {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 .notice_btn {
@@ -393,7 +396,7 @@ header {
   display: block;
   text-align: center;
 
-  width: 100%;
+  width: calc(100% - 12px);
   height: 34px;
   line-height: 2.8;
   color: $grey3-color;
@@ -722,7 +725,7 @@ sub .board_list {
 .category {
   position: relative;
   display: block;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.4;
   padding: 1px 6px 2px;
@@ -992,6 +995,8 @@ sub .board_list {
   min-width: 100px;
   min-height: 40px;
   margin-bottom: 8px;
+  background-color: transparent;
+  padding-left: 4px;
 }
 .write .write_top {
   font-size: 24px;
@@ -1004,6 +1009,7 @@ sub .board_list {
   outline: none;
   min-height: 42px;
   border-bottom: $border-grey;
+  background-color: transparent;
 }
 .write .toolbar {
   position: sticky;
@@ -1524,7 +1530,7 @@ sub .board_list {
   background-color: $grey4-color;
   border-radius: 4px;
   color: $grey-color;
-  height: 88px;
+  height: 120px;
 }
 /* view page end */
 
@@ -1734,12 +1740,7 @@ sub .board_list {
   font-size: 14px;
   font-weight: 500;
   text-align: center;
-  border-top: 1px solid #e0e0e0;
   transition: background-color 0.2s;
-}
-
-.notice_btn:hover {
-  background-color: #e8f2ff;
 }
 
 /* 모바일 대응 */
@@ -1928,6 +1929,11 @@ sub .board_list {
 
   /* Categories and badges */
   .category {
+    color: $dark-text-secondary !important;
+  }
+
+  .board_list .category {
+    background-color: $dark-bg-secondary !important;
     border: 1px solid $dark-border !important;
     color: $dark-text-secondary !important;
   }
@@ -2028,11 +2034,22 @@ sub .board_list {
 
   /* Special elements */
   .view_header .category {
-    color: $dark-main-color !important;
+    color: #fff !important;
+    border: none;
+  }
+
+  .view_header .view_title {
+    color: #fff !important;
   }
 
   .icon.notice {
     color: $dark-main-color !important;
+  }
+
+  .go_to_login_for_comment {
+    background-color: $dark-bg-tertiary !important;
+    color: $dark-text-secondary !important;
+    border-radius: 4px !important;
   }
 
   /* Admin styles */
@@ -2067,7 +2084,8 @@ sub .board_list {
     color: $dark-text-secondary !important;
   }
 
-  .checkbox .custom_checkbox span {
+  .checkbox .custom_checkbox span,
+  .checkbox .custom_checkbox b {
     font-size: 15px;
     color: #fff;
   }
