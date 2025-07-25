@@ -9,13 +9,7 @@ const TiptapEditor = dynamic(() => import("../adminEditor"), {
   loading: () => <p>에디터 로딩 중...</p>,
 });
 
-interface TiptapEditorProps {
-  content: string;
-  onChange: (content: string) => void;
-  placeholder?: string;
-}
-
-const commUseTerm: React.FC = () => {
+const CommUseTerm: React.FC = () => {
   const [content, setContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -106,9 +100,9 @@ const commUseTerm: React.FC = () => {
         </div>
       </div>
 
-      <TiptapEditor content={content} onChange={setContent} placeholder='이용약관 내용을 입력하세요...' />
+      <TiptapEditor content={content} onChange={setContent} />
     </div>
   );
 };
 
-export default commUseTerm;
+export default CommUseTerm;

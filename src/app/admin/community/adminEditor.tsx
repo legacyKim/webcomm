@@ -20,10 +20,9 @@ import Bars3BottomCenterIcon from "@/components/icons/Bars3BottomCenterIcon";
 interface TiptapEditorProps {
   content: string;
   onChange: (content: string) => void;
-  placeholder?: string;
 }
 
-export default function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
+export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   const editor = useEditor({
     extensions: [
       CustomTextStyle,
