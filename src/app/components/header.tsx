@@ -31,8 +31,8 @@ type Notification = {
 
 export default function Header() {
   const pathname = usePathname();
-
   const router = useRouter();
+
   const {
     loginStatus,
     isUserId,
