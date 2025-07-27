@@ -286,7 +286,7 @@ export default function Header({ siteSettings }: HeaderProps) {
   const notifyCheck = async (id: number, link: string) => {
     try {
       await axios.patch(`/api/notifications`, {
-        notificationIds: [id.toString()],
+        notificationIds: [id],
       });
       setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
       setUnreadCount((prev) => Math.max(0, prev - 1));
