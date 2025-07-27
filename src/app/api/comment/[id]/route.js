@@ -159,10 +159,9 @@ export async function POST(req, context) {
       // 자신의 글에 자신이 댓글을 단 경우가 아니라면 알림 동의 여부 확인 후 알림 생성
       if (postAuthor.user_id !== isUserId) {
         // 게시글 작성자의 알림 동의 여부 확인
-        const authorNotificationResult = await client.query(
-          `SELECT notification_enabled FROM members WHERE user_id = $1`,
-          [postAuthor.user_id],
-        );
+        const authorNotificationResult = await client.query(`SELECT notification_enabled FROM members WHERE id = $1`, [
+          postAuthor.user_id,
+        ]);
 
         // 알림 동의한 사용자에게만 알림 저장
         if (authorNotificationResult.rows[0]?.notification_enabled) {
@@ -181,7 +180,7 @@ export async function POST(req, context) {
       if (mentionedUserId !== isUserId && mentionedUserId !== postAuthorResult.rows[0]?.user_id) {
         // 멘션된 사용자의 알림 동의 여부 확인
         const mentionedUserNotificationResult = await client.query(
-          `SELECT notification_enabled FROM members WHERE user_id = $1`,
+          `SELECT notification_enabled FROM members WHERE id = $1`,
           [mentionedUserId],
         );
 
