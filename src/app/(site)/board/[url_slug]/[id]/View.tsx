@@ -58,14 +58,7 @@ export default function View({
 
   const loginCheck = useLoginCheck();
 
-  const {
-    isUserId,
-    isUserNick,
-    messageToUser,
-    boardType,
-    setRedirectPath,
-    initData,
-  } = useAuth();
+  const { isUserId, isUserNick, messageToUser, boardType, setRedirectPath, initData } = useAuth();
   // const [limit, setLimit] = useState(10);
 
   const [viewPost, setViewPost] = useState<Posts | null>(post);
@@ -75,9 +68,7 @@ export default function View({
     const isConfirmed = confirm("삭제하시겠습니까?");
     if (isConfirmed) {
       try {
-        const res = await axios.post(
-          `/api/post/${params.url_slug}/${params.id}`
-        );
+        const res = await axios.post(`/api/post/${params.url_slug}/${params.id}`);
 
         if (res.data.success) {
           alert("삭제되었습니다.");
@@ -99,9 +90,7 @@ export default function View({
 
       if (res.data.success && viewPost) {
         // 좋아요 상태에 따라 카운트 업데이트
-        const newLikes = res.data.liked
-          ? viewPost.likes + 1
-          : viewPost.likes - 1;
+        const newLikes = res.data.liked ? viewPost.likes + 1 : viewPost.likes - 1;
         setViewPost({ ...viewPost, likes: Math.max(0, newLikes) });
       }
     } catch (error) {
@@ -144,9 +133,7 @@ export default function View({
   };
 
   // 댓글 기능
-  const [commentList, setCommentList] = useState<CommentTreeNode[] | null>(
-    comment ?? []
-  );
+  const [commentList, setCommentList] = useState<CommentTreeNode[] | null>(comment ?? []);
 
   // 댓글 실시간 열람
   useEffect(() => {
@@ -205,11 +192,7 @@ export default function View({
         } else if (data.event === "UPDATE") {
           setCommentList((prev: CommentTreeNode[] | null) => {
             if (!prev) return prev;
-            return prev.map((c) =>
-              c.id === data.id
-                ? { ...c, likes: data.likes, content: data.content }
-                : c
-            );
+            return prev.map((c) => (c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c));
           });
         }
       } catch (error) {
@@ -227,9 +210,7 @@ export default function View({
           setCommentList((prev: CommentTreeNode[] | null) => {
             if (!prev) return prev;
 
-            const updateCommentLikes = (
-              comments: CommentTreeNode[]
-            ): CommentTreeNode[] => {
+            const updateCommentLikes = (comments: CommentTreeNode[]): CommentTreeNode[] => {
               return comments.map((comment) => {
                 if (comment.id === data.comment_id) {
                   return { ...comment, likes: data.likes_count };
@@ -283,11 +264,7 @@ export default function View({
   } | null>(null);
 
   // 댓글 등록
-  const commentPost = async (
-    commentContent: string,
-    id?: number,
-    depth?: number
-  ) => {
+  const commentPost = async (commentContent: string, id?: number, depth?: number | null) => {
     const comment = commentContent.trim();
     const parentId = id;
     const commentDepth = depth ?? null;
@@ -312,7 +289,7 @@ export default function View({
       formData.append("isUserNick", isUserNick || "");
       formData.append("parentId", parentId ? parentId.toString() : "");
       formData.append("mentionedUserIds", JSON.stringify(commentMentionUser));
-      formData.append("commentDepth", (commentDepth || 0).toString());
+      formData.append("commentDepth", commentDepth !== null ? commentDepth.toString() : "");
 
       // 이미지 파일이 있는 경우 base64로 변환하여 전송
       if (commentImagesFile.length > 0) {
@@ -325,7 +302,7 @@ export default function View({
               data: base64.split(",")[1], // data:image/... 부분 제거
               blobUrl: img.blobUrl,
             };
-          })
+          }),
         );
         formData.append("imageFiles", JSON.stringify(imageFilesData));
       }
@@ -348,9 +325,7 @@ export default function View({
         }
       } else {
         if (response.data.message === "인증되지 않은 사용자입니다.") {
-          const isConfirmed = confirm(
-            "로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?"
-          );
+          const isConfirmed = confirm("로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?");
           if (isConfirmed) {
             router.push("/login");
           }
@@ -381,12 +356,8 @@ export default function View({
   const [reset, setReset] = useState<boolean>(false);
 
   // 댓글 이미지 업로드
-  const [commentImagesFile, setCommentImagesFile] = useState<CommentImage[]>(
-    []
-  );
-  const [singleCommentImageFile, setSingleCommentImageFile] = useState<
-    string | null
-  >(null);
+  const [commentImagesFile, setCommentImagesFile] = useState<CommentImage[]>([]);
+  const [singleCommentImageFile, setSingleCommentImageFile] = useState<string | null>(null);
 
   const commentImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -438,18 +409,18 @@ export default function View({
 
   if (!viewPost)
     return (
-      <div className="data_wait">
+      <div className='data_wait'>
         <span>잠시만 기다려 주세요.</span>
-        <div className="dots">
-          <span className="dot dot1">.</span>
-          <span className="dot dot2">.</span>
-          <span className="dot dot3">.</span>
+        <div className='dots'>
+          <span className='dot dot1'>.</span>
+          <span className='dot dot2'>.</span>
+          <span className='dot dot3'>.</span>
         </div>
       </div>
     );
 
   return (
-    <sub className="sub">
+    <sub className='sub'>
       {isUserId !== userInfoInDropMenu.userId && writerDrop && (
         <DropDownMenu
           style={{
@@ -460,15 +431,15 @@ export default function View({
         />
       )}
 
-      <div className="view_page">
-        <div className="view_header">
-          <b className="category">{viewPost?.board_name}</b>
-          <h4 className="view_title">{viewPost?.title}</h4>
-          <div className="view_info_area">
-            <div className="view_info">
-              <div className="view_info_left">
+      <div className='view_page'>
+        <div className='view_header'>
+          <b className='category'>{viewPost?.board_name}</b>
+          <h4 className='view_title'>{viewPost?.title}</h4>
+          <div className='view_info_area'>
+            <div className='view_info'>
+              <div className='view_info_left'>
                 <div
-                  className="writer"
+                  className='writer'
                   ref={writerRef}
                   onClick={async (e) => {
                     e.preventDefault();
@@ -478,46 +449,42 @@ export default function View({
                       userId: viewPost?.user_id,
                       userNickname: viewPost?.user_nickname,
                     });
-                  }}
-                >
+                  }}>
                   <img
-                    className="profile_img"
+                    className='profile_img'
                     src={viewPost?.user_profile ?? "/profile/basic.png"}
                     alt={`${viewPost?.user_nickname}의 프로필`}
                   />
-                  <span className="writer_name">{viewPost?.user_nickname}</span>
+                  <span className='writer_name'>{viewPost?.user_nickname}</span>
                 </div>
               </div>
-              <div className="view_info_right">
-                <span className="view flex-start">
-                  <EyeIcon className="icon" />
+              <div className='view_info_right'>
+                <span className='view flex-start'>
+                  <EyeIcon className='icon' />
                   <span>{viewPost?.views}</span>
                 </span>
-                <span className="comment flex-start">
-                  <ChatBubbleLeftEllipsisIcon className="icon" />
+                <span className='comment flex-start'>
+                  <ChatBubbleLeftEllipsisIcon className='icon' />
                   <span>{commentList?.length}</span>
                 </span>
-                <span className="like flex-start">
-                  <HeartIcon className="icon" />
+                <span className='like flex-start'>
+                  <HeartIcon className='icon' />
                   <span>{viewPost?.likes}</span>
                 </span>
-                <span className="date">
-                  {new Date(viewPost?.created_at).toLocaleDateString()}
-                </span>
+                <span className='date'>{new Date(viewPost?.created_at).toLocaleDateString()}</span>
               </div>
             </div>
 
             {isUserId !== 0 && isUserId === viewPost?.user_id && (
-              <div className="view_btn">
-                <Link href={`/write/${params.id}`} type="button">
+              <div className='view_btn'>
+                <Link href={`/write/${params.id}`} type='button'>
                   수정
                 </Link>
                 <button
-                  type="button"
+                  type='button'
                   onClick={() => {
                     postDel();
-                  }}
-                >
+                  }}>
                   삭제
                 </button>
               </div>
@@ -525,64 +492,61 @@ export default function View({
           </div>
         </div>
 
-        <div className="view_content">
+        <div className='view_content'>
           <TiptapViewer content={viewPost?.content} />
         </div>
 
         {isUserId && viewPost?.user_nickname !== isUserNick && (
-          <div className="view_content_btn">
+          <div className='view_content_btn'>
             {!viewPost?.notice && (
               <button
-                type="button"
+                type='button'
                 onClick={async () => {
                   const ok = await loginCheck();
                   if (!ok) return;
 
                   postReport();
-                }}
-              >
-                <FlagIcon className="icon" />
+                }}>
+                <FlagIcon className='icon' />
                 신고
               </button>
             )}
 
             <button
               style={{ display: "none" }}
-              type="button"
+              type='button'
               onClick={async () => {
                 const ok = await loginCheck();
                 if (!ok) return;
 
                 postScrap();
-              }}
-            >
+              }}>
               스크랩
             </button>
             <button
-              className="like_btn"
-              type="button"
+              className='like_btn'
+              type='button'
               onClick={async () => {
                 const ok = await loginCheck();
                 if (!ok) return;
 
                 postLike();
-              }}
-            >
-              <HeartIcon className="icon" />
+              }}>
+              <HeartIcon className='icon' />
               공감
             </button>
           </div>
         )}
 
-        <div className="view_comment">
-          <div className="comment_top">
-            <ChatBubbleLeftRightIcon className="icon" />
+        <div className='view_comment'>
+          <div className='comment_top'>
+            <ChatBubbleLeftRightIcon className='icon' />
             <b>댓글</b>
-            <span className="comment_num"> {commentList?.length} </span>
+            <span className='comment_num'> {commentList?.length} </span>
             {/* <span className="comment_num"><i></i>{viewPost?.comments}</span> */}
           </div>
 
-          <div className="comment_list">
+          <div className='comment_list'>
             <CommentTree
               params={{
                 id: params.id as string,
@@ -619,7 +583,7 @@ export default function View({
 
         {isUserId !== null ? (
           commentAdd === null ? (
-            <div className="comment_add">
+            <div className='comment_add'>
               <b>댓글 작성</b>
               <CommentEditor
                 singleCommentImageFile={singleCommentImageFile}
@@ -629,33 +593,28 @@ export default function View({
                 users={mentionUsers}
                 reset={reset}
               />
-              <div className="comment_editor">
+              <div className='comment_editor'>
                 <div>
                   <input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
+                    id='image-upload'
+                    type='file'
+                    accept='image/*'
                     onChange={commentImageUpload}
                     style={{ display: "none" }}
                   />
-                  <label
-                    htmlFor="image-upload"
-                    style={{ cursor: "pointer", marginRight: "10px" }}
-                  >
-                    <PhotoIcon className="icon" />
-                    <span className="notice">
-                      용량이 <b className="red">2MB</b> 이하인 이미지만 업로드
-                      가능합니다.{" "}
+                  <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
+                    <PhotoIcon className='icon' />
+                    <span className='notice'>
+                      용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드 가능합니다.{" "}
                     </span>
                   </label>
                 </div>
 
-                <div className="btn_wrap">
+                <div className='btn_wrap'>
                   <button
                     onClick={() => {
                       commentPost(commentContent);
-                    }}
-                  >
+                    }}>
                     댓글 추가
                   </button>
                 </div>
@@ -665,13 +624,13 @@ export default function View({
             <></>
           )
         ) : (
-          <Link href="/login" className="go_to_login_for_comment">
+          <Link href='/login' className='go_to_login_for_comment'>
             댓글을 입력하려면 로그인 해야합니다.
           </Link>
         )}
       </div>
 
-      <div className="board_top">
+      <div className='board_top'>
         {/* {isUserId !== null && (
           <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
             <option value={10}>10</option>
@@ -681,14 +640,14 @@ export default function View({
           </select>
         )} */}
         <div></div>
-        <div className="btn_wrap btn_wrap_mb0">
+        <div className='btn_wrap btn_wrap_mb0'>
           <Link href={`/board/${params.url_slug}`}>
-            <ListBulletIcon className="icon" />
+            <ListBulletIcon className='icon' />
             <span>목록으로</span>
           </Link>
           {isUserId !== null && (
             <Link href={`/write`}>
-              <PencilSquareIcon className="icon" />
+              <PencilSquareIcon className='icon' />
               <span>글쓰기</span>
             </Link>
           )}

@@ -114,7 +114,7 @@ export async function POST(req, context) {
       parentId = formData.get("parentId") ? parseInt(formData.get("parentId")) : null;
       comment = formData.get("comment");
       mentionedUserIds = formData.get("mentionedUserIds") ? JSON.parse(formData.get("mentionedUserIds")) : [];
-      commentDepth = parseInt(formData.get("commentDepth") || "0");
+      commentDepth = formData.get("commentDepth") ? parseInt(formData.get("commentDepth")) : null;
 
       // 이미지 파일 데이터 가져오기
       const imageFilesData = formData.get("imageFiles");
@@ -136,6 +136,8 @@ export async function POST(req, context) {
       depth = 2;
     } else if (commentDepth === 0) {
       depth = 1;
+    } else {
+      depth = 0;
     }
 
     // 서버에서 파일 업로드 및 HTML 처리
