@@ -4,7 +4,7 @@ import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import webpush from "web-push";
 
 // VAPID 키 설정 (환경변수로 관리)
-webpush.setVapidDetails("mailto:admin@tokti.net", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+webpush.setVapidDetails("mailto:toktihara@gmail.com", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
@@ -124,7 +124,6 @@ export async function PATCH(req) {
       },
       data: {
         is_read: true,
-        read_at: new Date(),
       },
     });
 
