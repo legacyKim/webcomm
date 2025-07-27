@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import webpush from "web-push";
 
 // VAPID 키 설정 (환경변수로 관리)
-webpush.setVapidDetails("mailto:your-email@example.com", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+webpush.setVapidDetails("mailto:admin@tokti.net", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
@@ -13,7 +13,7 @@ export async function GET(req) {
   try {
     // 토큰에서 사용자 정보 확인
     const userData = await serverTokenCheck(req);
-    if (!userData) {
+    if (!userData.success) {
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
@@ -22,7 +22,7 @@ export async function GET(req) {
     // Prisma로 알림 조회
     const notifications = await prisma.notification.findMany({
       where: {
-        receiver_id: userData.userId,
+        receiver_id: userData.id,
         OR: [
           { is_read: false },
           {
@@ -106,7 +106,7 @@ export async function GET(req) {
 export async function PATCH(req) {
   try {
     const userData = await serverTokenCheck(req);
-    if (!userData) {
+    if (!userData.success) {
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
@@ -120,7 +120,7 @@ export async function PATCH(req) {
     await prisma.notification.updateMany({
       where: {
         id: { in: notificationIds },
-        receiver_id: userData.userId,
+        receiver_id: userData.id,
       },
       data: {
         is_read: true,
