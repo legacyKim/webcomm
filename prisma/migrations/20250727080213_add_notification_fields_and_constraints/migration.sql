@@ -5,5 +5,5 @@
 
 */
 -- AlterTable
-ALTER TABLE "members" ADD COLUMN     "marketing_enabled" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "notification_enabled" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "members" ADD COLUMN IF NOT EXISTS "marketing_enabled" BOOLEAN NOT NULL DEFAULT false,
+ADD COLUMN IF NOT EXISTS "notification_enabled" BOOLEAN NOT NULL DEFAULT false;
