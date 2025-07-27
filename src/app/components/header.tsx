@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
@@ -193,7 +193,7 @@ export default function Header({ siteSettings }: HeaderProps) {
         return () => clearTimeout(timer);
       }
     }
-  }, [tokenExpiration]);
+  }, [tokenExpiration, logout]);
 
   const [messageBox, setMessageBox] = useState<boolean>(false);
   const messageBoxRef = useRef<HTMLButtonElement | null>(null);
@@ -266,9 +266,9 @@ export default function Header({ siteSettings }: HeaderProps) {
     };
 
     if ("serviceWorker" in navigator) {
-      const handleMessage = (event: MessageEvent<any>) => {
+      const handleMessage = (event: MessageEvent<{ type: string; count?: number }>) => {
         if (event.data?.type === "NOTIFICATION_COUNT_UPDATE") {
-          setUnreadCount(event.data.count);
+          setUnreadCount(event.data.count || 0);
         } else if (event.data?.type === "NEW_NOTIFICATION") {
           // 새 알림이 도착했을 때 리스트 새로고침
           fetchNotifications();
@@ -311,10 +311,12 @@ export default function Header({ siteSettings }: HeaderProps) {
           ) : loginStatus ? (
             <>
               <div className='userinfo'>
-                <img
+                <Image
                   className='profile_img'
                   src={isUserProfile ?? "/profile/basic.png"}
                   alt={`${isUserNick}의 프로필`}
+                  width={40}
+                  height={40}
                 />
 
                 <div className='userinfo_name'>

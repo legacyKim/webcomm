@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/AuthContext";
-import {
-  requestNotificationPermission,
-  registerServiceWorker,
-  subscribeToNotifications,
-  checkSubscriptionStatus,
-  urlBase64ToUint8Array,
-} from "@/utils/notificationUtils";
-
-const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+import { registerServiceWorker, subscribeToNotifications, checkSubscriptionStatus } from "@/utils/notificationUtils";
 
 export default function NotificationManager({
   permission,
@@ -63,7 +55,7 @@ export default function NotificationManager({
 
   const registerServiceWorkerLocal = async () => {
     try {
-      const registration = await registerServiceWorker();
+      await registerServiceWorker();
 
       // 메시지 리스너 등록
       navigator.serviceWorker.addEventListener("message", (event) => {
@@ -80,7 +72,7 @@ export default function NotificationManager({
           updateNotificationBadge(event.data.count);
         }
       });
-    } catch (error) {
+    } catch {
       // Service Worker registration failed - silently handle
     }
   };

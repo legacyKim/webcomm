@@ -44,7 +44,7 @@ export default function MyNotice() {
                     </p>
                     <ol>
                       <li>주소창 왼쪽의 🔒 또는 ⚠️ 아이콘 클릭</li>
-                      <li>"알림" 설정을 "허용"으로 변경</li>
+                      <li>&quot;알림&quot; 설정을 &quot;허용&quot;으로 변경</li>
                       <li>페이지 새로고침</li>
                     </ol>
                     <p>
@@ -52,7 +52,7 @@ export default function MyNotice() {
                     </p>
                     <ol>
                       <li>주소창 왼쪽의 방패 아이콘 클릭</li>
-                      <li>"알림" 권한을 허용으로 변경</li>
+                      <li>&quot;알림&quot; 권한을 허용으로 변경</li>
                     </ol>
                   </div>
                 </details>

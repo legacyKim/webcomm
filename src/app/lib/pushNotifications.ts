@@ -43,9 +43,14 @@ export async function sendPushNotificationToUser(userId: number, payload: Notifi
         });
 
         await webpush.sendNotification(pushSubscription, pushPayload);
-      } catch (error: any) {
+      } catch (error: unknown) {
         // 유효하지 않은 구독은 삭제
-        if (error?.statusCode === 410 || error?.statusCode === 404) {
+        if (
+          error &&
+          typeof error === "object" &&
+          "statusCode" in error &&
+          (error.statusCode === 410 || error.statusCode === 404)
+        ) {
           await prisma.pushSubscription.delete({
             where: { id: sub.id },
           });
