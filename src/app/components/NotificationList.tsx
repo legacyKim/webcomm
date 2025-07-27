@@ -47,7 +47,7 @@ export default function NotificationList({ limit = 10 }: NotificationListProps) 
     if (!isUserId) return;
 
     try {
-      const response = await axios.get("/api/notifications/count");
+      const response = await axios.get("/api/notifications/unread-count");
       if (response.data && typeof response.data.count === "number") {
         setUnreadCount(response.data.count);
       }

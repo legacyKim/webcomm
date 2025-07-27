@@ -688,7 +688,7 @@ sub .board_list {
   background-color: $grey4-color;
 }
 .board_list .writer {
-  @include flex-start;
+  @include flex-center;
   gap: 4px;
   min-width: 120px;
   max-width: 120px;
@@ -1678,7 +1678,7 @@ sub .board_list {
 .unread-dot {
   position: absolute;
   top: 6px;
-  right: -10px;
+  right: -6px;
   width: 8px;
   height: 8px;
   background-color: #1976d2;
