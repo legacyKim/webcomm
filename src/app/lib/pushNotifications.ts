@@ -59,8 +59,9 @@ export async function sendPushNotificationToUser(userId: number, payload: Notifi
     });
 
     await Promise.allSettled(sendPromises);
-  } catch (error) {
+  } catch (err) {
     // Push notification error - silently handle
+    console.error("Failed to send push notification:", err);
   }
 }
 

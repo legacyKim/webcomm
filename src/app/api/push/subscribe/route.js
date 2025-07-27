@@ -31,7 +31,7 @@ export async function POST(request) {
     });
 
     // 새로운 구독 생성
-    const result = await prisma.pushSubscription.create({
+    await prisma.pushSubscription.create({
       data: {
         user_id: user.id,
         endpoint: subscription.endpoint,
@@ -51,7 +51,8 @@ export async function POST(request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (err) {
+    console.error("Failed to save subscription:", err);
     return NextResponse.json({ error: "Failed to save subscription" }, { status: 500 });
   }
 }

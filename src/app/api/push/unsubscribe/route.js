@@ -32,7 +32,8 @@ export async function POST(request) {
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (err) {
+    console.error("Failed to unsubscribe:", err);
     return NextResponse.json({ error: "Failed to unsubscribe" }, { status: 500 });
   }
 }

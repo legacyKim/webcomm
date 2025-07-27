@@ -118,7 +118,8 @@ export default function NotificationManager({
         setIsNotificationEnabled(false); // AuthContext 상태 업데이트
         alert("알림 구독이 해제되었습니다.");
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("구독 해제 중 오류가 발생했습니다:", err);
       alert("구독 해제 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
@@ -136,8 +137,9 @@ export default function NotificationManager({
           notificationIds: [notificationId],
         }),
       });
-    } catch (error) {
+    } catch (err) {
       // Error marking notification as read - silently handle
+      console.error("Failed to mark notification as read:", err);
     }
   };
 

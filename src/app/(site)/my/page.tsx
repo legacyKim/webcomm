@@ -127,9 +127,9 @@ export default function Mypage() {
   const inputPwRef = useRef<HTMLInputElement>(null);
   const [recaptchaToken, setRecaptchaToken] = useState("");
   const loadRecaptcha = useLoadRecaptcha(setRecaptchaToken);
-  // useEffect(() => {
-  //   loadRecaptcha();
-  // }, []);
+  useEffect(() => {
+    loadRecaptcha();
+  }, [loadRecaptcha]);
 
   const userChangePost = async (e: React.FormEvent) => {
     e.preventDefault();

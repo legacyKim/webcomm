@@ -34,7 +34,8 @@ export async function GET(request) {
       dbSubscription: !!subscription,
       notificationEnabled: member?.notification_enabled || false,
     });
-  } catch (error) {
+  } catch (err) {
+    console.error("Failed to check subscription status:", err);
     return NextResponse.json({ error: "Failed to check subscription status" }, { status: 500 });
   }
 }

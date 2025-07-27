@@ -1,5 +1,3 @@
-import { useAuth } from "@/AuthContext";
-
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
 // VAPID 키 변환 함수
@@ -26,7 +24,8 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
   try {
     const permission = await Notification.requestPermission();
     return permission === "granted";
-  } catch (error) {
+  } catch (err) {
+    console.error("Failed to request notification permission:", err);
     return false;
   }
 };
@@ -36,8 +35,9 @@ export const registerServiceWorker = async () => {
   try {
     const registration = await navigator.serviceWorker.register("/sw.js");
     return registration;
-  } catch (error) {
-    throw error;
+  } catch (err) {
+    console.error("Failed to register service worker:", err);
+    throw err;
   }
 };
 
