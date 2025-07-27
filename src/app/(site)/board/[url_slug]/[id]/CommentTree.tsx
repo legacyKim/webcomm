@@ -12,7 +12,12 @@ import CommentEditor from "./commentEditor";
 import { CommentTreeProps } from "@/type/commentType";
 import { useCommentResizeObserver } from "@/func/hook/useCommentResizeObserver";
 
-import { HeartIcon, FlagIcon, PhotoIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import {
+  HeartIcon,
+  FlagIcon,
+  PhotoIcon,
+  ChatBubbleLeftRightIcon,
+} from "@heroicons/react/24/outline";
 
 export default function CommentTree({
   params,
@@ -62,6 +67,8 @@ export default function CommentTree({
     recomment_id: number;
   } | null>(null);
 
+  const [likingComments, setLikingComments] = useState<Set<number>>(new Set());
+
   const commentDelete = async (id: number) => {
     const isConfirmed = confirm("삭제하시겠습니까?");
     if (isConfirmed) {
@@ -105,10 +112,55 @@ export default function CommentTree({
       }
     }
 
-    await axios.post("/api/comment/action/like", {
-      isUserId,
-      id,
-    });
+    // 중복 클릭 방지
+    if (likingComments.has(id)) {
+      return;
+    }
+
+    setLikingComments((prev) => new Set(prev).add(id));
+
+    try {
+      const res = await axios.post("/api/comment/action/like", {
+        isUserId,
+        id,
+      });
+
+      if (res.data.success && setCommentList) {
+        // 서버에서 받은 실제 좋아요 수로 업데이트 (실시간 동기화로 대체될 예정)
+        // 실시간 이벤트가 도착하기 전까지의 임시 업데이트
+        setCommentList((prev) => {
+          if (!prev) return prev;
+
+          const updateCommentLikes = (comments: any[]): any[] => {
+            return comments.map((comment) => {
+              if (comment.id === id) {
+                // 서버에서 받은 실제 좋아요 수 사용
+                return { ...comment, likes: res.data.likesCount };
+              }
+              if (comment.children && comment.children.length > 0) {
+                return {
+                  ...comment,
+                  children: updateCommentLikes(comment.children),
+                };
+              }
+              return comment;
+            });
+          };
+
+          return updateCommentLikes(prev);
+        });
+      }
+    } catch (error) {
+      console.error("댓글 좋아요 처리 실패:", error);
+      alert("좋아요 처리 중 오류가 발생했습니다.");
+    } finally {
+      // 로딩 상태 해제
+      setLikingComments((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
   };
 
   const commentReport = async (id: number) => {
@@ -145,18 +197,20 @@ export default function CommentTree({
 
   // 댓글 높이 계산을 위한 ref 설정
   const commentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const [commentHeights, setCommentHeights] = useState<{ [key: number]: number }>({});
+  const [commentHeights, setCommentHeights] = useState<{
+    [key: number]: number;
+  }>({});
 
   useCommentResizeObserver(commentRefs, setCommentHeights, commentList);
 
   if (!comments) {
     return (
-      <div className='data_wait'>
+      <div className="data_wait">
         <span>잠시만 기다려 주세요.</span>
-        <div className='dots'>
-          <span className='dot dot1'>.</span>
-          <span className='dot dot2'>.</span>
-          <span className='dot dot3'>.</span>
+        <div className="dots">
+          <span className="dot dot1">.</span>
+          <span className="dot dot2">.</span>
+          <span className="dot dot3">.</span>
         </div>
       </div>
     );
@@ -173,34 +227,36 @@ export default function CommentTree({
         const isWritingRecomment =
           recommentAdd?.recomment_id === comment.id ||
           (recommentAdd?.id === comment.id && comment.children.length === 0);
-        const isEditingRecomment = recommentCorrect?.recomment_id === comment.id;
+        const isEditingRecomment =
+          recommentCorrect?.recomment_id === comment.id;
 
         const commentDepth = Number(comment.depth);
 
         return (
-          <div className='comment_box_wrap' key={comment.id}>
+          <div className="comment_box_wrap" key={comment.id}>
             <div
               className={`depth_indicator`}
               style={{
                 height: commentHeights[comment.id] ?? 0,
                 width: `calc(${commentDepth * 40}px)`,
-              }}>
+              }}
+            >
               {commentDepth === 1 && (
-                <div className='depth_indicator_box'>
-                  <div className='depth_reply'></div>
+                <div className="depth_indicator_box">
+                  <div className="depth_reply"></div>
                 </div>
               )}
               {commentDepth === 2 && (
-                <div className='depth_indicator_box'>
-                  <div className='depth_line'></div>
-                  <div className='depth_reply depth2'></div>
+                <div className="depth_indicator_box">
+                  <div className="depth_line"></div>
+                  <div className="depth_reply depth2"></div>
                 </div>
               )}
               {commentDepth === 3 && (
-                <div className='depth_indicator_box'>
-                  <div className='depth_line'></div>
-                  <div className='depth_line depth3'></div>
-                  <div className='depth_reply depth3'></div>
+                <div className="depth_indicator_box">
+                  <div className="depth_line"></div>
+                  <div className="depth_line depth3"></div>
+                  <div className="depth_reply depth3"></div>
                 </div>
               )}
             </div>
@@ -209,12 +265,14 @@ export default function CommentTree({
               id={`comment-${comment.id}`}
               ref={(el) => {
                 commentRefs.current[comment.id] = el;
-                if (el) el.setAttribute("data-comment-id", comment.id.toString());
-              }}>
-              <div className='comment_box_inner'>
-                <div className='comment_info'>
+                if (el)
+                  el.setAttribute("data-comment-id", comment.id.toString());
+              }}
+            >
+              <div className="comment_box_inner">
+                <div className="comment_info">
                   <div
-                    className='writer'
+                    className="writer"
                     onClick={async (e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -223,49 +281,68 @@ export default function CommentTree({
                         userId: comment.user_id,
                         userNickname: comment.user_nickname,
                       });
-                    }}>
+                    }}
+                  >
                     <img
-                      className='profile_img'
+                      className="profile_img"
                       src={comment.profile ?? "/profile/basic.png"}
                       alt={`${comment.user_nickname}의 프로필`}
                     />
-                    <span className='writer_name'>{comment.user_nickname}</span>
+                    <span className="writer_name">{comment.user_nickname}</span>
                   </div>
 
                   {isUserId !== null && (
-                    <div className='comment_btn'>
+                    <div className="comment_btn">
                       {comment.depth < 3 && (
                         <button
-                          type='button'
+                          type="button"
                           onClick={() => {
                             if (isUserId === 0) {
-                              const isConfirmed = confirm("로그인이 필요합니다.");
+                              const isConfirmed =
+                                confirm("로그인이 필요합니다.");
                               if (isConfirmed) {
                                 router.push("/login");
                               }
                               return;
                             }
 
-                            setCommentAdd?.({ user_id: comment.user_id, id: comment.id });
+                            setCommentAdd?.({
+                              user_id: comment.user_id,
+                              id: comment.id,
+                            });
                             setRecommentAdd?.(null);
                             setCommentCorrect(null);
                             setRecommentCorrect(null);
-                          }}>
-                          <ChatBubbleLeftRightIcon className='icon' />
+                          }}
+                        >
+                          <ChatBubbleLeftRightIcon className="icon" />
                           <span>대댓글</span>
                         </button>
                       )}
 
                       {comment.user_id !== isUserId && (
                         <>
-                          {comment.depth < 3 && <div className='ball'></div>}
-                          <button onClick={() => commentLike(comment.id)}>
-                            <HeartIcon className='icon' />
-                            <span>공감</span>
+                          {comment.depth < 3 && <div className="ball"></div>}
+                          <button
+                            onClick={() => commentLike(comment.id)}
+                            disabled={likingComments.has(comment.id)}
+                            style={{
+                              opacity: likingComments.has(comment.id) ? 0.6 : 1,
+                            }}
+                          >
+                            <HeartIcon className="icon" />
+                            <span>
+                              {likingComments.has(comment.id)
+                                ? "처리중..."
+                                : "공감"}
+                            </span>
                           </button>
-                          <div className='ball'></div>
-                          <button className='comment_report' onClick={() => commentReport(comment.user_id)}>
-                            <FlagIcon className='icon' />
+                          <div className="ball"></div>
+                          <button
+                            className="comment_report"
+                            onClick={() => commentReport(comment.user_id)}
+                          >
+                            <FlagIcon className="icon" />
                             <span>신고</span>
                           </button>
                         </>
@@ -273,7 +350,7 @@ export default function CommentTree({
 
                       {comment.user_id === isUserId && (
                         <>
-                          <div className='ball'></div>
+                          <div className="ball"></div>
                           <button
                             onClick={() => {
                               setCommentAdd?.(null);
@@ -283,10 +360,11 @@ export default function CommentTree({
                                 id: comment.id,
                               });
                               setRecommentCorrect(null);
-                            }}>
+                            }}
+                          >
                             <span>수정</span>
                           </button>
-                          <div className='ball'></div>
+                          <div className="ball"></div>
                           <button onClick={() => commentDelete(comment.id)}>
                             <span>삭제</span>
                           </button>
@@ -296,54 +374,80 @@ export default function CommentTree({
                   )}
                 </div>
 
-                <div className='comment_content'>
+                <div className="comment_content">
                   <TiptapViewer content={comment.content} />
-                  <i className='comment_content_likes'>{comment.likes}</i>
+                  <i className="comment_content_likes">{comment.likes}</i>
                 </div>
 
-                {(isWritingComment || isEditingComment || isWritingRecomment || isEditingRecomment) && (
-                  <div className={`comment_add ${comment.depth === 1 ? "depth1" : "depth2"}`}>
+                {(isWritingComment ||
+                  isEditingComment ||
+                  isWritingRecomment ||
+                  isEditingRecomment) && (
+                  <div
+                    className={`comment_add ${comment.depth === 1 ? "depth1" : "depth2"}`}
+                  >
                     <CommentEditor
                       singleCommentImageFile={singleCommentImageFile}
-                      initialContent={isEditingComment || isEditingRecomment ? commentCorrect?.content ?? "" : ""}
-                      onChange={(html: string) => (isRecomment ? setRecommentContent(html) : setCommentContent(html))}
+                      initialContent={
+                        isEditingComment || isEditingRecomment
+                          ? (commentCorrect?.content ?? "")
+                          : ""
+                      }
+                      onChange={(html: string) =>
+                        isRecomment
+                          ? setRecommentContent(html)
+                          : setCommentContent(html)
+                      }
                       onMentionUsersChange={setCommentMentionUser}
                       users={mentionUsers}
                       reset={reset}
                     />
-                    <div className='comment_editor'>
+                    <div className="comment_editor">
                       <div>
                         <input
-                          id='image-upload'
-                          type='file'
-                          accept='image/*'
+                          id="image-upload"
+                          type="file"
+                          accept="image/*"
                           onChange={commentImageUpload}
                           style={{ display: "none" }}
                         />
-                        <label htmlFor='image-upload' style={{ cursor: "pointer", marginRight: "10px" }}>
-                          <PhotoIcon className='icon' />
-                          <span className='notice'>
-                            용량이 <b className='red'>2MB</b> 이하인 이미지만 업로드 가능합니다.
+                        <label
+                          htmlFor="image-upload"
+                          style={{ cursor: "pointer", marginRight: "10px" }}
+                        >
+                          <PhotoIcon className="icon" />
+                          <span className="notice">
+                            용량이 <b className="red">2MB</b> 이하인 이미지만
+                            업로드 가능합니다.
                           </span>
                         </label>
                       </div>
-                      <div className='btn_wrap'>
+                      <div className="btn_wrap">
                         {isEditingComment || isEditingRecomment ? (
                           <button
                             onClick={() =>
-                              commentUpdate(isRecomment ? recommentContent ?? "" : commentContent ?? "", comment.id)
-                            }>
+                              commentUpdate(
+                                isRecomment
+                                  ? (recommentContent ?? "")
+                                  : (commentContent ?? ""),
+                                comment.id
+                              )
+                            }
+                          >
                             댓글 수정
                           </button>
                         ) : (
                           <button
                             onClick={() =>
                               commentPost?.(
-                                isRecomment ? recommentContent ?? "" : commentContent ?? "",
+                                isRecomment
+                                  ? (recommentContent ?? "")
+                                  : (commentContent ?? ""),
                                 comment.parent_id ?? comment.id,
-                                comment.depth,
+                                comment.depth
                               )
-                            }>
+                            }
+                          >
                             댓글 추가
                           </button>
                         )}
@@ -356,7 +460,8 @@ export default function CommentTree({
                             setCommentContent("");
                             setRecommentContent("");
                             setReset(true);
-                          }}>
+                          }}
+                        >
                           취소
                         </button>
                       </div>
@@ -367,7 +472,7 @@ export default function CommentTree({
 
               {/* 자식 댓글 재귀 렌더링 */}
               {comment.children.length > 0 && (
-                <div className='comment_children'>
+                <div className="comment_children">
                   <CommentTree
                     params={{
                       id: params.id as string,

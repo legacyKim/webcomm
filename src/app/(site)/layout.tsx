@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
 import LayoutWrapper from "@/(site)/layoutWrapper";
-import prisma from "@/db/db.js";
+import prisma from "@/lib/prisma";
 
 import "@/style/base.css";
 import "@/style/font.css";
@@ -55,6 +55,8 @@ export default async function RootLayout({
   let userAuthority = null;
   let tokenExp = null;
   let userNickUpdatedAt = null;
+  let notificationEnabled = false;
+  let marketingEnabled = false;
 
   let loginStatusCheck = null;
 
@@ -69,6 +71,8 @@ export default async function RootLayout({
         userAuthority: number | null;
         exp: number | null;
         userNickUpdatedAt: Date | null;
+        notificationEnabled: boolean;
+        marketingEnabled: boolean;
       };
 
       username = decoded.username;
@@ -79,6 +83,8 @@ export default async function RootLayout({
       userAuthority = decoded.userAuthority;
       tokenExp = decoded.exp;
       userNickUpdatedAt = decoded.userNickUpdatedAt;
+      notificationEnabled = decoded.notificationEnabled || false;
+      marketingEnabled = decoded.marketingEnabled || false;
 
       loginStatusCheck = true;
     } catch (error) {
@@ -100,9 +106,23 @@ export default async function RootLayout({
           userAuthority={userAuthority}
           tokenExp={tokenExp}
           userNickUpdatedAt={userNickUpdatedAt}
-          loginStatusCheck={loginStatusCheck}>
+          loginStatusCheck={loginStatusCheck}
+          notificationEnabled={notificationEnabled}
+          marketingEnabled={marketingEnabled}>
           <QueryProvider>
-            <LayoutWrapper siteSettings={siteSettings}>{children}</LayoutWrapper>
+            <LayoutWrapper
+              siteSettings={
+                siteSettings
+                  ? {
+                      logo_url: siteSettings.logo_url || undefined,
+                      site_name: siteSettings.site_name || undefined,
+                      site_description: undefined, // DB에 없는 필드
+                      favicon_url: undefined, // DB에 없는 필드
+                    }
+                  : undefined
+              }>
+              {children}
+            </LayoutWrapper>
           </QueryProvider>
         </AuthProvider>
       </body>

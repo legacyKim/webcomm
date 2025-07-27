@@ -68,6 +68,9 @@ Next.js의 middleware가 Edge Runtime에서 실행되기 때문이고, 이 환�
 npm install resend
 이메일 인증 대체.
 
+npm install web-push
+web-push 라이브러리
+
 - tiptap
 
 npm install @tiptap/react @tiptap/starter-kit

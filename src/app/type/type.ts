@@ -88,6 +88,10 @@ export interface AuthContextType {
   setTokenExpiration: (expiration: number | null) => void;
   isUserNickUpdatedAt: Date | null;
   setIsUserNickUpdatedAt: (userNickUpdatedAt: Date | null) => void;
+  isNotificationEnabled: boolean;
+  setIsNotificationEnabled: (enabled: boolean) => void;
+  isMarketingEnabled: boolean;
+  setIsMarketingEnabled: (enabled: boolean) => void;
   redirectPath: string | null;
   setRedirectPath: (path: string | null) => void;
   initData: { posts: Posts[] } | null;

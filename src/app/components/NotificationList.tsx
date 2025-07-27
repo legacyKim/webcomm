@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useAuth } from "@/AuthContext";
 import { useRouter } from "next/navigation";
 
 // 날짜 포맷 함수
@@ -38,24 +38,46 @@ interface NotificationListProps {
 }
 
 export default function NotificationList({ limit = 20, showOnlyUnread = false }: NotificationListProps) {
-  const { data: session } = useSession();
+  const { isUserId, isNotificationEnabled } = useAuth();
+
   const router = useRouter();
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // 푸시 구독 상태 확인
+  // const checkPushSubscription = async () => {
+  //   try {
+  //     if ("serviceWorker" in navigator && "PushManager" in window) {
+  //       const registration = await navigator.serviceWorker.ready;
+  //       const subscription = await registration.pushManager.getSubscription();
+  //       setHasSubscription(!!subscription);
+  //     }
+  //   } catch (error) {
+  //     console.error("구독 상태 확인 오류:", error);
+  //     setHasSubscription(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (isUserId && isUserId > 0) {
+  //     checkPushSubscription();
+  //   }
+  // }, [isUserId]);
+
   useEffect(() => {
-    if (session?.user?.id) {
+    if (isUserId && isUserId > 0 && isNotificationEnabled) {
       fetchNotifications();
 
       // 주기적으로 알림 확인 (폴링)
       const interval = setInterval(() => {
         fetchUnreadCount();
-      }, 30000); // 30초마다
+      }, 300000); // 300초마다
 
       return () => clearInterval(interval);
     }
-  }, [session, limit, showOnlyUnread]);
+  }, [isUserId, limit, showOnlyUnread]);
 
   const fetchNotifications = async () => {
     try {
@@ -170,7 +192,7 @@ export default function NotificationList({ limit = 20, showOnlyUnread = false }:
     }
   };
 
-  if (!session) {
+  if (!isUserId || isUserId === 0) {
     return (
       <div className='notification-list'>
         <p>로그인이 필요합니다.</p>
@@ -178,18 +200,10 @@ export default function NotificationList({ limit = 20, showOnlyUnread = false }:
     );
   }
 
-  if (loading) {
-    return (
-      <div className='notification-list'>
-        <div className='loading'>알림을 불러오는 중...</div>
-      </div>
-    );
-  }
-
   return (
     <div className='notification-list'>
       <div className='notification-header'>
-        <h3>알림 {showOnlyUnread && "(읽지 않음)"}</h3>
+        <h2 className='mypage_subtitle'>알림 {showOnlyUnread && "(읽지 않음)"}</h2>
         {unreadCount > 0 && (
           <button onClick={markAllAsRead} className='mark-all-read-btn'>
             모두 읽음
@@ -220,134 +234,6 @@ export default function NotificationList({ limit = 20, showOnlyUnread = false }:
           ))}
         </ul>
       )}
-
-      <style jsx>{`
-        .notification-list {
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-        }
-
-        .notification-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 16px 20px;
-          border-bottom: 1px solid #e0e0e0;
-          background-color: #f5f5f5;
-        }
-
-        .notification-header h3 {
-          margin: 0;
-          font-size: 18px;
-          font-weight: 600;
-        }
-
-        .mark-all-read-btn {
-          background: #1976d2;
-          color: white;
-          border: none;
-          padding: 6px 12px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 12px;
-        }
-
-        .mark-all-read-btn:hover {
-          background: #1565c0;
-        }
-
-        .loading,
-        .no-notifications {
-          padding: 40px 20px;
-          text-align: center;
-          color: #666;
-        }
-
-        .notification-items {
-          list-style: none;
-          margin: 0;
-          padding: 0;
-          max-height: 400px;
-          overflow-y: auto;
-        }
-
-        .notification-item {
-          display: flex;
-          align-items: flex-start;
-          padding: 16px 20px;
-          border-bottom: 1px solid #f0f0f0;
-          cursor: pointer;
-          transition: background-color 0.2s;
-        }
-
-        .notification-item:hover {
-          background-color: #f8f9fa;
-        }
-
-        .notification-item.unread {
-          background-color: #f3f8ff;
-          border-left: 4px solid #1976d2;
-        }
-
-        .notification-item.unread:hover {
-          background-color: #e8f2ff;
-        }
-
-        .notification-icon {
-          font-size: 20px;
-          margin-right: 12px;
-          margin-top: 2px;
-        }
-
-        .notification-content {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .notification-message {
-          font-size: 14px;
-          line-height: 1.4;
-          margin-bottom: 4px;
-          word-break: break-word;
-        }
-
-        .notification-meta {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-          color: #666;
-        }
-
-        .unread-indicator {
-          background: #1976d2;
-          color: white;
-          padding: 2px 6px;
-          border-radius: 10px;
-          font-size: 10px;
-        }
-
-        @media (max-width: 768px) {
-          .notification-header {
-            padding: 12px 16px;
-          }
-
-          .notification-item {
-            padding: 12px 16px;
-          }
-
-          .notification-icon {
-            font-size: 18px;
-            margin-right: 10px;
-          }
-
-          .notification-message {
-            font-size: 13px;
-          }
-        }
-      `}</style>
     </div>
   );
 }

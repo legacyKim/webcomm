@@ -65,7 +65,19 @@ self.addEventListener("push", (event) => {
     }
   }
 
-  event.waitUntil(self.registration.showNotification(notificationData.title, notificationData));
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, notificationData).then(() => {
+      // 알림이 표시된 후 클라이언트에게 새 알림 도착을 알림
+      return self.clients.matchAll().then((clients) => {
+        clients.forEach((client) => {
+          client.postMessage({
+            type: "NEW_NOTIFICATION",
+            data: notificationData,
+          });
+        });
+      });
+    }),
+  );
 });
 
 // Notification click event - 알림 클릭 처리

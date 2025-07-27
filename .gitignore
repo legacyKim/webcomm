@@ -47,3 +47,5 @@ text
 trigger
 
 prisma/seed.ts
+
+READMETEXT.md

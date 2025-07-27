@@ -9,6 +9,7 @@ import { useRouter, usePathname } from "next/navigation";
 
 import { useAuth } from "@/AuthContext";
 import Logo from "@/components/Logo";
+import { handleNotificationActivation } from "@/utils/notificationUtils";
 
 import {
   ArrowRightStartOnRectangleIcon,
@@ -49,6 +50,7 @@ export default function Header({ siteSettings }: HeaderProps) {
     isUserProfile,
     isUserAuthority,
     tokenExpiration,
+    isNotificationEnabled,
 
     setLoginStatus,
     setIsUsername,
@@ -59,6 +61,7 @@ export default function Header({ siteSettings }: HeaderProps) {
     setIsUserAuthority,
     setTokenExpiration,
     setIsUserNickUpdatedAt,
+    setIsNotificationEnabled,
   } = useAuth();
 
   // Dark mode state
@@ -229,70 +232,56 @@ export default function Header({ siteSettings }: HeaderProps) {
       try {
         const limit = 10;
         const { data } = await axios.get(`/api/notifications?limit=${limit}`);
-        setNotifications(data);
+        setNotifications(data || []);
 
         // 읽지 않은 알림 수 계산
-        const unreadCount = data.filter((n: Notification) => !n.is_read).length;
+        const unreadCount = (data || []).filter((n: Notification) => !n.is_read).length;
         setUnreadCount(unreadCount);
       } catch (err) {
         console.error("알림 가져오기 실패:", err);
       }
     };
 
-    const fetchUnreadCount = async () => {
-      try {
-        const { data } = await axios.get("/api/notifications/unread-count");
-        setUnreadCount(data.count);
-      } catch (err) {
-        console.error("읽지 않은 알림 수 가져오기 실패:", err);
-      }
-    };
-
-    // 초기 로드
-    fetchNotifications();
-
-    // 30초마다 읽지 않은 알림 수만 폴링 (가벼운 요청)
-    const pollingInterval = setInterval(() => {
-      fetchUnreadCount();
-    }, 30000);
-
-    // 5분마다 전체 알림 리스트 새로고침
-    const refreshInterval = setInterval(() => {
+    // 알림 동의한 사용자만 초기 알림 데이터 가져오기 (한 번만)
+    if (isNotificationEnabled) {
       fetchNotifications();
-    }, 300000);
-
-    return () => {
-      clearInterval(pollingInterval);
-      clearInterval(refreshInterval);
-    };
-  }, [isUserId]);
-
-  // 웹푸시 알림 처리를 위한 Service Worker 리스너
-  useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.addEventListener("message", (event) => {
-        if (event.data.type === "NOTIFICATION_COUNT_UPDATE") {
-          setUnreadCount(event.data.count);
-        } else if (event.data.type === "NEW_NOTIFICATION") {
-          // 새 알림이 도착했을 때 리스트 새로고침
-          fetchNotifications();
-        }
-      });
     }
+  }, [isUserId, isNotificationEnabled]);
+
+  // 웹푸시 알림 처리를 위한 Service Worker 리스너 (폴링 대신 이벤트 기반)
+  useEffect(() => {
+    if (!isNotificationEnabled) return;
 
     const fetchNotifications = async () => {
       try {
         const limit = 10;
         const { data } = await axios.get(`/api/notifications?limit=${limit}`);
-        setNotifications(data);
+        setNotifications(data || []);
 
-        const unreadCount = data.filter((n: Notification) => !n.is_read).length;
+        const unreadCount = (data || []).filter((n: Notification) => !n.is_read).length;
         setUnreadCount(unreadCount);
       } catch (err) {
         console.error("알림 가져오기 실패:", err);
       }
     };
-  }, []);
+
+    if ("serviceWorker" in navigator) {
+      const handleMessage = (event: MessageEvent<any>) => {
+        if (event.data?.type === "NOTIFICATION_COUNT_UPDATE") {
+          setUnreadCount(event.data.count);
+        } else if (event.data?.type === "NEW_NOTIFICATION") {
+          // 새 알림이 도착했을 때 리스트 새로고침
+          fetchNotifications();
+        }
+      };
+
+      navigator.serviceWorker.addEventListener("message", handleMessage);
+
+      return () => {
+        navigator.serviceWorker.removeEventListener("message", handleMessage);
+      };
+    }
+  }, [isNotificationEnabled]);
 
   const notifyCheck = async (id: number, link: string) => {
     try {
@@ -347,49 +336,67 @@ export default function Header({ siteSettings }: HeaderProps) {
                 </button>
               </div>
 
-              <div className='notice_popup'>
-                <button
-                  className='header_btn'
-                  ref={messageBoxRef}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    setMessageBox(!messageBox);
-                  }}>
-                  <div className='notification-icon-container'>
-                    <BellIcon className='icon' />
-                    {unreadCount > 0 && (
-                      <span className='notification-badge'>{unreadCount > 99 ? "99+" : unreadCount}</span>
+              {/* 디버깅을 위해 임시로 모든 로그인 사용자에게 표시 */}
+              {loginStatus && (
+                <div className='notice_popup'>
+                  <button
+                    className={`header_btn ${isNotificationEnabled ? "" : "disabled"}`}
+                    ref={messageBoxRef}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+
+                      if (!isNotificationEnabled) {
+                        const success = await handleNotificationActivation(isNotificationEnabled, isUserId, () => {
+                          // 성공 후 AuthContext 상태 업데이트
+                          setIsNotificationEnabled(true);
+                          alert("알림이 활성화되었습니다! 이제 실시간 알림을 받으실 수 있습니다.");
+                        });
+
+                        if (!success) {
+                          return;
+                        }
+                      }
+
+                      setMessageBox(!messageBox);
+                    }}>
+                    <div className='notification-icon-container'>
+                      <BellIcon className='icon' />
+                      {unreadCount > 0 && (
+                        <span className='notification-badge'>{unreadCount > 99 ? "99+" : unreadCount}</span>
+                      )}
+                    </div>
+                    <span>알림</span>
+                  </button>
+
+                  <div className={`message ${messageBox ? "active" : ""}`}>
+                    {isNotificationEnabled && notifications.length === 0 ? (
+                      <div className='no-notifications'>
+                        <span>새로운 알림이 없습니다.</span>
+                      </div>
+                    ) : (
+                      (notifications || []).map((n, i) => (
+                        <div key={i} className={`message_box ${n.is_read ? "read" : "unread"}`}>
+                          <Link
+                            href='#'
+                            onClick={(e) => {
+                              e.preventDefault();
+                              notifyCheck(n.id, n.link);
+                            }}>
+                            <span>{n.message}</span>
+                            {!n.is_read && <span className='unread-dot'></span>}
+                          </Link>
+                        </div>
+                      ))
+                    )}
+                    {isNotificationEnabled && (
+                      <Link href='/my/notice' className='notice_btn'>
+                        알림함 이동하기
+                      </Link>
                     )}
                   </div>
-                  <span>알림</span>
-                </button>
-
-                <div className={`message ${messageBox ? "active" : ""}`}>
-                  {notifications.length === 0 ? (
-                    <div className='no-notifications'>
-                      <span>새로운 알림이 없습니다.</span>
-                    </div>
-                  ) : (
-                    notifications.map((n, i) => (
-                      <div key={i} className={`message_box ${n.is_read ? "read" : "unread"}`}>
-                        <Link
-                          href='#'
-                          onClick={(e) => {
-                            e.preventDefault();
-                            notifyCheck(n.id, n.link);
-                          }}>
-                          <span>{n.message}</span>
-                          {!n.is_read && <span className='unread-dot'></span>}
-                        </Link>
-                      </div>
-                    ))
-                  )}
-                  <Link href='/my/notice' className='notice_btn'>
-                    알림함 이동하기
-                  </Link>
                 </div>
-              </div>
+              )}
 
               {isUserAuthority === 0 ? (
                 <Link href='/admin'>

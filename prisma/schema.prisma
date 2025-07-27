@@ -31,6 +31,10 @@ model Member {
   updatedAt             DateTime    @updatedAt @default(now()) @map("updated_at")
   nickname_updated_at   DateTime?   @map("nickname_updated_at")
   restriction_until     DateTime?   @map("restriction_until")
+  
+  // 알림 및 마케팅 동의
+  notification_enabled  Boolean     @default(false) @map("notification_enabled")  // 알림 수신 동의
+  marketing_enabled     Boolean     @default(false) @map("marketing_enabled")     // 마케팅 수신 동의
 
   // Relations
   posts          Post[]          @relation("MemberPosts")
@@ -228,6 +232,8 @@ model PushSubscription {
   // Relations
   user Member @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  // 복합 unique 제약조건: 같은 사용자가 같은 endpoint를 중복 구독할 수 없음
+  @@unique([user_id, endpoint])
   @@map("push_subscriptions")
 }
 

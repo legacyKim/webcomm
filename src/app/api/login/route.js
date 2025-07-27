@@ -32,6 +32,8 @@ export async function POST(req) {
         userEmail: user.email,
         userAuthority: user.authority,
         userNickUpdatedAt: user.nickname_updated_at,
+        notificationEnabled: user.notification_enabled || false,
+        marketingEnabled: user.marketing_enabled || false,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" },
@@ -49,12 +51,15 @@ export async function POST(req) {
       userEmail: user.email,
       userAuthority: user.authority,
       userNickUpdatedAt: user.nickname_updated_at,
+      notificationEnabled: user.notification_enabled || false,
+      marketingEnabled: user.marketing_enabled || false,
       exp,
     });
 
     const isProduction = process.env.NODE_ENV === "production";
 
-    const cookie = [
+    // 인증 토큰 쿠키 설정
+    const authCookie = [
       `authToken=${token}`,
       `Path=/`,
       `HttpOnly`,
@@ -63,7 +68,21 @@ export async function POST(req) {
       ...(isProduction ? ["Secure"] : []),
     ].join("; ");
 
-    response.headers.set("Set-Cookie", cookie);
+    // 다크모드 쿠키가 없는 경우 기본값으로 false 설정
+    const existingDarkMode = req.cookies.get("darkMode");
+    if (!existingDarkMode) {
+      const darkModeCookie = [
+        `darkMode=false`,
+        `Path=/`,
+        `Max-Age=${60 * 60 * 24 * 30}`, // 30일
+        `SameSite=Lax`,
+        ...(isProduction ? ["Secure"] : []),
+      ].join("; ");
+
+      response.headers.set("Set-Cookie", [authCookie, darkModeCookie]);
+    } else {
+      response.headers.set("Set-Cookie", authCookie);
+    }
 
     return response;
   } catch (error) {

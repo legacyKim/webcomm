@@ -15,8 +15,6 @@ export const useInfiniteScroll = <T,>(
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  console.log(data, "useInfiniteScroll data");
-
   const fetchFunctionRef = useRef(fetchFunction);
   fetchFunctionRef.current = fetchFunction;
 

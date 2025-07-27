@@ -32,14 +32,17 @@ export default function Mypage() {
     isUserProfile,
     isUserEmail,
     isUserNickUpdatedAt,
+    isMarketingEnabled,
 
     setIsUsername,
     setLoginStatus,
     setIsUserAuthority,
     setIsUserNickUpdatedAt,
+    setIsMarketingEnabled,
   } = useAuth();
 
   const [newNick, setNewNick] = useState<string>(isUserNick || "");
+  const [marketingConsent, setMarketingConsent] = useState<boolean>(isMarketingEnabled);
 
   const [newPassword, setNewPassword] = useState<string>("");
   const [, setNewPasswordCon] = useState<string>("");
@@ -124,9 +127,9 @@ export default function Mypage() {
   const inputPwRef = useRef<HTMLInputElement>(null);
   const [recaptchaToken, setRecaptchaToken] = useState("");
   const loadRecaptcha = useLoadRecaptcha(setRecaptchaToken);
-  useEffect(() => {
-    loadRecaptcha();
-  }, []);
+  // useEffect(() => {
+  //   loadRecaptcha();
+  // }, []);
 
   const userChangePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,6 +168,7 @@ export default function Mypage() {
     formData.append("userPassword", newPassword);
     formData.append("userEmail", userEmail);
     formData.append("recaptchaToken", recaptchaToken || "");
+    formData.append("marketingEnabled", marketingConsent.toString());
 
     if (file) {
       formData.append("profileImage", file);
@@ -175,6 +179,10 @@ export default function Mypage() {
 
       if (response.data.success) {
         alert(response.data.message);
+
+        // 마케팅 동의 상태 업데이트
+        setIsMarketingEnabled(marketingConsent);
+
         await axios.post("/api/logout");
 
         setIsUsername("");
@@ -330,7 +338,7 @@ export default function Mypage() {
                 )}
 
                 <p>
-                  최대 &nbsp;<b className='notice'>1MB</b>&nbsp; 이하의 이미지만 업로드 가능합니다.
+                  최대 &nbsp;<b className='notice red'>1MB</b>&nbsp; 이하의 이미지만 업로드 가능합니다.
                 </p>
               </div>
             </div>
@@ -387,7 +395,25 @@ export default function Mypage() {
               </div>
             </div>
 
-            <div className='mypage_btn'>
+            <div className='mypage_info'>
+              <span>마케팅 정보 수신</span>
+              <div className='input_box'>
+                <div className='notification_settings'>
+                  <div className='notification-setting'>
+                    <div className='toggle-container'>
+                      <div
+                        className={`toggle-switch ${marketingConsent ? "active" : ""}`}
+                        onClick={() => setMarketingConsent(!marketingConsent)}>
+                        <div className='toggle-slider'></div>
+                      </div>
+                    </div>
+                    <p>이벤트, 프로모션 등의 마케팅 정보를 받으실 수 있습니다.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className='btn_wrap'>
               <button
                 type='submit'
                 onClick={(e) => {
@@ -397,7 +423,7 @@ export default function Mypage() {
                 정보 수정
               </button>
 
-              <button type='button' onClick={memberWithdrawal} className='btn_danger'>
+              <button type='button' onClick={memberWithdrawal} className='btn_withdrawal'>
                 회원 탈퇴
               </button>
             </div>

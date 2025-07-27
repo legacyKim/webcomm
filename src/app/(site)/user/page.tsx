@@ -178,6 +178,10 @@ export default function User() {
   const [certifyNumCheck, setCertifyNumCheck] = useState<string>("");
   const [certifyAgree, setCertifyAgree] = useState<boolean>(false);
 
+  // 알림 및 마케팅 동의
+  const [notificationEnabled, setNotificationEnabled] = useState<boolean>(false);
+  const [marketingEnabled, setMarketingEnabled] = useState<boolean>(false);
+
   const emailCheck = async () => {
     if (!userEmail) {
       alert("이메일을 입력하세요.");
@@ -276,6 +280,8 @@ export default function User() {
     formData.append("userPassword", userPassword);
     formData.append("userEmail", userEmail);
     formData.append("recaptchaToken", recaptchaToken ?? "");
+    formData.append("notificationEnabled", notificationEnabled.toString());
+    formData.append("marketingEnabled", marketingEnabled.toString());
 
     if (file) {
       formData.append("profileImage", file);
@@ -526,6 +532,81 @@ export default function User() {
                     value={certifyNum}
                     onChange={(e) => setCertifyNum(e.target.value)}
                   />
+                </div>
+              </div>
+
+              {/* 동의 체크박스 */}
+              <div className={styles.consent_section}>
+                <div className='checkbox checkbox_in_user'>
+                  <input
+                    type='checkbox'
+                    checked={notificationEnabled}
+                    onChange={(e) => setNotificationEnabled(e.target.checked)}
+                    className='hidden_checkbox'
+                    name='notification_enabled'
+                    id='notification_enabled'
+                  />
+                  <label htmlFor='notification_enabled' className='custom_checkbox'>
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      viewBox='0 0 24 24'
+                      width='24'
+                      height='24'
+                      className='svg_checkbox'>
+                      <rect
+                        className='svg_box'
+                        x='2'
+                        y='2'
+                        width='20'
+                        height='20'
+                        rx='4'
+                        fill='none'
+                        stroke='#ccc'
+                        strokeWidth='1'
+                      />
+                      <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
+                    </svg>
+                    <div>
+                      <span>알림 수신에 동의합니다 (선택)</span>
+                      <p>댓글, 멘션 등의 알림을 받으실 수 있습니다.</p>
+                    </div>
+                  </label>
+                </div>
+
+                <div className='checkbox checkbox_in_user'>
+                  <input
+                    type='checkbox'
+                    checked={marketingEnabled}
+                    onChange={(e) => setMarketingEnabled(e.target.checked)}
+                    className='hidden_checkbox'
+                    name='marketing_enabled'
+                    id='marketing_enabled'
+                  />
+                  <label htmlFor='marketing_enabled' className='custom_checkbox'>
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      viewBox='0 0 24 24'
+                      width='24'
+                      height='24'
+                      className='svg_checkbox'>
+                      <rect
+                        className='svg_box'
+                        x='2'
+                        y='2'
+                        width='20'
+                        height='20'
+                        rx='4'
+                        fill='none'
+                        stroke='#ccc'
+                        strokeWidth='1'
+                      />
+                      <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
+                    </svg>
+                    <div>
+                      <span>마케팅 정보 수신에 동의합니다 (선택)</span>
+                      <p>이벤트, 프로모션 등의 마케팅 정보를 받으실 수 있습니다.</p>
+                    </div>
+                  </label>
                 </div>
               </div>
 

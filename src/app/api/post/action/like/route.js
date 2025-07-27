@@ -6,6 +6,8 @@ export async function POST(req) {
   const { isUserId, id } = await req.json();
 
   try {
+    await client.query("BEGIN");
+
     const existingLike = await client.query(
       "SELECT * FROM post_actions WHERE user_id = $1 AND post_id = $2 AND action_type = 'like'",
       [isUserId, id],
@@ -35,6 +37,7 @@ export async function POST(req) {
       return NextResponse.json({ success: true, liked: true }, { status: 201 });
     }
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   } finally {
