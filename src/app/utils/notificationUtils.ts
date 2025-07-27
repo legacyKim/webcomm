@@ -167,12 +167,14 @@ export const checkSubscriptionStatus = async (): Promise<boolean> => {
           return false;
         }
       } catch (error) {
+        console.error("서버에서 구독 상태를 확인하는 중 오류 발생:", error);
         return false;
       }
     }
 
     return !!subscription;
   } catch (error) {
+    console.error("서버에서 구독 상태를 확인하는 중 오류 발생:", error);
     return false;
   }
 };
