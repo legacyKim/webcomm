@@ -471,7 +471,9 @@ export default function View({
                   <HeartIcon className='icon' />
                   <span>{viewPost?.likes}</span>
                 </span>
-                <span className='date'>{new Date(viewPost?.created_at).toLocaleDateString()}</span>
+                <span className='date'>
+                  {viewPost?.created_at ? new Date(viewPost.created_at).toISOString().split("T")[0] : ""}
+                </span>
               </div>
             </div>
 

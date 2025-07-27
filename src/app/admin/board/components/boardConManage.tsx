@@ -168,7 +168,7 @@ export default function BoardConManage() {
                   <span>{post.likes}</span>
                   <span>{post.dislike}</span>
                   <span>{post.reports}</span>
-                  <span className='table_date'>{new Date(post.created_at).toLocaleDateString()}</span>
+                  <span className='table_date'>{new Date(post.created_at).toISOString().split("T")[0]}</span>
                   <span className='table_btn'>
                     <button
                       onClick={() => {

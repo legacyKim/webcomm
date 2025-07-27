@@ -13,11 +13,15 @@ export async function GET(req) {
   try {
     // 토큰에서 사용자 정보 확인
     const userData = await serverTokenCheck(req);
+    console.log("User data:", userData);
+
     if (!userData.success) {
+      console.log("Token check failed");
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
     const limit = limitParam ? parseInt(limitParam, 10) : null;
+    console.log("Fetching notifications for user:", userData.id, "limit:", limit);
 
     // Prisma로 알림 조회
     const notifications = await prisma.notification.findMany({
@@ -49,6 +53,8 @@ export async function GET(req) {
       },
       take: limit || undefined,
     });
+
+    console.log("Found notifications:", notifications.length);
 
     // 메시지와 링크 생성
     const processedNotifications = notifications.map((n) => {
@@ -98,6 +104,11 @@ export async function GET(req) {
     return NextResponse.json(processedNotifications);
   } catch (err) {
     console.error("Error fetching notifications:", err);
+    console.error("Error details:", {
+      message: err.message,
+      stack: err.stack,
+      code: err.code,
+    });
     return NextResponse.json({ error: "서버 에러" }, { status: 500 });
   }
 }
@@ -106,18 +117,23 @@ export async function GET(req) {
 export async function PATCH(req) {
   try {
     const userData = await serverTokenCheck(req);
+    console.log("PATCH - User data:", userData);
+
     if (!userData.success) {
+      console.log("PATCH - Token check failed");
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
     const { notificationIds } = await req.json();
+    console.log("PATCH - Notification IDs:", notificationIds);
 
     if (!Array.isArray(notificationIds)) {
+      console.log("PATCH - Invalid notificationIds format");
       return NextResponse.json({ error: "notificationIds는 배열이어야 합니다" }, { status: 400 });
     }
 
     // 해당 사용자의 알림만 읽음 처리
-    await prisma.notification.updateMany({
+    const result = await prisma.notification.updateMany({
       where: {
         id: { in: notificationIds },
         receiver_id: userData.id,
@@ -127,9 +143,15 @@ export async function PATCH(req) {
       },
     });
 
+    console.log("PATCH - Updated notifications:", result.count);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Error marking notifications as read:", err);
+    console.error("PATCH Error details:", {
+      message: err.message,
+      stack: err.stack,
+      code: err.code,
+    });
     return NextResponse.json({ error: "서버 에러" }, { status: 500 });
   }
 }

@@ -1,4 +1,24 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
 export default function formatPostDate(isoString: string): string {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // 서버사이드에서는 기본 포맷 사용
+  if (!isClient) {
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}.${month}.${day}`;
+  }
+
+  // 클라이언트에서만 실시간 날짜 비교
   const date = new Date(isoString);
   const now = new Date();
 

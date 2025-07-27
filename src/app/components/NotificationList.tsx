@@ -26,18 +26,31 @@ export default function NotificationList({ limit = 10 }: NotificationListProps) 
   const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchNotifications = useCallback(async () => {
-    if (!isUserId) return;
+    if (!isUserId) {
+      console.log("No user ID, skipping notification fetch");
+      return;
+    }
 
     try {
       setLoading(true);
+      console.log("Fetching notifications for user:", isUserId);
       const response = await axios.get(`/api/notifications?limit=${limit}`);
+      console.log("Notifications response:", response.data);
+
       if (response.data) {
         setNotifications(response.data);
         const unread = response.data.filter((n: Notification) => !n.is_read).length;
         setUnreadCount(unread);
+        console.log("Set notifications count:", response.data.length, "unread:", unread);
       }
     } catch (error) {
       console.error("알림 목록 가져오기 실패:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Fetch notifications error details:", {
+          status: error.response.status,
+          data: error.response.data,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -66,8 +79,9 @@ export default function NotificationList({ limit = 10 }: NotificationListProps) 
 
   const markAsRead = async (notificationId: number) => {
     try {
+      console.log("Marking notification as read:", notificationId);
       await axios.patch("/api/notifications", {
-        notificationIds: [notificationId.toString()],
+        notificationIds: [notificationId],
       });
 
       // 로컬 상태 업데이트
@@ -84,6 +98,10 @@ export default function NotificationList({ limit = 10 }: NotificationListProps) 
       updateNotificationBadge(Math.max(0, unreadCount - 1));
     } catch (error) {
       console.error("알림 읽음 처리 실패:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        console.error("Response data:", error.response.data);
+        console.error("Response status:", error.response.status);
+      }
     }
   };
 
