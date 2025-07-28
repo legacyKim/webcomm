@@ -1,24 +1,11 @@
 import axios from "axios";
 
-// 서버 사이드에서 사용할 URL 결정
-function getServerUrl() {
-  // 서버 사이드에서는 작동하는 Vercel 도메인 사용
-  if (typeof window === "undefined") {
-    return "https://webcomm-one.vercel.app";
-  }
-  return "";
-}
-
-// const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 // 메인
 export const fetchHome = async (isUserId) => {
   try {
-    const url =
-      typeof window === "undefined"
-        ? `${getServerUrl()}/api/home?userId=${isUserId ?? ""}`
-        : `/api/home?userId=${isUserId ?? ""}`;
-    const response = await fetch(url);
+    const response = await fetch(`/api/home?userId=${isUserId ?? ""}`);
     return response.json();
   } catch (err) {
     console.error(err);
@@ -29,11 +16,7 @@ export const fetchHome = async (isUserId) => {
 // 메인 페이지 베스트 게시판
 export const fetchHomePop = async (page, limit, isUserId) => {
   try {
-    const url =
-      typeof window === "undefined"
-        ? `${getServerUrl()}/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`
-        : `/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`;
-    const res = await fetch(url, {
+    const res = await fetch(`/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`, {
       next: {
         revalidate: 30, // 30초로 단축 (기존 10분)
       },
@@ -53,8 +36,7 @@ export const fetchHomePop = async (page, limit, isUserId) => {
 // 게시판
 export const fetchBoard = async () => {
   try {
-    const url = typeof window === "undefined" ? `${getServerUrl()}/api/board` : `/api/board`;
-    const res = await fetch(url, {
+    const res = await fetch(`/api/board`, {
       next: { revalidate: 6000 },
     });
     return res.json();
@@ -67,11 +49,7 @@ export const fetchBoard = async () => {
 // 각 게시판
 export async function fetchBoardData(url_slug, page, limit, isUserId) {
   try {
-    const url =
-      typeof window === "undefined"
-        ? `${getServerUrl()}/api/board/${url_slug}/${page}/${limit}`
-        : `/api/board/${url_slug}/${page}/${limit}`;
-    const response = await axios.get(url, {
+    const response = await axios.get(`/api/board/${url_slug}/${page}/${limit}`, {
       params: { userId: isUserId },
     });
     return response.data;
