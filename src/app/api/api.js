@@ -84,7 +84,7 @@ export async function fetchUserCommentData(nickname, page, limit) {
 // 인기 게시판
 export const fetchBoardPop = async (page, limit, isUserId) => {
   try {
-    const response = await fetch(getApiUrl(`/api/board/popular/${page}/${limit}?userId=${isUserId ?? ""}`), {
+    const response = await fetch(`${baseUrl}/api/board/popular/${page}/${limit}?userId=${isUserId ?? ""}`, {
       next: {
         revalidate: 60 * 10,
       },
@@ -170,7 +170,7 @@ export const fetchPost = async (url_slug) => {
 // 게시물 상세 조회
 export default async function fetchPostDetail(url_slug, id) {
   try {
-    const response = await fetch(getApiUrl(`/api/post/${url_slug}/${id}`), {
+    const response = await fetch(`${baseUrl}/api/post/${url_slug}/${id}`, {
       next: {
         revalidate: 60 * 10,
       },
