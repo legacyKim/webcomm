@@ -6,9 +6,12 @@ function getApiUrl(path) {
   if (typeof window === "undefined") {
     // Vercel에서는 VERCEL_URL 사용, 로컬에서는 localhost
     const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
-    return `${baseUrl}${path}`;
+    const fullUrl = `${baseUrl}${path}`;
+    console.log(`[Server] VERCEL_URL: ${process.env.VERCEL_URL}, Full URL: ${fullUrl}`);
+    return fullUrl;
   }
   // 클라이언트 사이드에서는 상대 경로 사용
+  console.log(`[Client] Using relative path: ${path}`);
   return path;
 }
 
@@ -17,10 +20,22 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 // 메인
 export const fetchHome = async (isUserId) => {
   try {
-    const response = await fetch(getApiUrl(`/api/home?userId=${isUserId ?? ""}`));
-    return response.json();
+    const url = getApiUrl(`/api/home?userId=${isUserId ?? ""}`);
+    console.log(`[fetchHome] Fetching URL: ${url}`);
+    const response = await fetch(url);
+    console.log(`[fetchHome] Response status: ${response.status}, headers:`, response.headers);
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error(`[fetchHome] Error response (${response.status}):`, text.substring(0, 500));
+      return [];
+    }
+
+    const data = await response.json();
+    console.log(`[fetchHome] Success, data type:`, typeof data, Array.isArray(data));
+    return data;
   } catch (err) {
-    console.error(err);
+    console.error("[fetchHome] Fetch error:", err);
     return [];
   }
 };
@@ -28,11 +43,21 @@ export const fetchHome = async (isUserId) => {
 // 메인 페이지 베스트 게시판
 export const fetchHomePop = async (page, limit, isUserId) => {
   try {
-    const res = await fetch(getApiUrl(`/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`), {
+    const url = getApiUrl(`/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`);
+    console.log(`[fetchHomePop] Fetching URL: ${url}`);
+    const res = await fetch(url, {
       next: {
         revalidate: 30, // 30초로 단축 (기존 10분)
       },
     });
+
+    console.log(`[fetchHomePop] Response status: ${res.status}`);
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(`[fetchHomePop] Error response (${res.status}):`, text.substring(0, 500));
+      return [];
+    }
 
     const data = await res.json();
     if (!Array.isArray(data)) {
