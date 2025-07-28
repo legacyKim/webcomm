@@ -1,18 +1,12 @@
 import axios from "axios";
 
-// 서버 사이드와 클라이언트 사이드를 구분하여 URL 결정
-function getApiUrl(path) {
-  // 서버 사이드에서는 절대 URL 사용
+// 서버 사이드에서 사용할 URL 결정
+function getServerUrl() {
+  // 서버 사이드에서는 작동하는 Vercel 도메인 사용
   if (typeof window === "undefined") {
-    // 프로덕션에서는 실제 도메인 사용, 로컬에서는 localhost
-    const baseUrl = process.env.NODE_ENV === "production" ? "https://www.tokti.net" : "http://localhost:3000";
-    const fullUrl = `${baseUrl}${path}`;
-    console.log(`[Server] NODE_ENV: ${process.env.NODE_ENV}, Base URL: ${baseUrl}, Full URL: ${fullUrl}`);
-    return fullUrl;
+    return "https://webcomm-one.vercel.app";
   }
-  // 클라이언트 사이드에서는 상대 경로 사용
-  console.log(`[Client] Using relative path: ${path}`);
-  return path;
+  return "";
 }
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -20,22 +14,14 @@ const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 // 메인
 export const fetchHome = async (isUserId) => {
   try {
-    const url = getApiUrl(`/api/home?userId=${isUserId ?? ""}`);
-    console.log(`[fetchHome] Fetching URL: ${url}`);
+    const url =
+      typeof window === "undefined"
+        ? `${getServerUrl()}/api/home?userId=${isUserId ?? ""}`
+        : `/api/home?userId=${isUserId ?? ""}`;
     const response = await fetch(url);
-    console.log(`[fetchHome] Response status: ${response.status}, headers:`, response.headers);
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.error(`[fetchHome] Error response (${response.status}):`, text.substring(0, 500));
-      return [];
-    }
-
-    const data = await response.json();
-    console.log(`[fetchHome] Success, data type:`, typeof data, Array.isArray(data));
-    return data;
+    return response.json();
   } catch (err) {
-    console.error("[fetchHome] Fetch error:", err);
+    console.error(err);
     return [];
   }
 };
@@ -43,21 +29,15 @@ export const fetchHome = async (isUserId) => {
 // 메인 페이지 베스트 게시판
 export const fetchHomePop = async (page, limit, isUserId) => {
   try {
-    const url = getApiUrl(`/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`);
-    console.log(`[fetchHomePop] Fetching URL: ${url}`);
+    const url =
+      typeof window === "undefined"
+        ? `${getServerUrl()}/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`
+        : `/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`;
     const res = await fetch(url, {
       next: {
         revalidate: 30, // 30초로 단축 (기존 10분)
       },
     });
-
-    console.log(`[fetchHomePop] Response status: ${res.status}`);
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(`[fetchHomePop] Error response (${res.status}):`, text.substring(0, 500));
-      return [];
-    }
 
     const data = await res.json();
     if (!Array.isArray(data)) {
@@ -73,7 +53,8 @@ export const fetchHomePop = async (page, limit, isUserId) => {
 // 게시판
 export const fetchBoard = async () => {
   try {
-    const res = await fetch(getApiUrl(`/api/board`), {
+    const url = typeof window === "undefined" ? `${getServerUrl()}/api/board` : `/api/board`;
+    const res = await fetch(url, {
       next: { revalidate: 6000 },
     });
     return res.json();
@@ -86,7 +67,11 @@ export const fetchBoard = async () => {
 // 각 게시판
 export async function fetchBoardData(url_slug, page, limit, isUserId) {
   try {
-    const response = await axios.get(`${baseUrl}/api/board/${url_slug}/${page}/${limit}`, {
+    const url =
+      typeof window === "undefined"
+        ? `${getServerUrl()}/api/board/${url_slug}/${page}/${limit}`
+        : `/api/board/${url_slug}/${page}/${limit}`;
+    const response = await axios.get(url, {
       params: { userId: isUserId },
     });
     return response.data;
@@ -121,7 +106,11 @@ export async function fetchUserCommentData(nickname, page, limit) {
 // 인기 게시판
 export const fetchBoardPop = async (page, limit, isUserId) => {
   try {
-    const response = await fetch(getApiUrl(`/api/board/popular/${page}/${limit}?userId=${isUserId ?? ""}`), {
+    const url =
+      typeof window === "undefined"
+        ? `${getServerUrl()}/api/board/popular/${page}/${limit}?userId=${isUserId ?? ""}`
+        : `/api/board/popular/${page}/${limit}?userId=${isUserId ?? ""}`;
+    const response = await fetch(url, {
       next: {
         revalidate: 60 * 10,
       },
@@ -137,7 +126,11 @@ export const fetchBoardPop = async (page, limit, isUserId) => {
 // 검색한 게시물
 export async function fetchSearchData(keyword, page, limit, isUserId) {
   try {
-    const response = await axios.get(`/api/board/search/${keyword}/${page}/${limit}`, {
+    const url =
+      typeof window === "undefined"
+        ? `${getServerUrl()}/api/board/search/${keyword}/${page}/${limit}`
+        : `/api/board/search/${keyword}/${page}/${limit}`;
+    const response = await axios.get(url, {
       params: { userId: isUserId },
     });
     return response.data;
@@ -207,7 +200,9 @@ export const fetchPost = async (url_slug) => {
 // 게시물 상세 조회
 export default async function fetchPostDetail(url_slug, id) {
   try {
-    const response = await fetch(getApiUrl(`/api/post/${url_slug}/${id}`), {
+    const url =
+      typeof window === "undefined" ? `${getServerUrl()}/api/post/${url_slug}/${id}` : `/api/post/${url_slug}/${id}`;
+    const response = await fetch(url, {
       next: {
         revalidate: 60 * 10,
       },
