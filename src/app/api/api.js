@@ -2,9 +2,13 @@ import axios from "axios";
 
 // 서버 사이드와 클라이언트 사이드를 구분하여 URL 결정
 function getApiUrl(path) {
-  // 서버 사이드에서는 내부 URL 사용
-  if (typeof window === 'undefined') {
-    return `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}${path}`;
+  // 서버 사이드에서는 절대 URL 사용
+  if (typeof window === "undefined") {
+    // Vercel에서는 VERCEL_URL 사용, 로컬에서는 localhost
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}` 
+      : 'http://localhost:3000';
+    return `${baseUrl}${path}`;
   }
   // 클라이언트 사이드에서는 상대 경로 사용
   return path;
