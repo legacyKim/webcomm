@@ -3,13 +3,11 @@ const CACHE_NAME = "webcomm-notifications-v1";
 
 // Install event
 self.addEventListener("install", (event) => {
-  console.log("Service Worker installing...");
   self.skipWaiting();
 });
 
 // Activate event
 self.addEventListener("activate", (event) => {
-  console.log("Service Worker activating...");
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -26,8 +24,6 @@ self.addEventListener("activate", (event) => {
 
 // Push event - 푸시 알림 수신
 self.addEventListener("push", (event) => {
-  console.log("Push event received:", event);
-
   let notificationData = {
     title: "새 알림",
     body: "새로운 알림이 있습니다.",
@@ -82,8 +78,6 @@ self.addEventListener("push", (event) => {
 
 // Notification click event - 알림 클릭 처리
 self.addEventListener("notificationclick", (event) => {
-  console.log("Notification click received:", event);
-
   event.notification.close();
 
   if (event.action === "dismiss") {

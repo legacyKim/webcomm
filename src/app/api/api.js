@@ -18,7 +18,7 @@ export const fetchHomePop = async (page, limit, isUserId) => {
   try {
     const res = await fetch(`${baseUrl}/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`, {
       next: {
-        revalidate: 60 * 10,
+        revalidate: 30, // 30초로 단축 (기존 10분)
       },
     });
 
