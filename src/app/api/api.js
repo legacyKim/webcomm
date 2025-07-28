@@ -9,7 +9,7 @@ function getServerUrl() {
   return "";
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+// const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 // 메인
 export const fetchHome = async (isUserId) => {
