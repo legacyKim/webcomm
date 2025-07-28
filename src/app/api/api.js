@@ -1,11 +1,21 @@
 import axios from "axios";
 
+// 서버 사이드와 클라이언트 사이드를 구분하여 URL 결정
+function getApiUrl(path) {
+  // 서버 사이드에서는 내부 URL 사용
+  if (typeof window === 'undefined') {
+    return `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}${path}`;
+  }
+  // 클라이언트 사이드에서는 상대 경로 사용
+  return path;
+}
+
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 // 메인
 export const fetchHome = async (isUserId) => {
   try {
-    const response = await fetch(`${baseUrl}/api/home?userId=${isUserId ?? ""}`);
+    const response = await fetch(getApiUrl(`/api/home?userId=${isUserId ?? ""}`));
     return response.json();
   } catch (err) {
     console.error(err);
@@ -16,7 +26,7 @@ export const fetchHome = async (isUserId) => {
 // 메인 페이지 베스트 게시판
 export const fetchHomePop = async (page, limit, isUserId) => {
   try {
-    const res = await fetch(`${baseUrl}/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`, {
+    const res = await fetch(getApiUrl(`/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`), {
       next: {
         revalidate: 30, // 30초로 단축 (기존 10분)
       },
@@ -36,7 +46,7 @@ export const fetchHomePop = async (page, limit, isUserId) => {
 // 게시판
 export const fetchBoard = async () => {
   try {
-    const res = await fetch(`${baseUrl}/api/board`, {
+    const res = await fetch(getApiUrl(`/api/board`), {
       next: { revalidate: 6000 },
     });
     return res.json();
@@ -84,8 +94,7 @@ export async function fetchUserCommentData(nickname, page, limit) {
 // 인기 게시판
 export const fetchBoardPop = async (page, limit, isUserId) => {
   try {
-    const response = await fetch(`${baseUrl}/api/board/popular/${page}/${limit}`, {
-      params: { userId: isUserId },
+    const response = await fetch(getApiUrl(`/api/board/popular/${page}/${limit}?userId=${isUserId ?? ""}`), {
       next: {
         revalidate: 60 * 10,
       },
@@ -171,7 +180,7 @@ export const fetchPost = async (url_slug) => {
 // 게시물 상세 조회
 export default async function fetchPostDetail(url_slug, id) {
   try {
-    const response = await fetch(`${baseUrl}/api/post/${url_slug}/${id}`, {
+    const response = await fetch(getApiUrl(`/api/post/${url_slug}/${id}`), {
       next: {
         revalidate: 60 * 10,
       },
