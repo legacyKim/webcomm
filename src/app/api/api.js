@@ -4,10 +4,10 @@ import axios from "axios";
 function getApiUrl(path) {
   // 서버 사이드에서는 절대 URL 사용
   if (typeof window === "undefined") {
-    // Vercel에서는 VERCEL_URL 사용, 로컬에서는 localhost
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000";
+    // 프로덕션에서는 실제 도메인 사용, 로컬에서는 localhost
+    const baseUrl = process.env.NODE_ENV === "production" ? "https://www.tokti.net" : "http://localhost:3000";
     const fullUrl = `${baseUrl}${path}`;
-    console.log(`[Server] VERCEL_URL: ${process.env.VERCEL_URL}, Full URL: ${fullUrl}`);
+    console.log(`[Server] NODE_ENV: ${process.env.NODE_ENV}, Base URL: ${baseUrl}, Full URL: ${fullUrl}`);
     return fullUrl;
   }
   // 클라이언트 사이드에서는 상대 경로 사용
