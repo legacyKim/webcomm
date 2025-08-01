@@ -1,61 +1,35 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/AuthContext";
-import { registerServiceWorker, subscribeToNotifications, checkSubscriptionStatus } from "@/utils/notificationUtils";
+import { useSession } from "next-auth/react";
 
-export default function NotificationManager({
-  permission,
-  setPermission,
-}: {
-  permission: string;
-  setPermission: (value: string) => void;
-}) {
-  const { isUserId, isNotificationEnabled, setIsNotificationEnabled } = useAuth();
+const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+
+export default function NotificationManager() {
+  const { data: session } = useSession();
   const [isSupported, setIsSupported] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [permission, setPermission] = useState("default");
 
   useEffect(() => {
     // 브라우저 지원 여부 확인
     if ("serviceWorker" in navigator && "PushManager" in window) {
       setIsSupported(true);
-
       setPermission(Notification.permission);
 
       // Service Worker 등록
-      registerServiceWorkerLocal();
+      registerServiceWorker();
 
       // 기존 구독 상태 확인
-      checkSubscriptionStatusLocal();
+      checkSubscriptionStatus();
     }
-  }, [isUserId]);
+  }, [session]);
 
-  // 권한 변경 감지를 위한 별도 useEffect
-  useEffect(() => {
-    if (!isSupported) return;
-
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        // 페이지가 다시 활성화될 때 권한 상태 확인
-        const currentPermission = Notification.permission;
-        if (currentPermission !== permission) {
-          setPermission(currentPermission);
-          checkSubscriptionStatusLocal();
-        }
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("focus", handleVisibilityChange);
-
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("focus", handleVisibilityChange);
-    };
-  }, [isSupported, permission]);
-
-  const registerServiceWorkerLocal = async () => {
+  const registerServiceWorker = async () => {
     try {
-      await registerServiceWorker();
+      const registration = await navigator.serviceWorker.register("/sw.js");
+      console.log("Service Worker registered:", registration);
 
       // 메시지 리스너 등록
       navigator.serviceWorker.addEventListener("message", (event) => {
@@ -72,23 +46,83 @@ export default function NotificationManager({
           updateNotificationBadge(event.data.count);
         }
       });
-    } catch {
-      // Service Worker registration failed - silently handle
+    } catch (error) {
+      console.error("Service Worker registration failed:", error);
     }
   };
 
-  const checkSubscriptionStatusLocal = async () => {
-    const subscribed = await checkSubscriptionStatus();
-    setIsNotificationEnabled(subscribed);
-  };
-  const subscribeToNotificationsLocal = async () => {
-    setIsLoading(true);
-    const success = await subscribeToNotifications(isUserId);
-    if (success) {
-      setIsNotificationEnabled(true); // AuthContext 상태 업데이트
-      alert("알림 구독이 완료되었습니다!");
+  const checkSubscriptionStatus = async () => {
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      setIsSubscribed(!!subscription);
+    } catch (error) {
+      console.error("Error checking subscription status:", error);
     }
-    setIsLoading(false);
+  };
+
+  const requestNotificationPermission = async () => {
+    if (!isSupported) return false;
+
+    const permission = await Notification.requestPermission();
+    setPermission(permission);
+    return permission === "granted";
+  };
+
+  const subscribeToNotifications = async () => {
+    if (!session?.user?.id) {
+      alert("로그인이 필요합니다.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // 권한 요청
+      const hasPermission = await requestNotificationPermission();
+      if (!hasPermission) {
+        alert("알림 권한이 필요합니다.");
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+
+      // VAPID 키를 ArrayBuffer로 변환
+      if (!VAPID_PUBLIC_KEY) {
+        throw new Error("VAPID 공개 키가 설정되지 않았습니다.");
+      }
+
+      const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+
+      // 푸시 구독 생성
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey,
+      });
+
+      // 서버에 구독 정보 저장
+      const response = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscription: subscription.toJSON(),
+        }),
+      });
+
+      if (response.ok) {
+        setIsSubscribed(true);
+        alert("알림 구독이 완료되었습니다!");
+      } else {
+        throw new Error("구독 저장 실패");
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
+      alert("알림 구독 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const unsubscribeFromNotifications = async () => {
@@ -99,8 +133,6 @@ export default function NotificationManager({
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription) {
-        const endpoint = subscription.endpoint;
-
         // 브라우저에서 구독 해제
         await subscription.unsubscribe();
 
@@ -110,16 +142,13 @@ export default function NotificationManager({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            endpoint: endpoint,
-          }),
         });
 
-        setIsNotificationEnabled(false); // AuthContext 상태 업데이트
+        setIsSubscribed(false);
         alert("알림 구독이 해제되었습니다.");
       }
-    } catch (err) {
-      console.error("구독 해제 중 오류가 발생했습니다:", err);
+    } catch (error) {
+      console.error("Unsubscription error:", error);
       alert("구독 해제 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
@@ -137,9 +166,8 @@ export default function NotificationManager({
           notificationIds: [notificationId],
         }),
       });
-    } catch (err) {
-      // Error marking notification as read - silently handle
-      console.error("Failed to mark notification as read:", err);
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
     }
   };
 
@@ -156,7 +184,19 @@ export default function NotificationManager({
     }
   };
 
-  // VAPID 키 변환 함수는 utils에서 가져와서 사용하므로 제거
+  // VAPID 키 변환 함수
+  const urlBase64ToUint8Array = (base64String: string) => {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+  };
 
   if (!isSupported) {
     return (
@@ -166,39 +206,93 @@ export default function NotificationManager({
     );
   }
 
-  if (!isUserId || isUserId === 0) {
+  if (!session) {
     return null;
   }
 
   return (
     <div className='notification-manager'>
       <div className='notification-controls'>
-        <div className='notification-setting'>
-          {permission === "denied" ? (
-            <div className='permission-denied'>
-              <div className='toggle-container'>
-                <div className='toggle-switch disabled'>
-                  <div className='toggle-slider'></div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className='toggle-container'>
-              <div
-                className={`toggle-switch ${permission === "granted" && isNotificationEnabled ? "active" : ""} ${isLoading ? "loading" : ""}`}
-                onClick={
-                  permission === "granted"
-                    ? isNotificationEnabled
-                      ? unsubscribeFromNotifications
-                      : subscribeToNotificationsLocal
-                    : subscribeToNotificationsLocal
-                }>
-                <div className='toggle-slider'>{isLoading && <div className='loading-spinner'></div>}</div>
-              </div>
-            </div>
-          )}
-        </div>
+        {permission === "denied" && (
+          <p className='warning'>알림이 차단되어 있습니다. 브라우저 설정에서 알림을 허용해주세요.</p>
+        )}
+
+        {permission === "granted" && (
+          <>
+            {isSubscribed ? (
+              <button onClick={unsubscribeFromNotifications} disabled={isLoading} className='btn-unsubscribe'>
+                {isLoading ? "처리중..." : "푸시 알림 끄기"}
+              </button>
+            ) : (
+              <button onClick={subscribeToNotifications} disabled={isLoading} className='btn-subscribe'>
+                {isLoading ? "처리중..." : "푸시 알림 켜기"}
+              </button>
+            )}
+          </>
+        )}
+
+        {permission === "default" && (
+          <button onClick={subscribeToNotifications} disabled={isLoading} className='btn-subscribe'>
+            {isLoading ? "처리중..." : "푸시 알림 허용"}
+          </button>
+        )}
       </div>
+
+      <style jsx>{`
+        .notification-manager {
+          padding: 20px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          margin: 20px 0;
+        }
+
+        .notification-controls {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .warning {
+          color: #d32f2f;
+          background-color: #ffebee;
+          padding: 10px;
+          border-radius: 4px;
+          border-left: 4px solid #d32f2f;
+        }
+
+        .btn-subscribe,
+        .btn-unsubscribe {
+          padding: 12px 24px;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background-color 0.2s;
+        }
+
+        .btn-subscribe {
+          background-color: #1976d2;
+          color: white;
+        }
+
+        .btn-subscribe:hover:not(:disabled) {
+          background-color: #1565c0;
+        }
+
+        .btn-unsubscribe {
+          background-color: #d32f2f;
+          color: white;
+        }
+
+        .btn-unsubscribe:hover:not(:disabled) {
+          background-color: #c62828;
+        }
+
+        button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import axios from "axios";
-import Image from "next/image";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +9,7 @@ import { useAuth } from "@/AuthContext";
 import TiptapViewer from "@/components/tiptapViewer";
 import CommentEditor from "./commentEditor";
 
-import { CommentTreeProps, CommentTreeNode } from "@/type/commentType";
+import { CommentTreeProps } from "@/type/commentType";
 import { useCommentResizeObserver } from "@/func/hook/useCommentResizeObserver";
 
 import { HeartIcon, FlagIcon, PhotoIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
@@ -63,8 +62,6 @@ export default function CommentTree({
     recomment_id: number;
   } | null>(null);
 
-  const [likingComments, setLikingComments] = useState<Set<number>>(new Set());
-
   const commentDelete = async (id: number) => {
     const isConfirmed = confirm("삭제하시겠습니까?");
     if (isConfirmed) {
@@ -108,55 +105,10 @@ export default function CommentTree({
       }
     }
 
-    // 중복 클릭 방지
-    if (likingComments.has(id)) {
-      return;
-    }
-
-    setLikingComments((prev) => new Set(prev).add(id));
-
-    try {
-      const res = await axios.post("/api/comment/action/like", {
-        isUserId,
-        id,
-      });
-
-      if (res.data.success && setCommentList) {
-        // 서버에서 받은 실제 좋아요 수로 업데이트 (실시간 동기화로 대체될 예정)
-        // 실시간 이벤트가 도착하기 전까지의 임시 업데이트
-        setCommentList((prev) => {
-          if (!prev) return prev;
-
-          const updateCommentLikes = (comments: CommentTreeNode[]): CommentTreeNode[] => {
-            return comments.map((comment) => {
-              if (comment.id === id) {
-                // 서버에서 받은 실제 좋아요 수 사용
-                return { ...comment, likes: res.data.likesCount };
-              }
-              if (comment.children && comment.children.length > 0) {
-                return {
-                  ...comment,
-                  children: updateCommentLikes(comment.children),
-                };
-              }
-              return comment;
-            });
-          };
-
-          return updateCommentLikes(prev);
-        });
-      }
-    } catch (error) {
-      console.error("댓글 좋아요 처리 실패:", error);
-      alert("좋아요 처리 중 오류가 발생했습니다.");
-    } finally {
-      // 로딩 상태 해제
-      setLikingComments((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(id);
-        return newSet;
-      });
-    }
+    await axios.post("/api/comment/action/like", {
+      isUserId,
+      id,
+    });
   };
 
   const commentReport = async (id: number) => {
@@ -193,9 +145,7 @@ export default function CommentTree({
 
   // 댓글 높이 계산을 위한 ref 설정
   const commentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const [commentHeights, setCommentHeights] = useState<{
-    [key: number]: number;
-  }>({});
+  const [commentHeights, setCommentHeights] = useState<{ [key: number]: number }>({});
 
   useCommentResizeObserver(commentRefs, setCommentHeights, commentList);
 
@@ -274,12 +224,10 @@ export default function CommentTree({
                         userNickname: comment.user_nickname,
                       });
                     }}>
-                    <Image
+                    <img
                       className='profile_img'
                       src={comment.profile ?? "/profile/basic.png"}
                       alt={`${comment.user_nickname}의 프로필`}
-                      width={32}
-                      height={32}
                     />
                     <span className='writer_name'>{comment.user_nickname}</span>
                   </div>
@@ -298,10 +246,7 @@ export default function CommentTree({
                               return;
                             }
 
-                            setCommentAdd?.({
-                              user_id: comment.user_id,
-                              id: comment.id,
-                            });
+                            setCommentAdd?.({ user_id: comment.user_id, id: comment.id });
                             setRecommentAdd?.(null);
                             setCommentCorrect(null);
                             setRecommentCorrect(null);
@@ -314,14 +259,9 @@ export default function CommentTree({
                       {comment.user_id !== isUserId && (
                         <>
                           {comment.depth < 3 && <div className='ball'></div>}
-                          <button
-                            onClick={() => commentLike(comment.id)}
-                            disabled={likingComments.has(comment.id)}
-                            style={{
-                              opacity: likingComments.has(comment.id) ? 0.6 : 1,
-                            }}>
+                          <button onClick={() => commentLike(comment.id)}>
                             <HeartIcon className='icon' />
-                            <span>{likingComments.has(comment.id) ? "처리중..." : "공감"}</span>
+                            <span>공감</span>
                           </button>
                           <div className='ball'></div>
                           <button className='comment_report' onClick={() => commentReport(comment.user_id)}>

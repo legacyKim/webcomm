@@ -86,6 +86,10 @@ button {
   flex: 1;
   color: #333;
 }
+
+.flex-start {
+  @include flex-start;
+}
 /* page common */
 
 /* BUTTON */
@@ -169,20 +173,19 @@ button {
 .btn.undefined {
   background-color: $grey-color;
 }
+.btn_withdrawal {
+  color: $red-color;
+  opacity: 0.3;
+}
+.btn_withdrawal:hover {
+  opacity: 1;
+}
 .cancel {
   font-size: 15px;
   color: $grey3-color;
 }
 .block_btn {
   padding: 8px 15px;
-}
-.btn_withdrawal {
-  font-size: 12px;
-  font-weight: 300;
-  color: $grey-color;
-}
-.btn_withdrawal:hover {
-  color: $red-color;
 }
 /* btn end */
 
@@ -247,9 +250,6 @@ button {
 .checkbox:hover .custom_checkbox span {
   text-decoration: underline;
 }
-.checkbox_in_user label {
-  align-items: flex-start;
-}
 /* CHECKBOX end */
 
 /* header */
@@ -306,11 +306,6 @@ header {
   @include flex-start;
 }
 
-.header .header_btn.disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
 .header .header_btn > span {
   font-size: 16px;
   font-weight: 400;
@@ -364,7 +359,7 @@ header {
 
 .toggle-slider.dark .toggle-icon {
   transform: translateX(24px);
-  background: #1c1f23;
+  background: #2c3e50;
 }
 
 .toggle-icon .icon {
@@ -468,10 +463,11 @@ footer {
 /* footer end */
 
 /* menu */
+.menu_list_top {
+  background-color: $main-color;
+  @include flex-start;
+}
 .menu {
-  position: sticky;
-  top: 16px;
-  min-width: 120px;
   align-self: flex-start;
   height: max-content;
 }
@@ -479,7 +475,6 @@ footer {
 .menu_list {
   display: flex;
   justify-content: flex-start;
-  flex-direction: column;
 }
 
 .menu_list li a {
@@ -557,9 +552,9 @@ sub {
   align-self: flex-start;
   height: max-content;
 
-  flex: 1.5;
-  width: 100%;
-  max-width: 236px;
+  // flex: 1.5;
+  // width: 100%;
+  // max-width: 236px;
 }
 .right_ad.active {
   display: block;
@@ -642,13 +637,6 @@ main .title {
   border-radius: 4px;
   min-width: 65px;
   height: 34px;
-  background-color: white;
-  color: #333;
-}
-
-.board_top select option {
-  background-color: white;
-  color: #333;
 }
 
 .board_list {
@@ -688,7 +676,7 @@ sub .board_list {
   background-color: $grey4-color;
 }
 .board_list .writer {
-  @include flex-center;
+  @include flex-start;
   gap: 4px;
   min-width: 120px;
   max-width: 120px;
@@ -1678,7 +1666,7 @@ sub .board_list {
 .unread-dot {
   position: absolute;
   top: 6px;
-  right: -6px;
+  right: -10px;
   width: 8px;
   height: 8px;
   background-color: #1976d2;
@@ -1899,31 +1887,8 @@ sub .board_list {
 
   /* Form elements */
   input,
-  textarea {
-    color: $dark-text !important;
-  }
-
+  textarea,
   select {
-    color: $dark-text !important;
-    background-color: $dark-bg-secondary !important;
-    border-color: $dark-border !important;
-  }
-
-  /* Select options */
-  select option {
-    background-color: $dark-bg-secondary !important;
-    color: $dark-text !important;
-  }
-
-  /* Board top select */
-  .board_top select {
-    background-color: $dark-bg-secondary !important;
-    color: $dark-text !important;
-    border-color: $dark-border !important;
-  }
-
-  .board_top select option {
-    background-color: $dark-bg-secondary !important;
     color: $dark-text !important;
   }
 
@@ -2135,19 +2100,6 @@ sub .board_list {
     font-size: 15px;
     color: #fff;
   }
-
-  /* mypage styles */
-  .mypage_info p {
-    color: $dark-text-secondary;
-  }
-
-  .notice.red {
-    color: $red-color;
-  }
-
-  .notice.blue {
-    color: $blue-color;
-  }
 }
 
 /* mypage styles */
@@ -2187,13 +2139,8 @@ sub .board_list {
   border-left: 0px;
 }
 .mypage_inner {
-  padding: 16px;
-}
-.mypage_subtitle {
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.4;
-  margin-bottom: 6px;
+  padding: 12px;
+  padding-left: 4px;
 }
 .mypage_info_pw {
   flex: 1;
@@ -2321,16 +2268,11 @@ sub .board_list {
   width: 100%;
 }
 
-.mypage_info .notification_settings {
-  padding-top: 6px;
-}
-
 /* mypage board list */
 .mypage_boardlist_common {
   @include flex-column;
   width: 100%;
   min-height: 300px !important;
-  padding: 8px 0;
 }
 .mypage_boardlist_single {
   @include flex-column;
@@ -2368,169 +2310,6 @@ sub .board_list {
   color: $main-color;
 }
 
-/*notification*/
-.notification_settings {
-  @include space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.notification_text .mypage_info {
-  margin-bottom: 8px;
-}
-.denied-help {
-  padding: 16px;
-  padding-bottom: 8px;
-  background-color: #fff3cd;
-  border: 1px solid #ffeaa7;
-  border-radius: 8px;
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.denied-help p {
-  margin: 0 0 8px 0;
-  color: #856404;
-  font-weight: 500;
-}
-
-.denied-help details {
-  color: #856404;
-}
-
-.denied-help summary {
-  cursor: pointer;
-  font-weight: 500;
-  margin-bottom: 8px;
-  margin-left: 8px;
-}
-
-.help-content {
-  margin-top: 8px;
-  padding-left: 8px;
-}
-
-.help-content ol {
-  margin: 8px 0;
-  padding-left: 20px;
-}
-
-.help-content li {
-  margin: 4px 0;
-  line-height: 1.4;
-}
-
-.notification-setting {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 20px;
-}
-
-.setting-info {
-  flex: 1;
-}
-
-.setting-info h4 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #333;
-}
-
-.setting-info p {
-  margin: 0;
-  color: #666;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-.notification_settings {
-  .toggle-switch {
-    position: relative;
-    width: 52px;
-    height: 28px;
-    background-color: #ccc;
-    border-radius: 32px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    display: flex;
-    align-items: center;
-  }
-
-  .toggle-switch.active {
-    background-color: #1976d2;
-  }
-
-  .toggle-switch.disabled {
-    background-color: #f5f5f5;
-    cursor: not-allowed;
-    border: 2px solid #ddd;
-  }
-
-  .toggle-switch.loading {
-    cursor: wait;
-  }
-
-  .toggle-slider {
-    position: absolute;
-    top: 3px;
-    left: 4px;
-    width: 21px;
-    height: 21px;
-    background-color: white;
-    border-radius: 50%;
-    transition: transform 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
-  .toggle-switch.active .toggle-slider {
-    transform: translateX(23px);
-  }
-
-  .toggle-switch.disabled .toggle-slider {
-    top: 2px;
-    left: 3px;
-    background-color: #f0f0f0;
-  }
-
-  .loading-spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid #f3f3f3;
-    border-top: 2px solid #1976d2;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-
-  .permission-denied {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-end;
-  }
-}
-
-/*notification*/
-
 /* message */
 .mypage_message_box {
   padding: 12px;
@@ -2563,4 +2342,301 @@ sub .board_list {
   color: $font-color;
   border-radius: 4px;
   white-space: nowrap;
+}
+
+/* profile */
+.profile {
+  max-width: 768px;
+  width: 100%;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+.profile_info {
+  @include flex-start;
+  flex-direction: column;
+  width: 100%;
+}
+.profile_info_box {
+  @include flex-start;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 32px;
+  .profile_img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 32px;
+  }
+}
+
+.online_indicator {
+}
+.profile_user_info {
+  flex: 1;
+  padding-top: 40px;
+
+  .user_header {
+    .username {
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+
+  .user_bio {
+    @include re-bl;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 8px;
+    border: $border-grey;
+    border-top: 2px solid $main-color;
+    padding: 8px 12px;
+    border-radius: 4px 4px 12px 4px;
+    min-height: 101px;
+  }
+}
+
+.authority_badge {
+}
+.user_meta {
+  @include flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+
+  .meta_item {
+    @include flex-start;
+    gap: 6px;
+    .label {
+      font-size: 14px;
+      font-weight: 300;
+      opacity: 0.7;
+    }
+    .value {
+      font-size: 14px;
+      font-weight: 400;
+    }
+  }
+}
+
+.user_stats {
+  @include flex-start;
+  gap: 24px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+.stat_item {
+  @include flex-column;
+  align-items: center;
+  flex: 1;
+}
+.stat_number {
+  font-size: 32px;
+  font-weight: 600;
+}
+.stat_label {
+  @include re-bl;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+.follow_section {
+}
+.follow_btn {
+  position: relative;
+  @include flex-center;
+  width: 180px;
+  height: 36px;
+  background-color: $main-color;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+
+  display: inline-block;
+  transition-duration: 0.3s;
+  margin-bottom: 4px;
+  overflow: hidden;
+
+  .follow_btn_text {
+    position: relative;
+    transition: all 0.3s ease-in-out;
+  }
+
+  &:hover {
+    background-color: $main-hover-color;
+  }
+}
+
+.follow_description {
+  font-size: 14px;
+  font-weight: 300;
+  opacity: 0.7;
+  padding: 4px 0;
+}
+.profile_tabs {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+.tab_list {
+  @include flex-start;
+  border-top: $border-grey;
+  border-bottom: $border-grey;
+}
+.tab_btn {
+  flex: 1;
+  padding: 8px 0;
+  font-weight: 400;
+}
+.tab_btn.active {
+  font-weight: 600;
+  color: $main-color;
+}
+.tab_content {
+  width: 100%;
+  padding: 16px;
+}
+.summary_tab {
+  @include flex-column;
+  gap: 20px;
+
+  .section {
+    h3 {
+      @include re-bl;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.favorite_boards {
+  @include flex-start;
+  gap: 8px;
+}
+.board_tag {
+  @include re-bl;
+  position: relative;
+  display: inline-block;
+  padding: 2px;
+  border-radius: 8px;
+  background: linear-gradient(45deg, $main-color, #fff, $main-hover-color);
+  background-size: 300% 300%;
+  animation: gradientShift 3s ease infinite;
+  transition: all 1 ease-in-out;
+
+  span {
+    @include re-bl;
+    font-size: 15px;
+    color: $main-color;
+    background-color: #fff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+
+    span {
+      background-color: rgba(255, 255, 255, 0.95);
+    }
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.recent_posts {
+  position: relative;
+  @include flex-column;
+  gap: 12px;
+}
+.post_item {
+  border: $border-grey;
+  border-radius: 4px;
+  padding: 12px;
+
+  .post_title {
+    @include re-bl;
+    font-size: 16px;
+    font-weight: 400;
+    padding-bottom: 8px;
+  }
+  .post_meta {
+    @include flex-start;
+    gap: 8px;
+    .board_name {
+    }
+    .post_date {
+    }
+    .post_stats {
+    }
+  }
+}
+
+.recent_comments {
+  @include flex-column;
+  gap: 12px;
+
+  .comment_item {
+    border: $border-grey;
+    padding: 12px;
+
+    .comment_content {
+      padding: 0;
+      padding-bottom: 8px;
+      font-size: 16px;
+      font-weight: 400;
+    }
+  }
+}
+
+.comment_meta {
+}
+.comment_date {
+}
+.comment_likes {
+}
+.followers_list {
+}
+.follower_item {
+}
+.posts_tab {
+}
+.posts_list {
+}
+.post_card {
+}
+.post_header {
+}
+.post_board {
+}
+.comments_tab {
+}
+.comments_list {
+}
+.comment_card {
+}
+.comment_info {
+}
+.post_link {
+}
+.likes_tab {
+}
+.empty_state {
+}
+.sub_text {
 }

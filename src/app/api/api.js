@@ -18,7 +18,7 @@ export const fetchHomePop = async (page, limit, isUserId) => {
   try {
     const res = await fetch(`${baseUrl}/api/home/popular/${page}/${limit}?userId=${isUserId ?? ""}`, {
       next: {
-        revalidate: 30, // 30초로 단축 (기존 10분)
+        revalidate: 60 * 10,
       },
     });
 
@@ -84,7 +84,8 @@ export async function fetchUserCommentData(nickname, page, limit) {
 // 인기 게시판
 export const fetchBoardPop = async (page, limit, isUserId) => {
   try {
-    const response = await fetch(`${baseUrl}/api/board/popular/${page}/${limit}?userId=${isUserId ?? ""}`, {
+    const response = await fetch(`${baseUrl}/api/board/popular/${page}/${limit}`, {
+      params: { userId: isUserId },
       next: {
         revalidate: 60 * 10,
       },

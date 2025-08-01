@@ -40,6 +40,7 @@ export default function MyPost() {
     <sub className='sub'>
       <div className='mypage'>
         <MyHeader />
+
         <div className='mypage_content'>
           {/* 내가 쓴 글 */}
           <div className='mypage_boardlist_common'>

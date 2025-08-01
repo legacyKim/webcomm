@@ -87,10 +87,29 @@ export async function PUT(req, context) {
   const client = await pool.connect();
 
   try {
-    const query = `UPDATE posts SET views = views + 1 WHERE id = $1 RETURNING *;`;
-    const posts = await client.query(query, [id]);
+    await client.query("BEGIN");
 
-    return NextResponse.json({ posts });
+    // 게시글 조회수 증가
+    const query = `UPDATE posts SET views = views + 1 WHERE id = $1 RETURNING user_id, views;`;
+    const result = await client.query(query, [id]);
+
+    if (result.rows.length > 0) {
+      const { user_id } = result.rows[0];
+
+      // 게시글 작성자의 총 조회수 증가
+      await client.query(`UPDATE members SET all_views = all_views + 1 WHERE id = $1`, [user_id]);
+
+      // 프로필 캐시 무효화 (실제 구현 시)
+      // import { invalidateUserProfileCacheById } from "@/src/lib/cache-utils";
+      // invalidateUserProfileCacheById(user_id);
+    }
+
+    await client.query("COMMIT");
+    return NextResponse.json({ posts: result.rows });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("조회수 업데이트 실패:", error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   } finally {
     client.release();
   }

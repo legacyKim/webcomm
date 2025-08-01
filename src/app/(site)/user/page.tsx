@@ -48,6 +48,7 @@ export default function User() {
   const router = useRouter();
   const boxIdRef = useRef<HTMLDivElement | null>(null);
   const boxNickRef = useRef<HTMLDivElement | null>(null);
+  const boxBioRef = useRef<HTMLDivElement | null>(null);
   const boxPwRef = useRef<HTMLDivElement | null>(null);
   const boxPwcRef = useRef<HTMLDivElement | null>(null);
   const boxEmailRef = useRef<HTMLDivElement | null>(null);
@@ -55,6 +56,7 @@ export default function User() {
 
   const inputIdRef = useRef<HTMLInputElement | null>(null);
   const inputNickRef = useRef<HTMLInputElement | null>(null);
+  const inputBioRef = useRef<HTMLTextAreaElement | null>(null);
   const inputProfileImgRef = useRef<HTMLInputElement | null>(null);
   const inputPwRef = useRef<HTMLInputElement | null>(null);
   const inputPwcRef = useRef<HTMLInputElement | null>(null);
@@ -63,6 +65,7 @@ export default function User() {
 
   const labelIdRef = useRef<HTMLLabelElement>(null);
   const labelNickRef = useRef<HTMLLabelElement>(null);
+  const labelBioRef = useRef<HTMLLabelElement>(null);
   const labelProfileImgRef = useRef<HTMLLabelElement>(null);
   const labelPwRef = useRef<HTMLLabelElement>(null);
   const labelPwcRef = useRef<HTMLLabelElement>(null);
@@ -72,6 +75,7 @@ export default function User() {
   // 아이디 및 별명 중복 체크
   const [userid, setUserid] = useState<string>("");
   const [userNickname, setUserNickname] = useState<string>("");
+  const [userBio, setUserBio] = useState<string>("");
 
   const [idDupliCheck, setIdDupliCheck] = useState<boolean>(false);
 
@@ -178,10 +182,6 @@ export default function User() {
   const [certifyNumCheck, setCertifyNumCheck] = useState<string>("");
   const [certifyAgree, setCertifyAgree] = useState<boolean>(false);
 
-  // 알림 및 마케팅 동의
-  const [notificationEnabled, setNotificationEnabled] = useState<boolean>(false);
-  const [marketingEnabled, setMarketingEnabled] = useState<boolean>(false);
-
   const emailCheck = async () => {
     if (!userEmail) {
       alert("이메일을 입력하세요.");
@@ -277,11 +277,10 @@ export default function User() {
 
     formData.append("userid", userid);
     formData.append("userNickname", userNickname);
+    formData.append("userBio", userBio);
     formData.append("userPassword", userPassword);
     formData.append("userEmail", userEmail);
     formData.append("recaptchaToken", recaptchaToken ?? "");
-    formData.append("notificationEnabled", notificationEnabled.toString());
-    formData.append("marketingEnabled", marketingEnabled.toString());
 
     if (file) {
       formData.append("profileImage", file);
@@ -357,6 +356,31 @@ export default function User() {
                     name='userNickname'
                     value={userNickname}
                     onChange={(e) => setUserNickname(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* 자기소개 */}
+              <div className={styles.input_group}>
+                <div className={styles.input_box} ref={boxBioRef}>
+                  <div className={styles.input_bg}></div>
+                  <label className={styles.label_common} htmlFor='userBio' ref={labelBioRef}>
+                    자기소개 (선택)
+                  </label>
+                  <textarea
+                    className={`${styles.input_common} ${styles.textarea_bio}`}
+                    ref={inputBioRef}
+                    onFocus={() => handleFocus(labelBioRef, boxBioRef)}
+                    onBlur={() => {
+                      if (inputBioRef.current && inputBioRef.current.value === "") handleBlur(labelBioRef, boxBioRef);
+                    }}
+                    id='userBio'
+                    name='userBio'
+                    value={userBio}
+                    onChange={(e) => setUserBio(e.target.value)}
+                    rows={3}
+                    maxLength={200}
+                    placeholder='간단한 자기소개를 입력해주세요 (최대 200자)'
                   />
                 </div>
               </div>
@@ -532,81 +556,6 @@ export default function User() {
                     value={certifyNum}
                     onChange={(e) => setCertifyNum(e.target.value)}
                   />
-                </div>
-              </div>
-
-              {/* 동의 체크박스 */}
-              <div className={styles.consent_section}>
-                <div className='checkbox checkbox_in_user'>
-                  <input
-                    type='checkbox'
-                    checked={notificationEnabled}
-                    onChange={(e) => setNotificationEnabled(e.target.checked)}
-                    className='hidden_checkbox'
-                    name='notification_enabled'
-                    id='notification_enabled'
-                  />
-                  <label htmlFor='notification_enabled' className='custom_checkbox'>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      viewBox='0 0 24 24'
-                      width='24'
-                      height='24'
-                      className='svg_checkbox'>
-                      <rect
-                        className='svg_box'
-                        x='2'
-                        y='2'
-                        width='20'
-                        height='20'
-                        rx='4'
-                        fill='none'
-                        stroke='#ccc'
-                        strokeWidth='1'
-                      />
-                      <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
-                    </svg>
-                    <div>
-                      <span>알림 수신에 동의합니다 (선택)</span>
-                      <p>댓글, 멘션 등의 알림을 받으실 수 있습니다.</p>
-                    </div>
-                  </label>
-                </div>
-
-                <div className='checkbox checkbox_in_user'>
-                  <input
-                    type='checkbox'
-                    checked={marketingEnabled}
-                    onChange={(e) => setMarketingEnabled(e.target.checked)}
-                    className='hidden_checkbox'
-                    name='marketing_enabled'
-                    id='marketing_enabled'
-                  />
-                  <label htmlFor='marketing_enabled' className='custom_checkbox'>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      viewBox='0 0 24 24'
-                      width='24'
-                      height='24'
-                      className='svg_checkbox'>
-                      <rect
-                        className='svg_box'
-                        x='2'
-                        y='2'
-                        width='20'
-                        height='20'
-                        rx='4'
-                        fill='none'
-                        stroke='#ccc'
-                        strokeWidth='1'
-                      />
-                      <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
-                    </svg>
-                    <div>
-                      <span>마케팅 정보 수신에 동의합니다 (선택)</span>
-                      <p>이벤트, 프로모션 등의 마케팅 정보를 받으실 수 있습니다.</p>
-                    </div>
-                  </label>
                 </div>
               </div>
 

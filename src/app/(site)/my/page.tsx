@@ -32,17 +32,15 @@ export default function Mypage() {
     isUserProfile,
     isUserEmail,
     isUserNickUpdatedAt,
-    isMarketingEnabled,
 
     setIsUsername,
     setLoginStatus,
     setIsUserAuthority,
     setIsUserNickUpdatedAt,
-    setIsMarketingEnabled,
   } = useAuth();
 
   const [newNick, setNewNick] = useState<string>(isUserNick || "");
-  const [marketingConsent, setMarketingConsent] = useState<boolean>(isMarketingEnabled);
+  const [newBio, setNewBio] = useState<string>("");
 
   const [newPassword, setNewPassword] = useState<string>("");
   const [, setNewPasswordCon] = useState<string>("");
@@ -129,7 +127,25 @@ export default function Mypage() {
   const loadRecaptcha = useLoadRecaptcha(setRecaptchaToken);
   useEffect(() => {
     loadRecaptcha();
-  }, [loadRecaptcha]);
+  }, []);
+
+  // 현재 사용자의 bio 가져오기
+  useEffect(() => {
+    const fetchUserBio = async () => {
+      try {
+        const response = await axios.get(`/api/user/profile?user=${isUsername}`);
+        if (response.data.success && response.data.user) {
+          setNewBio(response.data.user.bio || "");
+        }
+      } catch (error) {
+        console.error("Bio 가져오기 실패:", error);
+      }
+    };
+
+    if (isUsername) {
+      fetchUserBio();
+    }
+  }, [isUsername]);
 
   const userChangePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,10 +181,10 @@ export default function Mypage() {
 
     formData.append("userid", String(isUserId || ""));
     formData.append("userNickname", newNick);
+    formData.append("userBio", newBio);
     formData.append("userPassword", newPassword);
     formData.append("userEmail", userEmail);
     formData.append("recaptchaToken", recaptchaToken || "");
-    formData.append("marketingEnabled", marketingConsent.toString());
 
     if (file) {
       formData.append("profileImage", file);
@@ -178,19 +194,23 @@ export default function Mypage() {
       const response = await axios.put("/api/user", formData);
 
       if (response.data.success) {
-        alert(response.data.message);
+        // 닉네임이나 비밀번호가 변경된 경우에만 로그아웃
+        const isNicknameChanged = newNick !== isUserNick;
+        const isPasswordChanged = newPassword !== "";
 
-        // 마케팅 동의 상태 업데이트
-        setIsMarketingEnabled(marketingConsent);
-
-        await axios.post("/api/logout");
-
-        setIsUsername("");
-        setLoginStatus(false);
-        setIsUserAuthority(null);
-        setIsUserNickUpdatedAt(null);
-
-        router.push("/login");
+        if (isNicknameChanged || isPasswordChanged) {
+          alert(response.data.message + "\n변경된 정보로 다시 로그인해주세요.");
+          await axios.post("/api/logout");
+          setIsUsername("");
+          setLoginStatus(false);
+          setIsUserAuthority(null);
+          setIsUserNickUpdatedAt(null);
+          router.push("/login");
+        } else {
+          alert("프로필이 성공적으로 업데이트되었습니다.");
+          // bio만 변경된 경우 페이지 새로고침으로 최신 정보 반영
+          window.location.reload();
+        }
       } else {
         alert(response.data.message);
       }
@@ -261,6 +281,7 @@ export default function Mypage() {
     <sub className='sub'>
       <div className='mypage'>
         <MyHeader />
+
         {/* 계정 정보 */}
         <div className='mypage_content'>
           <form className='mypage_inner'>
@@ -290,6 +311,31 @@ export default function Mypage() {
                   )}
                 </p>
                 <p className='notice red'>부적절한 별명은 임의로 변경될 수 있습니다.</p>
+              </div>
+            </div>
+
+            <div className='mypage_info'>
+              <span>자기소개</span>
+              <div className='input_box'>
+                <textarea
+                  value={newBio}
+                  onChange={(e) => setNewBio(e.target.value)}
+                  rows={3}
+                  maxLength={200}
+                  placeholder='간단한 자기소개를 입력해주세요 (최대 200자)'
+                  style={{
+                    width: "100%",
+                    padding: "12px 8px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    resize: "vertical",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                  }}
+                />
+                <p>
+                  <span style={{ fontSize: "12px", color: "#666" }}>{newBio.length}/200자</span>
+                </p>
               </div>
             </div>
 
@@ -338,7 +384,7 @@ export default function Mypage() {
                 )}
 
                 <p>
-                  최대 &nbsp;<b className='notice red'>1MB</b>&nbsp; 이하의 이미지만 업로드 가능합니다.
+                  최대 &nbsp;<b className='notice'>1MB</b>&nbsp; 이하의 이미지만 업로드 가능합니다.
                 </p>
               </div>
             </div>
@@ -392,24 +438,6 @@ export default function Mypage() {
                   <input type='text' ref={inputCertifyNumRef} onChange={(e) => setCertifyNum(e.target.value)} />
                 </div>
                 <p>비밀번호 분실 또는 수정 등 사이트 활동에 필요한 사항이 메일로 발송되니 정확히 입력해주세요.</p>
-              </div>
-            </div>
-
-            <div className='mypage_info'>
-              <span>마케팅 정보 수신</span>
-              <div className='input_box'>
-                <div className='notification_settings'>
-                  <div className='notification-setting'>
-                    <div className='toggle-container'>
-                      <div
-                        className={`toggle-switch ${marketingConsent ? "active" : ""}`}
-                        onClick={() => setMarketingConsent(!marketingConsent)}>
-                        <div className='toggle-slider'></div>
-                      </div>
-                    </div>
-                    <p>이벤트, 프로모션 등의 마케팅 정보를 받으실 수 있습니다.</p>
-                  </div>
-                </div>
               </div>
             </div>
 

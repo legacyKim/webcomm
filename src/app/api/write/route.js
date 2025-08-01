@@ -92,6 +92,7 @@ export async function POST(req) {
     }
 
     const formData = await req.formData();
+    const boardId = formData.get("board_id");
     const boardname = formData.get("boardname");
     const url_slug = formData.get("url_slug");
     const user_id = formData.get("user_id");
@@ -128,8 +129,8 @@ export async function POST(req) {
     const processedContent = await replaceBlobsWithS3UrlsServer(content, imageFiles, videoFiles);
 
     const result = await client.query(
-      "INSERT INTO posts (board_name, url_slug, user_id, user_nickname, title, content) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [boardname, url_slug, user_id, user_nickname, title, processedContent],
+      "INSERT INTO posts (board_id, board_name, url_slug, user_id, user_nickname, title, content) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [boardId, boardname, url_slug, user_id, user_nickname, title, processedContent],
     );
 
     await client.query("UPDATE members SET all_posts = all_posts + 1 WHERE id = $1", [user_id]);

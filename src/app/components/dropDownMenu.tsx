@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -23,9 +23,66 @@ interface DropDownMenuProps {
 export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenuProps) {
   const router = useRouter();
   const [isBlocked, setIsBlocked] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const { isUserId, messageToUser, setMessageToUser } = useAuth();
   const loginCheck = useLoginCheck();
+
+  // 팔로우 상태 확인
+  useEffect(() => {
+    const checkFollowStatus = async () => {
+      if (!isUserId) return;
+
+      try {
+        const response = await axios.get(
+          `/api/user/profile?username=${userInfoInDropMenu.userNickname}&current_user=${isUserId}`,
+        );
+        if (response.data.profile) {
+          setIsFollowing(response.data.profile.isFollowing);
+        }
+      } catch (error) {
+        console.error("팔로우 상태 확인 실패:", error);
+      }
+    };
+
+    checkFollowStatus();
+  }, [userInfoInDropMenu.userNickname, isUserId]);
+
+  // 프로필 보기
+  const viewProfile = () => {
+    router.push(`/profile/${userInfoInDropMenu.userNickname}`);
+  };
+
+  // 팔로우/언팔로우
+  const toggleFollow = async () => {
+    const ok = await loginCheck();
+    if (!ok) return;
+
+    try {
+      const response = await fetch("/api/user/follow", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          targetUserId: userInfoInDropMenu.userId,
+          action: isFollowing ? "unfollow" : "follow",
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setIsFollowing(!isFollowing);
+        console.log(result.message);
+      } else {
+        alert(result.error || "팔로우 처리 중 오류가 발생했습니다.");
+      }
+    } catch (error) {
+      console.error("팔로우 요청 실패:", error);
+      alert("네트워크 오류가 발생했습니다. 다시 시도해주세요.");
+    }
+  };
 
   // 작성글 검색
   const searchPosts = () => {
@@ -92,6 +149,12 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
   return (
     <>
       <ul className='dropDownMenu' style={style}>
+        <li>
+          <button onClick={viewProfile}>프로필 보기</button>
+        </li>
+        <li>
+          <button onClick={toggleFollow}>{isFollowing ? "언팔로우" : "팔로우"}</button>
+        </li>
         <li>
           <button onClick={searchPosts}>작성글 검색</button>
         </li>

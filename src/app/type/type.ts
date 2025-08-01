@@ -88,14 +88,65 @@ export interface AuthContextType {
   setTokenExpiration: (expiration: number | null) => void;
   isUserNickUpdatedAt: Date | null;
   setIsUserNickUpdatedAt: (userNickUpdatedAt: Date | null) => void;
-  isNotificationEnabled: boolean;
-  setIsNotificationEnabled: (enabled: boolean) => void;
-  isMarketingEnabled: boolean;
-  setIsMarketingEnabled: (enabled: boolean) => void;
   redirectPath: string | null;
   setRedirectPath: (path: string | null) => void;
   initData: { posts: Posts[] } | null;
   setInitData: (data: { posts: Posts[] } | null) => void;
   agreeCheck: boolean | null;
   setAgreeCheck: (agreeCheck: boolean | null) => void;
+}
+
+// profile
+export interface UserProfile {
+  id: number;
+  username: string;
+  user_nickname: string;
+  profile: string | null;
+  bio: string | null;
+  location: string | null;
+  website: string | null;
+  banner_image: string | null;
+  createdAt: string;
+  last_seen: string;
+  is_online: boolean;
+  authority: number;
+  all_posts: number;
+  all_views: number;
+  follower_count: number;
+  following_count: number;
+  total_likes_received: number;
+  isFollowing?: boolean;
+  isOwnProfile?: boolean;
+}
+
+export interface UserActivity {
+  recent_posts: {
+    id: number;
+    title: string;
+    board_name: string;
+    url_slug: string;
+    created_at: string;
+    views: number;
+    likes: number;
+  }[];
+  recent_comments: {
+    id: number;
+    content: string;
+    post_title: string;
+    board_name: string;
+    post_url_slug: string;
+    created_at: string;
+    likes: number;
+  }[];
+  favorite_boards: {
+    board_name: string;
+    url_slug: string;
+    activity_count: number;
+  }[];
+  followers: {
+    id: number;
+    username: string;
+    user_nickname: string;
+    profile: string | null;
+  }[];
 }

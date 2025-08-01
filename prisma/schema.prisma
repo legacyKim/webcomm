@@ -31,10 +31,15 @@ model Member {
   updatedAt             DateTime    @updatedAt @default(now()) @map("updated_at")
   nickname_updated_at   DateTime?   @map("nickname_updated_at")
   restriction_until     DateTime?   @map("restriction_until")
-  
-  // 알림 및 마케팅 동의
-  notification_enabled  Boolean     @default(false) @map("notification_enabled")  // 알림 수신 동의
-  marketing_enabled     Boolean     @default(false) @map("marketing_enabled")     // 마케팅 수신 동의
+
+  // 프로필 추가 정보
+  bio                   String?     @db.Text
+  location              String?     @db.VarChar(100)
+  website               String?     @db.VarChar(255)
+  banner_image          String?     @db.VarChar(255)
+  total_likes_received  Int         @default(0)
+  last_seen             DateTime?   @map("last_seen")
+  is_online             Boolean     @default(false)
 
   // Relations
   posts          Post[]          @relation("MemberPosts")
@@ -54,6 +59,10 @@ model Member {
   sentNotifications     Notification[] @relation("NotificationSender")
   receivedNotifications Notification[] @relation("NotificationReceiver")
   pushSubscriptions     PushSubscription[]
+
+  // 팔로우 관계
+  followers     Follow[] @relation("UserFollowers")   // 나를 팔로우하는 사람들
+  following     Follow[] @relation("UserFollowing")   // 내가 팔로우하는 사람들
 
   @@map("members")
 }
@@ -232,8 +241,6 @@ model PushSubscription {
   // Relations
   user Member @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  // 복합 unique 제약조건: 같은 사용자가 같은 endpoint를 중복 구독할 수 없음
-  @@unique([user_id, endpoint])
   @@map("push_subscriptions")
 }
 
@@ -255,15 +262,6 @@ model Policy {
   @@map("policy")
 }
 
-model SignupTerm {
-  id         Int      @id @default(autoincrement())
-  content    String   @db.Text
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@map("signup_terms")
-}
-
 model SiteSettings {
   id         Int      @id @default(autoincrement())
   logo_url   String?  @db.VarChar(255)
@@ -272,4 +270,19 @@ model SiteSettings {
   updated_at DateTime @updatedAt
 
   @@map("site_settings")
+}
+
+model Follow {
+  id           Int      @id @default(autoincrement())
+  follower_id  Int      // 팔로우하는 사람
+  following_id Int      // 팔로우당하는 사람
+  created_at   DateTime @default(now())
+
+  // Relations
+  follower  Member @relation("UserFollowing", fields: [follower_id], references: [id], onDelete: Cascade)
+  following Member @relation("UserFollowers", fields: [following_id], references: [id], onDelete: Cascade)
+
+  // 중복 팔로우 방지
+  @@unique([follower_id, following_id], name: "unique_follow")
+  @@map("follows")
 }

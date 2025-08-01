@@ -720,31 +720,3 @@
 .admin_editor_wrap h2:first-child {
   padding-top: 12px;
 }
-
-/* Dark mode support for admin */
-body.dark {
-  .select_group select {
-    background-color: #374151 !important;
-    color: #f9fafb !important;
-    border-color: #4b5563 !important;
-  }
-
-  .select_group select option {
-    background-color: #374151 !important;
-    color: #f9fafb !important;
-  }
-
-  /* Other admin form elements */
-  .admin_wrap input,
-  .admin_wrap textarea,
-  .admin_wrap select {
-    background-color: #374151 !important;
-    color: #f9fafb !important;
-    border-color: #4b5563 !important;
-  }
-
-  .admin_wrap input::placeholder,
-  .admin_wrap textarea::placeholder {
-    color: #9ca3af !important;
-  }
-}

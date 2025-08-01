@@ -134,7 +134,7 @@ export default function MemberDetailModal({ member, isOpen, onClose }: MemberDet
               <strong>총 조회수:</strong> {member.all_views.toLocaleString()}
             </div>
             <div>
-              <strong>가입일:</strong> 2024.01.01
+              <strong>가입일:</strong> {new Date().toLocaleDateString()}
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function MemberDetailModal({ member, isOpen, onClose }: MemberDet
                             {post.likes}
                           </td>
                           <td style={{ padding: "8px", border: "1px solid #e0e0e0", textAlign: "center" }}>
-                            {new Date(post.created_at).toISOString().split("T")[0]}
+                            {new Date(post.created_at).toLocaleDateString()}
                           </td>
                         </tr>
                       ))}
@@ -281,7 +281,7 @@ export default function MemberDetailModal({ member, isOpen, onClose }: MemberDet
                             {comment.likes}
                           </td>
                           <td style={{ padding: "8px", border: "1px solid #e0e0e0", textAlign: "center" }}>
-                            {new Date(comment.created_at).toISOString().split("T")[0]}
+                            {new Date(comment.created_at).toLocaleDateString()}
                           </td>
                         </tr>
                       ))}

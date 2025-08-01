@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import MyHeader from "../myHeader";
 import { useAuth } from "@/AuthContext";
@@ -8,8 +8,7 @@ import NotificationList from "@/components/NotificationList";
 import NotificationManager from "@/components/NotificationManager";
 
 export default function MyNotice() {
-  const { isUserId, isNotificationEnabled } = useAuth();
-  const [permission, setPermission] = useState("default");
+  const { isUserId } = useAuth();
 
   // 기본 인증 체크만 수행
   useEffect(() => {
@@ -22,51 +21,94 @@ export default function MyNotice() {
         <MyHeader />
         <div className='mypage_content'>
           <div className='mypage_inner'>
-            <div className='notification_settings'>
-              <div className='notification_text'>
-                <h2 className='mypage_subtitle'>푸시 알림 설정</h2>
-                <div className='mypage_info'>
-                  <p>새로운 댓글, 좋아요, 멘션 등을 실시간으로 받아보세요.</p>
-                </div>
+            <div className='notice-page-content'>
+              <div className='page-header'>
+                <h1>알림 관리</h1>
+                <p>새로운 알림을 확인하고 푸시 알림을 설정하세요.</p>
               </div>
 
-              <NotificationManager permission={permission} setPermission={setPermission} />
-            </div>
-
-            {permission === "denied" && (
-              <div className={`denied-help`}>
-                <p>🚫 알림이 차단되어 있습니다</p>
-                <details>
-                  <summary>알림 허용하는 방법</summary>
-                  <div className='help-content'>
-                    <p>
-                      <strong>Chrome/Edge:</strong>
-                    </p>
-                    <ol>
-                      <li>주소창 왼쪽의 🔒 또는 ⚠️ 아이콘 클릭</li>
-                      <li>&quot;알림&quot; 설정을 &quot;허용&quot;으로 변경</li>
-                      <li>페이지 새로고침</li>
-                    </ol>
-                    <p>
-                      <strong>Firefox:</strong>
-                    </p>
-                    <ol>
-                      <li>주소창 왼쪽의 방패 아이콘 클릭</li>
-                      <li>&quot;알림&quot; 권한을 허용으로 변경</li>
-                    </ol>
-                  </div>
-                </details>
+              <div className='notification-settings'>
+                <h2>푸시 알림 설정</h2>
+                <NotificationManager />
               </div>
-            )}
 
-            {isNotificationEnabled && (
               <div className='notification-list-section'>
+                <h2>알림 목록</h2>
                 <NotificationList limit={50} />
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        .notice-page-content {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .page-header {
+          text-align: center;
+          margin-bottom: 40px;
+          padding: 40px 20px;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-header h1 {
+          font-size: 32px;
+          font-weight: 700;
+          color: #333;
+          margin: 0 0 12px 0;
+        }
+
+        .page-header p {
+          font-size: 16px;
+          color: #666;
+          margin: 0;
+        }
+
+        .notification-settings {
+          margin-bottom: 40px;
+        }
+
+        .notification-settings h2,
+        .notification-list-section h2 {
+          font-size: 24px;
+          font-weight: 600;
+          color: #333;
+          margin: 0 0 20px 0;
+        }
+
+        .notification-list-section {
+          margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+          .page-header {
+            padding: 30px 16px;
+            margin-bottom: 30px;
+          }
+
+          .page-header h1 {
+            font-size: 28px;
+          }
+
+          .page-header p {
+            font-size: 14px;
+          }
+
+          .notification-settings h2,
+          .notification-list-section h2 {
+            font-size: 20px;
+          }
+
+          .notification-settings {
+            margin-bottom: 30px;
+          }
+        }
+      `}</style>
     </sub>
   );
 }

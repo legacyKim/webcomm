@@ -87,8 +87,8 @@ export async function POST(req, context) {
   const { id } = await context.params;
 
   try {
-    const user = await serverTokenCheck(req);
-    if (!user.success) {
+    const user = await serverTokenCheck();
+    if (!user) {
       return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
     }
 
@@ -114,7 +114,7 @@ export async function POST(req, context) {
       parentId = formData.get("parentId") ? parseInt(formData.get("parentId")) : null;
       comment = formData.get("comment");
       mentionedUserIds = formData.get("mentionedUserIds") ? JSON.parse(formData.get("mentionedUserIds")) : [];
-      commentDepth = formData.get("commentDepth") ? parseInt(formData.get("commentDepth")) : null;
+      commentDepth = parseInt(formData.get("commentDepth") || "0");
 
       // 이미지 파일 데이터 가져오기
       const imageFilesData = formData.get("imageFiles");
@@ -136,8 +136,6 @@ export async function POST(req, context) {
       depth = 2;
     } else if (commentDepth === 0) {
       depth = 1;
-    } else {
-      depth = 0;
     }
 
     // 서버에서 파일 업로드 및 HTML 처리
@@ -152,83 +150,16 @@ export async function POST(req, context) {
 
     const commentId = insertResult.rows[0].id;
 
-    // 게시글 작성자 정보 가져오기
-    const postAuthorResult = await client.query(`SELECT user_id, user_nickname FROM posts WHERE id = $1`, [id]);
-
-    if (postAuthorResult.rows.length > 0) {
-      const postAuthor = postAuthorResult.rows[0];
-
-      // 자신의 글에 자신이 댓글을 단 경우가 아니라면 알림 동의 여부 확인 후 알림 생성
-      if (postAuthor.user_id !== isUserId) {
-        // 게시글 작성자의 알림 동의 여부 확인
-        const authorNotificationResult = await client.query(`SELECT notification_enabled FROM members WHERE id = $1`, [
-          postAuthor.user_id,
-        ]);
-
-        // 알림 동의한 사용자에게만 알림 저장
-        if (authorNotificationResult.rows[0]?.notification_enabled) {
-          await client.query(
-            `INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id, is_read)
-             VALUES ('comment', $1, $2, $3, $4, false)`,
-            [isUserId, postAuthor.user_id, id, commentId],
-          );
-        }
-      }
-    }
-
     // 멘션된 유저에게 알림 생성
     for (const mentionedUserId of mentionedUserIds) {
-      // 자신을 멘션하거나 이미 게시글 작성자 알림이 있는 경우 제외
-      if (mentionedUserId !== isUserId && mentionedUserId !== postAuthorResult.rows[0]?.user_id) {
-        // 멘션된 사용자의 알림 동의 여부 확인
-        const mentionedUserNotificationResult = await client.query(
-          `SELECT notification_enabled FROM members WHERE id = $1`,
-          [mentionedUserId],
-        );
-
-        // 알림 동의한 사용자에게만 알림 저장
-        if (mentionedUserNotificationResult.rows[0]?.notification_enabled) {
-          await client.query(
-            `INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id, is_read)
-             VALUES ('mention', $1, $2, $3, $4, false)`,
-            [isUserId, mentionedUserId, id, commentId],
-          );
-        }
-      }
+      await client.query(
+        `INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id, is_read)
+         VALUES ('mention', $1, $2, $3, $4, false)`,
+        [isUserId, mentionedUserId, id, commentId],
+      );
     }
 
     await client.query("COMMIT");
-
-    // 푸시 알림 전송 (비동기로 실행, 실패해도 댓글 등록에 영향 없음)
-    try {
-      const { sendCommentNotification, sendMentionNotification } = await import("@/lib/pushNotifications");
-
-      // 게시글 제목 가져오기
-      const postTitleResult = await client.query(`SELECT title FROM posts WHERE id = $1`, [id]);
-      const postTitle = postTitleResult.rows[0]?.title || "게시글";
-
-      // 게시글 작성자에게 댓글 알림
-      if (postAuthorResult.rows.length > 0 && postAuthorResult.rows[0].user_id !== isUserId) {
-        await sendCommentNotification(
-          parseInt(id),
-          commentId,
-          isUserId,
-          postAuthorResult.rows[0].user_id,
-          isUserNick,
-          postTitle,
-        );
-      }
-
-      // 멘션된 사용자들에게 멘션 알림
-      for (const mentionedUserId of mentionedUserIds) {
-        if (mentionedUserId !== isUserId && mentionedUserId !== postAuthorResult.rows[0]?.user_id) {
-          await sendMentionNotification(parseInt(id), commentId, isUserId, mentionedUserId, isUserNick, postTitle);
-        }
-      }
-    } catch (pushError) {
-      console.error("푸시 알림 전송 실패:", pushError);
-      // 푸시 알림 실패는 무시 (댓글 등록 자체는 성공)
-    }
 
     try {
       await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
@@ -258,10 +189,6 @@ export async function POST(req, context) {
     }
 
     return NextResponse.json({ success: true, message: "댓글이 추가되었습니다." }, { status: 201 });
-  } catch (error) {
-    await client.query("ROLLBACK");
-    console.error("댓글 등록 오류:", error);
-    return NextResponse.json({ success: false, message: "댓글 등록 중 오류 발생" }, { status: 500 });
   } finally {
     client.release();
   }

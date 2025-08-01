@@ -7,26 +7,12 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 
 import LayoutWrapper from "@/(site)/layoutWrapper";
-import prisma from "@/lib/prisma";
 
 import "@/style/base.css";
 import "@/style/font.css";
 import "@/style/fontello/css/fontello.css";
 import "@/style/fontello/css/animation.css";
 import "@/style/style.common.scss";
-
-// 사이트 설정 가져오기 (직접 DB 접근)
-async function getSiteSettings() {
-  try {
-    const settings = await prisma.siteSettings.findFirst({
-      orderBy: { id: "desc" },
-    });
-    return settings;
-  } catch (error) {
-    console.error("사이트 설정 가져오기 실패:", error);
-    return null;
-  }
-}
 
 export const metadata: Metadata = {
   title: "Tokti",
@@ -44,9 +30,6 @@ export default async function RootLayout({
   const cookieStore = cookies();
   const token = (await cookieStore).get("authToken")?.value ?? "";
 
-  // 사이트 설정 가져오기
-  const siteSettings = await getSiteSettings();
-
   let username = "";
   let userId = null;
   let userNick = "";
@@ -55,8 +38,6 @@ export default async function RootLayout({
   let userAuthority = null;
   let tokenExp = null;
   let userNickUpdatedAt = null;
-  let notificationEnabled = false;
-  let marketingEnabled = false;
 
   let loginStatusCheck = null;
 
@@ -71,8 +52,6 @@ export default async function RootLayout({
         userAuthority: number | null;
         exp: number | null;
         userNickUpdatedAt: Date | null;
-        notificationEnabled: boolean;
-        marketingEnabled: boolean;
       };
 
       username = decoded.username;
@@ -83,8 +62,6 @@ export default async function RootLayout({
       userAuthority = decoded.userAuthority;
       tokenExp = decoded.exp;
       userNickUpdatedAt = decoded.userNickUpdatedAt;
-      notificationEnabled = decoded.notificationEnabled || false;
-      marketingEnabled = decoded.marketingEnabled || false;
 
       loginStatusCheck = true;
     } catch (error) {
@@ -106,23 +83,9 @@ export default async function RootLayout({
           userAuthority={userAuthority}
           tokenExp={tokenExp}
           userNickUpdatedAt={userNickUpdatedAt}
-          loginStatusCheck={loginStatusCheck}
-          notificationEnabled={notificationEnabled}
-          marketingEnabled={marketingEnabled}>
+          loginStatusCheck={loginStatusCheck}>
           <QueryProvider>
-            <LayoutWrapper
-              siteSettings={
-                siteSettings
-                  ? {
-                      logo_url: siteSettings.logo_url || undefined,
-                      site_name: siteSettings.site_name || undefined,
-                      site_description: undefined, // DB에 없는 필드
-                      favicon_url: undefined, // DB에 없는 필드
-                    }
-                  : undefined
-              }>
-              {children}
-            </LayoutWrapper>
+            <LayoutWrapper>{children}</LayoutWrapper>
           </QueryProvider>
         </AuthProvider>
       </body>

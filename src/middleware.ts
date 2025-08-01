@@ -16,7 +16,7 @@ const PROTECTED_PATHS = [
   "/api/post/action/scrap",
 ];
 
-const EXCLUDE_PATHS = ["/api/user/duplicate", "/api/user/email"];
+const EXCLUDE_PATHS = ["/api/user/duplicate", "/api/user/email", "/api/user/profile"];
 
 function getJwtSecretKey() {
   const secret = process.env.JWT_SECRET;

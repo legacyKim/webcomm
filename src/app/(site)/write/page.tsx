@@ -11,6 +11,12 @@ import Editor from "./Editor";
 import { useAuth } from "@/AuthContext";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
 
+interface boards {
+  board_id: number | null;
+  board_name: string;
+  url_slug: string;
+}
+
 export default function Write() {
   const { isUserId, isUserNick, isUserAuthority } = useAuth();
   const router = useRouter();
@@ -33,19 +39,21 @@ export default function Write() {
   const [imageFiles, setImageFiles] = useState<ImageWithBlob[]>([]);
   const [videoFiles, setVideoFiles] = useState<VideoWithBlob[]>([]);
 
-  const [boardInfo, setBoardInfo] = useState<{ board_name: string; url_slug: string }>({
+  const [boardInfo, setBoardInfo] = useState<boards>({
+    board_id: null,
     board_name: "",
     url_slug: "",
   });
 
   const posting = async () => {
+    const boardId = boardInfo.board_id;
     const boardname = boardInfo.board_name;
     const url_slug = boardInfo.url_slug;
     const title = writeTitle.current?.value;
     const user_id = isUserId;
     const user_nickname = isUserNick;
 
-    if (!boardname || !title) {
+    if (!boardId || !boardname || !title) {
       alert("카테고리와 제목을 모두 입력해 주세요!");
       return;
     }
@@ -58,6 +66,7 @@ export default function Write() {
     try {
       // FormData로 파일과 데이터를 함께 전송
       const formData = new FormData();
+      formData.append("board_id", boardId.toString());
       formData.append("boardname", boardname);
       formData.append("url_slug", url_slug);
       formData.append("user_id", (user_id || 0).toString());
@@ -141,21 +150,20 @@ export default function Write() {
         <select
           className='board_category'
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            const selectedBoard = boardData.boards.find(
-              (b: { board_name: string; url_slug: string }) => b.url_slug === e.target.value,
-            );
+            const selectedBoard = boardData.boards.find((b: boards) => b.url_slug === e.target.value);
             if (selectedBoard) {
               setBoardInfo({
+                board_id: selectedBoard.id,
                 board_name: selectedBoard.board_name,
                 url_slug: selectedBoard.url_slug,
               });
             } else {
-              setBoardInfo({ board_name: "", url_slug: "" });
+              setBoardInfo({ board_id: null, board_name: "", url_slug: "" });
             }
           }}>
           <option>선택</option>
           {boardData &&
-            boardData?.boards?.map((b: { board_name: string; url_slug: string }) => (
+            boardData?.boards?.map((b: boards) => (
               <option key={b.board_name} value={b.url_slug}>
                 {b.board_name}
               </option>

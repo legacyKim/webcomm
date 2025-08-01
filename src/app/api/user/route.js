@@ -15,12 +15,11 @@ export async function POST(req) {
     const formData = await req.formData();
     const userid = formData.get("userid");
     const userNickname = formData.get("userNickname");
+    const userBio = formData.get("userBio") || null;
     const userPassword = formData.get("userPassword");
     const userEmail = formData.get("userEmail");
     const profileImage = formData.get("profileImage");
     const recaptchaToken = formData.get("recaptchaToken");
-    const notificationEnabled = formData.get("notificationEnabled") === "true";
-    const marketingEnabled = formData.get("marketingEnabled") === "true";
 
     // recaptcha check
     if (!recaptchaToken || typeof recaptchaToken !== "string") {
@@ -73,8 +72,8 @@ export async function POST(req) {
     }
 
     const insertResult = await client.query(
-      "INSERT INTO members (username, password, email, user_nickname, profile, authority, notification_enabled, marketing_enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-      [userid, hashedPassword, userEmail, userNickname, imgPath, 1, notificationEnabled, marketingEnabled],
+      "INSERT INTO members (username, password, email, user_nickname, bio, profile, authority) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [userid, hashedPassword, userEmail, userNickname, userBio, imgPath, 1],
     );
 
     return NextResponse.json(
@@ -82,6 +81,7 @@ export async function POST(req) {
       { status: 201 },
     );
   } catch (err) {
+    console.log(err);
     if (err.code === "23505") {
       if (err.detail.includes("email")) {
         return NextResponse.json({ success: false, message: "이메일이 중복됩니다!" }, { status: 400 });
@@ -104,10 +104,10 @@ export async function PUT(req) {
 
     const userid = formData.get("userid");
     const userNickname = formData.get("userNickname") || null;
+    const userBio = formData.get("userBio") || null;
     const userPassword = formData.get("userPassword") || null;
     const userEmail = formData.get("userEmail") || null;
     const profileImage = formData.get("profileImage") || null;
-    const marketingEnabled = formData.get("marketingEnabled") === "true";
 
     // 기존 사용자 확인
     const userResult = await client.query("SELECT * FROM members WHERE id = $1", [userid]);
@@ -162,6 +162,12 @@ export async function PUT(req) {
       updateValues.push(userEmail);
     }
 
+    // Bio 변경
+    if (userBio !== null && userBio !== user.bio) {
+      updateFields.push(`bio = $${valueIndex++}`);
+      updateValues.push(userBio);
+    }
+
     // 프로필 이미지 변경
     let imgPath = user.profile;
     if (profileImage) {
@@ -182,12 +188,6 @@ export async function PUT(req) {
       imgPath = `https://du1qll7elnsez.cloudfront.net/${filename}`;
       updateFields.push(`profile = $${valueIndex++}`);
       updateValues.push(imgPath);
-    }
-
-    // 마케팅 동의 상태 변경
-    if (marketingEnabled !== user.marketing_enabled) {
-      updateFields.push(`marketing_enabled = $${valueIndex++}`);
-      updateValues.push(marketingEnabled);
     }
 
     // 변경된 데이터가 없다면 업데이트하지 않음

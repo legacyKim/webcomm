@@ -21,22 +21,16 @@ import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
 
-export default function Home({
-  popBoardposts,
-  eachBoardPosts,
-}: {
-  popBoardposts: initDataPosts;
-  eachBoardPosts: initDataPosts;
-}) {
+export default function Home({ popBoardposts }: { popBoardposts: initDataPosts }) {
   const { isUserId, setBoardType, messageToUser } = useAuth();
 
-  const { data: homeData } = useQuery({
-    queryKey: ["home", isUserId],
-    queryFn: () => fetchHome(isUserId),
-    initialData: eachBoardPosts,
-    enabled: !!isUserId,
-    staleTime: 1000 * 60,
-  });
+  // const { data: homeData } = useQuery({
+  //   queryKey: ["home", isUserId],
+  //   queryFn: () => fetchHome(isUserId),
+  //   initialData: eachBoardPosts,
+  //   enabled: !!isUserId,
+  //   staleTime: 1000 * 60,
+  // });
 
   // 인기글 로딩 상태
   const [isLoadingPop, setIsLoadingPop] = useState(true);
@@ -186,8 +180,7 @@ export default function Home({
             display: "none",
           }}></div>
 
-        <div className='board_double'>
-          {/* board */}
+        {/* <div className='board_double'>
           {homeData &&
             Object.keys(homeData).map((boardName) => {
               const board = homeData[boardName];
@@ -226,7 +219,7 @@ export default function Home({
                 </div>
               );
             })}
-        </div>
+        </div> */}
       </div>
     </main>
   );

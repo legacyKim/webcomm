@@ -61,7 +61,7 @@ export default function View({
   const { isUserId, isUserNick, messageToUser, boardType, setRedirectPath, initData } = useAuth();
   // const [limit, setLimit] = useState(10);
 
-  const [viewPost, setViewPost] = useState<Posts | null>(post);
+  const [viewPost] = useState<Posts | null>(post);
 
   // 게시물 삭제
   const postDel = async () => {
@@ -82,21 +82,10 @@ export default function View({
 
   // 게시물 좋아요.
   const postLike = async () => {
-    try {
-      const res = await axios.post("/api/post/action/like", {
-        isUserId,
-        id: params.id,
-      });
-
-      if (res.data.success && viewPost) {
-        // 좋아요 상태에 따라 카운트 업데이트
-        const newLikes = res.data.liked ? viewPost.likes + 1 : viewPost.likes - 1;
-        setViewPost({ ...viewPost, likes: Math.max(0, newLikes) });
-      }
-    } catch (error) {
-      console.error("좋아요 처리 실패:", error);
-      alert("좋아요 처리 중 오류가 발생했습니다.");
-    }
+    await axios.post("/api/post/action/like", {
+      isUserId,
+      id: params.id,
+    });
   };
 
   // 게시물 신고.
@@ -136,107 +125,74 @@ export default function View({
   const [commentList, setCommentList] = useState<CommentTreeNode[] | null>(comment ?? []);
 
   // 댓글 실시간 열람
-  useEffect(() => {
-    const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
+  // useEffect(() => {
+  //   const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
 
-    eventSource.onerror = (error) => {
-      console.error("SSE 연결 오류:", error);
-    };
+  //   eventSource.onerror = (error) => {
+  //     console.error("SSE 연결 오류:", error);
+  //   };
 
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data) as CommentTreeNode & {
-          event: string;
-          post_id: string;
-        };
+  //   eventSource.onmessage = (event) => {
+  //     try {
+  //       const data = JSON.parse(event.data) as CommentTreeNode & {
+  //         event: string;
+  //         post_id: string;
+  //       };
 
-        // 연결 확인 메시지는 무시
-        if (data.event === "connected") {
-          return;
-        }
+  //       // 연결 확인 메시지는 무시
+  //       if (data.event === "connected") {
+  //         return;
+  //       }
 
-        // 현재 게시글이 아닌 댓글은 무시
-        if (data.post_id !== params.id) {
-          return;
-        }
+  //       // 현재 게시글이 아닌 댓글은 무시
+  //       if (data.post_id !== params.id) {
+  //         return;
+  //       }
 
-        if (data.event === "INSERT") {
-          setCommentList((prev: CommentTreeNode[] | null) => {
-            // 누락된 필드들 추가
-            const newComment: CommentTreeNode = {
-              id: data.id,
-              parent_id: data.parent_id || null,
-              user_id: data.user_id,
-              user_nickname: data.user_nickname,
-              content: data.content,
-              profile: data.profile,
-              likes: data.likes || 0,
-              depth: data.depth || 0,
-              created_at: data.created_at,
-              updated_at: data.updated_at,
-              event: data.event,
-              post_id: data.post_id,
-              children: [],
-            };
+  //       if (data.event === "INSERT") {
+  //         setCommentList((prev: CommentTreeNode[] | null) => {
+  //           // 누락된 필드들 추가
+  //           const newComment: CommentTreeNode = {
+  //             id: data.id,
+  //             parent_id: data.parent_id || null,
+  //             user_id: data.user_id,
+  //             user_nickname: data.user_nickname,
+  //             content: data.content,
+  //             profile: data.profile,
+  //             likes: data.likes || 0,
+  //             depth: data.depth || 0,
+  //             created_at: data.created_at,
+  //             updated_at: data.updated_at,
+  //             event: data.event,
+  //             post_id: data.post_id,
+  //             children: [],
+  //           };
 
-            if (!prev) {
-              return [newComment];
-            }
-            return [...prev, newComment];
-          });
-        } else if (data.event === "DELETE") {
-          setCommentList((prev: CommentTreeNode[] | null) => {
-            if (!prev) return prev;
-            return prev.filter((c) => c.id !== data.id);
-          });
-        } else if (data.event === "UPDATE") {
-          setCommentList((prev: CommentTreeNode[] | null) => {
-            if (!prev) return prev;
-            return prev.map((c) => (c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c));
-          });
-        }
-      } catch (error) {
-        console.error("JSON 파싱 오류:", error);
-      }
-    };
+  //           if (!prev) {
+  //             return [newComment];
+  //           }
+  //           return [...prev, newComment];
+  //         });
+  //       } else if (data.event === "DELETE") {
+  //         setCommentList((prev: CommentTreeNode[] | null) => {
+  //           if (!prev) return prev;
+  //           return prev.filter((c) => c.id !== data.id);
+  //         });
+  //       } else if (data.event === "UPDATE") {
+  //         setCommentList((prev: CommentTreeNode[] | null) => {
+  //           if (!prev) return prev;
+  //           return prev.map((c) => (c.id === data.id ? { ...c, likes: data.likes, content: data.content } : c));
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error("JSON 파싱 오류:", error);
+  //     }
+  //   };
 
-    // 좋아요 변경 이벤트 처리
-    eventSource.addEventListener("message", (event) => {
-      try {
-        const data = JSON.parse(event.data);
-
-        // 좋아요 변경 이벤트 처리
-        if (data.type === "comment_like_update") {
-          setCommentList((prev: CommentTreeNode[] | null) => {
-            if (!prev) return prev;
-
-            const updateCommentLikes = (comments: CommentTreeNode[]): CommentTreeNode[] => {
-              return comments.map((comment) => {
-                if (comment.id === data.comment_id) {
-                  return { ...comment, likes: data.likes_count };
-                }
-                if (comment.children && comment.children.length > 0) {
-                  return {
-                    ...comment,
-                    children: updateCommentLikes(comment.children),
-                  };
-                }
-                return comment;
-              });
-            };
-
-            return updateCommentLikes(prev);
-          });
-        }
-      } catch (error) {
-        console.error("좋아요 이벤트 처리 오류:", error);
-      }
-    });
-
-    return () => {
-      eventSource.close();
-    };
-  }, []);
+  //   return () => {
+  //     eventSource.close();
+  //   };
+  // }, []);
 
   // 댓글 트리 구조로 변환
   const rows = commentList ?? [];
@@ -247,24 +203,14 @@ export default function View({
   const [recommentContent, setRecommentContent] = useState<string>("");
 
   // 댓글 수정
-  const [commentCorrect, setCommentCorrect] = useState<{
-    content: string;
-    id: number;
-  } | null>(null);
+  const [commentCorrect, setCommentCorrect] = useState<{ content: string; id: number } | null>(null);
 
   // 댓글 등록
-  const [commentAdd, setCommentAdd] = useState<{
-    user_id: number;
-    id: number;
-  } | null>(null);
-  const [recommentAdd, setRecommentAdd] = useState<{
-    user_id: number;
-    id: number;
-    recomment_id: number;
-  } | null>(null);
+  const [commentAdd, setCommentAdd] = useState<{ user_id: number; id: number } | null>(null);
+  const [recommentAdd, setRecommentAdd] = useState<{ user_id: number; id: number; recomment_id: number } | null>(null);
 
   // 댓글 등록
-  const commentPost = async (commentContent: string, id?: number, depth?: number | null) => {
+  const commentPost = async (commentContent: string, id?: number, depth?: number) => {
     const comment = commentContent.trim();
     const parentId = id;
     const commentDepth = depth ?? null;
@@ -289,7 +235,7 @@ export default function View({
       formData.append("isUserNick", isUserNick || "");
       formData.append("parentId", parentId ? parentId.toString() : "");
       formData.append("mentionedUserIds", JSON.stringify(commentMentionUser));
-      formData.append("commentDepth", commentDepth !== null ? commentDepth.toString() : "");
+      formData.append("commentDepth", (commentDepth || 0).toString());
 
       // 이미지 파일이 있는 경우 base64로 변환하여 전송
       if (commentImagesFile.length > 0) {
@@ -323,6 +269,7 @@ export default function View({
         if (setSingleCommentImageFile) {
           setSingleCommentImageFile(null);
         }
+        setReset(false);
       } else {
         if (response.data.message === "인증되지 않은 사용자입니다.") {
           const isConfirmed = confirm("로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?");
@@ -337,8 +284,6 @@ export default function View({
     } catch (error) {
       console.error("댓글 등록 실패:", error);
       alert("댓글 등록에 실패했습니다. 다시 시도해 주세요.");
-    } finally {
-      setReset(false);
     }
   };
 
@@ -375,9 +320,7 @@ export default function View({
 
   // writer dropdown
   const writerRef = useRef<HTMLDivElement>(null);
-  const { writerDrop, dropPosition, userClick } = useDropDown({
-    messageToUser,
-  });
+  const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });
   const [userInfoInDropMenu, setUserInfoInDropMenu] = useState<{
     userId: number;
     userNickname: string;
@@ -471,9 +414,7 @@ export default function View({
                   <HeartIcon className='icon' />
                   <span>{viewPost?.likes}</span>
                 </span>
-                <span className='date'>
-                  {viewPost?.created_at ? new Date(viewPost.created_at).toISOString().split("T")[0] : ""}
-                </span>
+                <span className='date'>{new Date(viewPost?.created_at).toLocaleDateString()}</span>
               </div>
             </div>
 

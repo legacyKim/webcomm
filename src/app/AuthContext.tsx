@@ -17,8 +17,6 @@ export function AuthProvider({
   tokenExp,
   userNickUpdatedAt,
   loginStatusCheck,
-  notificationEnabled,
-  marketingEnabled,
 }: {
   children: React.ReactNode;
   username: string;
@@ -30,8 +28,6 @@ export function AuthProvider({
   tokenExp: number | null;
   userNickUpdatedAt: Date | null;
   loginStatusCheck: boolean | null;
-  notificationEnabled: boolean;
-  marketingEnabled: boolean;
 }) {
   const [isUsername, setIsUsername] = useState<string | null>(username);
   const [isUserId, setIsUserId] = useState<number | null>(userId);
@@ -41,8 +37,6 @@ export function AuthProvider({
   const [isUserEmail, setIsUserEmail] = useState<string | null>(userEmail);
   const [isUserAuthority, setIsUserAuthority] = useState<number | null>(userAuthority);
   const [isUserNickUpdatedAt, setIsUserNickUpdatedAt] = useState<Date | null>(userNickUpdatedAt);
-  const [isNotificationEnabled, setIsNotificationEnabled] = useState<boolean>(notificationEnabled);
-  const [isMarketingEnabled, setIsMarketingEnabled] = useState<boolean>(marketingEnabled);
 
   const [loginStatus, setLoginStatus] = useState<boolean | null>(loginStatusCheck);
   const [tokenExpiration, setTokenExpiration] = useState<number | null>(tokenExp);
@@ -91,10 +85,6 @@ export function AuthProvider({
         setTokenExpiration,
         isUserNickUpdatedAt,
         setIsUserNickUpdatedAt,
-        isNotificationEnabled,
-        setIsNotificationEnabled,
-        isMarketingEnabled,
-        setIsMarketingEnabled,
         redirectPath,
         setRedirectPath,
         initData,
