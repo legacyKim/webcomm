@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 // Prisma 클라이언트 - 글로벌 객체에서 가져오기
 const prisma = global.prisma;
