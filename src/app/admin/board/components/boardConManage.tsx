@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
 import { useState } from "react";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
-import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
+import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 import BoardConManagePopup from "./popup/boardConManagePopup";
 
 export default function BoardConManage() {
