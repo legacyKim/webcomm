@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import formatPostDate from "@/components/formatDate";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
-import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
+import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 
 import BoardNoticePopup from "./popup/boardNoticePopup";
 import BoardNoticeViewPopup from "./popup/boardNoticeViewPopup";

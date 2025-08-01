@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
-import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
+import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 import formatPostDate from "@/components/formatDate";
 import TiptapViewer from "@/components/tiptapViewer";
 

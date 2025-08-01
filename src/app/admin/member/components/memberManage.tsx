@@ -3,7 +3,7 @@
 import { Member } from "@/type/type";
 import { useState } from "react";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
-import { QueryInfiniteScrollContainer } from "@/components/QueryComponentsNew";
+import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 import { useMemberAuthorityMutation, useMemberDeleteMutation, useStatsUpdateMutation } from "@/func/hook/useMutations";
 import RestrictionPopup from "./popup/RestrictionPopup";
 import MemberDetailModal from "./MemberDetailModal";
