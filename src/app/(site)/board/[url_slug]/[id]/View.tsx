@@ -20,7 +20,6 @@ import { CommentTreeBuild } from "./CommentTreeBuild";
 import CommentTree from "./CommentTree";
 
 import dynamic from "next/dynamic";
-import { SSE_BASE_URL } from "@/lib/sse";
 
 import {
   ChatBubbleLeftEllipsisIcon,

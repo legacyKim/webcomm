@@ -15,7 +15,7 @@ export function invalidateUserProfileCache(username: string) {
   });
 }
 
-export function invalidateUserProfileCacheById(userId: number) {
+export function invalidateUserProfileCacheById() {
   // TODO: userId로 username을 찾아서 캐시 무효화
   // 임시로 전체 프로필 캐시 무효화
   revalidateTag("profiles");

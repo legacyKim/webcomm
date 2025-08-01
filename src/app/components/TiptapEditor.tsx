@@ -23,7 +23,7 @@ interface TiptapEditorProps {
   placeholder?: string;
 }
 
-export default function TiptapEditor({ content, onChange, placeholder }: TiptapEditorProps) {
+export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   const editor = useEditor({
     extensions: [
       CustomTextStyle,

@@ -3,7 +3,15 @@
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/AuthContext";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+
+interface CustomMenu {
+  id: number;
+  title: string;
+  url_slug: string;
+  board_name: string;
+  isFixed: boolean;
+}
 
 export default function Menu({
   boardList,
@@ -13,8 +21,8 @@ export default function Menu({
   const pathname = usePathname();
   const { setBoardType, isUserId } = useAuth();
   const [showToggleMenu, setShowToggleMenu] = useState(false);
-  const [customMenus, setCustomMenus] = useState<any[]>([]);
-  const [hasCustomMenus, setHasCustomMenus] = useState(false);
+  const [customMenus] = useState<CustomMenu[]>([]);
+  const [hasCustomMenus] = useState(false);
 
   if (["/login", "/user", "/find", "/agree"].includes(pathname)) return null;
 
@@ -27,7 +35,12 @@ export default function Menu({
   };
 
   // 자유게시판 찾기
-  const freeBoard = boardList?.boards?.find((board) => board.board_name === "자유게시판" || board.url_slug === "free");
+  const freeBoard = boardList?.boards?.find((board) => board.board_name === "자유게시판" || board.url_slug === "free")
+    ? {
+        ...boardList?.boards?.find((board) => board.board_name === "자유게시판" || board.url_slug === "free"),
+        isFixed: true,
+      }
+    : undefined;
 
   // 커스텀 메뉴는 로그인 한 유저에 한정해서 정해짐. 만약 커스텀 메뉴가 없을 시 보여줄 메뉴는
   // 베스트 게시판, 자유 게시판, 유머 게시판 <- 이 3가지가 공통 게시판, 나머지는 가장 활성화된 게시판을 보여줘야할 듯

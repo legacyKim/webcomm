@@ -1,8 +1,9 @@
 // 사용자 활동 통계 업데이트 유틸리티
 import { revalidateTag } from "next/cache";
+import { PrismaClient } from "@prisma/client";
 
 // Prisma 클라이언트
-const prisma = (global as any).prisma;
+const prisma = (global as unknown as { prisma: PrismaClient }).prisma;
 
 export interface UserStats {
   userId: number;
@@ -12,13 +13,24 @@ export interface UserStats {
   postsCount?: number;
 }
 
+interface UpdateData {
+  total_views_received?: { increment: number };
+  total_likes_received?: { increment: number };
+  all_comments?: { increment: number };
+  all_posts?: { increment: number };
+  total_comments_count?: { increment: number };
+  total_posts_count?: { increment: number };
+  last_seen?: Date;
+  is_online?: boolean;
+}
+
 // 사용자 통계 업데이트 (실제 DB 업데이트 + 캐시 무효화)
 export async function updateUserStats(stats: UserStats) {
   const { userId, postViews, likesReceived, commentsCount, postsCount } = stats;
 
   try {
     // 실제 DB 업데이트 실행
-    const updateData: any = {};
+    const updateData: UpdateData = {};
 
     if (postViews !== undefined) {
       updateData.total_views_received = {
@@ -146,21 +158,16 @@ export async function updateLikeStats(postId: number, authorId: number, isLike: 
 // 댓글 작성 시 호출
 export async function updateCommentStats(postId: number, authorId: number, isAdd: boolean) {
   try {
-    // 게시물 댓글 수 업데이트
-    await prisma.post.update({
-      where: { id: postId },
-      data: {
-        comments_count: {
-          increment: isAdd ? 1 : -1,
-        },
-      },
-    });
-
+    // 게시물 댓글 수는 Prisma에서 자동으로 계산되므로 별도 업데이트 불필요
     // 게시물 작성자 통계 업데이트 (댓글 받은 수)
     await updateUserStats({
       userId: authorId,
       commentsCount: isAdd ? 1 : -1,
     });
+
+    // 캐시 무효화
+    revalidateTag(`post-${postId}`);
+    revalidateTag("posts");
 
     console.log(`게시물 ${postId} 댓글 ${isAdd ? "추가" : "삭제"}, 작성자 ${authorId} 통계 업데이트`);
     return true;

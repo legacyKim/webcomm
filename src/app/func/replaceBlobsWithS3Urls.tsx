@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export interface BlobFile {
   file: File;
   blobUrl: string;

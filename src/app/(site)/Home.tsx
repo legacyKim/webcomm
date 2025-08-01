@@ -5,7 +5,6 @@ import Search from "@/components/search";
 import Link from "next/link";
 
 import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Posts, initDataPosts } from "@/type/type";
 
 import { useAuth } from "@/AuthContext";
@@ -13,7 +12,7 @@ import { useDropDown } from "@/func/hook/useDropDown";
 import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
 
-import { fetchHome } from "@/api/api";
+// import { fetchHome } from "@/api/api";
 
 import { ChatBubbleLeftEllipsisIcon, EyeIcon, HeartIcon } from "@heroicons/react/24/outline";
 // import { SSE_BASE_URL } from "@/lib/sse";

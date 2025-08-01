@@ -1,18 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 
 // Prisma 클라이언트
-const prisma = (global as any).prisma;
+const prisma = global.prisma;
 
-interface FollowRequest {
-  targetUserId: number;
-  action: "follow" | "unfollow";
-}
-
-export async function POST(request: NextRequest) {
+export async function POST(request) {
   try {
-    const body: FollowRequest = await request.json();
+    const body = await request.json();
     const { targetUserId, action } = body;
 
     if (!targetUserId || !action || !["follow", "unfollow"].includes(action)) {
@@ -107,7 +102,7 @@ export async function POST(request: NextRequest) {
 }
 
 // 팔로우 목록 조회
-export async function GET(request: NextRequest) {
+export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
@@ -154,7 +149,7 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      const users = followData.map((follow: any) => (type === "followers" ? follow.follower : follow.following));
+      const users = followData.map((follow) => (type === "followers" ? follow.follower : follow.following));
 
       return NextResponse.json(
         {

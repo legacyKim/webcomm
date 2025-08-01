@@ -1,22 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { UserProfile, UserActivity } from "@/type/type";
-import { revalidateTag } from "next/cache";
 
 // Prisma 클라이언트 - 글로벌 객체에서 가져오기
-const prisma = (global as any).prisma;
+const prisma = global.prisma;
 
-// 응답 타입 정의
-
-interface ProfileResponse {
-  profile: UserProfile;
-  activity: UserActivity;
-}
-
-async function getUserProfileFromDB(
-  usernameOrNickname: string,
-  currentUserId?: number,
-  tab: string = "summary",
-): Promise<ProfileResponse | null> {
+async function getUserProfileFromDB(usernameOrNickname, currentUserId, tab = "summary") {
   try {
     // 사용자 기본 정보 조회 - username 또는 user_nickname으로 검색
     const user = await prisma.member.findFirst({
@@ -149,7 +136,7 @@ async function getUserProfileFromDB(
         : [];
 
     // 관심 게시판 통계 (게시글과 댓글 활동 기반)
-    let favoriteBoards: any[] = [];
+    let favoriteBoards = [];
     if (tab === "summary" || tab === "activity") {
       try {
         // 게시글 기반 활동 통계
@@ -164,20 +151,8 @@ async function getUserProfileFromDB(
           },
         });
 
-        // 댓글 기반 활동 통계
-        const commentActivity = await prisma.comment.groupBy({
-          by: ["post_id"],
-          where: {
-            user_id: user.id,
-            is_deleted: false,
-          },
-          _count: {
-            id: true,
-          },
-        });
-
         // 게시판 정보와 함께 조합
-        const boardIds = [...new Set(postActivity.map((p: any) => p.board_id))];
+        const boardIds = [...new Set(postActivity.map((p) => p.board_id))];
         const boards = await prisma.board.findMany({
           where: { id: { in: boardIds } },
           select: {
@@ -188,15 +163,15 @@ async function getUserProfileFromDB(
         });
 
         favoriteBoards = boards
-          .map((board: any) => {
-            const postCount = postActivity.find((p: any) => p.board_id === board.id)?._count.id || 0;
+          .map((board) => {
+            const postCount = postActivity.find((p) => p.board_id === board.id)?._count.id || 0;
             return {
               board_name: board.board_name,
               url_slug: board.url_slug,
               activity_count: postCount,
             };
           })
-          .sort((a: any, b: any) => b.activity_count - a.activity_count)
+          .sort((a, b) => b.activity_count - a.activity_count)
           .slice(0, 5);
       } catch (error) {
         console.error("관심 게시판 통계 조회 오류:", error);
@@ -204,11 +179,11 @@ async function getUserProfileFromDB(
       }
     }
 
-    const profileData: ProfileResponse = {
+    const profileData = {
       profile: {
         id: user.id,
         username: user.username,
-        user_nickname: user.user_nickname,
+        user_nickname: user.user_nickname || "",
         profile: user.profile,
         bio: user.bio,
         location: user.location,
@@ -227,7 +202,7 @@ async function getUserProfileFromDB(
         isOwnProfile: currentUserId === user.id,
       },
       activity: {
-        recent_posts: recentPosts.map((post: any) => ({
+        recent_posts: recentPosts.map((post) => ({
           id: post.id,
           title: post.title,
           board_name: post.board?.board_name || "알 수 없음",
@@ -236,7 +211,7 @@ async function getUserProfileFromDB(
           views: post.views,
           likes: post.likes,
         })),
-        recent_comments: recentComments.map((comment: any) => ({
+        recent_comments: recentComments.map((comment) => ({
           id: comment.id,
           content: comment.content,
           post_title: comment.post?.title || "",
@@ -246,10 +221,10 @@ async function getUserProfileFromDB(
           likes: comment.likes,
         })),
         favorite_boards: favoriteBoards,
-        followers: followers.map((f: any) => ({
+        followers: followers.map((f) => ({
           id: f.follower.id,
           username: f.follower.username,
-          user_nickname: f.follower.user_nickname,
+          user_nickname: f.follower.user_nickname || "",
           profile: f.follower.profile,
         })),
       },
@@ -265,7 +240,7 @@ async function getUserProfileFromDB(
 }
 
 // GET 요청 핸들러 - ISR과 캐싱 최적화
-export async function GET(request: NextRequest) {
+export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const username = searchParams.get("username");
@@ -307,7 +282,7 @@ export async function GET(request: NextRequest) {
 }
 
 // 캐시 재검증을 위한 API (관리자용)
-export async function POST(request: NextRequest) {
+export async function POST(request) {
   try {
     const { username, action } = await request.json();
 
