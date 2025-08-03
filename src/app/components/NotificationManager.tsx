@@ -1,16 +1,25 @@
 "use client";
 
+import { NoSymbolIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
-export default function NotificationManager() {
-  const { data: session } = useSession();
+export default function NotificationManager({
+  isUserId,
+  permission,
+  setPermission,
+  isSubscribed,
+  setIsSubscribed,
+}: {
+  isUserId: number | null;
+  permission: string;
+  setPermission: (permission: string) => void;
+  isSubscribed: boolean;
+  setIsSubscribed: (isSubscribed: boolean) => void;
+}) {
   const [isSupported, setIsSupported] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [permission, setPermission] = useState("default");
 
   useEffect(() => {
     // 브라우저 지원 여부 확인
@@ -24,7 +33,7 @@ export default function NotificationManager() {
       // 기존 구독 상태 확인
       checkSubscriptionStatus();
     }
-  }, [session]);
+  }, [isUserId]);
 
   const registerServiceWorker = async () => {
     try {
@@ -70,7 +79,7 @@ export default function NotificationManager() {
   };
 
   const subscribeToNotifications = async () => {
-    if (!session?.user?.id) {
+    if (!isUserId) {
       alert("로그인이 필요합니다.");
       return;
     }
@@ -201,98 +210,45 @@ export default function NotificationManager() {
   if (!isSupported) {
     return (
       <div className='notification-manager'>
-        <p>이 브라우저는 푸시 알림을 지원하지 않습니다.</p>
+        <p className='warning'>
+          <NoSymbolIcon className='icon' />이 브라우저는 푸시 알림을 지원하지 않습니다.
+        </p>
       </div>
     );
   }
 
-  if (!session) {
+  if (!isUserId) {
     return null;
   }
 
   return (
     <div className='notification-manager'>
       <div className='notification-controls'>
-        {permission === "denied" && (
-          <p className='warning'>알림이 차단되어 있습니다. 브라우저 설정에서 알림을 허용해주세요.</p>
-        )}
+        <p className='notice'>새로운 알림을 확인하고 푸시 알림을 설정하세요.</p>
 
         {permission === "granted" && (
-          <>
-            {isSubscribed ? (
-              <button onClick={unsubscribeFromNotifications} disabled={isLoading} className='btn-unsubscribe'>
-                {isLoading ? "처리중..." : "푸시 알림 끄기"}
-              </button>
-            ) : (
-              <button onClick={subscribeToNotifications} disabled={isLoading} className='btn-subscribe'>
-                {isLoading ? "처리중..." : "푸시 알림 켜기"}
-              </button>
-            )}
-          </>
-        )}
-
-        {permission === "default" && (
-          <button onClick={subscribeToNotifications} disabled={isLoading} className='btn-subscribe'>
-            {isLoading ? "처리중..." : "푸시 알림 허용"}
-          </button>
+          <div className='toggle-container'>
+            <label className='toggle-switch'>
+              <input
+                type='checkbox'
+                checked={isSubscribed}
+                onChange={isSubscribed ? unsubscribeFromNotifications : subscribeToNotifications}
+                disabled={isLoading}
+              />
+              <span className='toggle-slider'></span>
+            </label>
+            {/* <span className='toggle-label'>
+              {isLoading ? "처리중..." : isSubscribed ? "푸시 알림 켜짐" : "푸시 알림 꺼짐"}
+            </span> */}
+          </div>
         )}
       </div>
-
-      <style jsx>{`
-        .notification-manager {
-          padding: 20px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          margin: 20px 0;
-        }
-
-        .notification-controls {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-
-        .warning {
-          color: #d32f2f;
-          background-color: #ffebee;
-          padding: 10px;
-          border-radius: 4px;
-          border-left: 4px solid #d32f2f;
-        }
-
-        .btn-subscribe,
-        .btn-unsubscribe {
-          padding: 12px 24px;
-          border: none;
-          border-radius: 6px;
-          cursor: pointer;
-          font-size: 16px;
-          transition: background-color 0.2s;
-        }
-
-        .btn-subscribe {
-          background-color: #1976d2;
-          color: white;
-        }
-
-        .btn-subscribe:hover:not(:disabled) {
-          background-color: #1565c0;
-        }
-
-        .btn-unsubscribe {
-          background-color: #d32f2f;
-          color: white;
-        }
-
-        .btn-unsubscribe:hover:not(:disabled) {
-          background-color: #c62828;
-        }
-
-        button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      `}</style>
+      {permission === "denied" && (
+        <p className='warning'>
+          <NoSymbolIcon className='icon' />
+          알림이 차단되어 있습니다. 브라우저 설정에서 알림을 허용해주세요.
+        </p>
+      )}
     </div>
   );
 }

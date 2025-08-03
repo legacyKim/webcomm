@@ -463,18 +463,25 @@ footer {
 /* footer end */
 
 /* menu */
-.menu_list_top {
-  background-color: $main-color;
-  @include flex-start;
-}
+
 .menu {
   align-self: flex-start;
   height: max-content;
 }
 
+.menu_wrap {
+  background-color: $main-color;
+}
+.menu_list_top {
+  @include space-between;
+  align-items: center;
+  height: $menu-height;
+}
+
 .menu_list {
   display: flex;
   justify-content: flex-start;
+  gap: 4px;
 }
 
 .menu_list li a {
@@ -487,10 +494,48 @@ footer {
   width: 100%;
   border-radius: 4px;
   transition: all 0.3s ease-in-out;
+  color: #fff;
 }
-.menu_list li a:hover {
-  color: $main-color;
+
+.menu_list_all {
+  position: absolute;
+  top: $menu-height;
+  left: -10px;
+  width: 100vw;
+  background-color: #fff;
+  z-index: 9;
+  max-height: 0;
+  overflow: hidden;
+
+  box-shadow: $box-shadow;
+
+  &.active {
+    max-height: 1000px;
+    transition: max-height 1s ease;
+  }
+
+  .menu_list {
+    gap: 8px;
+    padding: 6px 8px 40px;
+    li a {
+      color: #000;
+      font-weight: 400;
+      font-size: 14px;
+
+      &:hover {
+        color: $main-color;
+      }
+    }
+  }
 }
+
+.menu_custom_btn {
+  @include flex-center;
+  .icon {
+    color: #fff;
+  }
+}
+
 /* menu end */
 
 /* search */
@@ -527,8 +572,8 @@ footer {
 /* main */
 main,
 sub {
-  flex: 5;
-  margin-right: 24px;
+  // flex: 5;
+  // margin-right: 24px;
   min-width: 788px;
 }
 sub {
@@ -542,7 +587,7 @@ sub {
   display: flex;
   justify-content: flex-start;
   align-items: stretch;
-  column-gap: 16px;
+  // column-gap: 16px;
   min-height: calc(100vh - $header-height - $footer-height + 200px);
   padding-top: 20px;
 }
@@ -2469,6 +2514,11 @@ sub .board_list {
   &:hover {
     background-color: $main-hover-color;
   }
+
+  &.following {
+    background: linear-gradient(45deg, $main-color, #fff, $main-hover-color);
+    background-size: 300% 300%;
+  }
 }
 
 .follow_description {
@@ -2498,7 +2548,7 @@ sub .board_list {
 }
 .tab_content {
   width: 100%;
-  padding: 16px;
+  padding: 32px 16px;
 }
 .summary_tab {
   @include flex-column;
@@ -2639,4 +2689,122 @@ sub .board_list {
 .empty_state {
 }
 .sub_text {
+}
+
+/* notification styles */
+
+.notification-settings {
+  padding-bottom: 40px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    padding-bottom: 12px;
+  }
+}
+
+.notification-list-section {
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    padding-bottom: 12px;
+  }
+}
+
+.notification-controls {
+  position: relative;
+  @include space-between;
+  align-items: center;
+
+  border: $border-grey;
+  border-radius: 4px;
+  padding: 16px 12px;
+  box-shadow: $box-shadow;
+}
+
+/* 알림 토글 스위치 */
+.notification-manager .toggle-container {
+  @include flex-start;
+  height: 28px;
+}
+
+.notification-manager .toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
+}
+
+.notification-manager .toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.notification-manager .toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: block;
+  cursor: pointer;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 32px;
+  width: 55px;
+  height: 30px;
+}
+
+.notification-manager .toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 5px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.notification-manager .toggle-switch input:checked + .toggle-slider {
+  background-color: #4caf50;
+}
+
+.notification-manager .toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(23px);
+}
+
+.notification-manager .toggle-switch input:disabled + .toggle-slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.notification-manager .toggle-label {
+  font-size: 14px;
+  color: var(--font-color);
+  font-weight: 500;
+}
+
+.notification-manager {
+  .warning {
+    @include flex-start;
+    align-items: center;
+    border: 1px solid #ffca2b;
+    background-color: #feffec;
+    color: #991c1c;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    .icon {
+      color: #ffca2b;
+      margin-right: 8px;
+      top: 1px;
+    }
+  }
 }

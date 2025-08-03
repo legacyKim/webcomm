@@ -9,22 +9,33 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const subscription = await request.json();
+    const { subscription } = await request.json();
+
+    // 디버깅 로그
+    console.log("받은 구독 데이터:", JSON.stringify({ subscription }, null, 2));
+
+    // 구독 데이터 유효성 검사
+    if (!subscription || !subscription.endpoint || !subscription.keys) {
+      return NextResponse.json({ error: "Invalid subscription data" }, { status: 400 });
+    }
+
+    const { endpoint, keys } = subscription;
+    const { p256dh, auth } = keys;
 
     // 기존 구독이 있다면 업데이트, 없다면 생성
     await prisma.pushSubscription.upsert({
       where: {
-        endpoint: subscription.endpoint,
+        endpoint: endpoint,
       },
       update: {
-        p256dh: subscription.keys.p256dh,
-        auth: subscription.keys.auth,
+        p256dh: p256dh,
+        auth: auth,
       },
       create: {
         user_id: user.id,
-        endpoint: subscription.endpoint,
-        p256dh: subscription.keys.p256dh,
-        auth: subscription.keys.auth,
+        endpoint: endpoint,
+        p256dh: p256dh,
+        auth: auth,
       },
     });
 

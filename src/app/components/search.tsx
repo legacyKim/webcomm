@@ -16,7 +16,9 @@ export default function Search() {
       alert("검색어를 입력해 주세요.");
       return;
     }
-    router.push(`/board/search/${keyword}`);
+    // URL 인코딩 추가하여 한글 및 특수문자 처리
+    const encodedKeyword = encodeURIComponent(keyword.trim());
+    router.push(`/board/search/${encodedKeyword}`);
   };
 
   return (

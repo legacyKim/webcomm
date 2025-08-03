@@ -1,9 +1,12 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/AuthContext";
 import Link from "next/link";
-import { useState } from "react";
+
+import { BarsArrowDownIcon } from "@heroicons/react/24/outline";
 
 interface CustomMenu {
   id: number;
@@ -24,6 +27,25 @@ export default function Menu({
   const [customMenus] = useState<CustomMenu[]>([]);
   const [hasCustomMenus] = useState(false);
 
+  useEffect(() => {
+    const clickOutSide = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const menu = document.querySelector(".menu_list_all");
+      const menuBtn = document.querySelector(".menu_custom_btn");
+
+      if ((menu && menu.contains(target)) || (menuBtn && menuBtn.contains(target))) {
+        return;
+      }
+      setShowToggleMenu(false);
+    };
+
+    document.addEventListener("mousedown", clickOutSide);
+    return () => {
+      document.removeEventListener("mousedown", clickOutSide);
+    };
+  }, []);
+
+  // 조건부 return을 hooks 호출 이후로 이동
   if (["/login", "/user", "/find", "/agree"].includes(pathname)) return null;
 
   // 베스트 게시판 (고정)
@@ -82,34 +104,39 @@ export default function Menu({
         onClick={() => {
           setBoardType("board");
         }}>
-        <div className='menu_list_top'>
-          {/* 커스텀 메뉴가 없을 때는 기본 메뉴 2개를 순차적으로 보여줌. - 베스트 게시판, 자유 게시판 */}
-          {/* 커스텀 메뉴가 있으면 커스텀 메뉴를 우선 보여줌. */}
-          <ul className='menu_list page'>
-            {primaryMenus.map((menu) => (
-              <li key={menu.url_slug || menu.id}>
-                <Link href={`/board/${menu.url_slug}`} className={menu.isFixed ? "menu-fixed" : ""}>
-                  {menu.board_name}
-                </Link>
-              </li>
-            ))}
+        <div className='menu_wrap'>
+          <div className='menu_list_top page'>
+            {/* 커스텀 메뉴가 없을 때는 기본 메뉴 2개를 순차적으로 보여줌. - 베스트 게시판, 자유 게시판 */}
+            {/* 커스텀 메뉴가 있으면 커스텀 메뉴를 우선 보여줌. */}
+            <ul className='menu_list '>
+              {primaryMenus.map((menu) => (
+                <li key={menu.url_slug || menu.id}>
+                  <Link href={`/board/${menu.url_slug}`} className={menu.isFixed ? "menu-fixed" : ""}>
+                    {menu.board_name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
 
             <div className='menu_custom_btn'>
               {/* 로그인한 사용자에게만 메뉴 설정 버튼 표시 */}
 
               {/* 토글 메뉴가 있을 때만 토글 버튼 표시 */}
               {toggleMenus.length > 0 && (
-                <button className={`toggle_menu_btn ${showToggleMenu ? "active" : ""}`} onClick={handleToggleMenu}>
-                  전체 메뉴 보기
+                <button
+                  className={`toggle_menu_btn ${showToggleMenu ? "active" : ""}`}
+                  onClick={handleToggleMenu}
+                  aria-label='전체메뉴 보기'>
+                  <BarsArrowDownIcon className='icon' />
                 </button>
               )}
             </div>
-          </ul>
+          </div>
         </div>
 
         {/* 토글 메뉴, 전체 메뉴가 들어오는 곳임. */}
-        {showToggleMenu && toggleMenus.length > 0 && (
-          <div className='menu_list_all'>
+        {toggleMenus.length > 0 && (
+          <div className={`menu_list_all ${showToggleMenu ? "active" : ""}`}>
             <ul className='menu_list page'>
               {/* 만약 커스텀한 메뉴가 있다면 전체 메뉴 중 커스텀 한 메뉴를 제외한 나머지 메뉴만을 보여줌. */}
               {toggleMenus.map((board) => (

@@ -181,7 +181,7 @@ export default function Header() {
   useEffect(() => {
     const clickOutSide = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const messageBtn = document.querySelector(".header_btn"); // 버튼 클래스명 확인
+      const messageBtn = document.querySelector(".header_btn");
       const dropdownBox = document.querySelector(".message");
 
       if ((dropdownBox && dropdownBox.contains(target)) || (messageBtn && messageBtn.contains(target))) {
