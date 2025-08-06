@@ -9,4 +9,5 @@ if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 // global 객체에도 할당
 global.prisma = prisma;
 
+export { prisma };
 export default prisma;
