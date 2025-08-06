@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
+import { createNotificationService } from "@/lib/notification-service.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({
@@ -89,20 +90,35 @@ export async function POST(req, context) {
   try {
     const user = await serverTokenCheck();
     if (!user) {
-      return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: "인증되지 않은 사용자입니다." },
+        { status: 401 }
+      );
     }
 
     // 권한 확인: 경고회원(authority: 2)과 정지회원(authority: 3)은 댓글 작성 불가
     if (user.userAuthority === 2) {
-      return NextResponse.json({ success: false, message: "경고회원은 댓글을 작성할 수 없습니다." }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "경고회원은 댓글을 작성할 수 없습니다." },
+        { status: 403 }
+      );
     }
 
     if (user.userAuthority === 3) {
-      return NextResponse.json({ success: false, message: "정지회원은 댓글을 쓸 수 없습니다!" }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "정지회원은 댓글을 쓸 수 없습니다!" },
+        { status: 403 }
+      );
     }
 
     // FormData 또는 JSON 처리
-    let isUserId, isUserNick, parentId, comment, mentionedUserIds, commentDepth, imageFiles;
+    let isUserId,
+      isUserNick,
+      parentId,
+      comment,
+      mentionedUserIds,
+      commentDepth,
+      imageFiles;
 
     const contentType = req.headers.get("content-type");
 
@@ -111,9 +127,13 @@ export async function POST(req, context) {
       const formData = await req.formData();
       isUserId = parseInt(formData.get("isUserId"));
       isUserNick = formData.get("isUserNick");
-      parentId = formData.get("parentId") ? parseInt(formData.get("parentId")) : null;
+      parentId = formData.get("parentId")
+        ? parseInt(formData.get("parentId"))
+        : null;
       comment = formData.get("comment");
-      mentionedUserIds = formData.get("mentionedUserIds") ? JSON.parse(formData.get("mentionedUserIds")) : [];
+      mentionedUserIds = formData.get("mentionedUserIds")
+        ? JSON.parse(formData.get("mentionedUserIds"))
+        : [];
       commentDepth = parseInt(formData.get("commentDepth") || "0");
 
       // 이미지 파일 데이터 가져오기
@@ -122,42 +142,63 @@ export async function POST(req, context) {
     } else {
       // JSON 방식 (기존 방식, 이미지 없는 경우)
       const body = await req.json();
-      ({ isUserId, isUserNick, parentId, comment, mentionedUserIds = [], commentDepth } = body);
+      ({
+        isUserId,
+        isUserNick,
+        parentId,
+        comment,
+        mentionedUserIds = [],
+        commentDepth,
+      } = body);
       imageFiles = [];
     }
 
     await client.query("BEGIN");
 
-    let depth = 0;
+    console.log(
+      "받은 commentDepth:",
+      commentDepth,
+      "타입:",
+      typeof commentDepth
+    );
 
-    if (commentDepth === 2) {
-      depth = 3;
-    } else if (commentDepth === 1) {
-      depth = 2;
-    } else if (commentDepth === 0) {
-      depth = 1;
-    }
+    // commentDepth를 그대로 depth로 사용 (이미 프론트엔드에서 올바른 값을 계산해서 전송)
+    const depth = commentDepth;
+
+    console.log("최종 depth:", depth);
 
     // 서버에서 파일 업로드 및 HTML 처리
-    const processedComment = await replaceBlobsWithS3UrlsServer(comment, imageFiles);
+    const processedComment = await replaceBlobsWithS3UrlsServer(
+      comment,
+      imageFiles
+    );
 
     // 댓글 저장 후 commentId 받아오기
     const insertResult = await client.query(
       `INSERT INTO comments (post_id, user_id, user_nickname, parent_id, content, depth)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [id, isUserId, isUserNick, parentId, processedComment, depth],
+      [id, isUserId, isUserNick, parentId, processedComment, depth]
     );
 
     const commentId = insertResult.rows[0].id;
 
-    // 멘션된 유저에게 알림 생성
-    for (const mentionedUserId of mentionedUserIds) {
-      await client.query(
-        `INSERT INTO notifications (type, sender_id, receiver_id, post_id, comment_id, is_read)
-         VALUES ('mention', $1, $2, $3, $4, false)`,
-        [isUserId, mentionedUserId, id, commentId],
-      );
-    }
+    // 게시글의 url_slug 조회
+    const postSlugResult = await client.query(
+      "SELECT url_slug FROM posts WHERE id = $1",
+      [id]
+    );
+    const urlSlug = postSlugResult.rows[0]?.url_slug;
+
+    // NotificationService를 사용하여 모든 댓글 관련 알림 생성
+    const notificationService = createNotificationService(client);
+    await notificationService.createCommentNotifications({
+      senderId: isUserId,
+      postId: parseInt(id),
+      commentId: commentId,
+      parentId: parentId,
+      mentionedUserIds: mentionedUserIds,
+      urlSlug: urlSlug,
+    });
 
     await client.query("COMMIT");
 
@@ -188,7 +229,10 @@ export async function POST(req, context) {
       // SSE 서버 오류는 무시 (댓글 등록 자체는 성공)
     }
 
-    return NextResponse.json({ success: true, message: "댓글이 추가되었습니다." }, { status: 201 });
+    return NextResponse.json(
+      { success: true, message: "댓글이 추가되었습니다." },
+      { status: 201 }
+    );
   } finally {
     client.release();
   }
@@ -200,12 +244,21 @@ export async function PUT(req) {
   try {
     const { comment, id } = await req.json();
 
-    await client.query("UPDATE comments SET content = $2 WHERE id = $1 RETURNING *;", [id, comment]);
+    await client.query(
+      "UPDATE comments SET content = $2 WHERE id = $1 RETURNING *;",
+      [id, comment]
+    );
 
-    return NextResponse.json({ success: true, message: "댓글이 수정되었습니다." }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: "댓글이 수정되었습니다." },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("댓글 삭제 오류:", error);
-    return NextResponse.json({ success: false, message: "댓글 삭제 중 오류 발생" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "댓글 삭제 중 오류 발생" },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }
@@ -216,16 +269,28 @@ export async function DELETE(req) {
 
   try {
     const { id } = await req.json();
-    const result = await client.query("DELETE FROM comments WHERE id = $1 RETURNING *", [id]);
+    const result = await client.query(
+      "DELETE FROM comments WHERE id = $1 RETURNING *",
+      [id]
+    );
 
     if (result.rowCount === 0) {
-      return NextResponse.json({ success: false, message: "댓글이 존재하지 않습니다." }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "댓글이 존재하지 않습니다." },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ success: true, message: "댓글이 삭제되었습니다." }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: "댓글이 삭제되었습니다." },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("댓글 삭제 오류:", error);
-    return NextResponse.json({ success: false, message: "댓글 삭제 중 오류 발생" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "댓글 삭제 중 오류 발생" },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }

@@ -1,11 +1,12 @@
 "use client";
 
+import styles from "@/style/Login.module.scss";
+
 import axios from "axios";
+
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-
-import styles from "@/style/Login.module.scss";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { handleBlur, handleFocus } from "@/func/inputActive";
 import { useLoadRecaptcha } from "@/func/hook/useLoadRecaptcha";
@@ -14,7 +15,10 @@ declare global {
   interface Window {
     grecaptcha: {
       ready: (cb: () => void) => void;
-      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+      execute: (
+        siteKey: string,
+        options: { action: string }
+      ) => Promise<string>;
     };
   }
 }
@@ -109,7 +113,10 @@ export default function User() {
     }
 
     try {
-      const response = await axios.post("/api/user/duplicate", { userid, userNickname });
+      const response = await axios.post("/api/user/duplicate", {
+        userid,
+        userNickname,
+      });
       if (response.data.isUserDupli) {
         alert(response.data.message);
         setUserid("");
@@ -141,7 +148,7 @@ export default function User() {
   const [userPasswordCheck, setUserPassowrdCheck] = useState<string>("");
 
   const [userPasswordNotice, setUserPasswordNotice] = useState<string>(
-    "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.",
+    "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요."
   );
 
   //caps lock
@@ -158,7 +165,8 @@ export default function User() {
   };
 
   useEffect(() => {
-    const regex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
+    const regex =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
 
     if (capsLockOn) {
       setUserPasswordNotice("Caps Lock이 켜져 있습니다.");
@@ -172,7 +180,9 @@ export default function User() {
         setUserPasswordNotice("비밀번호가 일치합니다.");
       }
     } else if (!regex.test(userPassword)) {
-      setUserPasswordNotice("영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.");
+      setUserPasswordNotice(
+        "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요."
+      );
     }
   }, [userPassword, userPasswordCheck, capsLockOn]);
 
@@ -210,7 +220,11 @@ export default function User() {
   };
 
   useEffect(() => {
-    if (inputCertifyNumRef.current && inputCertifyNumRef.current.value === certifyNumCheck && certifyNumCheck !== "") {
+    if (
+      inputCertifyNumRef.current &&
+      inputCertifyNumRef.current.value === certifyNumCheck &&
+      certifyNumCheck !== ""
+    ) {
       setCertifyAgree(true);
     } else {
       setCertifyAgree(false);
@@ -228,6 +242,11 @@ export default function User() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+
+  // 마케팅 수신 동의
+  const [marketingConsent, setMarketingConsent] = useState<boolean>(false);
+  const [notificationConsent, setNotificationConsent] =
+    useState<boolean>(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -252,7 +271,8 @@ export default function User() {
   const userPost = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
+    const passwordRegex =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
 
     if (!idDupliCheck) {
       alert("아이디 및 별명 중복 체크를 해주세요.");
@@ -262,7 +282,9 @@ export default function User() {
 
     if (!passwordRegex.test(userPassword)) {
       alert("영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.");
-      setUserPasswordNotice("영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.");
+      setUserPasswordNotice(
+        "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요."
+      );
       inputPwRef.current?.focus();
       return;
     }
@@ -281,6 +303,8 @@ export default function User() {
     formData.append("userPassword", userPassword);
     formData.append("userEmail", userEmail);
     formData.append("recaptchaToken", recaptchaToken ?? "");
+    formData.append("marketingConsent", marketingConsent.toString());
+    formData.append("notificationConsent", notificationConsent.toString());
 
     if (file) {
       formData.append("profileImage", file);
@@ -310,14 +334,20 @@ export default function User() {
             <form onSubmit={userPost} className={styles.form}>
               <div className={styles.header_login}>
                 <h2 className={styles.header_text}>회원가입</h2>
-                <p className={styles.header_subtext}>새로운 계정을 생성합니다.</p>
+                <p className={styles.header_subtext}>
+                  새로운 계정을 생성합니다.
+                </p>
               </div>
 
               {/* id */}
               <div className={styles.input_group}>
                 <div className={styles.input_box} ref={boxIdRef}>
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='userid' ref={labelIdRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="userid"
+                    ref={labelIdRef}
+                  >
                     아이디
                   </label>
                   <input
@@ -325,11 +355,12 @@ export default function User() {
                     ref={inputIdRef}
                     onFocus={() => handleFocus(labelIdRef, boxIdRef)}
                     onBlur={() => {
-                      if (inputIdRef.current && inputIdRef.current.value === "") handleBlur(labelIdRef, boxIdRef);
+                      if (inputIdRef.current && inputIdRef.current.value === "")
+                        handleBlur(labelIdRef, boxIdRef);
                     }}
-                    type='text'
-                    id='userid'
-                    name='userid'
+                    type="text"
+                    id="userid"
+                    name="userid"
                     value={userid}
                     onChange={(e) => setUserid(e.target.value)}
                   />
@@ -340,7 +371,11 @@ export default function User() {
               <div className={styles.input_group}>
                 <div className={styles.input_box} ref={boxNickRef}>
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='userid' ref={labelNickRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="userid"
+                    ref={labelNickRef}
+                  >
                     별명
                   </label>
                   <input
@@ -348,12 +383,15 @@ export default function User() {
                     ref={inputNickRef}
                     onFocus={() => handleFocus(labelNickRef, boxNickRef)}
                     onBlur={() => {
-                      if (inputNickRef.current && inputNickRef.current.value === "")
+                      if (
+                        inputNickRef.current &&
+                        inputNickRef.current.value === ""
+                      )
                         handleBlur(labelNickRef, boxNickRef);
                     }}
-                    type='text'
-                    id='userNickname'
-                    name='userNickname'
+                    type="text"
+                    id="userNickname"
+                    name="userNickname"
                     value={userNickname}
                     onChange={(e) => setUserNickname(e.target.value)}
                   />
@@ -362,9 +400,16 @@ export default function User() {
 
               {/* 자기소개 */}
               <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxBioRef}>
+                <div
+                  className={`${styles.input_box} ${styles.textarea_box}`}
+                  ref={boxBioRef}
+                >
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='userBio' ref={labelBioRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="userBio"
+                    ref={labelBioRef}
+                  >
                     자기소개 (선택)
                   </label>
                   <textarea
@@ -372,29 +417,33 @@ export default function User() {
                     ref={inputBioRef}
                     onFocus={() => handleFocus(labelBioRef, boxBioRef)}
                     onBlur={() => {
-                      if (inputBioRef.current && inputBioRef.current.value === "") handleBlur(labelBioRef, boxBioRef);
+                      if (
+                        inputBioRef.current &&
+                        inputBioRef.current.value === ""
+                      )
+                        handleBlur(labelBioRef, boxBioRef);
                     }}
-                    id='userBio'
-                    name='userBio'
+                    id="userBio"
+                    name="userBio"
                     value={userBio}
                     onChange={(e) => setUserBio(e.target.value)}
                     rows={3}
                     maxLength={200}
-                    placeholder='간단한 자기소개를 입력해주세요 (최대 200자)'
                   />
                 </div>
               </div>
 
               {!idDupliCheck && (
-                <div className='btn_wrap'>
+                <div className="btn_wrap">
                   <button
                     onClick={() => {
                       idCheck();
                     }}
-                    type='button'
+                    type="button"
                     className={`btn 
                             ${idRegex.test(userid) && nickRegex.test(userNickname) ? "" : "btn_nonactive"}
-                            `}>
+                            `}
+                  >
                     중복 확인
                   </button>
                 </div>
@@ -403,14 +452,24 @@ export default function User() {
               {/* 프로필 이미지 */}
               <div className={styles.input_group}>
                 <div className={`${styles.input_box} ${styles.input_img}`}>
-                  <label className={`${styles.label_img}`} htmlFor='profileImage' ref={labelProfileImgRef}>
+                  <label
+                    className={`${styles.label_img}`}
+                    htmlFor="profileImage"
+                    ref={labelProfileImgRef}
+                  >
                     {fileName ? (
                       <>
-                        <span className={`${styles.file_name_label} ${styles.after}`}>프로필 이미지</span>
+                        <span
+                          className={`${styles.file_name_label} ${styles.after}`}
+                        >
+                          프로필 이미지
+                        </span>
                         <p className={styles.file_name}>{fileName}</p>
                       </>
                     ) : (
-                      <span className={styles.file_name_label}>프로필 이미지</span>
+                      <span className={styles.file_name_label}>
+                        프로필 이미지 (선택)
+                      </span>
                     )}
                   </label>
 
@@ -418,10 +477,10 @@ export default function User() {
                   <input
                     className={styles.input_common}
                     ref={inputProfileImgRef}
-                    type='file'
-                    id='profileImage'
-                    name='profileImage'
-                    accept='image/*'
+                    type="file"
+                    id="profileImage"
+                    name="profileImage"
+                    accept="image/*"
                     onChange={(e) => {
                       handleImageChange(e);
                     }}
@@ -431,13 +490,14 @@ export default function User() {
               </div>
 
               <span className={`${styles.notice}`}>
-                용량이 <b className={`${styles.red}`}>1MB</b> 이하인 이미지만 업로드가 가능합니다.
+                용량이 <b className={`${styles.red}`}>1MB</b> 이하인 이미지만
+                업로드가 가능합니다.
               </span>
 
               {/* 미리보기 이미지 */}
               {profileImage && (
                 <div className={styles.img_preview}>
-                  <img src={profileImage} alt='Profile Preview' />
+                  <img src={profileImage} alt="Profile Preview" />
                 </div>
               )}
 
@@ -445,7 +505,11 @@ export default function User() {
               <div className={styles.input_group}>
                 <div className={styles.input_box} ref={boxPwRef}>
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='user_password' ref={labelPwRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="user_password"
+                    ref={labelPwRef}
+                  >
                     비밀번호
                   </label>
                   <input
@@ -453,13 +517,14 @@ export default function User() {
                     ref={inputPwRef}
                     onFocus={() => handleFocus(labelPwRef, boxPwRef)}
                     onBlur={() => {
-                      if (inputPwRef.current && inputPwRef.current.value === "") handleBlur(labelPwRef, boxPwRef);
+                      if (inputPwRef.current && inputPwRef.current.value === "")
+                        handleBlur(labelPwRef, boxPwRef);
                     }}
                     onKeyDown={handleKeyDown}
                     onKeyUp={handleKeyUp}
-                    type='password'
-                    id='user_password'
-                    name='user_password'
+                    type="password"
+                    id="user_password"
+                    name="user_password"
                     value={userPassword}
                     onChange={(e) => setUserPassowrd(e.target.value)}
                   />
@@ -469,7 +534,11 @@ export default function User() {
               <div className={styles.input_group}>
                 <div className={styles.input_box} ref={boxPwcRef}>
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='user_password_check' ref={labelPwcRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="user_password_check"
+                    ref={labelPwcRef}
+                  >
                     비밀번호 확인
                   </label>
                   <input
@@ -477,13 +546,17 @@ export default function User() {
                     ref={inputPwcRef}
                     onFocus={() => handleFocus(labelPwcRef, boxPwcRef)}
                     onBlur={() => {
-                      if (inputPwcRef.current && inputPwcRef.current.value === "") handleBlur(labelPwcRef, boxPwcRef);
+                      if (
+                        inputPwcRef.current &&
+                        inputPwcRef.current.value === ""
+                      )
+                        handleBlur(labelPwcRef, boxPwcRef);
                     }}
                     onKeyDown={handleKeyDown}
                     onKeyUp={handleKeyUp}
-                    type='password'
-                    id='user_password_check'
-                    name='user_password_check'
+                    type="password"
+                    id="user_password_check"
+                    name="user_password_check"
                     value={userPasswordCheck}
                     onChange={(e) => setUserPassowrdCheck(e.target.value)}
                   />
@@ -497,7 +570,8 @@ export default function User() {
                     : userPasswordNotice === "비밀번호가 일치합니다."
                       ? styles.notice_true
                       : ""
-                }`}>
+                }`}
+              >
                 {userPasswordNotice}
               </span>
 
@@ -505,7 +579,11 @@ export default function User() {
               <div className={styles.input_group}>
                 <div className={styles.input_box} ref={boxEmailRef}>
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='user_email' ref={labelEmailRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="user_email"
+                    ref={labelEmailRef}
+                  >
                     이메일
                   </label>
                   <input
@@ -513,22 +591,26 @@ export default function User() {
                     ref={inputEmailRef}
                     onFocus={() => handleFocus(labelEmailRef, boxEmailRef)}
                     onBlur={() => {
-                      if (inputEmailRef.current && inputEmailRef.current.value === "")
+                      if (
+                        inputEmailRef.current &&
+                        inputEmailRef.current.value === ""
+                      )
                         handleBlur(labelEmailRef, boxEmailRef);
                     }}
-                    type='text'
-                    id='user_email'
-                    name='user_email'
+                    type="text"
+                    id="user_email"
+                    name="user_email"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
                   />
                 </div>
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => {
                     emailCheck();
                   }}
-                  className='btn_line_grey'>
+                  className="btn_line_grey"
+                >
                   인증번호
                   <br />
                   요청
@@ -539,28 +621,135 @@ export default function User() {
               <div className={styles.input_group}>
                 <div className={styles.input_box} ref={boxCertifyNumRef}>
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='certify_num' ref={labelCertifyNumRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="certify_num"
+                    ref={labelCertifyNumRef}
+                  >
                     인증번호
                   </label>
                   <input
                     className={styles.input_common}
                     ref={inputCertifyNumRef}
-                    onFocus={() => handleFocus(labelCertifyNumRef, boxCertifyNumRef)}
+                    onFocus={() =>
+                      handleFocus(labelCertifyNumRef, boxCertifyNumRef)
+                    }
                     onBlur={() => {
-                      if (inputCertifyNumRef.current && inputCertifyNumRef.current.value === "")
+                      if (
+                        inputCertifyNumRef.current &&
+                        inputCertifyNumRef.current.value === ""
+                      )
                         handleBlur(labelCertifyNumRef, boxCertifyNumRef);
                     }}
-                    type='text'
-                    id='certify_num'
-                    name='certify_num'
+                    type="text"
+                    id="certify_num"
+                    name="certify_num"
                     value={certifyNum}
                     onChange={(e) => setCertifyNum(e.target.value)}
                   />
                 </div>
               </div>
 
+              {/* 마케팅 수신 동의 및 알림 동의 */}
+
+              <div className="checkbox_wrap">
+                <div className="checkbox">
+                  <input
+                    type="checkbox"
+                    id="marketingConsent"
+                    checked={marketingConsent}
+                    onChange={(e) => setMarketingConsent(e.target.checked)}
+                    className={styles.checkbox}
+                  />
+                  <label
+                    htmlFor="marketingConsent"
+                    className={styles.consent_label}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      height="24"
+                      className="svg_checkbox"
+                    >
+                      <rect
+                        className="svg_box"
+                        x="2"
+                        y="2"
+                        width="20"
+                        height="20"
+                        rx="4"
+                        fill="none"
+                        stroke="#ccc"
+                        strokeWidth="1"
+                      />
+                      <path
+                        className="svg_checkmark"
+                        d="M6 12l4 4 8-8"
+                        fill="none"
+                        stroke="#007bff"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                    <b>마케팅 정보 수신에 동의합니다 (선택)</b>
+                  </label>
+                </div>
+                <p className="notice">
+                  마케팅 정보: 새로운 기능, 이벤트, 프로모션 소식을 이메일로
+                  받아보실 수 있습니다.
+                </p>
+              </div>
+
+              <div className="checkbox_wrap">
+                <div className="checkbox">
+                  <input
+                    type="checkbox"
+                    id="notificationConsent"
+                    checked={notificationConsent}
+                    onChange={(e) => setNotificationConsent(e.target.checked)}
+                    className={styles.checkbox}
+                  />
+                  <label
+                    htmlFor="notificationConsent"
+                    className={styles.consent_label}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      height="24"
+                      className="svg_checkbox"
+                    >
+                      <rect
+                        className="svg_box"
+                        x="2"
+                        y="2"
+                        width="20"
+                        height="20"
+                        rx="4"
+                        fill="none"
+                        stroke="#ccc"
+                        strokeWidth="1"
+                      />
+                      <path
+                        className="svg_checkmark"
+                        d="M6 12l4 4 8-8"
+                        fill="none"
+                        stroke="#007bff"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                    <b>알림 수신에 동의합니다 (선택)</b>
+                  </label>
+                </div>
+                <p className="notice">
+                  알림 수신: 댓글, 좋아요, 멘션 등의 알림을 받아보실 수
+                  있습니다.
+                </p>
+              </div>
+
               {/* 버튼 */}
-              <div className='btn_wrap'>
+              <div className="btn_wrap">
                 <button
                   onClick={(e) => {
                     if (!idDupliCheck) {
@@ -580,10 +769,15 @@ export default function User() {
                     }
                     return;
                   }}
-                  type='submit'
+                  type="submit"
                   className={`btn ${
-                    certifyAgree && idDupliCheck && userPassword === userPasswordCheck ? "" : "btn_nonactive"
-                  }`}>
+                    certifyAgree &&
+                    idDupliCheck &&
+                    userPassword === userPasswordCheck
+                      ? ""
+                      : "btn_nonactive"
+                  }`}
+                >
                   회원가입
                 </button>
               </div>

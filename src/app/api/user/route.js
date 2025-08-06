@@ -20,6 +20,8 @@ export async function POST(req) {
     const userEmail = formData.get("userEmail");
     const profileImage = formData.get("profileImage");
     const recaptchaToken = formData.get("recaptchaToken");
+    const marketingConsent = formData.get("marketingConsent") === "true";
+    const notificationConsent = formData.get("notificationConsent") === "true";
 
     // recaptcha check
     if (!recaptchaToken || typeof recaptchaToken !== "string") {
@@ -72,8 +74,8 @@ export async function POST(req) {
     }
 
     const insertResult = await client.query(
-      "INSERT INTO members (username, password, email, user_nickname, bio, profile, authority) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-      [userid, hashedPassword, userEmail, userNickname, userBio, imgPath, 1],
+      "INSERT INTO members (username, password, email, user_nickname, bio, profile, authority, marketing_enabled, notification_enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+      [userid, hashedPassword, userEmail, userNickname, userBio, imgPath, 1, marketingConsent, notificationConsent],
     );
 
     return NextResponse.json(
@@ -108,6 +110,8 @@ export async function PUT(req) {
     const userPassword = formData.get("userPassword") || null;
     const userEmail = formData.get("userEmail") || null;
     const profileImage = formData.get("profileImage") || null;
+    const marketingConsent = formData.get("marketingConsent");
+    const notificationConsent = formData.get("notificationConsent");
 
     // 기존 사용자 확인
     const userResult = await client.query("SELECT * FROM members WHERE id = $1", [userid]);
@@ -188,6 +192,20 @@ export async function PUT(req) {
       imgPath = `https://du1qll7elnsez.cloudfront.net/${filename}`;
       updateFields.push(`profile = $${valueIndex++}`);
       updateValues.push(imgPath);
+    }
+
+    // 마케팅 수신 동의 변경
+    if (marketingConsent !== null && marketingConsent !== undefined) {
+      const marketingEnabled = marketingConsent === "true";
+      updateFields.push(`marketing_enabled = $${valueIndex++}`);
+      updateValues.push(marketingEnabled);
+    }
+
+    // 알림 수신 동의 변경
+    if (notificationConsent !== null && notificationConsent !== undefined) {
+      const notificationEnabled = notificationConsent === "true";
+      updateFields.push(`notification_enabled = $${valueIndex++}`);
+      updateValues.push(notificationEnabled);
     }
 
     // 변경된 데이터가 없다면 업데이트하지 않음

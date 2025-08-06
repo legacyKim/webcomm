@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
-import "@/style/style.common.scss";
 import styles from "@/style/Login.module.scss";
 
 interface AgreeClientProps {
@@ -13,7 +12,10 @@ interface AgreeClientProps {
   privacyContent?: string;
 }
 
-export default function AgreeClient({ termsContent, privacyContent }: AgreeClientProps) {
+export default function AgreeClient({
+  termsContent,
+  privacyContent,
+}: AgreeClientProps) {
   const { setAgreeCheck } = useAuth();
 
   const [agree01, setAgree01] = useState(false);
@@ -37,130 +39,159 @@ export default function AgreeClient({ termsContent, privacyContent }: AgreeClien
       <div className={styles.membership_wrap}>
         <div className={styles.membership}>
           <h4 className={styles.membership_tit}>
-            <CheckCircleIcon className='icon' />
+            <CheckCircleIcon className="icon" />
             회원가입약관
           </h4>
           <div className={styles.membership_box}>
             <div className={styles.membership_contents}>
-              <div dangerouslySetInnerHTML={{ __html: termsContent || "이용약관을 불러오는 중..." }} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: termsContent || "이용약관을 불러오는 중...",
+                }}
+              />
             </div>
           </div>
 
           {/* 체크박스 */}
-          <div className='checkbox'>
+          <div className="checkbox">
             <input
-              type='checkbox'
-              id='member_agree_01'
-              name='member_agree_01'
-              className='hidden_checkbox'
+              type="checkbox"
+              id="member_agree_01"
+              name="member_agree_01"
+              className="hidden_checkbox"
               checked={agree01}
               onChange={() => setAgree01((prev) => !prev)}
             />
-            <label htmlFor='member_agree_01' className='custom_checkbox'>
+            <label htmlFor="member_agree_01" className="custom_checkbox">
               <svg
-                xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 24 24'
-                width='24'
-                height='24'
-                className='svg_checkbox'>
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                className="svg_checkbox"
+              >
                 <rect
-                  className='svg_box'
-                  x='2'
-                  y='2'
-                  width='20'
-                  height='20'
-                  rx='4'
-                  fill='none'
-                  stroke='#ccc'
-                  strokeWidth='1'
+                  className="svg_box"
+                  x="2"
+                  y="2"
+                  width="20"
+                  height="20"
+                  rx="4"
+                  fill="none"
+                  stroke="#ccc"
+                  strokeWidth="1"
                 />
-                <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
+                <path
+                  className="svg_checkmark"
+                  d="M6 12l4 4 8-8"
+                  fill="none"
+                  stroke="#007bff"
+                  strokeWidth="2"
+                />
               </svg>
               <span>회원가입약관의 내용에 동의합니다.</span>
             </label>
           </div>
 
           <h4 className={styles.membership_tit}>
-            <CheckCircleIcon className='icon' />
+            <CheckCircleIcon className="icon" />
             개인정보처리방침
           </h4>
           <div className={styles.membership_box}>
             <div className={styles.membership_contents}>
-              <div dangerouslySetInnerHTML={{ __html: privacyContent || "개인정보처리방침을 불러오는 중..." }} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: privacyContent || "개인정보처리방침을 불러오는 중...",
+                }}
+              />
             </div>
           </div>
 
           {/* 체크박스 */}
-          <div className='checkbox'>
+          <div className="checkbox">
             <input
-              type='checkbox'
-              id='member_agree_02'
-              name='member_agree_02'
-              className='hidden_checkbox'
+              type="checkbox"
+              id="member_agree_02"
+              name="member_agree_02"
+              className="hidden_checkbox"
               checked={agree02}
               onChange={() => setAgree02((prev) => !prev)}
             />
-            <label htmlFor='member_agree_02' className='custom_checkbox'>
+            <label htmlFor="member_agree_02" className="custom_checkbox">
               <svg
-                xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 24 24'
-                width='24'
-                height='24'
-                className='svg_checkbox'>
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                className="svg_checkbox"
+              >
                 <rect
-                  className='svg_box'
-                  x='2'
-                  y='2'
-                  width='20'
-                  height='20'
-                  rx='4'
-                  fill='none'
-                  stroke='#ccc'
-                  strokeWidth='1'
+                  className="svg_box"
+                  x="2"
+                  y="2"
+                  width="20"
+                  height="20"
+                  rx="4"
+                  fill="none"
+                  stroke="#ccc"
+                  strokeWidth="1"
                 />
-                <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
+                <path
+                  className="svg_checkmark"
+                  d="M6 12l4 4 8-8"
+                  fill="none"
+                  stroke="#007bff"
+                  strokeWidth="2"
+                />
               </svg>
               <span>개인정보처리방침안내의 내용에 동의합니다.</span>
             </label>
           </div>
 
           {/* 전체 동의 */}
-          <div className='checkbox checkbox_all'>
+          <div className="checkbox checkbox_all">
             <input
-              type='checkbox'
-              id='member_agree_all'
-              name='member_agree_all'
-              className='hidden_checkbox'
+              type="checkbox"
+              id="member_agree_all"
+              name="member_agree_all"
+              className="hidden_checkbox"
               checked={allChecked}
               onChange={() => setAgreeAll(!allChecked)}
             />
-            <label htmlFor='member_agree_all' className='custom_checkbox'>
+            <label htmlFor="member_agree_all" className="custom_checkbox">
               <svg
-                xmlns='http://www.w3.org/2000/svg'
-                viewBox='0 0 24 24'
-                width='24'
-                height='24'
-                className='svg_checkbox'>
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                className="svg_checkbox"
+              >
                 <rect
-                  className='svg_box'
-                  x='2'
-                  y='2'
-                  width='20'
-                  height='20'
-                  rx='4'
-                  fill='none'
-                  stroke='#ccc'
-                  strokeWidth='1'
+                  className="svg_box"
+                  x="2"
+                  y="2"
+                  width="20"
+                  height="20"
+                  rx="4"
+                  fill="none"
+                  stroke="#ccc"
+                  strokeWidth="1"
                 />
-                <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
+                <path
+                  className="svg_checkmark"
+                  d="M6 12l4 4 8-8"
+                  fill="none"
+                  stroke="#007bff"
+                  strokeWidth="2"
+                />
               </svg>
               <b>모두 동의합니다.</b>
             </label>
           </div>
 
-          <div className='btn_wrap'>
+          <div className="btn_wrap">
             <Link
-              href='/user'
+              href="/user"
               className={`btn btn_width ${!allChecked ? styles.disabled : ""}`}
               tabIndex={allChecked ? 0 : -1}
               aria-disabled={!allChecked}
@@ -168,7 +199,8 @@ export default function AgreeClient({ termsContent, privacyContent }: AgreeClien
                 if (!allChecked) {
                   e.preventDefault();
                 }
-              }}>
+              }}
+            >
               회원가입
             </Link>
           </div>

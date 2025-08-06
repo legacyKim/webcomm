@@ -28,7 +28,7 @@ export async function GET() {
         success: false,
         error: error.message,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -70,7 +70,7 @@ export async function PUT(req) {
         success: false,
         error: error.message,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

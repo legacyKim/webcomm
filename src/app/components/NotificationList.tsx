@@ -7,7 +7,9 @@ import { useRouter } from "next/navigation";
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
-  const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+  const diffInMinutes = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60)
+  );
 
   if (diffInMinutes < 1) return "방금 전";
   if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
@@ -37,7 +39,11 @@ interface NotificationListProps {
   showOnlyUnread?: boolean;
 }
 
-export default function NotificationList({ isUserId, limit = 20, showOnlyUnread = false }: NotificationListProps) {
+export default function NotificationList({
+  isUserId,
+  limit = 20,
+  showOnlyUnread = false,
+}: NotificationListProps) {
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +69,9 @@ export default function NotificationList({ isUserId, limit = 20, showOnlyUnread 
 
       if (response.ok) {
         const data = await response.json();
-        const filteredData = showOnlyUnread ? data.filter((n: Notification) => !n.is_read) : data;
+        const filteredData = showOnlyUnread
+          ? data.filter((n: Notification) => !n.is_read)
+          : data;
         setNotifications(filteredData);
 
         // 읽지 않은 알림 수 계산
@@ -105,12 +113,16 @@ export default function NotificationList({ isUserId, limit = 20, showOnlyUnread 
         // 로컬 상태 업데이트
         setNotifications((prev) =>
           prev.map((notification) =>
-            notificationIds.includes(notification.id) ? { ...notification, is_read: true } : notification,
-          ),
+            notificationIds.includes(notification.id)
+              ? { ...notification, is_read: true }
+              : notification
+          )
         );
 
         // 읽지 않은 알림 수 업데이트
-        const newUnreadCount = notifications.filter((n) => !notificationIds.includes(n.id) && !n.is_read).length;
+        const newUnreadCount = notifications.filter(
+          (n) => !notificationIds.includes(n.id) && !n.is_read
+        ).length;
         setUnreadCount(newUnreadCount);
         updateNotificationBadge(newUnreadCount);
       }
@@ -150,28 +162,28 @@ export default function NotificationList({ isUserId, limit = 20, showOnlyUnread 
     }
   };
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case "comment":
-        return "💬";
-      case "reply":
-        return "↩️";
-      case "like_comment":
-        return "👍";
-      case "post_like":
-        return "❤️";
-      case "message":
-        return "📩";
-      case "mention":
-        return "@";
-      default:
-        return "🔔";
-    }
-  };
+  // const getNotificationIcon = (type: string) => {
+  //   switch (type) {
+  //     case "comment":
+  //       return "💬";
+  //     case "reply":
+  //       return "↩️";
+  //     case "like_comment":
+  //       return "👍";
+  //     case "post_like":
+  //       return "❤️";
+  //     case "message":
+  //       return "📩";
+  //     case "mention":
+  //       return "@";
+  //     default:
+  //       return "🔔";
+  //   }
+  // };
 
   if (!isUserId) {
     return (
-      <div className='notification-list'>
+      <div className="notification-list">
         <p>로그인이 필요합니다.</p>
       </div>
     );
@@ -179,39 +191,50 @@ export default function NotificationList({ isUserId, limit = 20, showOnlyUnread 
 
   if (loading) {
     return (
-      <div className='notification-list'>
-        <div className='loading'>알림을 불러오는 중...</div>
+      <div className="notification-list">
+        <div className="loading">알림을 불러오는 중...</div>
       </div>
     );
   }
 
   return (
-    <div className='notification-list'>
-      <div className='notification-header'>
+    <div className="notification-list">
+      <div className="notification-header">
         {unreadCount > 0 && (
-          <button onClick={markAllAsRead} className='mark-all-read-btn'>
+          <button onClick={markAllAsRead} className="mark-all-read-btn">
             모두 읽음
           </button>
         )}
       </div>
 
       {notifications.length === 0 ? (
-        <div className='no-notifications'>
-          <p>{showOnlyUnread ? "읽지 않은 알림이 없습니다." : "알림이 없습니다."}</p>
+        <div className="no-notifications">
+          <p>
+            {showOnlyUnread ? "읽지 않은 알림이 없습니다." : "알림이 없습니다."}
+          </p>
         </div>
       ) : (
-        <ul className='notification-items'>
+        <ul className="notification-items">
           {notifications.map((notification) => (
             <li
               key={notification.id}
               className={`notification-item ${!notification.is_read ? "unread" : ""}`}
-              onClick={() => handleNotificationClick(notification)}>
-              <div className='notification-icon'>{getNotificationIcon(notification.type)}</div>
-              <div className='notification-content'>
-                <div className='notification-message'>{notification.message}</div>
-                <div className='notification-meta'>
-                  <span className='notification-time'>{formatDate(notification.created_at)}</span>
-                  {!notification.is_read && <span className='unread-indicator'>새 알림</span>}
+              onClick={() => handleNotificationClick(notification)}
+            >
+              {/* <div className="notification-icon">
+                {getNotificationIcon(notification.type)}
+              </div> */}
+              <div className="notification-content">
+                <div className="notification-message">
+                  {notification.message}
+                </div>
+                <div className="notification-meta">
+                  <span className="notification-time">
+                    {formatDate(notification.created_at)}
+                  </span>
+                  {!notification.is_read && (
+                    <span className="unread-indicator">새 알림</span>
+                  )}
                 </div>
               </div>
             </li>

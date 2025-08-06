@@ -3,12 +3,19 @@ import { NextResponse } from "next/server";
 // Prisma 클라이언트 - 글로벌 객체에서 가져오기
 const prisma = global.prisma;
 
-async function getUserProfileFromDB(usernameOrNickname, currentUserId, tab = "summary") {
+async function getUserProfileFromDB(
+  usernameOrNickname,
+  currentUserId,
+  tab = "summary"
+) {
   try {
     // 사용자 기본 정보 조회 - username 또는 user_nickname으로 검색
     const user = await prisma.member.findFirst({
       where: {
-        OR: [{ username: usernameOrNickname }, { user_nickname: usernameOrNickname }],
+        OR: [
+          { username: usernameOrNickname },
+          { user_nickname: usernameOrNickname },
+        ],
       },
       select: {
         id: true,
@@ -24,6 +31,8 @@ async function getUserProfileFromDB(usernameOrNickname, currentUserId, tab = "su
         is_online: true,
         authority: true,
         total_likes_received: true,
+        marketing_enabled: true,
+        notification_enabled: true,
       },
     });
 
@@ -72,6 +81,13 @@ async function getUserProfileFromDB(usernameOrNickname, currentUserId, tab = "su
           },
         })
       : null;
+
+    console.log("팔로우 상태 확인:", {
+      currentUserId,
+      targetUserId: user.id,
+      followRecord: isFollowing,
+      isFollowingBoolean: !!isFollowing,
+    });
 
     // 최근 게시글 조회
     const recentPosts = await prisma.post.findMany({
@@ -164,7 +180,8 @@ async function getUserProfileFromDB(usernameOrNickname, currentUserId, tab = "su
 
         favoriteBoards = boards
           .map((board) => {
-            const postCount = postActivity.find((p) => p.board_id === board.id)?._count.id || 0;
+            const postCount =
+              postActivity.find((p) => p.board_id === board.id)?._count.id || 0;
             return {
               board_name: board.board_name,
               url_slug: board.url_slug,
@@ -248,15 +265,24 @@ export async function GET(request) {
     const tab = searchParams.get("tab") || "summary";
 
     if (!username) {
-      return NextResponse.json({ error: "Username is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Username is required" },
+        { status: 400 }
+      );
     }
 
     // URL 디코딩 (한글 사용자명 지원)
     const decodedUsername = decodeURIComponent(username);
-    const currentUserId = currentUserParam ? parseInt(currentUserParam) : undefined;
+    const currentUserId = currentUserParam
+      ? parseInt(currentUserParam)
+      : undefined;
 
     // 데이터베이스에서 사용자 프로필 조회 (캐싱 적용)
-    const userData = await getUserProfileFromDB(decodedUsername, currentUserId, tab);
+    const userData = await getUserProfileFromDB(
+      decodedUsername,
+      currentUserId,
+      tab
+    );
 
     if (!userData) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -268,16 +294,22 @@ export async function GET(request) {
     // 캐싱 헤더 설정
     response.headers.set(
       "Cache-Control",
-      "public, s-maxage=86400, stale-while-revalidate=172800", // 24시간 캐시, 48시간 stale-while-revalidate
+      "public, s-maxage=86400, stale-while-revalidate=172800" // 24시간 캐시, 48시간 stale-while-revalidate
     );
 
     // Vercel/Next.js ISR 태그
-    response.headers.set("x-cache-tags", `profile-${decodedUsername},user-activity-${decodedUsername}-${tab},profiles`);
+    response.headers.set(
+      "x-cache-tags",
+      `profile-${decodedUsername},user-activity-${decodedUsername}-${tab},profiles`
+    );
 
     return response;
   } catch (error) {
     console.error("Profile API error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 

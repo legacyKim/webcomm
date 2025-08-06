@@ -31,7 +31,8 @@
     ".next/types/**/*.ts",
     "src/app/api/user/follow/route.js",
     "src/app/api/member/route.js",
-    "src/app/api/user/profile/route.js"
+    "src/app/api/user/profile/route.js",
+    "src/app/api/boards/settings/route.js"
   ],
   "exclude": ["node_modules"]
 }

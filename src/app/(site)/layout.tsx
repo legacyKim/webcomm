@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 
 import QueryProvider from "@/QueryProvider";
-import { AuthProvider } from "@/AuthContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import MenuProviderWrapper from "@/components/MenuProviderWrapper";
+import { fetchBoard } from "@/api/api";
 
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
@@ -13,6 +15,7 @@ import "@/style/font.css";
 import "@/style/fontello/css/fontello.css";
 import "@/style/fontello/css/animation.css";
 import "@/style/style.common.scss";
+import "@/style/checkbox.scss";
 
 export const metadata: Metadata = {
   title: "Tokti",
@@ -29,6 +32,9 @@ export default async function RootLayout({
 }>) {
   const cookieStore = cookies();
   const token = (await cookieStore).get("authToken")?.value ?? "";
+
+  // 게시판 데이터 가져오기
+  const boardList = await fetchBoard();
 
   let username = "";
   let userId = null;
@@ -72,7 +78,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang='kor'>
+    <html lang="kor">
       <body>
         <AuthProvider
           username={username}
@@ -83,10 +89,13 @@ export default async function RootLayout({
           userAuthority={userAuthority}
           tokenExp={tokenExp}
           userNickUpdatedAt={userNickUpdatedAt}
-          loginStatusCheck={loginStatusCheck}>
-          <QueryProvider>
-            <LayoutWrapper>{children}</LayoutWrapper>
-          </QueryProvider>
+          loginStatusCheck={loginStatusCheck}
+        >
+          <MenuProviderWrapper initialBoards={boardList}>
+            <QueryProvider>
+              <LayoutWrapper>{children}</LayoutWrapper>
+            </QueryProvider>
+          </MenuProviderWrapper>
         </AuthProvider>
       </body>
     </html>

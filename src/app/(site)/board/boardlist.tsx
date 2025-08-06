@@ -2,9 +2,15 @@
 
 import { useState, useRef } from "react";
 // import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchBoardData, fetchUserPostData, fetchUserCommentData, fetchSearchData, fetchBoardPop } from "@/api/api";
+import {
+  fetchBoardData,
+  fetchUserPostData,
+  fetchUserCommentData,
+  fetchSearchData,
+  fetchBoardPop,
+} from "@/api/api";
 import { Posts, initDataPosts } from "@/type/type";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 
 import Link from "next/link";
@@ -33,7 +39,11 @@ interface BoardlistProps {
 
 // BoardList React Query CSR
 const getBoardQueryFn = (boardType: string) => {
-  return async ({ queryKey }: { queryKey: [string | null, number, number, number | null] }) => {
+  return async ({
+    queryKey,
+  }: {
+    queryKey: [string | null, number, number, number | null];
+  }) => {
     const [url_slug, page, limit, userId] = queryKey;
 
     if (boardType === "popular") {
@@ -50,7 +60,13 @@ const getBoardQueryFn = (boardType: string) => {
   };
 };
 
-export default function Boardlist({ url_slug, page, boardType, limit, initData }: BoardlistProps) {
+export default function Boardlist({
+  url_slug,
+  page,
+  boardType,
+  limit,
+  initData,
+}: BoardlistProps) {
   const { isUserId, messageToUser } = useAuth();
   // const [postData, setPostData] = useState<initDataPosts>(initData || { posts: [] });
 
@@ -58,12 +74,15 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
     queryKey: [url_slug, page, limit, isUserId],
     queryFn: getBoardQueryFn(boardType),
     staleTime: 0,
-    initialData: initData && initData.initUrlSlug === url_slug ? initData : undefined,
+    initialData:
+      initData && initData.initUrlSlug === url_slug ? initData : undefined,
   });
 
   // writer dropdown
   const writerRef = useRef<HTMLDivElement>(null);
-  const { writerDrop, dropPosition, userClick } = useDropDown({ messageToUser });
+  const { writerDrop, dropPosition, userClick } = useDropDown({
+    messageToUser,
+  });
   const [userInfoInDropMenu, setUserInfoInDropMenu] = useState<{
     userId: number;
     userNickname: string;
@@ -76,7 +95,7 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
 
   return (
     <>
-      <ol className='board_list'>
+      <ol className="board_list">
         {isUserId && isUserId !== userInfoInDropMenu.userId && writerDrop && (
           <DropDownMenu
             style={{
@@ -86,46 +105,55 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
             userInfoInDropMenu={userInfoInDropMenu}
           />
         )}
-        <li className='board_list_header'>
-          {boardType === "popular" ? <span className=''></span> : <span className='num'></span>}
-          <span className='title'></span>
-          <div className='comment'>
-            <ChatBubbleLeftEllipsisIcon className='icon' />
+        <li className="board_list_header">
+          {boardType === "popular" ? (
+            <span className=""></span>
+          ) : (
+            <span className="num"></span>
+          )}
+          <span className="title"></span>
+          <div className="comment">
+            <ChatBubbleLeftEllipsisIcon className="icon" />
           </div>
-          <div className='writer'></div>
-          <div className='like'>
-            <HeartIcon className='icon' />
+          <div className="writer"></div>
+          <div className="like">
+            <HeartIcon className="icon" />
           </div>
-          <div className='view'>
-            <EyeIcon className='icon' />
+          <div className="view">
+            <EyeIcon className="icon" />
           </div>
-          <div className='date'>
-            <CalendarIcon className='icon' />
+          <div className="date">
+            <CalendarIcon className="icon" />
           </div>
         </li>
         {postData?.posts?.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link
-                href={`/board/${boardType === "popular" ? "popular" : url_slug}/${b.id}/?${new URLSearchParams({
-                  page: String(page),
-                })}`}>
+                href={`/board/${boardType === "popular" ? "popular" : url_slug}/${b.id}/?${new URLSearchParams(
+                  {
+                    page: String(page),
+                  }
+                )}`}
+              >
                 {boardType !== "popular" &&
                   (b.notice ? (
-                    <SpeakerWaveIcon className='icon notice' />
+                    <SpeakerWaveIcon className="icon notice" />
                   ) : (
-                    <span className='num'>{b.post_number}</span>
+                    <span className="num">{b.post_number}</span>
                   ))}
-                <span className='title'>
-                  {boardType === "popular" && <span className='category'>{b.board_name}</span>}
+                <span className="title">
+                  {boardType === "popular" && (
+                    <span className="category">{b.board_name}</span>
+                  )}
                   {b.title}
                 </span>
-                <div className='comment'>
+                <div className="comment">
                   <i></i>
                   {b.comment_count}
                 </div>
                 <span
-                  className='writer'
+                  className="writer"
                   ref={writerRef}
                   onClick={async (e) => {
                     e.preventDefault();
@@ -135,31 +163,37 @@ export default function Boardlist({ url_slug, page, boardType, limit, initData }
                       userId: Number(b.user_id),
                       userNickname: b.user_nickname,
                     });
-                  }}>
+                  }}
+                >
                   {b.user_nickname}
                 </span>
-                <div className='like'>
+                <div className="like">
                   <i></i>
                   {b.likes}
                 </div>
-                <div className='view'>
+                <div className="view">
                   <i></i>
                   {b.views}
                 </div>
                 {/* <span className="comment"><i></i>33</span> */}
-                <div className='date'>{formatPostDate(b.created_at)}</div>
+                <div className="date">{formatPostDate(b.created_at)}</div>
               </Link>
             </li>
           ))
         ) : (
-          <div className='data_none'>
+          <div className="data_none">
             <NoSymbolIcon />
             <span>작성한 글이 없습니다.</span>
           </div>
         )}
       </ol>
 
-      <Pagination page={page} totalPage={totalPage} type={boardType} url_slug={url_slug} />
+      <Pagination
+        page={page}
+        totalPage={totalPage}
+        type={boardType}
+        url_slug={url_slug}
+      />
     </>
   );
 }

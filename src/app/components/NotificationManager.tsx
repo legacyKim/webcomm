@@ -196,7 +196,9 @@ export default function NotificationManager({
   // VAPID 키 변환 함수
   const urlBase64ToUint8Array = (base64String: string) => {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-    const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+    const base64 = (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
 
     const rawData = window.atob(base64);
     const outputArray = new Uint8Array(rawData.length);
@@ -209,9 +211,10 @@ export default function NotificationManager({
 
   if (!isSupported) {
     return (
-      <div className='notification-manager'>
-        <p className='warning'>
-          <NoSymbolIcon className='icon' />이 브라우저는 푸시 알림을 지원하지 않습니다.
+      <div className="notification-manager">
+        <p className="warning">
+          <NoSymbolIcon className="icon" />이 브라우저는 푸시 알림을 지원하지
+          않습니다.
         </p>
       </div>
     );
@@ -222,20 +225,30 @@ export default function NotificationManager({
   }
 
   return (
-    <div className='notification-manager'>
-      <div className='notification-controls'>
-        <p className='notice'>새로운 알림을 확인하고 푸시 알림을 설정하세요.</p>
+    <div className="notification-manager">
+      <div className="notification-controls">
+        {permission === "granted" && isSubscribed ? (
+          <p className="notice">푸시 알림이 활성화되었습니다.</p>
+        ) : (
+          <p className="notice">
+            새로운 알림을 확인하고 푸시 알림을 설정하세요.
+          </p>
+        )}
 
         {permission === "granted" && (
-          <div className='toggle-container'>
-            <label className='toggle-switch'>
+          <div className="toggle-container">
+            <label className="toggle-switch">
               <input
-                type='checkbox'
+                type="checkbox"
                 checked={isSubscribed}
-                onChange={isSubscribed ? unsubscribeFromNotifications : subscribeToNotifications}
+                onChange={
+                  isSubscribed
+                    ? unsubscribeFromNotifications
+                    : subscribeToNotifications
+                }
                 disabled={isLoading}
               />
-              <span className='toggle-slider'></span>
+              <span className="toggle-slider"></span>
             </label>
             {/* <span className='toggle-label'>
               {isLoading ? "처리중..." : isSubscribed ? "푸시 알림 켜짐" : "푸시 알림 꺼짐"}
@@ -244,8 +257,8 @@ export default function NotificationManager({
         )}
       </div>
       {permission === "denied" && (
-        <p className='warning'>
-          <NoSymbolIcon className='icon' />
+        <p className="warning">
+          <NoSymbolIcon className="icon" />
           알림이 차단되어 있습니다. 브라우저 설정에서 알림을 허용해주세요.
         </p>
       )}

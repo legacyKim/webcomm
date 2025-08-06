@@ -5,7 +5,7 @@ import axios from "axios";
 import { useState } from "react";
 import MyHeader from "../myHeader";
 
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Message from "@/components/message";
 
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
@@ -27,7 +27,10 @@ export default function MyMessage() {
 
   const queryClient = useQueryClient();
 
-  const { data = { received: [], sent: [] }, isLoading } = useQuery<{ received: Message[]; sent: Message[] }>({
+  const { data = { received: [], sent: [] }, isLoading } = useQuery<{
+    received: Message[];
+    sent: Message[];
+  }>({
     queryKey: ["messages", isUserId],
     queryFn: async () => {
       const res = await axios.get("/api/message/", {
@@ -51,7 +54,9 @@ export default function MyMessage() {
   const messageDelete = async (messageId: number) => {
     if (!isUserId) return;
 
-    const confirmDelete = confirm("쪽지를 삭제하시겠습니까? 삭제하신 메세지는 확인하실 수 없습니다.");
+    const confirmDelete = confirm(
+      "쪽지를 삭제하시겠습니까? 삭제하신 메세지는 확인하실 수 없습니다."
+    );
     if (!confirmDelete) return;
 
     try {
@@ -90,83 +95,90 @@ export default function MyMessage() {
   };
 
   return (
-    <sub className='sub'>
-      <div className='mypage'>
+    <sub className="sub">
+      <div className="mypage">
         <MyHeader />
-        <div className='mypage_content'>
-          <div className='mypage_message'>
-            <div className='mypage_list_sub'>
+        <div className="mypage_content">
+          <div className="mypage_message">
+            <div className="mypage_list_sub">
               <button
                 className={`${filter === "received" ? "active" : ""}`}
                 onClick={() => setFilter("received")}
-                disabled={filter === "received"}>
+                disabled={filter === "received"}
+              >
                 받은 쪽지
               </button>
               <button
                 className={`${filter === "sent" ? "active" : ""}`}
                 onClick={() => setFilter("sent")}
-                disabled={filter === "sent"}>
+                disabled={filter === "sent"}
+              >
                 보낸 쪽지
               </button>
             </div>
 
-            <div className='mypage_message_box'>
+            <div className="mypage_message_box">
               {isLoading ? (
-                <div className='data_wait'>
+                <div className="data_wait">
                   <span>잠시만 기다려 주세요.</span>
-                  <div className='dots'>
-                    <span className='dot dot1'>.</span>
-                    <span className='dot dot2'>.</span>
-                    <span className='dot dot3'>.</span>
+                  <div className="dots">
+                    <span className="dot dot1">.</span>
+                    <span className="dot dot2">.</span>
+                    <span className="dot dot3">.</span>
                   </div>
                 </div>
               ) : messages.length === 0 ? (
-                <div className='data_none'>
+                <div className="data_none">
                   <NoSymbolIcon />
                   <span>쪽지가 없습니다.</span>
                 </div>
               ) : (
-                <ul className='message_list board_list'>
+                <ul className="message_list board_list">
                   {messages.map((msg, index) => (
                     <li key={msg.id}>
-                      <span className='num'>{index}</span>
-                      <div className='message_box'>
-                        <div className='message_box_top'>
-                          <div className='writer'>
+                      <span className="num">{index}</span>
+                      <div className="message_box">
+                        <div className="message_box_top">
+                          <div className="writer">
                             <img
-                              className='profile_img'
+                              className="profile_img"
                               src={msg.profile ?? "/profile/basic.png"}
                               alt={`${msg.user_nickname}의 프로필 이미지`}
                               width={32}
                               height={32}
                             />
-                            <span className='writer_name'>{msg.user_nickname}</span>
+                            <span className="writer_name">
+                              {msg.user_nickname}
+                            </span>
                           </div>
-                          <div className='btn_wrap'>
+                          <div className="btn_wrap">
                             {filter === "received" && (
                               <button
                                 onClick={() => {
                                   sendMessage(msg.user_id);
                                   setMessageNickname(msg.user_nickname);
-                                }}>
+                                }}
+                              >
                                 답장
                               </button>
                             )}
                             <button
                               onClick={() => {
                                 reportUser(msg.user_id);
-                              }}>
+                              }}
+                            >
                               신고
                             </button>
                             <button
                               onClick={() => {
                                 messageDelete(msg.id);
-                              }}>
+                              }}
+                            >
                               삭제
                             </button>
                           </div>
                         </div>
-                        <p className='message'>{msg.content}</p>
+                        <p className="message">{msg.content}</p>
                       </div>
                     </li>
                   ))}

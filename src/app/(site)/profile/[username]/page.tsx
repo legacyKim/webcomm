@@ -15,7 +15,7 @@ interface ProfileResponse {
 async function getUserData(
   username: string,
   currentUserId?: number,
-  tab: string = "summary",
+  tab: string = "summary"
 ): Promise<ProfileResponse | null> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
@@ -36,7 +36,9 @@ async function getUserData(
     });
 
     if (!response.ok) {
-      console.warn(`Failed to fetch user data for ${username}: ${response.status}`);
+      console.warn(
+        `Failed to fetch user data for ${username}: ${response.status}`
+      );
       return null;
     }
 
@@ -52,7 +54,9 @@ export default async function Page({
   searchParams,
 }: {
   params: Promise<{ username: string }>;
-  searchParams: Promise<{ tab?: "summary" | "posts" | "comments" | "likes" | "follower" }>;
+  searchParams: Promise<{
+    tab?: "summary" | "posts" | "comments" | "likes" | "follower";
+  }>;
 }) {
   const { username } = await params;
   const { tab = "summary" } = await searchParams;
@@ -71,14 +75,22 @@ export default async function Page({
   }
 
   return (
-    <div className='profile'>
-      <Profile userProfile={userData.profile} userActivity={userData.activity} currentTab={tab} />
+    <div className="profile">
+      <Profile
+        userProfile={userData.profile}
+        userActivity={userData.activity}
+        currentTab={tab}
+      />
     </div>
   );
 }
 
 // 메타데이터 생성
-export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
   const { username } = await params;
   const decodedUsername = decodeURIComponent(username);
 
@@ -92,13 +104,24 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
 
   const { profile } = userData;
 
+  // profile이 undefined인 경우를 방지
+  if (!profile) {
+    return {
+      title: "Profile Not Found",
+    };
+  }
+
   return {
-    title: `${profile.user_nickname || profile.username} - Profile`,
-    description: profile.bio || `${profile.user_nickname || profile.username}'s profile`,
+    title: `${profile?.user_nickname || profile?.username || "Unknown"} - Profile`,
+    description:
+      profile?.bio ||
+      `${profile?.user_nickname || profile?.username || "Unknown"}'s profile`,
     openGraph: {
-      title: `${profile.user_nickname || profile.username} - Profile`,
-      description: profile.bio || `${profile.user_nickname || profile.username}'s profile`,
-      images: profile.profile ? [profile.profile] : [],
+      title: `${profile?.user_nickname || profile?.username || "Unknown"} - Profile`,
+      description:
+        profile?.bio ||
+        `${profile?.user_nickname || profile?.username || "Unknown"}'s profile`,
+      images: profile?.profile ? [profile.profile] : [],
     },
   };
 }

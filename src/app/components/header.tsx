@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 
 import { useRouter, usePathname } from "next/navigation";
 
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Logo from "@/components/Logo";
 
 import {
@@ -23,7 +23,15 @@ import {
 
 type Notification = {
   id: number;
-  type: "comment" | "reply" | "like_comment" | "message" | "mention";
+  type:
+    | "comment"
+    | "reply"
+    | "mention"
+    | "liked_post_comment"
+    | "liked_comment_reply"
+    | "message"
+    | "post_like"
+    | "comment_like";
   message: string;
   link: string;
   is_read: boolean;
@@ -67,7 +75,10 @@ export default function Header() {
     localStorage.setItem("darkMode", newDarkMode.toString());
 
     // Apply theme
-    document.documentElement.setAttribute("data-theme", newDarkMode ? "dark" : "light");
+    document.documentElement.setAttribute(
+      "data-theme",
+      newDarkMode ? "dark" : "light"
+    );
 
     // Save to server session if user is logged in
     if (loginStatus) {
@@ -103,22 +114,31 @@ export default function Header() {
               shouldUseDark = response.data.darkMode;
             } else {
               // Fallback to system preference
-              shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+              shouldUseDark = window.matchMedia(
+                "(prefers-color-scheme: dark)"
+              ).matches;
             }
           } catch {
             // Fallback to system preference
-            shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            shouldUseDark = window.matchMedia(
+              "(prefers-color-scheme: dark)"
+            ).matches;
           }
         } else {
           // Fallback to system preference
-          shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          shouldUseDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
         }
       }
 
       setIsDarkMode(shouldUseDark);
       sessionStorage.setItem("darkMode", shouldUseDark.toString());
       localStorage.setItem("darkMode", shouldUseDark.toString());
-      document.documentElement.setAttribute("data-theme", shouldUseDark ? "dark" : "light");
+      document.documentElement.setAttribute(
+        "data-theme",
+        shouldUseDark ? "dark" : "light"
+      );
     };
 
     initializeDarkMode();
@@ -181,16 +201,19 @@ export default function Header() {
   useEffect(() => {
     const clickOutSide = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const messageBtn = document.querySelector(".header_btn");
-      const dropdownBox = document.querySelector(".message");
+      const noticePopup = document.querySelector(".notice_popup");
+      const noticeMessage = document.querySelector(".notice_message");
 
-      if ((dropdownBox && dropdownBox.contains(target)) || (messageBtn && messageBtn.contains(target))) {
+      // 알림 팝업 영역 내부 클릭이면 무시
+      if (
+        (noticePopup && noticePopup.contains(target)) ||
+        (noticeMessage && noticeMessage.contains(target))
+      ) {
         return;
       }
 
-      if (messageBoxRef.current) {
-        setMessageBox(false);
-      }
+      // 알림 팝업 외부 클릭 시 닫기
+      setMessageBox(false);
     };
 
     document.addEventListener("mousedown", clickOutSide);
@@ -282,8 +305,13 @@ export default function Header() {
       await axios.patch(`/api/notifications`, {
         notificationIds: [id.toString()],
       });
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, is_read: true } : n)));
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+      );
       setUnreadCount((prev) => Math.max(0, prev - 1));
+      
+      // 알림 상태 업데이트 후 페이지 이동
+      setMessageBox(false);
       router.push(link);
     } catch (err) {
       console.error("알림 읽음 처리 실패", err);
@@ -291,97 +319,117 @@ export default function Header() {
   };
 
   return (
-    <header className='header'>
-      <div className='header_top page'>
-        <Link href='/' className='logo'>
+    <header className="header">
+      <div className="header_top page">
+        <Link href="/" className="logo">
           <Logo />
         </Link>
 
-        <div className='header_info'>
+        <div className="header_info">
           {loginStatus === null ? (
             <>
               <p>로딩 중...</p>
             </>
           ) : loginStatus ? (
             <>
-              <div className='userinfo'>
+              <div className="userinfo">
                 <img
-                  className='profile_img'
+                  className="profile_img"
                   src={isUserProfile ?? "/profile/basic.png"}
                   alt={`${isUserNick}의 프로필`}
                 />
 
-                <div className='userinfo_name'>
+                <div className="userinfo_name">
                   <span>{isUserNick}</span>님 환영합니다.
                 </div>
               </div>
 
               {/* Dark Mode Toggle */}
-              <div className='dark-mode-toggle'>
+              <div className="dark-mode-toggle">
                 <button
                   onClick={toggleDarkMode}
-                  className='dark-mode-btn'
-                  aria-label={`${isDarkMode ? "라이트" : "다크"} 모드로 전환`}>
-                  <div className={`toggle-slider ${isDarkMode ? "dark" : "light"}`}>
-                    <div className='toggle-icon'>
-                      {isDarkMode ? <MoonIcon className='icon' /> : <SunIcon className='icon' />}
+                  className="dark-mode-btn"
+                  aria-label={`${isDarkMode ? "라이트" : "다크"} 모드로 전환`}
+                >
+                  <div
+                    className={`toggle-slider ${isDarkMode ? "dark" : "light"}`}
+                  >
+                    <div className="toggle-icon">
+                      {isDarkMode ? (
+                        <MoonIcon className="icon" />
+                      ) : (
+                        <SunIcon className="icon" />
+                      )}
                     </div>
                   </div>
                 </button>
               </div>
 
-              <div className='notice_popup'>
+              <div className="notice_popup">
                 <button
-                  className='header_btn'
+                  className="header_btn"
                   ref={messageBoxRef}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
                     setMessageBox(!messageBox);
-                  }}>
-                  <div className='notification-icon-container'>
-                    <BellIcon className='icon' />
+                  }}
+                >
+                  <div className="notification-icon-container">
+                    <BellIcon className="icon" />
                     {unreadCount > 0 && (
-                      <span className='notification-badge'>{unreadCount > 99 ? "99+" : unreadCount}</span>
+                      <span className="notification-badge">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
                     )}
                   </div>
                   <span>알림</span>
                 </button>
 
-                <div className={`message ${messageBox ? "active" : ""}`}>
+                <div className={`notice_message ${messageBox ? "active" : ""}`}>
                   {notifications.length === 0 ? (
-                    <div className='no-notifications'>
+                    <div className="no-notifications">
                       <span>새로운 알림이 없습니다.</span>
                     </div>
                   ) : (
                     notifications.map((n, i) => (
-                      <div key={i} className={`message_box ${n.is_read ? "read" : "unread"}`}>
+                      <div
+                        key={i}
+                        className={`message_box ${n.is_read ? "read" : "unread"}`}
+                      >
                         <Link
-                          href='#'
-                          onClick={(e) => {
+                          href={`${n.link}`}
+                          onClick={async (e) => {
                             e.preventDefault();
-                            notifyCheck(n.id, n.link);
-                          }}>
+                            await notifyCheck(n.id, n.link);
+                          }}
+                        >
                           <span>{n.message}</span>
-                          {!n.is_read && <span className='unread-dot'></span>}
+                          {!n.is_read && <span className="unread-dot"></span>}
                         </Link>
                       </div>
                     ))
                   )}
-                  <Link href='/my/notice' className='notice_btn'>
+                  <Link
+                    href="/my/notice"
+                    className="notice_btn"
+                    onClick={() => {
+                      setMessageBox(false);
+                    }}
+                  >
                     알림함 이동하기
                   </Link>
                 </div>
               </div>
 
               {isUserAuthority === 0 ? (
-                <Link href='/admin'>
-                  <WrenchScrewdriverIcon className='icon' />
+                <Link href="/admin">
+                  <WrenchScrewdriverIcon className="icon" />
                   <span>관리자 페이지</span>
                 </Link>
               ) : (
-                <Link href='/my' className='header_btn'>
-                  <UserCircleIcon className='icon' />
+                <Link href="/my" className="header_btn">
+                  <UserCircleIcon className="icon" />
                   <span>마이페이지</span>
                 </Link>
               )}
@@ -390,33 +438,41 @@ export default function Header() {
                 onClick={() => {
                   logoutPop();
                 }}
-                className='header_btn'>
-                <ArrowRightStartOnRectangleIcon className='icon icon_space' />
+                className="header_btn"
+              >
+                <ArrowRightStartOnRectangleIcon className="icon icon_space" />
                 <span>로그아웃</span>
               </button>
             </>
           ) : (
             <>
               {/* Dark Mode Toggle */}
-              <div className='dark-mode-toggle'>
+              <div className="dark-mode-toggle">
                 <button
                   onClick={toggleDarkMode}
-                  className='dark-mode-btn'
-                  aria-label={`${isDarkMode ? "라이트" : "다크"} 모드로 전환`}>
-                  <div className={`toggle-slider ${isDarkMode ? "dark" : "light"}`}>
-                    <div className='toggle-icon'>
-                      {isDarkMode ? <MoonIcon className='icon' /> : <SunIcon className='icon' />}
+                  className="dark-mode-btn"
+                  aria-label={`${isDarkMode ? "라이트" : "다크"} 모드로 전환`}
+                >
+                  <div
+                    className={`toggle-slider ${isDarkMode ? "dark" : "light"}`}
+                  >
+                    <div className="toggle-icon">
+                      {isDarkMode ? (
+                        <MoonIcon className="icon" />
+                      ) : (
+                        <SunIcon className="icon" />
+                      )}
                     </div>
                   </div>
                 </button>
               </div>
 
-              <Link href='/login' className=''>
-                <ArrowRightEndOnRectangleIcon className='icon icon_space' />
+              <Link href="/login" className="">
+                <ArrowRightEndOnRectangleIcon className="icon icon_space" />
                 <span>로그인</span>
               </Link>
-              <Link href='/agree' className=''>
-                <UserIcon className='icon' />
+              <Link href="/agree" className="">
+                <UserIcon className="icon" />
                 <span>회원가입</span>
               </Link>
             </>

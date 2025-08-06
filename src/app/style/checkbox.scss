@@ -1,0 +1,59 @@
+@use "./var.scss" as *; /* var css */
+
+/* CHECKBOX */
+.checkbox {
+  position: relative;
+  display: block;
+  margin-bottom: 12px;
+}
+.checkbox,
+.checkbox label {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  cursor: pointer;
+}
+.checkbox_all {
+  border-top: 1px solid $grey-c-color;
+  padding-top: 12px;
+}
+.checkbox label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #333;
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.5;
+  transition: all 0.3s ease-in-out;
+}
+.checkbox label .svg_checkbox {
+  margin-right: 4px;
+}
+.checkbox input[type="checkbox"] {
+  display: none;
+}
+.checkbox input[type="checkbox"] + label .svg_checkmark {
+  display: none;
+}
+.checkbox input[type="checkbox"]:checked + label .svg_checkmark {
+  display: block;
+}
+.checkbox .custom_checkbox span {
+  font-size: 15px;
+  color: #000;
+}
+.checkbox .custom_checkbox b {
+  font-weight: 500;
+}
+.checkbox:hover .custom_checkbox span {
+  text-decoration: underline;
+}
+.checkbox_wrap {
+  .checkbox {
+    margin-bottom: 4px;
+  }
+  margin-bottom: 8px;
+}
+
+/* CHECKBOX end */

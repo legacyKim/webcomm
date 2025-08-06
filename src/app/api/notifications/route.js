@@ -1,28 +1,37 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import webpush from "web-push";
+import prisma from "@/lib/prisma.js";
 
 // VAPID 키 설정 (환경변수로 관리)
-webpush.setVapidDetails("mailto:your-email@example.com", process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+webpush.setVapidDetails(
+  "mailto:your-email@example.com",
+  process.env.VAPID_PUBLIC_KEY,
+  process.env.VAPID_PRIVATE_KEY
+);
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const limitParam = searchParams.get("limit");
 
   try {
+    console.log("=== 알림 목록 조회 시작 ===");
+
     // 토큰에서 사용자 정보 확인
     const userData = await serverTokenCheck(req);
+    console.log("사용자 정보:", userData);
+
     if (!userData) {
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
     const limit = limitParam ? parseInt(limitParam, 10) : null;
+    console.log("조회 제한:", limit);
 
     // Prisma로 알림 조회
     const notifications = await prisma.notification.findMany({
       where: {
-        receiver_id: userData.userId,
+        receiver_id: userData.id, // userId가 아닌 id 사용
         OR: [
           { is_read: false },
           {
@@ -38,11 +47,6 @@ export async function GET(req) {
             user_nickname: true,
           },
         },
-        post: {
-          select: {
-            board_name: true,
-          },
-        },
       },
       orderBy: {
         created_at: "desc",
@@ -50,35 +54,49 @@ export async function GET(req) {
       take: limit || undefined,
     });
 
+    console.log("조회된 알림 수:", notifications.length);
+
     // 메시지와 링크 생성
     const processedNotifications = notifications.map((n) => {
       let message = "";
       let link = "/";
 
       switch (n.type) {
+        case "test":
+          message = "테스트 알림입니다.";
+          link = "/my/notice";
+          break;
         case "comment":
           message = `게시물에 ${n.sender.user_nickname}님이 댓글을 달았습니다.`;
-          link = `/board/${n.post?.board_name}/${n.post_id}`;
+          link = `/board/${n.url_slug}/${n.post_id}`;
           break;
         case "reply":
           message = `댓글에 ${n.sender.user_nickname}님이 대댓글을 달았습니다.`;
-          link = `/board/${n.post?.board_name}/${n.post_id}#comment-${n.comment_id}`;
-          break;
-        case "like_comment":
-          message = `${n.sender.user_nickname}님이 댓글을 좋아합니다.`;
-          link = `/board/${n.post?.board_name}/${n.post_id}#comment-${n.comment_id}`;
-          break;
-        case "post_like":
-          message = `${n.sender.user_nickname}님이 게시글을 좋아합니다.`;
-          link = `/board/${n.post?.board_name}/${n.post_id}`;
-          break;
-        case "message":
-          message = `${n.sender.user_nickname}님이 쪽지를 보냈습니다.`;
-          link = `/my/message`;
+          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
           break;
         case "mention":
           message = `${n.sender.user_nickname}님이 언급했습니다.`;
-          link = `/board/${n.post?.board_name}/${n.post_id}#comment-${n.comment_id}`;
+          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          break;
+        case "liked_post_comment":
+          message = `좋아요한 게시물에 ${n.sender.user_nickname}님이 댓글을 달았습니다.`;
+          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          break;
+        case "liked_comment_reply":
+          message = `좋아요한 댓글에 ${n.sender.user_nickname}님이 대댓글을 달았습니다.`;
+          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          break;
+        case "message":
+          message = `${n.sender.user_nickname}님이 쪽지를 보냈습니다.`;
+          link = "/my/message";
+          break;
+        case "post_like":
+          message = `${n.sender.user_nickname}님이 게시글을 좋아합니다.`;
+          link = `/board/${n.url_slug}/${n.post_id}`;
+          break;
+        case "comment_like":
+          message = `${n.sender.user_nickname}님이 댓글을 좋아합니다.`;
+          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
           break;
         default:
           message = "새로운 알림이 있습니다.";
@@ -95,53 +113,86 @@ export async function GET(req) {
       };
     });
 
+    console.log("처리된 알림:", processedNotifications.length);
+
     return NextResponse.json(processedNotifications);
   } catch (err) {
     console.error("Error fetching notifications:", err);
-    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "서버 에러",
+        details: err.message,
+      },
+      { status: 500 }
+    );
   }
 }
 
 // 알림 읽음 처리
 export async function PATCH(req) {
   try {
+    console.log("=== 알림 읽음 처리 시작 ===");
+
     const userData = await serverTokenCheck(req);
+    console.log("사용자 정보:", userData);
+
     if (!userData) {
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
     const { notificationIds } = await req.json();
+    console.log("읽음 처리할 알림 IDs:", notificationIds);
 
     if (!Array.isArray(notificationIds)) {
-      return NextResponse.json({ error: "notificationIds는 배열이어야 합니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "notificationIds는 배열이어야 합니다" },
+        { status: 400 }
+      );
     }
 
-    // 해당 사용자의 알림만 읽음 처리
-    await prisma.notification.updateMany({
+    // 문자열 ID를 정수로 변환
+    const intNotificationIds = notificationIds.map((id) => parseInt(id, 10));
+    console.log("변환된 알림 IDs:", intNotificationIds);
+
+    console.log("Prisma 업데이트 시작...");
+
+    // 해당 사용자의 알림만 읽음 처리 (read_at 필드 제거)
+    const result = await prisma.notification.updateMany({
       where: {
-        id: { in: notificationIds },
-        receiver_id: userData.userId,
+        id: { in: intNotificationIds },
+        receiver_id: userData.id, // userId가 아닌 id 사용
       },
       data: {
         is_read: true,
-        read_at: new Date(),
       },
     });
 
-    return NextResponse.json({ success: true });
+    console.log("업데이트 결과:", result);
+
+    return NextResponse.json({ success: true, updated: result.count });
   } catch (err) {
     console.error("Error marking notifications as read:", err);
-    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "서버 에러",
+        details: err.message,
+      },
+      { status: 500 }
+    );
   }
 }
 
 // 새 알림 생성 및 웹푸시 발송
 export async function POST(req) {
   try {
-    const { receiver_id, sender_id, type, post_id, comment_id, content } = await req.json();
+    const { receiver_id, sender_id, type, post_id, comment_id, content } =
+      await req.json();
 
     if (!receiver_id || !sender_id || !type) {
-      return NextResponse.json({ error: "필수 필드가 누락되었습니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "필수 필드가 누락되었습니다" },
+        { status: 400 }
+      );
     }
 
     // 알림 생성
@@ -186,17 +237,23 @@ export async function POST(req) {
           case "reply":
             pushMessage = `${notification.sender.user_nickname}님이 대댓글을 달았습니다.`;
             break;
-          case "like_comment":
-            pushMessage = `${notification.sender.user_nickname}님이 댓글을 좋아합니다.`;
+          case "mention":
+            pushMessage = `${notification.sender.user_nickname}님이 언급했습니다.`;
             break;
-          case "post_like":
-            pushMessage = `${notification.sender.user_nickname}님이 게시글을 좋아합니다.`;
+          case "liked_post_comment":
+            pushMessage = `좋아요한 게시물에 ${notification.sender.user_nickname}님이 댓글을 달았습니다.`;
+            break;
+          case "liked_comment_reply":
+            pushMessage = `좋아요한 댓글에 ${notification.sender.user_nickname}님이 대댓글을 달았습니다.`;
             break;
           case "message":
             pushMessage = `${notification.sender.user_nickname}님이 쪽지를 보냈습니다.`;
             break;
-          case "mention":
-            pushMessage = `${notification.sender.user_nickname}님이 언급했습니다.`;
+          case "post_like":
+            pushMessage = `${notification.sender.user_nickname}님이 게시글을 좋아합니다.`;
+            break;
+          case "comment_like":
+            pushMessage = `${notification.sender.user_nickname}님이 댓글을 좋아합니다.`;
             break;
           default:
             pushMessage = "새로운 알림이 있습니다.";
@@ -227,7 +284,7 @@ export async function POST(req) {
                   auth: subscription.auth,
                 },
               },
-              payload,
+              payload
             );
           } catch (error) {
             console.error("Push send error:", error);

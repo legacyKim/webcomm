@@ -34,6 +34,8 @@ export interface Posts {
   notice: boolean;
   created_at: string;
   updated_at: string;
+  is_liked_by_user?: boolean;
+  likers?: PostLiker[];
 }
 
 export interface initDataPosts {
@@ -149,4 +151,11 @@ export interface UserActivity {
     user_nickname: string;
     profile: string | null;
   }[];
+}
+
+export interface PostLiker {
+  user_id: number;
+  user_nickname: string;
+  user_profile?: string;
+  created_at: string;
 }

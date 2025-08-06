@@ -8,120 +8,108 @@ datasource db {
 }
 
 model Board {
-  id        Int      @id @default(autoincrement())
-  board_name String  @unique @db.VarChar(255)
-  url_slug   String  @unique @db.VarChar(255) 
-  seq       Int      @default(autoincrement())
-  posts     Post[]
+  id         Int    @id @default(autoincrement())
+  board_name String @unique @db.VarChar(255)
+  url_slug   String @unique @db.VarChar(255)
+  seq        Int    @default(autoincrement())
+  posts      Post[]
+  menuCustoms MenuCustom[]
 
   @@map("boards")
 }
 
 model Member {
-  id                    Int         @id @default(autoincrement())
-  username              String      @unique @db.VarChar(50)
-  email                 String      @unique @db.VarChar(100)
-  all_posts             Int         @default(0)
-  authority             Int         @default(0)
-  all_views             Int         @default(0)
-  password              String      @db.Text
-  user_nickname         String?     @unique @db.VarChar(50)
-  profile               String?     @db.VarChar(255)
-  createdAt             DateTime    @default(now()) @map("created_at")
-  updatedAt             DateTime    @updatedAt @default(now()) @map("updated_at")
-  nickname_updated_at   DateTime?   @map("nickname_updated_at")
-  restriction_until     DateTime?   @map("restriction_until")
-
-  // 프로필 추가 정보
-  bio                   String?     @db.Text
-  location              String?     @db.VarChar(100)
-  website               String?     @db.VarChar(255)
-  banner_image          String?     @db.VarChar(255)
-  total_likes_received  Int         @default(0)
-  last_seen             DateTime?   @map("last_seen")
-  is_online             Boolean     @default(false)
-
-  // Relations
-  posts          Post[]          @relation("MemberPosts")
-  comments       Comment[]       @relation("MemberComments")
-  postActions    PostAction[]    @relation("MemberPostActions")
-  commentActions CommentAction[] @relation("MemberCommentActions")
-
-  blockedBy      BlockedUser[]   @relation("BlockedBy")
-  blockedUsers   BlockedUser[]   @relation("BlockedUsers")
-
-  reportedBy     UserReport[]    @relation("ReportedBy")
-  reportedUsers  UserReport[]    @relation("ReportedUsers")
-  
-  sentMessages     UserMessage[] @relation("SentMessages")
-  receivedMessages UserMessage[] @relation("ReceivedMessages")
-
-  sentNotifications     Notification[] @relation("NotificationSender")
-  receivedNotifications Notification[] @relation("NotificationReceiver")
+  id                    Int                @id @default(autoincrement())
+  username              String             @unique @db.VarChar(50)
+  email                 String             @unique @db.VarChar(100)
+  all_posts             Int                @default(0)
+  authority             Int                @default(0)
+  all_views             Int                @default(0)
+  password              String
+  user_nickname         String?            @unique @db.VarChar(50)
+  profile               String?            @db.VarChar(255)
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @default(now()) @updatedAt @map("updated_at")
+  nickname_updated_at   DateTime?          @map("nickname_updated_at")
+  restriction_until     DateTime?          @map("restriction_until")
+  bio                   String?
+  location              String?            @db.VarChar(100)
+  website               String?            @db.VarChar(255)
+  banner_image          String?            @db.VarChar(255)
+  total_likes_received  Int                @default(0)
+  last_seen             DateTime?          @map("last_seen")
+  is_online             Boolean            @default(false)
+  marketing_enabled     Boolean            @default(false)
+  notification_enabled  Boolean            @default(false)
+  blockedUsers          BlockedUser[]      @relation("BlockedUsers")
+  blockedBy             BlockedUser[]      @relation("BlockedBy")
+  commentActions        CommentAction[]    @relation("MemberCommentActions")
+  comments              Comment[]          @relation("MemberComments")
+  following             Follow[]           @relation("UserFollowing")
+  followers             Follow[]           @relation("UserFollowers")
+  receivedNotifications Notification[]     @relation("NotificationReceiver")
+  sentNotifications     Notification[]     @relation("NotificationSender")
+  postActions           PostAction[]       @relation("MemberPostActions")
+  posts                 Post[]             @relation("MemberPosts")
   pushSubscriptions     PushSubscription[]
-
-  // 팔로우 관계
-  followers     Follow[] @relation("UserFollowers")   // 나를 팔로우하는 사람들
-  following     Follow[] @relation("UserFollowing")   // 내가 팔로우하는 사람들
+  receivedMessages      UserMessage[]      @relation("ReceivedMessages")
+  sentMessages          UserMessage[]      @relation("SentMessages")
+  reportedUsers         UserReport[]       @relation("ReportedUsers")
+  reportedBy            UserReport[]       @relation("ReportedBy")
+  menuCustoms           MenuCustom[]
 
   @@map("members")
 }
 
 model Post {
-  id            Int         @id @default(autoincrement())
-  board_id      Int         @default(1)
-  board_name    String      @db.VarChar(255)
-  title         String      @db.VarChar(255)
-  content       String      @db.Text
-  user_id       Int      
-  views         Int         @default(0)
-  likes         Int         @default(0)
-  dislikes      Int         @default(0)
-  reports       Int         @default(0)
-  created_at    DateTime    @default(now())
-  updated_at    DateTime    @default(now())
-  url_slug      String      @db.VarChar(255)
-  user_nickname String?     @db.VarChar(255)
-  deleted       Boolean     @default(false)
-  notice        Boolean     @default(false)
-  
-  // Relations
-  board        Board    @relation(fields: [board_id], references: [id])
-  author       Member   @relation("MemberPosts", fields: [user_id], references: [id])
-  comments     Comment[]
-  postActions  PostAction[]
-  images       PostImage[]
+  id            Int            @id @default(autoincrement())
+  board_id      Int            @default(1)
+  board_name    String         @db.VarChar(255)
+  title         String         @db.VarChar(255)
+  content       String
+  user_id       Int
+  views         Int            @default(0)
+  likes         Int            @default(0)
+  dislikes      Int            @default(0)
+  reports       Int            @default(0)
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @default(now())
+  url_slug      String         @db.VarChar(255)
+  user_nickname String?        @db.VarChar(255)
+  deleted       Boolean        @default(false)
+  notice        Boolean        @default(false)
+  comments      Comment[]
+  notifications Notification[]
+  postActions   PostAction[]
+  images        PostImage[]
+  board         Board          @relation(fields: [board_id], references: [id])
+  author        Member         @relation("MemberPosts", fields: [user_id], references: [id])
 
   @@map("posts")
-
-  notifications Notification[]
 }
 
 model Comment {
-  id            Int      @id @default(autoincrement())
+  id            Int             @id @default(autoincrement())
   post_id       Int
-  user_id       Int      
-  content       String   @db.Text
+  user_id       Int
+  content       String
   parent_id     Int?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @default(now())
-  likes         Int      @default(0)
-  dislikes      Int      @default(0)
-  user_nickname String?  @db.VarChar(255)
-  depth         Int      
-  is_deleted    Boolean  @default(false)
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @default(now())
+  likes         Int             @default(0)
+  dislikes      Int             @default(0)
+  user_nickname String?         @db.VarChar(255)
+  depth         Int
+  is_deleted    Boolean         @default(false)
   deleted_at    DateTime?
-
-  // Relations
-  post         Post     @relation(fields: [post_id], references: [id])
-  author       Member   @relation("MemberComments", fields: [user_id], references: [id])
-  parent       Comment? @relation("CommentReplies", fields: [parent_id], references: [id])
-  replies      Comment[] @relation("CommentReplies")
-  actions      CommentAction[]
+  actions       CommentAction[]
+  parent        Comment?        @relation("CommentReplies", fields: [parent_id], references: [id])
+  replies       Comment[]       @relation("CommentReplies")
+  post          Post            @relation(fields: [post_id], references: [id])
+  author        Member          @relation("MemberComments", fields: [user_id], references: [id])
+  notifications Notification[]
 
   @@map("comments")
-
-  notifications Notification[]
 }
 
 model PostAction {
@@ -130,8 +118,6 @@ model PostAction {
   user_id     Int
   action_type String   @db.VarChar(50)
   created_at  DateTime @default(now())
-
-  // Relations
   post        Post     @relation(fields: [post_id], references: [id])
   user        Member   @relation("MemberPostActions", fields: [user_id], references: [id])
 
@@ -143,11 +129,9 @@ model CommentAction {
   id          Int      @id @default(autoincrement())
   comment_id  Int
   user_id     Int
-  action_type String   @db.Text
-  reason      String?  @db.Text
+  action_type String
+  reason      String?
   created_at  DateTime @default(now())
-
-  // Relations
   comment     Comment  @relation(fields: [comment_id], references: [id])
   user        Member   @relation("MemberCommentActions", fields: [user_id], references: [id])
 
@@ -158,10 +142,8 @@ model CommentAction {
 model PostImage {
   id         Int      @id @default(autoincrement())
   post_id    Int
-  image_url  String   @db.Text
+  image_url  String
   created_at DateTime @default(now())
-
-  // Relations
   post       Post     @relation(fields: [post_id], references: [id])
 
   @@map("post_images")
@@ -169,12 +151,11 @@ model PostImage {
 
 model BlockedUser {
   id        Int      @id @default(autoincrement())
-  blockerId Int  
-  blockedId Int   
+  blockerId Int
+  blockedId Int
   createdAt DateTime @default(now()) @map("created_at")
-
-  blocker   Member   @relation("BlockedBy", fields: [blockerId], references: [id])
   blocked   Member   @relation("BlockedUsers", fields: [blockedId], references: [id])
+  blocker   Member   @relation("BlockedBy", fields: [blockerId], references: [id])
 
   @@unique([blockerId, blockedId])
   @@map("blocked_users")
@@ -182,71 +163,65 @@ model BlockedUser {
 
 model UserReport {
   id         Int      @id @default(autoincrement())
-  reporterId Int   
-  reportedId Int  
+  reporterId Int
+  reportedId Int
   reason     String
   createdAt  DateTime @default(now()) @map("created_at")
   type       String   @default("general")
-
-  reporter   Member   @relation("ReportedBy", fields: [reporterId], references: [id])
   reported   Member   @relation("ReportedUsers", fields: [reportedId], references: [id])
+  reporter   Member   @relation("ReportedBy", fields: [reporterId], references: [id])
 
   @@map("user_reports")
-} 
+}
 
 model UserMessage {
-  id                      Int       @id @default(autoincrement())
-  sender_id               Int       @map("sender_id")
-  receiver_id             Int       @map("receiver_id")
-  content                 String
-  isRead                  Boolean   @default(false) @map("is_read")
-  createdAt               DateTime  @default(now()) @map("created_at")
-  is_deleted_by_sender    Boolean   @default(false)
-  is_deleted_by_receiver  Boolean   @default(false)
-
-  sender      Member   @relation("SentMessages", fields: [sender_id], references: [id])
-  receiver    Member   @relation("ReceivedMessages", fields: [receiver_id], references: [id])
+  id                     Int      @id @default(autoincrement())
+  sender_id              Int      @map("sender_id")
+  receiver_id            Int      @map("receiver_id")
+  content                String
+  isRead                 Boolean  @default(false) @map("is_read")
+  createdAt              DateTime @default(now()) @map("created_at")
+  is_deleted_by_sender   Boolean  @default(false)
+  is_deleted_by_receiver Boolean  @default(false)
+  receiver               Member   @relation("ReceivedMessages", fields: [receiver_id], references: [id])
+  sender                 Member   @relation("SentMessages", fields: [sender_id], references: [id])
 
   @@map("user_messages")
 }
 
 model Notification {
-  id          Int       @id @default(autoincrement())
-  type        String    // ex: 'comment', 'like_post', 'like_comment', 'mention', 'recomment', 'message'
+  id          Int      @id @default(autoincrement())
+  type        String
   sender_id   Int
   receiver_id Int
   post_id     Int?
   comment_id  Int?
-  is_read     Boolean   @default(false)
-  created_at  DateTime  @default(now())
-
-  // Relations
-  sender   Member @relation("NotificationSender", fields: [sender_id], references: [id])
-  receiver Member @relation("NotificationReceiver", fields: [receiver_id], references: [id])
-
-  post     Post?    @relation(fields: [post_id], references: [id])
-  comment  Comment? @relation(fields: [comment_id], references: [id])
+  url_slug    String?
+  is_read     Boolean  @default(false)
+  created_at  DateTime @default(now())
+  comment     Comment? @relation(fields: [comment_id], references: [id])
+  post        Post?    @relation(fields: [post_id], references: [id])
+  receiver    Member   @relation("NotificationReceiver", fields: [receiver_id], references: [id])
+  sender      Member   @relation("NotificationSender", fields: [sender_id], references: [id])
 
   @@map("notifications")
 }
 
 model PushSubscription {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  endpoint  String   @unique
-  p256dh    String
-  auth      String
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  endpoint   String   @unique
+  p256dh     String
+  auth       String
   created_at DateTime @default(now())
-
-  // Relations
-  user Member @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user       Member   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("push_subscriptions")
 }
 
 model Terms {
   id         Int      @id @default(autoincrement())
-  content    String   @db.Text
+  content    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -255,7 +230,7 @@ model Terms {
 
 model Policy {
   id         Int      @id @default(autoincrement())
-  content    String   @db.Text
+  content    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -274,15 +249,27 @@ model SiteSettings {
 
 model Follow {
   id           Int      @id @default(autoincrement())
-  follower_id  Int      // 팔로우하는 사람
-  following_id Int      // 팔로우당하는 사람
+  follower_id  Int
+  following_id Int
   created_at   DateTime @default(now())
+  follower     Member   @relation("UserFollowing", fields: [follower_id], references: [id], onDelete: Cascade)
+  following    Member   @relation("UserFollowers", fields: [following_id], references: [id], onDelete: Cascade)
 
-  // Relations
-  follower  Member @relation("UserFollowing", fields: [follower_id], references: [id], onDelete: Cascade)
-  following Member @relation("UserFollowers", fields: [following_id], references: [id], onDelete: Cascade)
-
-  // 중복 팔로우 방지
   @@unique([follower_id, following_id], name: "unique_follow")
   @@map("follows")
+}
+
+model MenuCustom {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  board_id   Int
+  priority   Int      @default(0)
+  is_visible Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  user       Member   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  board      Board    @relation(fields: [board_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, board_id], name: "unique_user_board")
+  @@map("menu_customs")
 }

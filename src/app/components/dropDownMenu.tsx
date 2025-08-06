@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import Message from "@/components/message";
 
 import { useLoginCheck } from "@/func/hook/useLoginCheck";
@@ -20,7 +20,10 @@ interface DropDownMenuProps {
   };
 }
 
-export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenuProps) {
+export default function DropDownMenu({
+  style,
+  userInfoInDropMenu,
+}: DropDownMenuProps) {
   const router = useRouter();
   const [isBlocked, setIsBlocked] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
@@ -33,11 +36,23 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
     const checkFollowStatus = async () => {
       if (!isUserId) return;
 
+      console.log("팔로우 상태 확인 요청:", {
+        username: userInfoInDropMenu.userNickname,
+        currentUser: isUserId,
+      });
+
       try {
         const response = await axios.get(
-          `/api/user/profile?username=${userInfoInDropMenu.userNickname}&current_user=${isUserId}`,
+          `/api/user/profile?username=${userInfoInDropMenu.userNickname}&current_user=${isUserId}`
         );
+
+        console.log("팔로우 상태 API 응답:", response.data);
+
         if (response.data.profile) {
+          console.log(
+            "isFollowing 값 설정:",
+            response.data.profile.isFollowing
+          );
           setIsFollowing(response.data.profile.isFollowing);
         }
       } catch (error) {
@@ -102,7 +117,9 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
 
   // 차단하기
   const blockUserConfirm = () => {
-    const isConfirmed = confirm(`${userInfoInDropMenu.userNickname}님을 차단하시겠습니까?`);
+    const isConfirmed = confirm(
+      `${userInfoInDropMenu.userNickname}님을 차단하시겠습니까?`
+    );
     if (isConfirmed) {
       blockUser();
     }
@@ -117,7 +134,9 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
       const userName = userInfoInDropMenu.userNickname;
       if (response.data.success) {
         setIsBlocked(true);
-        alert(`${userName}님을 차단했습니다. 해당 유저의 댓글 및 게시글을 확인할 수 없습니다.`);
+        alert(
+          `${userName}님을 차단했습니다. 해당 유저의 댓글 및 게시글을 확인할 수 없습니다.`
+        );
       }
     } catch (error) {
       console.error("차단 실패:", error);
@@ -148,12 +167,14 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
 
   return (
     <>
-      <ul className='dropDownMenu' style={style}>
+      <ul className="dropDownMenu" style={style}>
         <li>
           <button onClick={viewProfile}>프로필 보기</button>
         </li>
         <li>
-          <button onClick={toggleFollow}>{isFollowing ? "언팔로우" : "팔로우"}</button>
+          <button onClick={toggleFollow}>
+            {isFollowing ? "언팔로우" : "팔로우"}
+          </button>
         </li>
         <li>
           <button onClick={searchPosts}>작성글 검색</button>
@@ -173,7 +194,8 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
               blockUserConfirm();
             }}
             disabled={isBlocked}
-            style={{ color: isBlocked ? "gray" : "inherit" }}>
+            style={{ color: isBlocked ? "gray" : "inherit" }}
+          >
             {isBlocked ? "차단됨" : "차단하기"}
           </button>
         </li>
@@ -184,7 +206,8 @@ export default function DropDownMenu({ style, userInfoInDropMenu }: DropDownMenu
               if (!ok) return;
 
               reportUser();
-            }}>
+            }}
+          >
             신고하기
           </button>
         </li>

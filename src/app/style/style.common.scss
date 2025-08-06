@@ -123,18 +123,18 @@ button {
   background-color: $main-hover-color;
 }
 .btn_nonactive {
-  background-color: $grey-color;
+  background-color: $grey-c-color;
   cursor: default;
 }
 .btn_nonactive:hover {
-  background-color: $grey-color;
+  background-color: $grey-c-color;
 }
 .btn_width {
   max-width: 200px;
 }
 .btn_line_grey {
   font-weight: 600;
-  color: $grey-color;
+  color: $grey-c-color;
   border: $border-grey;
   border-radius: 4px;
   background-color: #fff;
@@ -171,18 +171,18 @@ button {
   display: none;
 }
 .btn.undefined {
-  background-color: $grey-color;
+  background-color: $grey-c-color;
 }
 .btn_withdrawal {
   color: $red-color;
-  opacity: 0.3;
+  opacity: 0.6;
 }
 .btn_withdrawal:hover {
   opacity: 1;
 }
 .cancel {
   font-size: 15px;
-  color: $grey3-color;
+  color: $grey6-color;
 }
 .block_btn {
   padding: 8px 15px;
@@ -200,57 +200,6 @@ button {
   margin-right: 2px;
 }
 /* icon */
-
-/* CHECKBOX */
-.checkbox {
-  position: relative;
-  display: block;
-  margin-bottom: 12px;
-}
-.checkbox,
-.checkbox label {
-  align-items: center;
-  display: flex;
-  justify-content: flex-start;
-  cursor: pointer;
-}
-.checkbox_all {
-  border-top: 1px solid $grey-color;
-  padding-top: 12px;
-}
-.checkbox label {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #333;
-  font-size: 13px;
-  font-weight: 300;
-  line-height: 1.5;
-  transition: all 0.3s ease-in-out;
-}
-.checkbox label .svg_checkbox {
-  margin-right: 4px;
-}
-.checkbox input[type="checkbox"] {
-  display: none;
-}
-.checkbox input[type="checkbox"] + label .svg_checkmark {
-  display: none;
-}
-.checkbox input[type="checkbox"]:checked + label .svg_checkmark {
-  display: block;
-}
-.checkbox .custom_checkbox span {
-  font-size: 15px;
-  color: #000;
-}
-.checkbox .custom_checkbox b {
-  font-weight: 500;
-}
-.checkbox:hover .custom_checkbox span {
-  text-decoration: underline;
-}
-/* CHECKBOX end */
 
 /* header */
 header {
@@ -359,7 +308,7 @@ header {
 
 .toggle-slider.dark .toggle-icon {
   transform: translateX(24px);
-  background: #2c3e50;
+  background: #19222b;
 }
 
 .toggle-icon .icon {
@@ -381,7 +330,7 @@ header {
   transform: scale(0.95);
 }
 
-.header .message {
+.header .notice_message {
   position: absolute;
   top: 32px;
   left: 0;
@@ -397,7 +346,7 @@ header {
   gap: 8px;
 }
 
-.header .message.active {
+.header .notice_message.active {
   display: flex;
   flex-direction: column;
 }
@@ -410,8 +359,8 @@ header {
   width: calc(100% - 12px);
   height: 34px;
   line-height: 2.8;
-  color: $grey3-color;
-  background-color: $grey-color;
+  color: $grey6-color;
+  background-color: $grey-c-color;
   border-radius: 4px;
 }
 
@@ -425,7 +374,7 @@ header {
 footer {
   position: relative;
   display: block;
-  background-color: $grey4-color;
+  background-color: $grey-f8-color;
   padding: 32px 0;
   height: $footer-height;
 }
@@ -476,28 +425,32 @@ footer {
   @include space-between;
   align-items: center;
   height: $menu-height;
+  gap: 8px;
 }
 
 .menu_list {
-  display: flex;
-  justify-content: flex-start;
+  @include flex-start;
   gap: 4px;
+  background-color: $main-color;
+}
+.menu_list_main {
+  @include flex-start;
+  gap: 8px;
 }
 
-.menu_list li a {
+.menu_list a {
   position: relative;
   display: block;
   font-size: 16px;
   font-weight: 600;
   line-height: 1.6;
   padding: 3px 0 2px;
-  width: 100%;
   border-radius: 4px;
   transition: all 0.3s ease-in-out;
   color: #fff;
 }
 
-.menu_list_all {
+.menu_custom_dropdown {
   position: absolute;
   top: $menu-height;
   left: -10px;
@@ -515,12 +468,16 @@ footer {
   }
 
   .menu_list {
+    background-color: #fff;
+    padding: 8px 0 40px;
     gap: 8px;
-    padding: 6px 8px 40px;
-    li a {
+    a {
+      position: relative;
+      display: inline-block;
       color: #000;
       font-weight: 400;
       font-size: 14px;
+      width: initial;
 
       &:hover {
         color: $main-color;
@@ -531,6 +488,7 @@ footer {
 
 .menu_custom_btn {
   @include flex-center;
+  font-size: 24px;
   .icon {
     color: #fff;
   }
@@ -556,16 +514,16 @@ footer {
   flex: 1;
 }
 .search input::placeholder {
-  color: $grey-color;
+  color: $grey-c-color;
 }
 .search button {
   border-radius: 50%;
   width: 48px;
   height: 48px;
-  background-color: $grey2-color;
+  background-color: $grey-ef-color;
 }
 .search button {
-  color: $grey-color;
+  color: $grey-c-color;
 }
 /* search end */
 
@@ -589,7 +547,7 @@ sub {
   align-items: stretch;
   // column-gap: 16px;
   min-height: calc(100vh - $header-height - $footer-height + 200px);
-  padding-top: 20px;
+  padding-top: 32px;
 }
 .right_ad {
   position: sticky;
@@ -662,12 +620,12 @@ main .title {
 }
 .board_top a.more span {
   font-size: 14px;
-  color: $grey5-color;
+  color: $grey9-color;
 }
 .board_top a svg {
   width: 16px;
   height: 16px;
-  color: $grey-color;
+  color: $grey-c-color;
 }
 .board_top a:hover {
   color: $main-hover-color;
@@ -718,7 +676,7 @@ sub .board_list {
   width: 100%;
   padding: 12px;
   margin-bottom: 5px;
-  background-color: $grey4-color;
+  background-color: $grey-f8-color;
 }
 .board_list .writer {
   @include flex-start;
@@ -756,17 +714,24 @@ sub .board_list {
   width: 100%;
 }
 .board_list li a:hover {
-  background-color: $grey4-color;
+  background-color: $grey-f8-color;
 }
 .board_list_info_wrap {
   @include space-between;
   align-items: center;
+}
+.message_list {
+  box-shadow: none !important;
+  overflow: visible !important;
+  gap: 12px;
 }
 .message_list li {
   justify-content: flex-start;
   align-items: center;
   padding: 4px;
   gap: 8px;
+  box-shadow: $box-shadow;
+  border-radius: 8px;
 }
 .block_list li {
   padding: 4px;
@@ -785,8 +750,8 @@ sub .board_list {
   font-weight: 400;
   line-height: 1.4;
   padding: 1px 6px 2px;
-  border: 1px solid $grey-color;
-  color: $grey5-color;
+  border: 1px solid $grey-c-color;
+  color: $grey9-color;
   border-radius: 3px;
   text-align: center;
 }
@@ -858,29 +823,31 @@ sub .board_list {
   @include space-between;
 }
 
+.message_box_top .writer .writer_name {
+  overflow: visible;
+}
+
 .message_box_top .btn_wrap {
   margin-bottom: 0;
 }
 
 .message_box_top .btn_wrap > * {
   border: $border-grey;
-  padding: 2px 4px;
+  padding: 4px 8px;
   font-size: 13px;
-  color: $grey-color;
+  color: $grey-c-color;
   border-radius: 4px;
+  font-size: 13px;
 }
 .message_box_top .btn_wrap > *:hover {
-  border-color: $grey3-color;
-  color: $grey3-color;
+  border-color: $grey6-color;
+  color: $grey6-color;
 }
 
 .message_box_top .profile_img {
   width: 40px;
   height: 40px;
-}
-
-.message_list {
-  gap: 12px;
+  margin-right: 8px;
 }
 
 .message_list .message_box {
@@ -1015,7 +982,7 @@ sub .board_list {
   font-size: 15px;
   font-weight: 400;
   line-height: 1;
-  color: $grey-color;
+  color: $grey-c-color;
   width: 27px;
   height: 27px;
   @include flex-center;
@@ -1033,7 +1000,7 @@ sub .board_list {
 .pagination a .icon {
   width: 24px;
   height: 24px;
-  color: $grey-color;
+  color: $grey-c-color;
 }
 .pagination a .icon:hover {
   color: $main-color;
@@ -1145,7 +1112,7 @@ sub .board_list {
 .editor_bar {
   width: 20px;
   height: 1px;
-  background-color: $grey-color;
+  background-color: $grey-c-color;
 }
 
 .text-size-12px {
@@ -1222,7 +1189,7 @@ sub .board_list {
   @include space-between;
   padding: 18px 14px;
   padding-left: 16px;
-  background-color: $grey4-color;
+  background-color: $grey-f8-color;
   box-shadow: $box-shadow;
   border-radius: 4px 4px 0 0;
 }
@@ -1252,7 +1219,7 @@ sub .board_list {
 .view_info span b {
   font-size: 14px;
   font-weight: 400;
-  color: $grey3-color;
+  color: $grey6-color;
 }
 
 .view_info_left {
@@ -1295,7 +1262,7 @@ sub .board_list {
   height: 32px;
   width: 60px;
   line-height: 2;
-  background-color: $grey5-color;
+  background-color: $grey9-color;
   color: #fff;
   border-radius: 2px;
   padding-top: 1px;
@@ -1357,7 +1324,7 @@ sub .board_list {
   position: relative;
   width: 1px;
   height: 100%;
-  background-color: $grey-color;
+  background-color: $grey-c-color;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1367,7 +1334,7 @@ sub .board_list {
   position: absolute;
   width: 40px;
   height: 1px;
-  background-color: $grey-color;
+  background-color: $grey-c-color;
   top: 43px;
   left: 0px;
 }
@@ -1380,7 +1347,7 @@ sub .board_list {
 .depth_line {
   width: 1px;
   height: 100%;
-  background-color: $grey-color;
+  background-color: $grey-c-color;
 }
 .depth_line.depth3 {
   margin-left: 41px;
@@ -1394,16 +1361,16 @@ sub .board_list {
 .comment_info .bar {
   width: 1px;
   height: 7px;
-  background-color: $grey5-color;
+  background-color: $grey9-color;
 }
 .comment_info .ball {
   min-width: 2px;
   min-height: 2px;
-  background-color: $grey-color;
+  background-color: $grey-c-color;
   border-radius: 50%;
 }
 .comment_box.re .commnet_info {
-  background-color: $grey2-color;
+  background-color: $grey-ef-color;
 }
 .comment_info .writer {
   @include flex-start;
@@ -1430,7 +1397,7 @@ sub .board_list {
   font-size: 12px;
   font-weight: 300;
   line-height: 1.4;
-  color: $grey5-color;
+  color: $grey9-color;
 }
 .comment_info .comment_btn button .icon {
   width: 14px;
@@ -1530,7 +1497,7 @@ sub .board_list {
   line-height: 1.4;
   padding: 8px;
   border-radius: 4px;
-  border: 1px solid $grey3-color;
+  border: 1px solid $grey6-color;
   outline: none;
 }
 .comment_add button {
@@ -1538,16 +1505,16 @@ sub .board_list {
   font-size: 12px;
   font-weight: 300;
   line-height: 1.4;
-  border: 1px solid $grey-color;
-  color: $grey-color;
+  border: 1px solid $grey-c-color;
+  color: $grey-c-color;
   padding: 8px;
   border-radius: 4px;
   min-width: 80px;
   height: 32px;
 }
 .comment_add button:hover {
-  border: 1px solid $grey3-color;
-  color: $grey3-color;
+  border: 1px solid $grey6-color;
+  color: $grey6-color;
 }
 .comment_editor {
   @include space-between;
@@ -1570,7 +1537,7 @@ sub .board_list {
 .comment_editor label .notice {
   font-size: 13px;
   font-weight: 400;
-  color: $grey5-color;
+  color: $grey9-color;
 }
 .comment_editor label .notice .red {
   color: $red-color;
@@ -1583,9 +1550,9 @@ sub .board_list {
 .go_to_login_for_comment {
   @include flex-center;
   width: 100%;
-  background-color: $grey4-color;
+  background-color: $grey-f8-color;
   border-radius: 4px;
-  color: $grey-color;
+  color: $grey-c-color;
   height: 120px;
 }
 /* view page end */
@@ -1730,6 +1697,29 @@ sub .board_list {
   }
 }
 
+.notification-list {
+  padding-bottom: 12px;
+}
+
+.notification-items {
+  @include flex-column;
+  gap: 12px;
+}
+
+.notification-content {
+  box-shadow: $box-shadow2;
+  padding: 12px 8px;
+  opacity: 0.7;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.notification-content:hover {
+  opacity: 1;
+}
+.notification-content.unread {
+  opacity: 1;
+}
+
 /* 알림 드롭다운 스타일 개선 */
 .message {
   position: absolute;
@@ -1758,13 +1748,8 @@ sub .board_list {
 
 .message_box {
   padding: 12px 12px 12px 0;
-  border-bottom: 1px solid #f0f0f0;
   position: relative;
   transition: background-color 0.2s;
-}
-
-.message_box:hover {
-  background-color: #f8f9fa;
 }
 
 .message_box a {
@@ -2169,12 +2154,13 @@ sub .board_list {
 }
 
 .mypage_list a:hover {
-  background-color: $grey2-color;
-  color: $grey3-color;
+  background-color: $grey-ef-color;
+  color: $grey6-color;
 }
 .mypage_list a.active {
-  background-color: $grey3-color;
+  background-color: $main-color;
   color: #fff;
+  box-shadow: $box-shadow;
 }
 
 .mypage_content {
@@ -2207,7 +2193,8 @@ sub .board_list {
   font-weight: 400;
   line-height: 1.4;
 }
-.mypage_info input {
+.mypage_info input[type="text"],
+.mypage_info input[type="password"] {
   border: $border-grey;
   outline: none;
   padding: 12px 8px;
@@ -2215,15 +2202,39 @@ sub .board_list {
   margin-bottom: 8px;
   height: 42px;
 }
-.mypage_info p {
+.mypage_bio_section {
+  @include flex-column;
+  width: 300px;
+
+  span {
+    font-size: 14px;
+    color: $grey6-color;
+  }
+}
+.mypage_bio {
+  position: relative;
+  display: block;
+  width: 100%;
+  box-shadow: $box-shadow;
+  border: none;
+  resize: none;
+  padding: 12px 8px;
+  border-radius: 4px;
+  outline: none;
+}
+.notice {
   @include flex-start;
   align-items: flex-start;
   font-size: 15px;
   font-weight: 300;
   line-height: 1.4;
   color: $grey6-color;
+  word-break: keep-all;
 }
-.mypage_info p b {
+.notice.mb-12 {
+  margin-bottom: 12px;
+}
+.notice b {
   font-size: inherit;
   line-height: inherit;
 }
@@ -2238,6 +2249,7 @@ sub .board_list {
 }
 .mypage_info .input_box input {
   margin-right: 8px;
+  box-shadow: $box-shadow;
 }
 .mypage_info .input_box button {
   position: relative;
@@ -2278,7 +2290,7 @@ sub .board_list {
 }
 .mypage_info .input_img .file_name_label {
   padding-top: 0;
-  border: 1px solid $grey-color;
+  border: 1px solid $grey-c-color;
   padding: 10px 16px 12px;
   border-radius: 4px;
   margin-bottom: 8px;
@@ -2313,15 +2325,48 @@ sub .board_list {
   width: 100%;
 }
 
+h2.mypage_title {
+  font-size: 16px;
+  font-weight: 600;
+  padding-bottom: 12px;
+}
+
+.mypage_content {
+  .menu_list {
+    padding: 20px 16px;
+    gap: 8px;
+
+    .menu-item {
+      span {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+    }
+  }
+}
+
 /* mypage board list */
 .mypage_boardlist_common {
   @include flex-column;
   width: 100%;
-  min-height: 300px !important;
+
+  .board_list {
+    border-bottom: $border-grey;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+    border-radius: 0;
+  }
 }
 .mypage_boardlist_single {
   @include flex-column;
   width: 100%;
+}
+.mypage_list_sub {
+  @include space-between;
+  width: 100%;
+  border-bottom: 1px solid $grey-c-color;
+  margin-bottom: 12px;
 }
 .mypage_list_sub a,
 .mypage_list_sub button {
@@ -2331,11 +2376,6 @@ sub .board_list {
   color: #999;
   border-radius: 4px;
   padding: 8px 16px;
-}
-.mypage_list_sub {
-  @include space-between;
-  width: 100%;
-  border-bottom: 1px solid $grey-color;
 }
 .mypage_list_sub a,
 .mypage_list_sub button {
@@ -2358,7 +2398,27 @@ sub .board_list {
 /* message */
 .mypage_message_box {
   padding: 12px;
-  padding-left: 0px;
+}
+
+.menu_settings_info {
+  border: $border-grey;
+  border-radius: 0 0 8px 8px;
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  border-top: 1px solid $main-color;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+  li {
+    font-size: 16px;
+
+    strong {
+      font-weight: 600;
+      margin-right: 12px;
+    }
+  }
 }
 
 /* mypage */
@@ -2618,6 +2678,7 @@ sub .board_list {
   border: $border-grey;
   border-radius: 4px;
   padding: 12px;
+  box-shadow: $box-shadow;
 
   .post_title {
     @include re-bl;
@@ -2644,6 +2705,7 @@ sub .board_list {
   .comment_item {
     border: $border-grey;
     padding: 12px;
+    box-shadow: $box-shadow;
 
     .comment_content {
       padding: 0;
@@ -2695,12 +2757,6 @@ sub .board_list {
 
 .notification-settings {
   padding-bottom: 40px;
-
-  h2 {
-    font-size: 16px;
-    font-weight: 600;
-    padding-bottom: 12px;
-  }
 }
 
 .notification-list-section {
@@ -2805,6 +2861,313 @@ sub .board_list {
       color: #ffca2b;
       margin-right: 8px;
       top: 1px;
+    }
+  }
+}
+
+/* 토글 스위치 스타일 */
+.toggle_section {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggle_item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle_label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  padding-top: 0 !important;
+}
+
+.toggle_container {
+  position: relative;
+}
+
+.toggle_input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle_switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  background-color: #ccc;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.toggle_switch::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 18px;
+  height: 18px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle_input:checked + .toggle_switch {
+  background-color: $main-color;
+}
+
+.toggle_input:checked + .toggle_switch::before {
+  transform: translateX(24px);
+}
+
+.toggle_input:focus + .toggle_switch {
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.3);
+}
+
+.toggle_description {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+
+  p {
+    margin: 4px 0;
+  }
+}
+
+/* menu settings styles */
+.mypage_inner {
+  .menu_list {
+    .main_menu,
+    .normal_menu,
+    .hidden_menu {
+      margin-bottom: 30px;
+
+      h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #333;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      cursor: context-menu;
+      transition: all 0.2s ease;
+      user-select: none;
+
+      &.main {
+        background-color: #e3f2fd;
+        border: 1px solid #90caf9;
+      }
+
+      &.normal {
+        background-color: #f5f5f5;
+        border: 1px solid #e0e0e0;
+      }
+
+      &.hidden {
+        background-color: #ffebee;
+        border: 1px solid #ffcdd2;
+        opacity: 0.8;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      span {
+        font-weight: 500;
+        color: #333;
+      }
+    }
+
+    .empty_menu {
+      text-align: center;
+      color: #999;
+      padding: 20px;
+      font-style: italic;
+      background-color: #fafafa;
+      border-radius: 4px;
+      border: 1px dashed #ddd;
+    }
+  }
+}
+
+.context_menu {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 4px 0;
+  min-width: 160px;
+
+  .context_menu_item {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background-color: #f5f5f5;
+    }
+
+    &:disabled {
+      color: #ccc;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.menu_actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e5e5;
+
+  .btn_reset,
+  .btn_save {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn_reset {
+    background: white;
+    border-color: #ddd;
+    color: #666;
+
+    &:hover:not(:disabled) {
+      background-color: #f5f5f5;
+      border-color: #bbb;
+    }
+  }
+
+  .btn_save {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+  }
+}
+
+/* 가로 정렬 레이아웃 */
+.menu_categories {
+  @include flex-column;
+  gap: 20px;
+  margin-bottom: 30px;
+
+  .menu_category {
+    flex: 1;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+    h3 {
+      margin: 0;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #e5e5e5;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      text-align: center;
+    }
+
+    .menu_list_container {
+      @include flex-start;
+      align-items: baseline;
+      padding: 15px;
+      min-height: 200px;
+      max-height: 400px;
+      overflow-y: auto;
+      gap: 8px;
+
+      .menu-item {
+        font-size: 16px;
+        font-weight: 500;
+
+        &:hover span {
+          color: $main-color;
+        }
+
+        span {
+          font-size: 16px;
+          cursor: pointer;
+        }
+
+        &.menu_main_item {
+          @include flex-start;
+          gap: 8px;
+        }
+      }
+    }
+  }
+}
+
+.menu_controls {
+  @include flex-column;
+  gap: 4px;
+
+  &.active {
+    display: flex;
+  }
+  .move_btn {
+    width: 28px;
+    height: 20px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled) {
+      background-color: #f0f0f0;
+      border-color: #bbb;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
   }
 }

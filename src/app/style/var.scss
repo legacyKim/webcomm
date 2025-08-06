@@ -44,12 +44,19 @@ $sub-color: rgb(130, 193, 255);
 $font-color: #000;
 $font2-color: #999;
 
-$grey-color: #ccc;
-$grey2-color: #efefef;
-$grey3-color: #666;
-$grey4-color: #f8f8f8;
-$grey5-color: #999;
-$grey6-color: #333;
+$grey-c-color: #ccc;
+$grey-ef-color: #efefef;
+$grey-f8-color: #f8f8f8;
+
+$grey1-color: #111;
+$grey2-color: #222;
+$grey3-color: #333;
+$grey4-color: #444;
+$grey5-color: #555;
+$grey6-color: #666;
+$grey7-color: #777;
+$grey8-color: #888;
+$grey9-color: #999;
 
 // Dark mode colors
 $dark-bg: #252a2f;
@@ -74,7 +81,7 @@ $admin_header_height: 54px;
 $admin_left_width: 200px;
 
 /* border */
-$border-grey: 1px solid $grey-color;
+$border-grey: 1px solid $grey-c-color;
 $box-shadow:
   0 3.5px 7px 0 rgba(0, 0, 0, 0.05),
   0 1.5px 3px 0 rgba(0, 0, 0, 0.07) !important;

@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
-export function useDropDown({ messageToUser }: { messageToUser: number | null }) {
+export function useDropDown({
+  messageToUser,
+}: {
+  messageToUser: number | null;
+}) {
   const { loginStatus } = useAuth();
 
   const [writerDrop, setWriterDrop] = useState<boolean>(false);
@@ -14,7 +18,10 @@ export function useDropDown({ messageToUser }: { messageToUser: number | null })
       const target = e.target as HTMLElement;
       const dropdownEl = document.querySelector(".dropDownMenu");
 
-      if ((dropdownEl && dropdownEl.contains(target)) || messageToUser !== null) {
+      if (
+        (dropdownEl && dropdownEl.contains(target)) ||
+        messageToUser !== null
+      ) {
         return;
       }
       setWriterDrop(false);

@@ -3,7 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import MyHeader from "../myHeader";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
 
@@ -48,48 +48,51 @@ export default function MyBlocked() {
   };
 
   return (
-    <sub className='sub'>
-      <div className='mypage'>
+    <sub className="sub">
+      <div className="mypage">
         <MyHeader />
 
-        <div className='mypage_content'>
-          <div className='mypage_inner'>
+        <div className="mypage_content">
+          <div className="mypage_inner">
             {isLoading ? (
-              <div className='data_wait'>
+              <div className="data_wait">
                 <span>잠시만 기다려 주세요.</span>
-                <div className='dots'>
-                  <span className='dot dot1'>.</span>
-                  <span className='dot dot2'>.</span>
-                  <span className='dot dot3'>.</span>
+                <div className="dots">
+                  <span className="dot dot1">.</span>
+                  <span className="dot dot2">.</span>
+                  <span className="dot dot3">.</span>
                 </div>
               </div>
             ) : blockedUsers.length === 0 ? (
-              <div className='data_none'>
+              <div className="data_none">
                 <NoSymbolIcon />
                 <span>차단한 유저가 없습니다.</span>
               </div>
             ) : (
-              <ul className='block_list board_list'>
+              <ul className="block_list board_list">
                 {blockedUsers.map((user) => (
                   <li key={user.id}>
-                    <div className='writer'>
+                    <div className="writer">
                       <img
-                        className='profile_img'
+                        className="profile_img"
                         src={user.profile ?? "/profile/basic.png"}
                         alt={user.user_nickname}
                         width={32}
                         height={32}
                       />
-                      <span className='writer_name'>{user.user_nickname}</span>
+                      <span className="writer_name">{user.user_nickname}</span>
                     </div>
 
-                    <span className='date'>{new Date(user.created_at).toLocaleDateString()}</span>
+                    <span className="date">
+                      {new Date(user.created_at).toLocaleDateString()}
+                    </span>
 
                     <button
-                      className='block_btn btn_line_grey'
+                      className="block_btn btn_line_grey"
                       onClick={() => {
                         block_off(user.id);
-                      }}>
+                      }}
+                    >
                       차단 해제
                     </button>
                   </li>

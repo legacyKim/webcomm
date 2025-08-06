@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
 
 import Editor from "../Editor";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { Posts } from "@/type/type";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
@@ -19,7 +19,10 @@ export default function Write() {
 
   const { id } = useParams();
 
-  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
+  const { data: boardData } = useQuery({
+    queryKey: ["boardData"],
+    queryFn: fetchBoard,
+  });
 
   const writeTitle = useRef<HTMLInputElement>(null);
   const [editorContent, setEditorContent] = useState<string>("");
@@ -27,7 +30,10 @@ export default function Write() {
   const [imageFiles, setImageFiles] = useState<ImageWithBlob[]>([]);
   const [videoFiles, setVideoFiles] = useState<VideoWithBlob[]>([]);
 
-  const [boardInfo, setBoardInfo] = useState<{ board_name: string; url_slug: string }>({
+  const [boardInfo, setBoardInfo] = useState<{
+    board_name: string;
+    url_slug: string;
+  }>({
     board_name: "",
     url_slug: "",
   });
@@ -55,7 +61,9 @@ export default function Write() {
   // 글 수정 POST 요청
   const postCorrecting = async () => {
     if (isUsername === null) {
-      const isConfirm = confirm("로그인이 필요합니다. 이동할 시 글이 저장되지 않습니다. 이동하시겠습니까?");
+      const isConfirm = confirm(
+        "로그인이 필요합니다. 이동할 시 글이 저장되지 않습니다. 이동하시겠습니까?"
+      );
       if (isConfirm) {
         router.push("/login");
       }
@@ -99,7 +107,7 @@ export default function Write() {
             data: base64.split(",")[1], // data:image/... 부분 제거
             blobUrl: img.blobUrl,
           };
-        }),
+        })
       );
 
       // 비디오 파일 데이터를 base64로 변환하여 전송
@@ -112,7 +120,7 @@ export default function Write() {
             data: base64.split(",")[1], // data:video/... 부분 제거
             blobUrl: vid.blobUrl,
           };
-        }),
+        })
       );
 
       formData.append("imageFiles", JSON.stringify(imageFilesData));
@@ -157,7 +165,10 @@ export default function Write() {
 
   useEffect(() => {
     if (writeData !== null) {
-      setBoardInfo({ board_name: writeData.board_name, url_slug: writeData.url_slug });
+      setBoardInfo({
+        board_name: writeData.board_name,
+        url_slug: writeData.url_slug,
+      });
       setEditorContent(writeData.content);
       if (writeTitle.current) {
         writeTitle.current.value = writeData.title;
@@ -167,31 +178,33 @@ export default function Write() {
 
   if (writeData === null) {
     return (
-      <div className='data_wait'>
+      <div className="data_wait">
         <span>잠시만 기다려 주세요.</span>
-        <div className='dots'>
-          <span className='dot dot1'>.</span>
-          <span className='dot dot2'>.</span>
-          <span className='dot dot3'>.</span>
+        <div className="dots">
+          <span className="dot dot1">.</span>
+          <span className="dot dot2">.</span>
+          <span className="dot dot3">.</span>
         </div>
       </div>
     );
   }
 
   return (
-    <sub className='sub'>
+    <sub className="sub">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           postCorrecting();
         }}
-        className='write'>
+        className="write"
+      >
         <select
-          className='board_category'
+          className="board_category"
           value={boardInfo.url_slug}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             const selectedBoard = boardData.boards.rows.find(
-              (b: { board_name: string; url_slug: string }) => b.url_slug === e.target.value,
+              (b: { board_name: string; url_slug: string }) =>
+                b.url_slug === e.target.value
             );
             if (selectedBoard) {
               setBoardInfo({
@@ -199,18 +212,21 @@ export default function Write() {
                 url_slug: selectedBoard.url_slug,
               });
             }
-          }}>
+          }}
+        >
           <option>선택</option>
           {boardData &&
-            boardData?.boards?.map((b: { board_name: string; url_slug: string }) => (
-              <option key={b.board_name} value={b.url_slug}>
-                {b.board_name}
-              </option>
-            ))}
+            boardData?.boards?.map(
+              (b: { board_name: string; url_slug: string }) => (
+                <option key={b.board_name} value={b.url_slug}>
+                  {b.board_name}
+                </option>
+              )
+            )}
         </select>
 
-        <div className='write_top'>
-          <input type='text' ref={writeTitle} />
+        <div className="write_top">
+          <input type="text" ref={writeTitle} />
         </div>
 
         <Editor
@@ -220,8 +236,8 @@ export default function Write() {
           setVideoFiles={setVideoFiles}
         />
 
-        <div className='btn_wrap btn_posting_wrap'>
-          <button type='submit' className='btn btn_posting'>
+        <div className="btn_wrap btn_posting_wrap">
+          <button type="submit" className="btn btn_posting">
             EDITING
           </button>
         </div>

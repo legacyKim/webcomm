@@ -10,7 +10,7 @@ import styles from "@/style/Login.module.scss";
 
 import { handleBlur, handleFocus } from "@/func/inputActive";
 import Cookies from "js-cookie";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -182,7 +182,11 @@ export default function LoginPage() {
             <div className={styles.input_group}>
               <div className={styles.input_box} ref={boxIdRef}>
                 <div className={styles.input_bg}></div>
-                <label className={styles.label_common} htmlFor='userid' ref={labelIdRef}>
+                <label
+                  className={styles.label_common}
+                  htmlFor="userid"
+                  ref={labelIdRef}
+                >
                   아이디
                 </label>
                 <input
@@ -194,9 +198,9 @@ export default function LoginPage() {
                       handleBlur(labelIdRef, boxIdRef);
                     }
                   }}
-                  type='text'
-                  id='userid'
-                  name='USERID'
+                  type="text"
+                  id="userid"
+                  name="USERID"
                   value={userid}
                   onChange={(e) => setUserid(e.target.value)}
                 />
@@ -205,7 +209,11 @@ export default function LoginPage() {
             <div className={styles.input_group}>
               <div className={styles.input_box} ref={boxPwRef}>
                 <div className={styles.input_bg}></div>
-                <label className={styles.label_common} htmlFor='password' ref={labelPwRef}>
+                <label
+                  className={styles.label_common}
+                  htmlFor="password"
+                  ref={labelPwRef}
+                >
                   비밀번호
                 </label>
                 <input
@@ -220,9 +228,9 @@ export default function LoginPage() {
                   }}
                   onKeyDown={handleKeyDown}
                   onKeyUp={handleKeyUp}
-                  type='password'
-                  id='password'
-                  name='password'
+                  type="password"
+                  id="password"
+                  name="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -230,52 +238,65 @@ export default function LoginPage() {
             </div>
 
             {/* checkbox */}
-            <div className='checkbox'>
+            <div className="checkbox">
               <input
-                type='checkbox'
-                id='remember'
-                name='remember'
-                className='hidden_checkbox'
+                type="checkbox"
+                id="remember"
+                name="remember"
+                className="hidden_checkbox"
                 checked={remember}
                 readOnly
               />
-              <label htmlFor='remember' className='custom_checkbox' onClick={() => handleRememberChange(!remember)}>
+              <label
+                htmlFor="remember"
+                className="custom_checkbox"
+                onClick={() => handleRememberChange(!remember)}
+              >
                 <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 24 24'
-                  width='24'
-                  height='24'
-                  className='svg_checkbox'>
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="24"
+                  height="24"
+                  className="svg_checkbox"
+                >
                   <rect
-                    className='svg_box'
-                    x='2'
-                    y='2'
-                    width='20'
-                    height='20'
-                    rx='4'
-                    fill='none'
-                    stroke='#ccc'
-                    strokeWidth='1'
+                    className="svg_box"
+                    x="2"
+                    y="2"
+                    width="20"
+                    height="20"
+                    rx="4"
+                    fill="none"
+                    stroke="#ccc"
+                    strokeWidth="1"
                   />
-                  <path className='svg_checkmark' d='M6 12l4 4 8-8' fill='none' stroke='#007bff' strokeWidth='2' />
+                  <path
+                    className="svg_checkmark"
+                    d="M6 12l4 4 8-8"
+                    fill="none"
+                    stroke="#007bff"
+                    strokeWidth="2"
+                  />
                 </svg>
                 <span>아이디 저장</span>
               </label>
             </div>
 
-            {error && <span className={`${styles.notice} ${styles.blue}`}>{error}</span>}
+            {error && (
+              <span className={`${styles.notice} ${styles.blue}`}>{error}</span>
+            )}
 
             {/* 버튼 */}
-            <div className='btn_wrap'>
-              <button type='submit' className='btn'>
+            <div className="btn_wrap">
+              <button type="submit" className="btn">
                 로그인
               </button>
             </div>
 
             {/* 아이디/비밀번호 찾기 및 회원가입 */}
             <div className={styles.find_info}>
-              <Link href='/find'>아이디/비밀번호 찾기</Link>
-              <Link href='/agree'>회원가입</Link>
+              <Link href="/find">아이디/비밀번호 찾기</Link>
+              <Link href="/agree">회원가입</Link>
             </div>
           </form>
         </div>

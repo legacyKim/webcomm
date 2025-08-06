@@ -6,12 +6,14 @@ import "@/style/style.common.scss";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import MyHeader from "./myHeader";
 
 import { useLoadRecaptcha } from "@/func/hook/useLoadRecaptcha";
 
-function getNicknameCooldownLeft(nicknameUpdatedAt: string | Date | null): number {
+function getNicknameCooldownLeft(
+  nicknameUpdatedAt: string | Date | null
+): number {
   if (!nicknameUpdatedAt) return 0;
   const last = new Date(nicknameUpdatedAt);
   const now = new Date();
@@ -45,7 +47,7 @@ export default function Mypage() {
   const [newPassword, setNewPassword] = useState<string>("");
   const [, setNewPasswordCon] = useState<string>("");
   const [userPasswordNotice, setUserPasswordNotice] = useState<string>(
-    "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.",
+    "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요."
   );
 
   // 이미지 관련
@@ -81,6 +83,11 @@ export default function Mypage() {
   const [certifyNumCheck, setCertifyNumCheck] = useState<string>("");
   const [, setCertifyAgree] = useState<boolean>(false);
 
+  // 마케팅 수신 동의 상태
+  const [marketingConsent, setMarketingConsent] = useState<boolean>(false);
+  const [notificationConsent, setNotificationConsent] =
+    useState<boolean>(false);
+
   const emailCheck = async () => {
     if (!userEmail) {
       alert("이메일을 입력하세요.");
@@ -114,7 +121,11 @@ export default function Mypage() {
   };
 
   useEffect(() => {
-    if (inputCertifyNumRef.current && inputCertifyNumRef.current.value === certifyNumCheck && certifyNumCheck !== "") {
+    if (
+      inputCertifyNumRef.current &&
+      inputCertifyNumRef.current.value === certifyNumCheck &&
+      certifyNumCheck !== ""
+    ) {
       setCertifyAgree(true);
     } else {
       setCertifyAgree(false);
@@ -133,19 +144,24 @@ export default function Mypage() {
   useEffect(() => {
     const fetchUserBio = async () => {
       try {
-        const response = await axios.get(`/api/user/profile?user=${isUsername}`);
+        const response = await axios.get(`/api/my/bio`);
         if (response.data.success && response.data.user) {
           setNewBio(response.data.user.bio || "");
+          // 마케팅 수신 동의 상태도 함께 가져오기
+          setMarketingConsent(response.data.user.marketing_enabled || false);
+          setNotificationConsent(
+            response.data.user.notification_enabled || false
+          );
         }
       } catch (error) {
         console.error("Bio 가져오기 실패:", error);
       }
     };
 
-    if (isUsername) {
+    if (isUserId) {
       fetchUserBio();
     }
-  }, [isUsername]);
+  }, [isUserId]);
 
   const userChangePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,11 +178,14 @@ export default function Mypage() {
       return;
     }
 
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
+    const passwordRegex =
+      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
 
     if (newPassword !== "" && !passwordRegex.test(newPassword)) {
       alert("영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.");
-      setUserPasswordNotice("영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요.");
+      setUserPasswordNotice(
+        "영문, 숫자, 특수문자 혼합 사용 / 최소 4자 이상 입력하세요."
+      );
       inputPwRef.current?.focus();
       return;
     }
@@ -185,6 +204,8 @@ export default function Mypage() {
     formData.append("userPassword", newPassword);
     formData.append("userEmail", userEmail);
     formData.append("recaptchaToken", recaptchaToken || "");
+    formData.append("marketingConsent", marketingConsent.toString());
+    formData.append("notificationConsent", notificationConsent.toString());
 
     if (file) {
       formData.append("profileImage", file);
@@ -221,12 +242,19 @@ export default function Mypage() {
   };
 
   const memberWithdrawal = async () => {
-    const reasons = ["서비스 불만족", "개인정보 보호", "사용 빈도 낮음", "다른 서비스 이용", "개인사유", "기타"];
+    const reasons = [
+      "서비스 불만족",
+      "개인정보 보호",
+      "사용 빈도 낮음",
+      "다른 서비스 이용",
+      "개인사유",
+      "기타",
+    ];
 
     const reason = prompt(
       `탈퇴 사유를 선택해주세요:\n\n` +
         reasons.map((r, i) => `${i + 1}. ${r}`).join("\n") +
-        `\n\n숫자를 입력하세요 (1-${reasons.length}):`,
+        `\n\n숫자를 입력하세요 (1-${reasons.length}):`
     );
 
     if (!reason) return;
@@ -247,7 +275,7 @@ export default function Mypage() {
           `• 회원 정보 및 게시물이 숨김 처리됩니다\n` +
           `• 탈퇴 후 동일한 아이디로 재가입이 불가능합니다\n` +
           `• 작성하신 게시물과 댓글은 복구되지 않습니다\n\n` +
-          `이에 동의하고 탈퇴하시겠습니까?`,
+          `이에 동의하고 탈퇴하시겠습니까?`
       )
     ) {
       return;
@@ -278,92 +306,99 @@ export default function Mypage() {
   };
 
   return (
-    <sub className='sub'>
-      <div className='mypage'>
+    <sub className="sub">
+      <div className="mypage">
         <MyHeader />
 
         {/* 계정 정보 */}
-        <div className='mypage_content'>
-          <form className='mypage_inner'>
-            <div className='mypage_info'>
+        <div className="mypage_content">
+          <form className="mypage_inner">
+            <div className="mypage_info">
               <span>아이디</span>
-              <div className='input_box'>
-                <input type='text' value={isUsername || ""} disabled />
+              <div className="input_box">
+                <input type="text" value={isUsername || ""} disabled />
               </div>
             </div>
 
-            <div className='mypage_info'>
+            <div className="mypage_info">
               <span>별명</span>
-              <div className='input_box'>
+              <div className="input_box">
                 <input
-                  type='text'
+                  type="text"
                   value={newNick}
                   onChange={(e) => {
                     setNewNick(e.target.value);
                   }}
                 />
-                <p>별명은 최대 한글 6자, 영문 12자까지 입력이 가능합니다.</p>
-                <p className='notice blue'>
+                <p className="notice">
+                  별명은 최대 한글 6자, 영문 12자까지 입력이 가능합니다.
+                </p>
+                <p className="notice blue">
                   {getNicknameCooldownLeft(isUserNickUpdatedAt) === 0 ? (
                     <>별명은 14일마다 변경이 가능합니다.</>
                   ) : (
-                    <>{getNicknameCooldownLeft(isUserNickUpdatedAt)} 일 후에 변경이 가능합니다.</>
+                    <>
+                      {getNicknameCooldownLeft(isUserNickUpdatedAt)} 일 후에
+                      변경이 가능합니다.
+                    </>
                   )}
                 </p>
-                <p className='notice red'>부적절한 별명은 임의로 변경될 수 있습니다.</p>
+                <p className="notice red">
+                  부적절한 별명은 임의로 변경될 수 있습니다.
+                </p>
               </div>
             </div>
 
-            <div className='mypage_info'>
+            <div className="mypage_info">
               <span>자기소개</span>
-              <div className='input_box'>
+              <div className="mypage_bio_section">
                 <textarea
+                  className="mypage_bio"
                   value={newBio}
                   onChange={(e) => setNewBio(e.target.value)}
                   rows={3}
                   maxLength={200}
-                  placeholder='간단한 자기소개를 입력해주세요 (최대 200자)'
-                  style={{
-                    width: "100%",
-                    padding: "12px 8px",
-                    border: "1px solid #ddd",
-                    borderRadius: "4px",
-                    resize: "vertical",
-                    fontSize: "14px",
-                    fontFamily: "inherit",
-                  }}
+                  placeholder="간단한 자기소개를 입력해주세요 (최대 200자)"
                 />
-                <p>
-                  <span style={{ fontSize: "12px", color: "#666" }}>{newBio.length}/200자</span>
+                <p className="notice">
+                  <span>{newBio.length}/200자</span>
                 </p>
               </div>
             </div>
 
-            <div className='mypage_info'>
+            <div className="mypage_info">
               <span>프로필 사진</span>
 
               <div>
-                <div className='input_group'>
-                  <div className='input_box input_img'>
-                    <label className='label_img' htmlFor='profileImage' ref={labelProfileImgRef}>
+                <div className="input_group">
+                  <div className="input_box input_img">
+                    <label
+                      className="label_img"
+                      htmlFor="profileImage"
+                      ref={labelProfileImgRef}
+                    >
                       {fileName ? (
                         <>
-                          <span className={`file_name_label after`}>프로필 이미지</span>
-                          <p className='file_name'>{fileName}</p>
+                          <span className={`file_name_label after`}>
+                            프로필 이미지
+                          </span>
+                          <p className="file_name">{fileName}</p>
                         </>
                       ) : (
-                        <span className='file_name_label'>프로필 이미지 변경하기</span>
+                        <span className="file_name_label">
+                          프로필 이미지 변경하기
+                        </span>
                       )}
                     </label>
 
                     {/* 파일 선택 버튼 (커스텀 스타일링) */}
                     <input
-                      className='input_common'
+                      className="input_common"
                       ref={inputProfileImgRef}
-                      type='file'
-                      id='profileImage'
-                      name='profileImage'
-                      accept='image/*'
+                      type="file"
+                      id="profileImage"
+                      name="profileImage"
+                      accept="image/*"
                       onChange={(e) => {
                         handleImageChange(e);
                       }}
@@ -374,26 +409,27 @@ export default function Mypage() {
 
                 {/* 미리보기 이미지 */}
                 {newProfile ? (
-                  <div className='img_preview'>
-                    <img src={newProfile} alt='Profile Preview' />
+                  <div className="img_preview">
+                    <img src={newProfile} alt="Profile Preview" />
                   </div>
                 ) : (
-                  <div className='img_preview'>
-                    <img src='/profile/basic.png' alt='기본 이미지' />
+                  <div className="img_preview">
+                    <img src="/profile/basic.png" alt="기본 이미지" />
                   </div>
                 )}
 
-                <p>
-                  최대 &nbsp;<b className='notice'>1MB</b>&nbsp; 이하의 이미지만 업로드 가능합니다.
+                <p className="notice">
+                  최대 &nbsp;<b className="notice">1MB</b>&nbsp; 이하의 이미지만
+                  업로드 가능합니다.
                 </p>
               </div>
             </div>
 
-            <div className='mypage_info mb_4'>
+            <div className="mypage_info">
               <span>비밀번호 변경</span>
-              <div className='input_box'>
+              <div className="input_box">
                 <input
-                  type='password'
+                  type="password"
                   onChange={(e) => {
                     setNewPassword(e.target.value);
                   }}
@@ -401,11 +437,11 @@ export default function Mypage() {
               </div>
             </div>
 
-            <div className='mypage_info'>
+            <div className="mypage_info">
               <span>비밀번호 확인</span>
-              <div className='input_box'>
+              <div className="input_box">
                 <input
-                  type='password'
+                  type="password"
                   onChange={(e) => {
                     setNewPasswordCon(e.target.value);
                   }}
@@ -414,44 +450,113 @@ export default function Mypage() {
               </div>
             </div>
 
-            <div className='mypage_info mb_4'>
+            <div className="mypage_info mb_4">
               <span>이메일 변경</span>
-              <div className='input_box'>
+              <div className="input_box">
                 <input
-                  type='text'
+                  type="text"
                   ref={inputEmailRef}
                   value={userEmail}
                   onChange={(e) => {
                     setUserEmail(e.target.value);
                   }}
                 />
-                <button type='button' onClick={() => emailCheck()}>
+                <button type="button" onClick={() => emailCheck()}>
                   인증번호 요청
                 </button>
               </div>
             </div>
 
-            <div className='mypage_info'>
+            <div className="mypage_info">
               <span>인증번호</span>
-              <div className='input_box'>
-                <div className='input_box'>
-                  <input type='text' ref={inputCertifyNumRef} onChange={(e) => setCertifyNum(e.target.value)} />
+              <div className="input_box">
+                <div className="input_box">
+                  <input
+                    type="text"
+                    ref={inputCertifyNumRef}
+                    onChange={(e) => setCertifyNum(e.target.value)}
+                  />
                 </div>
-                <p>비밀번호 분실 또는 수정 등 사이트 활동에 필요한 사항이 메일로 발송되니 정확히 입력해주세요.</p>
+                <p className="notice">
+                  비밀번호 분실 또는 수정 등 사이트 활동에 필요한 사항이 메일로
+                  발송되니 정확히 입력해주세요.
+                </p>
               </div>
             </div>
 
-            <div className='btn_wrap'>
+            {/* 마케팅 수신 동의 설정 */}
+            <div className="mypage_info ">
+              <span>알림 설정</span>
+              <div className="input_box">
+                <div className="toggle_section">
+                  <div className="toggle_item">
+                    <div>
+                      <span className="toggle_label">마케팅 정보 수신</span>
+                      <p className="notice">
+                        마케팅 정보: 새로운 기능, 이벤트, 프로모션 소식을
+                        이메일로 받아보실 수 있습니다.
+                      </p>
+                    </div>
+                    <div className="toggle_container">
+                      <input
+                        type="checkbox"
+                        id="marketingToggle"
+                        checked={marketingConsent}
+                        onChange={(e) => setMarketingConsent(e.target.checked)}
+                        className="toggle_input"
+                      />
+                      <label
+                        htmlFor="marketingToggle"
+                        className="toggle_switch"
+                      ></label>
+                    </div>
+                  </div>
+
+                  <div className="toggle_item">
+                    <div>
+                      <span className="toggle_label">알림 수신</span>
+
+                      <p className="notice">
+                        알림 수신: 댓글, 좋아요, 멘션 등의 알림을 받아보실 수
+                        있습니다.
+                      </p>
+                    </div>
+                    <div className="toggle_container">
+                      <input
+                        type="checkbox"
+                        id="notificationToggle"
+                        checked={notificationConsent}
+                        onChange={(e) =>
+                          setNotificationConsent(e.target.checked)
+                        }
+                        className="toggle_input"
+                      />
+                      <label
+                        htmlFor="notificationToggle"
+                        className="toggle_switch"
+                      ></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="btn_wrap">
               <button
-                type='submit'
+                type="submit"
                 onClick={(e) => {
                   userChangePost(e);
                 }}
-                className='btn'>
+                className="btn"
+              >
                 정보 수정
               </button>
 
-              <button type='button' onClick={memberWithdrawal} className='btn_withdrawal'>
+              <button
+                type="button"
+                onClick={memberWithdrawal}
+                className="btn_withdrawal"
+              >
                 회원 탈퇴
               </button>
             </div>

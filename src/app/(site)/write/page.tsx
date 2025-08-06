@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
 
 import Editor from "./Editor";
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
 
 interface boards {
@@ -32,7 +32,10 @@ export default function Write() {
     // 주의회원인 경우 제한 기간 확인은 서버에서 처리
   }, [isUserAuthority, router]);
 
-  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
+  const { data: boardData } = useQuery({
+    queryKey: ["boardData"],
+    queryFn: fetchBoard,
+  });
 
   const writeTitle = useRef<HTMLInputElement>(null);
   const [editorContent, setEditorContent] = useState<string>("");
@@ -84,7 +87,7 @@ export default function Write() {
             data: base64.split(",")[1], // data:image/... 부분 제거
             blobUrl: img.blobUrl,
           };
-        }),
+        })
       );
 
       // 비디오 파일 데이터를 base64로 변환하여 전송
@@ -97,7 +100,7 @@ export default function Write() {
             data: base64.split(",")[1], // data:video/... 부분 제거
             blobUrl: vid.blobUrl,
           };
-        }),
+        })
       );
 
       formData.append("imageFiles", JSON.stringify(imageFilesData));
@@ -140,17 +143,20 @@ export default function Write() {
   }, [isUserId, router]);
 
   return (
-    <sub className='sub'>
+    <sub className="sub">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           posting();
         }}
-        className='write'>
+        className="write"
+      >
         <select
-          className='board_category'
+          className="board_category"
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            const selectedBoard = boardData.boards.find((b: boards) => b.url_slug === e.target.value);
+            const selectedBoard = boardData.boards.find(
+              (b: boards) => b.url_slug === e.target.value
+            );
             if (selectedBoard) {
               setBoardInfo({
                 board_id: selectedBoard.id,
@@ -160,7 +166,8 @@ export default function Write() {
             } else {
               setBoardInfo({ board_id: null, board_name: "", url_slug: "" });
             }
-          }}>
+          }}
+        >
           <option>선택</option>
           {boardData &&
             boardData?.boards?.map((b: boards) => (
@@ -169,8 +176,12 @@ export default function Write() {
               </option>
             ))}
         </select>
-        <div className='write_top'>
-          <input type='text' ref={writeTitle} placeholder='제목을 입력해 주세요.' />
+        <div className="write_top">
+          <input
+            type="text"
+            ref={writeTitle}
+            placeholder="제목을 입력해 주세요."
+          />
         </div>
 
         <Editor
@@ -180,8 +191,8 @@ export default function Write() {
           setVideoFiles={setVideoFiles}
         />
 
-        <div className='btn_wrap btn_posting_wrap'>
-          <button type='submit' className='btn btn_posting'>
+        <div className="btn_wrap btn_posting_wrap">
+          <button type="submit" className="btn btn_posting">
             POSTING
           </button>
         </div>

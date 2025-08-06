@@ -32,14 +32,24 @@ export function AuthProvider({
   const [isUsername, setIsUsername] = useState<string | null>(username);
   const [isUserId, setIsUserId] = useState<number | null>(userId);
   const [isUserNick, setIsUserNick] = useState<string | null>(userNick);
-  const [isUserProfile, setIsUserProfile] = useState<string | null>(userProfile);
+  const [isUserProfile, setIsUserProfile] = useState<string | null>(
+    userProfile
+  );
 
   const [isUserEmail, setIsUserEmail] = useState<string | null>(userEmail);
-  const [isUserAuthority, setIsUserAuthority] = useState<number | null>(userAuthority);
-  const [isUserNickUpdatedAt, setIsUserNickUpdatedAt] = useState<Date | null>(userNickUpdatedAt);
+  const [isUserAuthority, setIsUserAuthority] = useState<number | null>(
+    userAuthority
+  );
+  const [isUserNickUpdatedAt, setIsUserNickUpdatedAt] = useState<Date | null>(
+    userNickUpdatedAt
+  );
 
-  const [loginStatus, setLoginStatus] = useState<boolean | null>(loginStatusCheck);
-  const [tokenExpiration, setTokenExpiration] = useState<number | null>(tokenExp);
+  const [loginStatus, setLoginStatus] = useState<boolean | null>(
+    loginStatusCheck
+  );
+  const [tokenExpiration, setTokenExpiration] = useState<number | null>(
+    tokenExp
+  );
 
   const [boardType, setBoardType] = useState<string | null>("board");
   const [messageToUser, setMessageToUser] = useState<number | null>(null);
@@ -91,7 +101,8 @@ export function AuthProvider({
         setInitData,
         agreeCheck,
         setAgreeCheck,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

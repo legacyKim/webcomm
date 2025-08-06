@@ -24,13 +24,18 @@ export type CommentTreeNode = {
 export interface CommentTreeProps {
   params: { id: string; url_slug: string };
   commentList: CommentTreeNode[] | null;
-  setCommentList: React.Dispatch<React.SetStateAction<CommentTreeNode[] | null>>;
+  setCommentList: React.Dispatch<
+    React.SetStateAction<CommentTreeNode[] | null>
+  >;
 
   comments: CommentTreeNode[] | null;
   mentionUsers: MentionUser[];
   loginCheck: () => Promise<boolean>;
   userClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  setUserInfoInDropMenu: (info: { userId: number; userNickname: string }) => void;
+  setUserInfoInDropMenu: (info: {
+    userId: number;
+    userNickname: string;
+  }) => void;
 
   singleCommentImageFile?: string | null;
   setSingleCommentImageFile?: (blobUrl: string | null) => void;
@@ -53,10 +58,17 @@ export interface CommentTreeProps {
   commentAdd?: { user_id: number; id: number } | null;
   setCommentAdd?: (commentAdd: { user_id: number; id: number } | null) => void;
   recommentAdd?: { user_id: number; id: number; recomment_id: number } | null;
-  setRecommentAdd?: (recommentAdd: { user_id: number; id: number; recomment_id: number } | null) => void;
+  setRecommentAdd?: (
+    recommentAdd: { user_id: number; id: number; recomment_id: number } | null
+  ) => void;
 
   commentPost?: (commentContent: string, id?: number, depth?: number) => void;
 
   commentCorrect: { content: string; id: number } | null;
-  setCommentCorrect: React.Dispatch<React.SetStateAction<{ content: string; id: number } | null>>;
+  setCommentCorrect: React.Dispatch<
+    React.SetStateAction<{ content: string; id: number } | null>
+  >;
+
+  commentLike?: (commentId: number, isLiked: boolean) => void;
+  commentLikers?: { [key: number]: any[] };
 }

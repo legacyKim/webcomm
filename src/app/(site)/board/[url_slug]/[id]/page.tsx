@@ -5,7 +5,11 @@ import View from "./View";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: Promise<{ url_slug: string; id: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ url_slug: string; id: string }>;
+}) {
   const { url_slug, id } = await params;
 
   const postData = await fetchPostDetail(url_slug, id);

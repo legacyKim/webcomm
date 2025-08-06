@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import Search from "@/components/search";
 import Boardlist from "@/(site)/board/boardlist";
 
-import { useAuth } from "@/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
 import { initDataPosts } from "@/type/type";
@@ -40,13 +40,13 @@ export default function Board({
   // const [limit, setLimit] = useState(20);
 
   return (
-    <sub className='sub'>
+    <sub className="sub">
       <Search />
 
-      <div className='board_single'>
+      <div className="board_single">
         {/* board best */}
-        <div className='board'>
-          <div className='board_top'>
+        <div className="board">
+          <div className="board_top">
             {/* {isUserId !== null && (
               <select onChange={(e) => setLimit(Number(e.target.value))} value={limit}>
                 <option value={10}>10개씩</option>
@@ -60,8 +60,8 @@ export default function Board({
 
             {isUserId !== null && (
               <div>
-                <Link href='/write'>
-                  <PencilSquareIcon className='icon' />
+                <Link href="/write">
+                  <PencilSquareIcon className="icon" />
                   <span>글쓰기</span>
                 </Link>
               </div>
