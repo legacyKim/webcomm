@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
-import { createNotificationService } from "@/lib/notification-service.js";
+import { createNotificationService } from "@/lib/notification-service";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({

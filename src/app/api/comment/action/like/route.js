@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
-import { createNotificationService } from "@/lib/notification-service.js";
+import { createNotificationService } from "@/lib/notification-service";
 
 export async function GET(req) {
   const client = await pool.connect();

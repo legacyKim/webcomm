@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
-import { createNotificationService } from "@/lib/notification-service.js";
+import { createNotificationService } from "@/lib/notification-service";
 // import { invalidateUserProfileCacheById } from "@/src/lib/cache-utils";
 
 export async function GET(req) {
