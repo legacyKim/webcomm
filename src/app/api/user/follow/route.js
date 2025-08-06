@@ -11,20 +11,29 @@ export async function POST(request) {
     const { targetUserId, action } = body;
 
     if (!targetUserId || !action || !["follow", "unfollow"].includes(action)) {
-      return NextResponse.json({ error: "targetUserId와 action(follow/unfollow)이 필요합니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: "targetUserId와 action(follow/unfollow)이 필요합니다." },
+        { status: 400 }
+      );
     }
 
     // JWT에서 현재 사용자 ID 추출
     const tokenData = await serverTokenCheck();
 
     if (!tokenData) {
-      return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+      return NextResponse.json(
+        { error: "로그인이 필요합니다." },
+        { status: 401 }
+      );
     }
 
     const currentUserId = tokenData.id;
 
     if (currentUserId === targetUserId) {
-      return NextResponse.json({ error: "자기 자신을 팔로우할 수 없습니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: "자기 자신을 팔로우할 수 없습니다." },
+        { status: 400 }
+      );
     }
 
     // 실제 Prisma 쿼리 실행
@@ -42,7 +51,10 @@ export async function POST(request) {
         });
 
         if (existingFollow) {
-          return NextResponse.json({ error: "이미 팔로우 중입니다." }, { status: 400 });
+          return NextResponse.json(
+            { error: "이미 팔로우 중입니다." },
+            { status: 400 }
+          );
         }
 
         // 팔로우 추가
@@ -52,8 +64,6 @@ export async function POST(request) {
             following_id: targetUserId,
           },
         });
-
-        console.log(`사용자 ${currentUserId}가 사용자 ${targetUserId}를 팔로우했습니다.`);
       } else {
         // 언팔로우
         const deletedFollow = await prisma.follow.deleteMany({
@@ -64,10 +74,11 @@ export async function POST(request) {
         });
 
         if (deletedFollow.count === 0) {
-          return NextResponse.json({ error: "팔로우 관계가 존재하지 않습니다." }, { status: 400 });
+          return NextResponse.json(
+            { error: "팔로우 관계가 존재하지 않습니다." },
+            { status: 400 }
+          );
         }
-
-        console.log(`사용자 ${currentUserId}가 사용자 ${targetUserId}를 언팔로우했습니다.`);
       }
 
       // 캐시 무효화를 위해 대상 사용자 정보 조회
@@ -77,7 +88,10 @@ export async function POST(request) {
       });
     } catch (dbError) {
       console.error("데이터베이스 오류:", dbError);
-      return NextResponse.json({ error: "데이터베이스 처리 중 오류가 발생했습니다." }, { status: 500 });
+      return NextResponse.json(
+        { error: "데이터베이스 처리 중 오류가 발생했습니다." },
+        { status: 500 }
+      );
     }
 
     // 프로필 캐시 무효화 (username 기반)
@@ -97,7 +111,10 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("팔로우 API 오류:", error);
-    return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json(
+      { error: "서버 오류가 발생했습니다." },
+      { status: 500 }
+    );
   }
 }
 
@@ -109,13 +126,19 @@ export async function GET(request) {
     const type = searchParams.get("type"); // followers, following
 
     if (!userId || !type || !["followers", "following"].includes(type)) {
-      return NextResponse.json({ error: "userId와 type(followers/following)이 필요합니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: "userId와 type(followers/following)이 필요합니다." },
+        { status: 400 }
+      );
     }
 
     // 실제 Prisma 쿼리로 팔로우 목록 조회
     try {
       const followData = await prisma.follow.findMany({
-        where: type === "followers" ? { following_id: parseInt(userId) } : { follower_id: parseInt(userId) },
+        where:
+          type === "followers"
+            ? { following_id: parseInt(userId) }
+            : { follower_id: parseInt(userId) },
         include: {
           follower:
             type === "followers"
@@ -149,7 +172,9 @@ export async function GET(request) {
         },
       });
 
-      const users = followData.map((follow) => (type === "followers" ? follow.follower : follow.following));
+      const users = followData.map((follow) =>
+        type === "followers" ? follow.follower : follow.following
+      );
 
       return NextResponse.json(
         {
@@ -161,7 +186,7 @@ export async function GET(request) {
           headers: {
             "Cache-Control": "s-maxage=300, stale-while-revalidate=600",
           },
-        },
+        }
       );
     } catch (dbError) {
       console.error("팔로우 목록 DB 조회 오류:", dbError);
@@ -172,11 +197,14 @@ export async function GET(request) {
           total: 0,
           type,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
   } catch (error) {
     console.error("팔로우 목록 조회 오류:", error);
-    return NextResponse.json({ error: "서버 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json(
+      { error: "서버 오류가 발생했습니다." },
+      { status: 500 }
+    );
   }
 }

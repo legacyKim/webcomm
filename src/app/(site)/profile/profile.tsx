@@ -20,8 +20,6 @@ export default function Profile({
   userActivity,
   currentTab,
 }: ProfileProps) {
-  console.log(userProfile);
-
   const [isFollowing, setIsFollowing] = useState(
     userProfile?.isFollowing || false
   );
@@ -32,14 +30,6 @@ export default function Profile({
     "summary" | "posts" | "comments" | "likes" | "follower"
   >(currentTab ?? "summary");
 
-  // 디버깅을 위한 로그
-  console.log("Profile 컴포넌트 렌더링:", {
-    userProfile: userProfile?.username,
-    isFollowing,
-    followerCount,
-    userProfileIsFollowing: userProfile?.isFollowing,
-  });
-
   // 팔로우/언팔로우 핸들러
   const handleFollowToggle = async () => {
     if (!userProfile) {
@@ -47,23 +37,12 @@ export default function Profile({
       return;
     }
 
-    console.log("팔로우 요청 시작:", {
-      targetUserId: userProfile.id,
-      currentAction: isFollowing ? "unfollow" : "follow",
-      currentFollowState: isFollowing,
-    });
-
     const previousFollowing = isFollowing;
     const previousCount = followerCount;
 
     // 낙관적 업데이트
     setIsFollowing(!isFollowing);
     setFollowerCount((prev) => (isFollowing ? prev - 1 : prev + 1));
-
-    console.log("낙관적 업데이트 완료:", {
-      newFollowState: !isFollowing,
-      newFollowerCount: isFollowing ? followerCount - 1 : followerCount + 1,
-    });
 
     try {
       const response = await fetch("/api/user/follow", {
@@ -78,18 +57,15 @@ export default function Profile({
       });
 
       const result = await response.json();
-      console.log("API 응답:", { status: response.status, result });
 
       if (!response.ok) {
         // 실패 시 원래 상태로 복원
-        console.log("API 실패, 상태 복원");
         setIsFollowing(previousFollowing);
         setFollowerCount(previousCount);
         alert(result.error || "팔로우 처리 중 오류가 발생했습니다.");
       } else {
         // 성공 메시지 표시 (선택사항)
         alert(result.message);
-        console.log("API 성공:", result.message);
       }
     } catch (error) {
       // 네트워크 오류 시 원래 상태로 복원

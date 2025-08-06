@@ -36,23 +36,12 @@ export default function DropDownMenu({
     const checkFollowStatus = async () => {
       if (!isUserId) return;
 
-      console.log("팔로우 상태 확인 요청:", {
-        username: userInfoInDropMenu.userNickname,
-        currentUser: isUserId,
-      });
-
       try {
         const response = await axios.get(
           `/api/user/profile?username=${userInfoInDropMenu.userNickname}&current_user=${isUserId}`
         );
 
-        console.log("팔로우 상태 API 응답:", response.data);
-
         if (response.data.profile) {
-          console.log(
-            "isFollowing 값 설정:",
-            response.data.profile.isFollowing
-          );
           setIsFollowing(response.data.profile.isFollowing);
         }
       } catch (error) {
@@ -89,7 +78,6 @@ export default function DropDownMenu({
 
       if (response.ok) {
         setIsFollowing(!isFollowing);
-        console.log(result.message);
       } else {
         alert(result.error || "팔로우 처리 중 오류가 발생했습니다.");
       }

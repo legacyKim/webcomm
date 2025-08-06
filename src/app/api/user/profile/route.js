@@ -37,11 +37,8 @@ async function getUserProfileFromDB(
     });
 
     if (!user) {
-      console.log(`사용자 ${usernameOrNickname}을 찾을 수 없습니다.`);
       return null;
     }
-
-    console.log(`사용자 ${usernameOrNickname} 정보 조회 성공:`, user);
 
     // 사용자의 게시글 수 계산
     const postsCount = await prisma.post.count({
@@ -81,13 +78,6 @@ async function getUserProfileFromDB(
           },
         })
       : null;
-
-    console.log("팔로우 상태 확인:", {
-      currentUserId,
-      targetUserId: user.id,
-      followRecord: isFollowing,
-      isFollowingBoolean: !!isFollowing,
-    });
 
     // 최근 게시글 조회
     const recentPosts = await prisma.post.findMany({
@@ -247,7 +237,6 @@ async function getUserProfileFromDB(
       },
     };
 
-    console.log(`사용자 ${usernameOrNickname} 프로필 데이터 생성 완료`);
     return profileData;
   } catch (error) {
     console.error("Database query error:", error);

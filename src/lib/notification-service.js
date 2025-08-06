@@ -28,7 +28,6 @@ export class NotificationService {
   }) {
     // 자기 자신에게는 알림 보내지 않기
     if (senderId === receiverId) {
-      console.log(`알림 생성 건너뜀: 발신자와 수신자가 동일 (${senderId})`);
       return null;
     }
 
@@ -39,9 +38,6 @@ export class NotificationService {
         [type, senderId, receiverId, postId, commentId, urlSlug]
       );
 
-      console.log(
-        `${type} 알림 생성 성공: 발신자=${senderId}, 수신자=${receiverId}, 게시글=${postId}, 댓글=${commentId}`
-      );
       return result.rows[0];
     } catch (error) {
       console.error("알림 생성 실패:", error);
@@ -377,7 +373,6 @@ export class NotificationService {
         });
       }
 
-      console.log(`댓글 관련 알림 ${notificationsToCreate.length}개 생성 완료`);
       return notificationsToCreate.length;
     } catch (error) {
       console.error("댓글 알림 생성 중 오류:", error);

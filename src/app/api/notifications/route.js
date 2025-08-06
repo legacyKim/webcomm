@@ -15,18 +15,14 @@ export async function GET(req) {
   const limitParam = searchParams.get("limit");
 
   try {
-    console.log("=== 알림 목록 조회 시작 ===");
-
     // 토큰에서 사용자 정보 확인
     const userData = await serverTokenCheck(req);
-    console.log("사용자 정보:", userData);
 
     if (!userData) {
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
     const limit = limitParam ? parseInt(limitParam, 10) : null;
-    console.log("조회 제한:", limit);
 
     // Prisma로 알림 조회
     const notifications = await prisma.notification.findMany({
@@ -53,8 +49,6 @@ export async function GET(req) {
       },
       take: limit || undefined,
     });
-
-    console.log("조회된 알림 수:", notifications.length);
 
     // 메시지와 링크 생성
     const processedNotifications = notifications.map((n) => {
@@ -113,8 +107,6 @@ export async function GET(req) {
       };
     });
 
-    console.log("처리된 알림:", processedNotifications.length);
-
     return NextResponse.json(processedNotifications);
   } catch (err) {
     console.error("Error fetching notifications:", err);
@@ -131,17 +123,13 @@ export async function GET(req) {
 // 알림 읽음 처리
 export async function PATCH(req) {
   try {
-    console.log("=== 알림 읽음 처리 시작 ===");
-
     const userData = await serverTokenCheck(req);
-    console.log("사용자 정보:", userData);
 
     if (!userData) {
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
     const { notificationIds } = await req.json();
-    console.log("읽음 처리할 알림 IDs:", notificationIds);
 
     if (!Array.isArray(notificationIds)) {
       return NextResponse.json(
@@ -152,9 +140,6 @@ export async function PATCH(req) {
 
     // 문자열 ID를 정수로 변환
     const intNotificationIds = notificationIds.map((id) => parseInt(id, 10));
-    console.log("변환된 알림 IDs:", intNotificationIds);
-
-    console.log("Prisma 업데이트 시작...");
 
     // 해당 사용자의 알림만 읽음 처리 (read_at 필드 제거)
     const result = await prisma.notification.updateMany({
@@ -166,8 +151,6 @@ export async function PATCH(req) {
         is_read: true,
       },
     });
-
-    console.log("업데이트 결과:", result);
 
     return NextResponse.json({ success: true, updated: result.count });
   } catch (err) {

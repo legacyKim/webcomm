@@ -70,7 +70,6 @@ export async function updateUserStats(stats: UserStats) {
     revalidateTag(`profile-${userId}`);
     revalidateTag("user-stats");
 
-    console.log(`사용자 ${userId} 통계 업데이트 완료:`, stats);
     return true;
   } catch (error) {
     console.error("사용자 통계 업데이트 오류:", error);
@@ -79,7 +78,10 @@ export async function updateUserStats(stats: UserStats) {
 }
 
 // 사용자 온라인 상태 업데이트
-export async function updateUserOnlineStatus(userId: number, isOnline: boolean) {
+export async function updateUserOnlineStatus(
+  userId: number,
+  isOnline: boolean
+) {
   try {
     // 사용자 온라인 상태 업데이트
     await prisma.member.update({
@@ -93,7 +95,6 @@ export async function updateUserOnlineStatus(userId: number, isOnline: boolean) 
     // 프로필 캐시 무효화
     revalidateTag(`profile-${userId}`);
 
-    console.log(`사용자 ${userId} 온라인 상태 업데이트: ${isOnline ? "온라인" : "오프라인"}`);
     return true;
   } catch (error) {
     console.error("온라인 상태 업데이트 오류:", error);
@@ -120,7 +121,6 @@ export async function incrementPostView(postId: number, authorId: number) {
       postViews: 1,
     });
 
-    console.log(`게시물 ${postId} 조회수 증가, 작성자 ${authorId} 통계 업데이트`);
     return true;
   } catch (error) {
     console.error("게시물 조회수 업데이트 오류:", error);
@@ -129,7 +129,11 @@ export async function incrementPostView(postId: number, authorId: number) {
 }
 
 // 좋아요 클릭 시 호출
-export async function updateLikeStats(postId: number, authorId: number, isLike: boolean) {
+export async function updateLikeStats(
+  postId: number,
+  authorId: number,
+  isLike: boolean
+) {
   try {
     // 게시물 좋아요 수 업데이트
     await prisma.post.update({
@@ -147,7 +151,6 @@ export async function updateLikeStats(postId: number, authorId: number, isLike: 
       likesReceived: isLike ? 1 : -1,
     });
 
-    console.log(`게시물 ${postId} 좋아요 ${isLike ? "증가" : "감소"}, 작성자 ${authorId} 통계 업데이트`);
     return true;
   } catch (error) {
     console.error("좋아요 통계 업데이트 오류:", error);
@@ -156,7 +159,11 @@ export async function updateLikeStats(postId: number, authorId: number, isLike: 
 }
 
 // 댓글 작성 시 호출
-export async function updateCommentStats(postId: number, authorId: number, isAdd: boolean) {
+export async function updateCommentStats(
+  postId: number,
+  authorId: number,
+  isAdd: boolean
+) {
   try {
     // 게시물 댓글 수는 Prisma에서 자동으로 계산되므로 별도 업데이트 불필요
     // 게시물 작성자 통계 업데이트 (댓글 받은 수)
@@ -169,7 +176,6 @@ export async function updateCommentStats(postId: number, authorId: number, isAdd
     revalidateTag(`post-${postId}`);
     revalidateTag("posts");
 
-    console.log(`게시물 ${postId} 댓글 ${isAdd ? "추가" : "삭제"}, 작성자 ${authorId} 통계 업데이트`);
     return true;
   } catch (error) {
     console.error("댓글 통계 업데이트 오류:", error);

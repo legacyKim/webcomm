@@ -42,10 +42,6 @@ export async function POST(req) {
     const notificationService = createNotificationService(client);
     await notificationService.createMessageNotification(from, parseInt(to, 10));
 
-    console.log(
-      `쪽지 알림 생성 완료: 발신자=${from}, 수신자=${to}, 메시지ID=${messageId}`
-    );
-
     return NextResponse.json(
       {
         ...result.rows[0],

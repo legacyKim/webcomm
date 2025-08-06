@@ -283,8 +283,6 @@ export default function View({
       console.error("SSE 연결 오류:", error);
     };
 
-    console.log("SSE 연결 성공");
-
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data) as CommentTreeNode & {
@@ -292,18 +290,8 @@ export default function View({
           post_id: string;
         };
 
-        console.log(data, "?????");
-        console.log("현재 post_id:", params.id, "타입:", typeof params.id);
-        console.log(
-          "받은 post_id:",
-          data.post_id,
-          "타입:",
-          typeof data.post_id
-        );
-
         // 연결 확인 메시지는 무시
         if (data.event === "connected") {
-          console.log("연결 확인 메시지 - 무시됨");
           return;
         }
 
@@ -315,21 +303,11 @@ export default function View({
             : data.post_id;
 
         if (receivedPostId !== currentPostId) {
-          console.log("post_id 불일치로 무시됨", {
-            receivedPostId,
-            currentPostId,
-          });
           return;
         }
 
-        console.log("post_id 일치! 댓글 처리 시작");
-
         if (data.event === "INSERT") {
-          console.log("INSERT 이벤트 처리 중...");
           setCommentList((prev: CommentTreeNode[] | null) => {
-            console.log("이전 댓글 목록:", prev);
-
-            // 누락된 필드들 추가
             const newComment: CommentTreeNode = {
               id: data.id,
               parent_id: data.parent_id || null,
@@ -346,15 +324,11 @@ export default function View({
               children: [],
             };
 
-            console.log("새 댓글 객체:", newComment);
-
             if (!prev) {
-              console.log("이전 댓글이 없음, 새 댓글만 반환");
               return [newComment];
             }
 
             const updatedList = [...prev, newComment];
-            console.log("업데이트된 댓글 목록:", updatedList);
             return updatedList;
           });
         } else if (data.event === "DELETE") {
@@ -385,7 +359,6 @@ export default function View({
   // 댓글 트리 구조로 변환 - useMemo로 최적화
   const commentTree = useMemo(() => {
     const rows = commentList ?? [];
-    console.log("commentTree 재계산 중, commentList:", rows);
     return CommentTreeBuild(rows);
   }, [commentList]);
 
@@ -416,18 +389,10 @@ export default function View({
     id?: number,
     depth?: number | null
   ) => {
-    console.log("댓글 등록 요청:", {
-      content: commentContent,
-      parentId: id,
-      depth: depth,
-    });
-
     const comment = commentContent.trim();
     const parentId = id;
     // depth가 명시적으로 전달되지 않은 경우 최상위 댓글(0)으로 처리
     const commentDepth = depth !== null && depth !== undefined ? depth : 0;
-
-    console.log("최종 commentDepth:", commentDepth);
 
     if (comment === "") {
       alert("댓글을 입력해 주세요.");

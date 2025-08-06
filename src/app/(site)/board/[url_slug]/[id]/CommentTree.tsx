@@ -390,13 +390,6 @@ export default function CommentTree({
                                 ? (comment.depth || 0) + 1
                                 : 0;
 
-                              console.log("댓글 등록 - depth 계산:", {
-                                isReply,
-                                currentCommentDepth: comment.depth,
-                                newDepth,
-                                parentId: comment.parent_id ?? comment.id,
-                              });
-
                               commentPost?.(
                                 isRecomment
                                   ? (recommentContent ?? "")

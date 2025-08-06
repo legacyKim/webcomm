@@ -4,9 +4,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 // 무한 스크롤 훅
 export const useInfiniteScroll = <T,>(
-  fetchFunction: (page: number, limit: number) => Promise<{ data: T[]; hasMore: boolean }>,
+  fetchFunction: (
+    page: number,
+    limit: number
+  ) => Promise<{ data: T[]; hasMore: boolean }>,
   limit: number = 20,
-  queryKey?: string[],
+  queryKey?: string[]
 ) => {
   const [data, setData] = useState<T[]>([]);
   const [page, setPage] = useState(1);
@@ -14,8 +17,6 @@ export const useInfiniteScroll = <T,>(
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-
-  console.log(data, "useInfiniteScroll data");
 
   const fetchFunctionRef = useRef(fetchFunction);
   fetchFunctionRef.current = fetchFunction;
@@ -35,12 +36,12 @@ export const useInfiniteScroll = <T,>(
         {
           rootMargin: "100px", // 요소가 100px 전에 미리 로딩 시작
           threshold: 0.1,
-        },
+        }
       );
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore],
+    [loading, hasMore]
   );
 
   const loadMore = useCallback(async () => {
@@ -61,7 +62,11 @@ export const useInfiniteScroll = <T,>(
 
       setHasMore(result.hasMore);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "데이터 로딩 중 오류가 발생했습니다.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "데이터 로딩 중 오류가 발생했습니다."
+      );
     } finally {
       setLoading(false);
     }
@@ -100,7 +105,11 @@ export const useInfiniteScroll = <T,>(
       if (savedData) {
         try {
           const parsed = JSON.parse(savedData);
-          if (parsed.data && Array.isArray(parsed.data) && parsed.data.length > 0) {
+          if (
+            parsed.data &&
+            Array.isArray(parsed.data) &&
+            parsed.data.length > 0
+          ) {
             // 캐시된 데이터가 5분 이내인 경우만 사용
             if (Date.now() - parsed.timestamp < 5 * 60 * 1000) {
               setData(parsed.data);
@@ -131,7 +140,7 @@ export const useInfiniteScroll = <T,>(
           page,
           hasMore,
           timestamp: Date.now(),
-        }),
+        })
       );
     }
   }, [data, page, hasMore, queryKey]);
@@ -148,7 +157,11 @@ export const useInfiniteScroll = <T,>(
 };
 
 // 로딩 스피너 컴포넌트
-export const LoadingSpinner = ({ size = "medium" }: { size?: "small" | "medium" | "large" }) => {
+export const LoadingSpinner = ({
+  size = "medium",
+}: {
+  size?: "small" | "medium" | "large";
+}) => {
   const sizeClasses = {
     small: "w-4 h-4",
     medium: "w-8 h-8",
@@ -156,7 +169,7 @@ export const LoadingSpinner = ({ size = "medium" }: { size?: "small" | "medium" 
   };
 
   return (
-    <div className='loading-spinner'>
+    <div className="loading-spinner">
       <div className={`spinner ${sizeClasses[size]}`}></div>
 
       <style jsx>{`
@@ -188,12 +201,18 @@ export const LoadingSpinner = ({ size = "medium" }: { size?: "small" | "medium" 
 };
 
 // 에러 메시지 컴포넌트
-export const ErrorMessage = ({ message, onRetry }: { message: string; onRetry?: () => void }) => {
+export const ErrorMessage = ({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry?: () => void;
+}) => {
   return (
-    <div className='error-message'>
+    <div className="error-message">
       <p>{message}</p>
       {onRetry && (
-        <button onClick={onRetry} className='retry-button'>
+        <button onClick={onRetry} className="retry-button">
           다시 시도
         </button>
       )}
@@ -257,7 +276,7 @@ export const InfiniteScrollContainer = <T,>({
 
   if (data.length === 0 && !loading) {
     return (
-      <div className='empty-message'>
+      <div className="empty-message">
         <p>{emptyMessage}</p>
 
         <style jsx>{`
@@ -275,11 +294,15 @@ export const InfiniteScrollContainer = <T,>({
   }
 
   return (
-    <div className='infinite-scroll-container'>
+    <div className="infinite-scroll-container">
       {data.map((item, index) => {
         const isLast = index === data.length - 1;
         return (
-          <div key={index} ref={isLast ? lastElementRef : null} className='scroll-item'>
+          <div
+            key={index}
+            ref={isLast ? lastElementRef : null}
+            className="scroll-item"
+          >
             {renderItem(item, index)}
           </div>
         );
@@ -288,7 +311,7 @@ export const InfiniteScrollContainer = <T,>({
       {loading && (loadingComponent || <LoadingSpinner />)}
 
       {!hasMore && data.length > 0 && (
-        <div className='end-message'>
+        <div className="end-message">
           <p>모든 데이터를 불러왔습니다.</p>
         </div>
       )}

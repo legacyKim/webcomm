@@ -51,7 +51,9 @@ export default function BoardConManage() {
     // url_slug를 통해 board_name 찾기
     let boardName = "";
     if (selectedSlug) {
-      const selectedBoard = boardData?.boards?.find((b: Board) => b.url_slug === selectedSlug);
+      const selectedBoard = boardData?.boards?.find(
+        (b: Board) => b.url_slug === selectedSlug
+      );
       boardName = selectedBoard?.board_name || "";
     }
 
@@ -91,27 +93,27 @@ export default function BoardConManage() {
 
   // 검색 조건이 변경될 때 새로고침
   const handleSearch = () => {
-    console.log("?????");
     refresh();
   };
 
   return (
-    <div className='admin_content_wrap'>
-      <div className='admin_title'>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
         <h4>게시글 관리</h4>
       </div>
-      <div className='admin_content'>
+      <div className="admin_content">
         {/* 검색 및 필터 */}
-        <div className='search-filters'>
-          <div className='filter-group'>
+        <div className="search-filters">
+          <div className="filter-group">
             <select
               value={selectedSlug}
               onChange={(e) => {
                 setSelectedSlug(e.target.value);
                 // 게시판 선택 시 즉시 새로고침
                 setTimeout(() => refresh(), 0);
-              }}>
-              <option value=''>전체 게시판</option>
+              }}
+            >
+              <option value="">전체 게시판</option>
               {boardData?.boards?.map((b: Board) => (
                 <option key={b.id} value={b.url_slug}>
                   {b.board_name}
@@ -119,35 +121,35 @@ export default function BoardConManage() {
               ))}
             </select>
           </div>
-          <div className='search-group'>
+          <div className="search-group">
             <input
-              type='text'
-              placeholder='제목, 내용, 작성자로 검색...'
+              type="text"
+              placeholder="제목, 내용, 작성자로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button onClick={handleSearch} className='search-btn'>
+            <button onClick={handleSearch} className="search-btn">
               검색
             </button>
-            <button onClick={() => refresh()} className='reset-btn'>
+            <button onClick={() => refresh()} className="reset-btn">
               새로고침
             </button>
           </div>
         </div>
 
-        <ol className='table'>
-          <li className='table_header'>
+        <ol className="table">
+          <li className="table_header">
             <span>No</span>
-            <span className='table_board'>게시판</span>
-            <span className='table_title'>제목</span>
+            <span className="table_board">게시판</span>
+            <span className="table_title">제목</span>
             <span>닉네임</span>
             <span>조회수</span>
             <span>좋아요</span>
             <span>싫어요</span>
             <span>신고</span>
-            <span className='table_date'>날짜</span>
-            <span className='table_btn'>관리</span>
+            <span className="table_date">날짜</span>
+            <span className="table_btn">관리</span>
           </li>
           {!loading ? (
             <QueryInfiniteScrollContainer
@@ -161,27 +163,32 @@ export default function BoardConManage() {
               renderItem={(post: Posts, index: number) => (
                 <li key={post.id}>
                   <span>{index + 1}</span>
-                  <span className='table_board'>{post.board_name}</span>
-                  <span className='table_title'>{post.title}</span>
+                  <span className="table_board">{post.board_name}</span>
+                  <span className="table_title">{post.title}</span>
                   <span>{post.user_nickname}</span>
                   <span>{post.views}</span>
                   <span>{post.likes}</span>
                   <span>{post.dislike}</span>
                   <span>{post.reports}</span>
-                  <span className='table_date'>{new Date(post.created_at).toLocaleDateString()}</span>
-                  <span className='table_btn'>
+                  <span className="table_date">
+                    {new Date(post.created_at).toLocaleDateString()}
+                  </span>
+                  <span className="table_btn">
                     <button
                       onClick={() => {
                         setBoardContent(post);
                         setPopupOpen(true);
-                      }}>
+                      }}
+                    >
                       보기
                     </button>
-                    <button onClick={() => handleArchivePost(post.id)}>보관</button>
+                    <button onClick={() => handleArchivePost(post.id)}>
+                      보관
+                    </button>
                   </span>
                 </li>
               )}
-              emptyMessage='게시물이 없습니다.'
+              emptyMessage="게시물이 없습니다."
             />
           ) : (
             <li>로딩 중...</li>
@@ -189,7 +196,12 @@ export default function BoardConManage() {
         </ol>
       </div>
 
-      {popupOpen && <BoardConManagePopup boardContent={boardContent} setPopupOpen={setPopupOpen} />}
+      {popupOpen && (
+        <BoardConManagePopup
+          boardContent={boardContent}
+          setPopupOpen={setPopupOpen}
+        />
+      )}
     </div>
   );
 }

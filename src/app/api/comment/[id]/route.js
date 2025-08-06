@@ -155,17 +155,8 @@ export async function POST(req, context) {
 
     await client.query("BEGIN");
 
-    console.log(
-      "받은 commentDepth:",
-      commentDepth,
-      "타입:",
-      typeof commentDepth
-    );
-
     // commentDepth를 그대로 depth로 사용 (이미 프론트엔드에서 올바른 값을 계산해서 전송)
     const depth = commentDepth;
-
-    console.log("최종 depth:", depth);
 
     // 서버에서 파일 업로드 및 HTML 처리
     const processedComment = await replaceBlobsWithS3UrlsServer(

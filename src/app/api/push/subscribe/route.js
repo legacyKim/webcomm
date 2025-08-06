@@ -11,12 +11,12 @@ export async function POST(request) {
 
     const { subscription } = await request.json();
 
-    // 디버깅 로그
-    console.log("받은 구독 데이터:", JSON.stringify({ subscription }, null, 2));
-
     // 구독 데이터 유효성 검사
     if (!subscription || !subscription.endpoint || !subscription.keys) {
-      return NextResponse.json({ error: "Invalid subscription data" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid subscription data" },
+        { status: 400 }
+      );
     }
 
     const { endpoint, keys } = subscription;
@@ -42,6 +42,9 @@ export async function POST(request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("구독 저장 실패:", error);
-    return NextResponse.json({ error: "Failed to save subscription" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to save subscription" },
+      { status: 500 }
+    );
   }
 }
