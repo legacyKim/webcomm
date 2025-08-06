@@ -33,7 +33,7 @@ export default function MenuSettingsPage() {
   // They may be needed for future functionality
   console.log("Debug - contextBoards:", contextBoards);
 
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   // 메뉴 타입별 분류 (로컬 상태)
   const [mainMenus, setMainMenus] = useState<Board[]>([]);
