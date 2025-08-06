@@ -136,7 +136,7 @@ export async function PUT(request: NextRequest) {
       SELECT id FROM menu_customs 
       WHERE user_id = ${parseInt(userId)} AND board_id = ${parseInt(boardId)}
       LIMIT 1
-    `) as any[];
+    `) as { id: number }[];
 
     if (existingCustom.length > 0) {
       // 업데이트

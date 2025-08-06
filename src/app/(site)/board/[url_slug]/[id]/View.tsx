@@ -80,12 +80,11 @@ export default function View({
 
   // 좋아요한 사용자 목록
   const [likers, setLikers] = useState<PostLiker[]>(post?.likers || []);
-  const [showLikers, setShowLikers] = useState(false);
 
   // 댓글별 좋아요한 사용자 목록
-  const [commentLikers, setCommentLikers] = useState<{ [key: number]: any[] }>(
-    {}
-  );
+  const [commentLikers, setCommentLikers] = useState<{
+    [key: number]: PostLiker[];
+  }>({});
 
   // SSR 데이터가 변경되면 상태 업데이트
   useEffect(() => {
@@ -97,11 +96,11 @@ export default function View({
 
     // 댓글별 좋아요 사용자 정보 초기화
     if (comment) {
-      const initialCommentLikers: { [key: number]: any[] } = {};
-      comment.forEach((c: any) => {
-        if (c.likers) {
-          initialCommentLikers[c.id] = c.likers;
-        }
+      const initialCommentLikers: { [key: number]: PostLiker[] } = {};
+      comment.forEach((c: CommentTreeNode) => {
+        // Note: likers property should be added to CommentTreeNode type if needed
+        // For now, we'll initialize empty
+        initialCommentLikers[c.id] = [];
       });
       setCommentLikers(initialCommentLikers);
     }
@@ -536,13 +535,6 @@ export default function View({
   };
 
   const mentionUsers = extractMentionUsers();
-
-  // 게시물 좋아요 사용자 목록 가져오기
-  const getPostLikers = () => likers;
-
-  // 댓글 좋아요 사용자 목록 가져오기
-  const getCommentLikers = (commentId: number) =>
-    commentLikers[commentId] || [];
 
   if (!viewPost)
     return (

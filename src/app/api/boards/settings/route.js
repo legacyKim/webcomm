@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/db/db";
 
-export async function GET(request) {
+export async function GET() {
   try {
     // 각 게시판별로 (게시물 수 * 조회수)의 합을 계산
     const boardPopularity = await prisma.board.findMany({

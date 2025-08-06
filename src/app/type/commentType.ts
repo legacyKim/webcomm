@@ -1,5 +1,7 @@
 export type CommentImage = { file: File; blobUrl: string };
 
+import { PostLiker } from "./type";
+
 interface MentionUser {
   id: number;
   name: string;
@@ -70,5 +72,5 @@ export interface CommentTreeProps {
   >;
 
   commentLike?: (commentId: number, isLiked: boolean) => void;
-  commentLikers?: { [key: number]: any[] };
+  commentLikers?: { [key: number]: PostLiker[] };
 }

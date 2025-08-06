@@ -37,7 +37,7 @@ export default function NotificationManager({
 
   const registerServiceWorker = async () => {
     try {
-      const registration = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.register("/sw.js");
       // 메시지 리스너 등록
       navigator.serviceWorker.addEventListener("message", (event) => {
         if (event.data.type === "NOTIFICATION_CLICKED") {

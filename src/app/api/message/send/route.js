@@ -38,13 +38,13 @@ export async function POST(req) {
     ]);
 
     // 5. 쪽지 받은 사람에게 알림 생성
-    const messageId = result.rows[0].id;
+    const result_row = result.rows[0];
     const notificationService = createNotificationService(client);
     await notificationService.createMessageNotification(from, parseInt(to, 10));
 
     return NextResponse.json(
       {
-        ...result.rows[0],
+        ...result_row,
         success: true,
         message: "쪽지를 보냈습니다!",
       },

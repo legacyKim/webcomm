@@ -11,8 +11,8 @@ import { BarsArrowDownIcon } from "@heroicons/react/24/outline";
 
 export default function Menu() {
   const pathname = usePathname();
-  const { setBoardType, isUserId } = useAuth();
-  const { boards, mainMenus, normalMenus, menuCustoms } = useMenu();
+  const { setBoardType } = useAuth();
+  const { mainMenus, normalMenus } = useMenu();
   const [showToggleMenu, setShowToggleMenu] = useState(false);
 
   useEffect(() => {

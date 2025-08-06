@@ -54,7 +54,7 @@ export function MenuProvider({
   const [boards, setBoards] = useState<Board[]>(initialBoards);
   const [menuCustoms, setMenuCustoms] =
     useState<MenuCustom[]>(initialMenuCustoms);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
 
   // 로그인하지 않은 사용자를 위한 인기도 기반 게시판 데이터 로드
   useEffect(() => {
