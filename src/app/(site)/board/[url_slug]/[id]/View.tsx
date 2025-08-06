@@ -212,12 +212,14 @@ export default function View({
           );
           if (detailResponse.data.response && detailResponse.data.comments) {
             // 댓글별 좋아요 사용자 정보 업데이트
-            const updatedCommentLikers: { [key: number]: any[] } = {};
-            detailResponse.data.comments.forEach((c: any) => {
-              if (c.likers) {
-                updatedCommentLikers[c.id] = c.likers;
+            const updatedCommentLikers: { [key: number]: PostLiker[] } = {};
+            detailResponse.data.comments.forEach(
+              (c: CommentTreeNode & { likers?: PostLiker[] }) => {
+                if (c.likers) {
+                  updatedCommentLikers[c.id] = c.likers;
+                }
               }
-            });
+            );
             setCommentLikers(updatedCommentLikers);
 
             // 댓글 목록도 업데이트 (좋아요 수 반영)
