@@ -39,6 +39,11 @@ model Member {
   total_likes_received  Int                @default(0)
   last_seen             DateTime?          @map("last_seen")
   is_online             Boolean            @default(false)
+  account_locked_until  DateTime?          @map("account_locked_until")
+  failed_login_attempts Int                @default(0)
+  last_failed_login     DateTime?          @map("last_failed_login")
+  lock_count            Int                @default(0)
+  permanent_lock        Boolean            @default(false)
   marketing_enabled     Boolean            @default(false)
   notification_enabled  Boolean            @default(false)
   blockedUsers          BlockedUser[]      @relation("BlockedUsers")
@@ -216,6 +221,7 @@ model PushSubscription {
   created_at DateTime @default(now())
   user       Member   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
+  @@unique([user_id, endpoint])
   @@map("push_subscriptions")
 }
 

@@ -46,6 +46,6 @@ yarn-error.log*
 text
 trigger
 
-prisma/seed.ts
+# prisma/seed.ts
 
 READMETEXT.md
