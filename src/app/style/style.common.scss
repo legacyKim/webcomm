@@ -333,7 +333,7 @@ header {
 .header .notice_message {
   position: absolute;
   top: 32px;
-  left: 0;
+  left: 100px;
   transform: translateX(-50%);
   min-width: 200px;
   z-index: $zIndexFirst;
@@ -2898,7 +2898,7 @@ h2.mypage_title {
   position: relative;
   display: inline-block;
   width: 50px;
-  height: 24px;
+  height: 25px;
   background-color: #ccc;
   border-radius: 24px;
   cursor: pointer;
@@ -2908,7 +2908,7 @@ h2.mypage_title {
 .toggle_switch::before {
   content: "";
   position: absolute;
-  top: 3px;
+  top: 50%;
   left: 4px;
   width: 18px;
   height: 18px;
@@ -2923,7 +2923,7 @@ h2.mypage_title {
 }
 
 .toggle_input:checked + .toggle_switch::before {
-  transform: translateX(24px);
+  transform: translate(24px, -50%);
 }
 
 .toggle_input:focus + .toggle_switch {

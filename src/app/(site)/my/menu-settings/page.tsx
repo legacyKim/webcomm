@@ -29,10 +29,6 @@ export default function MenuSettingsPage() {
     setMenuCustoms,
   } = useMenu();
 
-  // Note: These variables are assigned but not used in current implementation
-  // They may be needed for future functionality
-  console.log("Debug - contextBoards:", contextBoards);
-
   const [loading] = useState(false);
 
   // 메뉴 타입별 분류 (로컬 상태)
