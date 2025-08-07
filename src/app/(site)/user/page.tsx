@@ -233,7 +233,11 @@ export default function User() {
 
   // recaptcha
   const [recaptchaToken, setRecaptchaToken] = useState("");
-  const loadRecaptcha = useLoadRecaptcha(setRecaptchaToken);
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+  const loadRecaptcha = useLoadRecaptcha((token) => {
+    setRecaptchaToken(token);
+    setRecaptchaLoaded(true);
+  });
   useEffect(() => {
     loadRecaptcha();
   }, []);
@@ -295,6 +299,46 @@ export default function User() {
       return;
     }
 
+    // reCAPTCHA 토큰 새로 생성
+    let currentRecaptchaToken = recaptchaToken;
+
+    if (!currentRecaptchaToken) {
+      try {
+        const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+        if (siteKey && window.grecaptcha) {
+          currentRecaptchaToken = await new Promise<string>((resolve) => {
+            window.grecaptcha.ready(() => {
+              window.grecaptcha
+                .execute(siteKey, { action: "signup" })
+                .then((token) => {
+                  resolve(token);
+                });
+            });
+          });
+        }
+      } catch (error) {
+        console.error("reCAPTCHA 토큰 생성 실패:", error);
+        alert("reCAPTCHA 검증에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+    }
+
+    if (!currentRecaptchaToken) {
+      console.error("reCAPTCHA 토큰이 없습니다:", {
+        recaptchaToken,
+        currentRecaptchaToken,
+        recaptchaLoaded,
+        hasGrecaptcha: !!window.grecaptcha,
+      });
+      alert("reCAPTCHA 검증이 필요합니다. 페이지를 새로고침해주세요.");
+      return;
+    }
+
+    console.log(
+      "reCAPTCHA 토큰 전송:",
+      currentRecaptchaToken ? "있음" : "없음"
+    );
+
     const formData = new FormData();
 
     formData.append("userid", userid);
@@ -302,7 +346,7 @@ export default function User() {
     formData.append("userBio", userBio);
     formData.append("userPassword", userPassword);
     formData.append("userEmail", userEmail);
-    formData.append("recaptchaToken", recaptchaToken ?? "");
+    formData.append("recaptchaToken", currentRecaptchaToken);
     formData.append("marketingConsent", marketingConsent.toString());
     formData.append("notificationConsent", notificationConsent.toString());
 
