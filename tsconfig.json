@@ -32,7 +32,8 @@
     "src/app/api/user/follow/route.js",
     "src/app/api/member/route.js",
     "src/app/api/user/profile/route.js",
-    "src/app/api/boards/settings/route.js"
+    "src/app/api/boards/settings/route.js",
+    "prisma/seed.js"
   ],
   "exclude": ["node_modules"]
 }

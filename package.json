@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run migrate && npm run generate && next build",
-    "vercel-build": "prisma generate && npm run seed  && next build",
+    "vercel-build": "prisma generate && npm run seed && next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
@@ -13,7 +13,7 @@
     "generate": "prisma generate",
     "apply-triggers": "psql $DATABASE_URL -f prisma/triggers.sql",
     "deploy": "npm run migrate && npm run apply-triggers",
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "node prisma/seed.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.850.0",
