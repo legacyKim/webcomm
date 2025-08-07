@@ -22,7 +22,7 @@ export default function MenuSettingsPage() {
   const router = useRouter();
   const { isUserId } = useAuth();
   const {
-    boards: contextBoards,
+    // boards: contextBoards,
     mainMenus: contextMainMenus,
     normalMenus: contextNormalMenus,
     hiddenMenus: contextHiddenMenus,
