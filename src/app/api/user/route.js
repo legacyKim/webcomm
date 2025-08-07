@@ -25,27 +25,70 @@ export async function POST(req) {
 
     // recaptcha check
     if (!recaptchaToken || typeof recaptchaToken !== "string") {
-      return NextResponse.json({ success: false, message: "reCAPTCHA 토큰 누락" }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "reCAPTCHA 토큰 누락" },
+        { status: 400 }
+      );
     }
 
-    const verifyRes = await axios.post("https://www.google.com/recaptcha/api/siteverify", null, {
-      params: {
-        secret: process.env.RECAPTCHA_SECRET_KEY,
-        response: recaptchaToken,
-      },
+    console.log("reCAPTCHA 검증 시작:", {
+      hasToken: !!recaptchaToken,
+      hasSecretKey: !!process.env.RECAPTCHA_SECRET_KEY,
+      tokenLength: recaptchaToken.length,
     });
 
-    const { success, score, action } = verifyRes.data;
-    if (!success || score < 0.5 || action !== "signup") {
-      return NextResponse.json({ success: false, message: "reCAPTCHA 검증 실패" }, { status: 403 });
+    const verifyRes = await axios.post(
+      "https://www.google.com/recaptcha/api/siteverify",
+      null,
+      {
+        params: {
+          secret: process.env.RECAPTCHA_SECRET_KEY,
+          response: recaptchaToken,
+        },
+      }
+    );
+
+    const {
+      success,
+      score,
+      action,
+      "error-codes": errorCodes,
+    } = verifyRes.data;
+
+    console.log("reCAPTCHA 검증 결과:", {
+      success,
+      score,
+      action,
+      errorCodes,
+      expectedAction: "signup",
+    });
+
+    if (!success || score < 0.3 || action !== "signup") {
+      console.error("reCAPTCHA 검증 실패:", {
+        success,
+        score,
+        action,
+        errorCodes,
+        threshold: 0.3,
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: `reCAPTCHA 검증 실패: ${errorCodes ? errorCodes.join(", ") : "점수 또는 액션 불일치"}`,
+        },
+        { status: 403 }
+      );
     }
 
     // 프로필 이미지 용량 제한
     const MAX_SIZE = 1 * 1024 * 1024;
     if (profileImage && profileImage.size > MAX_SIZE) {
       return NextResponse.json(
-        { success: false, message: "프로필 이미지 용량은 최대 1MB까지 가능합니다." },
-        { status: 400 },
+        {
+          success: false,
+          message: "프로필 이미지 용량은 최대 1MB까지 가능합니다.",
+        },
+        { status: 400 }
       );
     }
 
@@ -75,24 +118,47 @@ export async function POST(req) {
 
     const insertResult = await client.query(
       "INSERT INTO members (username, password, email, user_nickname, bio, profile, authority, marketing_enabled, notification_enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-      [userid, hashedPassword, userEmail, userNickname, userBio, imgPath, 1, marketingConsent, notificationConsent],
+      [
+        userid,
+        hashedPassword,
+        userEmail,
+        userNickname,
+        userBio,
+        imgPath,
+        1,
+        marketingConsent,
+        notificationConsent,
+      ]
     );
 
     return NextResponse.json(
-      { success: true, user: insertResult.rows[0], message: "회원가입이 성공했습니다." },
-      { status: 201 },
+      {
+        success: true,
+        user: insertResult.rows[0],
+        message: "회원가입이 성공했습니다.",
+      },
+      { status: 201 }
     );
   } catch (err) {
     console.log(err);
     if (err.code === "23505") {
       if (err.detail.includes("email")) {
-        return NextResponse.json({ success: false, message: "이메일이 중복됩니다!" }, { status: 400 });
+        return NextResponse.json(
+          { success: false, message: "이메일이 중복됩니다!" },
+          { status: 400 }
+        );
       } else if (err.detail.includes("user_id")) {
-        return NextResponse.json({ success: false, message: "아이디가 중복됩니다!" }, { status: 400 });
+        return NextResponse.json(
+          { success: false, message: "아이디가 중복됩니다!" },
+          { status: 400 }
+        );
       }
     }
 
-    return NextResponse.json({ success: false, message: "서버 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "서버 오류가 발생했습니다." },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }
@@ -114,7 +180,10 @@ export async function PUT(req) {
     const notificationConsent = formData.get("notificationConsent");
 
     // 기존 사용자 확인
-    const userResult = await client.query("SELECT * FROM members WHERE id = $1", [userid]);
+    const userResult = await client.query(
+      "SELECT * FROM members WHERE id = $1",
+      [userid]
+    );
     const user = userResult.rows[0];
 
     const updateFields = [];
@@ -123,21 +192,32 @@ export async function PUT(req) {
 
     // 닉네임 변경
     if (userNickname && userNickname !== user.usernickname) {
-      const dupCheck = await client.query("SELECT 1 FROM members WHERE user_nickname = $1 AND id != $2", [
-        userNickname,
-        userid,
-      ]);
+      const dupCheck = await client.query(
+        "SELECT 1 FROM members WHERE user_nickname = $1 AND id != $2",
+        [userNickname, userid]
+      );
       if (dupCheck.rowCount > 0) {
-        return NextResponse.json({ success: false, message: "이미 사용 중인 닉네임입니다." }, { status: 400 });
+        return NextResponse.json(
+          { success: false, message: "이미 사용 중인 닉네임입니다." },
+          { status: 400 }
+        );
       }
 
       const now = new Date();
-      const lastUpdated = user.nickname_updated_at ? new Date(user.nickname_updated_at) : null;
+      const lastUpdated = user.nickname_updated_at
+        ? new Date(user.nickname_updated_at)
+        : null;
 
-      if (lastUpdated && now.getTime() - lastUpdated.getTime() < 1000 * 60 * 60 * 24 * 14) {
+      if (
+        lastUpdated &&
+        now.getTime() - lastUpdated.getTime() < 1000 * 60 * 60 * 24 * 14
+      ) {
         return NextResponse.json(
-          { success: false, message: "닉네임은 2주에 한 번만 변경할 수 있습니다." },
-          { status: 400 },
+          {
+            success: false,
+            message: "닉네임은 2주에 한 번만 변경할 수 있습니다.",
+          },
+          { status: 400 }
         );
       }
 
@@ -148,8 +228,14 @@ export async function PUT(req) {
       updateValues.push(now.toISOString());
 
       // 닉네임 변경 시 posts, comments 테이블 내에 모든 user_nickname 업데이트
-      await client.query("UPDATE posts SET user_nickname = $1 WHERE user_id = $2", [userNickname, userid]);
-      await client.query("UPDATE comments SET user_nickname = $1 WHERE user_id = $2", [userNickname, userid]);
+      await client.query(
+        "UPDATE posts SET user_nickname = $1 WHERE user_id = $2",
+        [userNickname, userid]
+      );
+      await client.query(
+        "UPDATE comments SET user_nickname = $1 WHERE user_id = $2",
+        [userNickname, userid]
+      );
     }
 
     // 비밀번호 변경 (입력값이 있을 경우에만 해싱 후 업데이트)
@@ -210,7 +296,10 @@ export async function PUT(req) {
 
     // 변경된 데이터가 없다면 업데이트하지 않음
     if (updateFields.length === 0) {
-      return NextResponse.json({ success: false, message: "변경된 정보가 없습니다." }, { status: 400 });
+      return NextResponse.json(
+        { success: false, message: "변경된 정보가 없습니다." },
+        { status: 400 }
+      );
     }
 
     // 업데이트 쿼리 실행
@@ -225,14 +314,22 @@ export async function PUT(req) {
     const updateResult = await client.query(updateQuery, updateValues);
 
     return NextResponse.json(
-      { success: true, user: updateResult.rows[0], message: "회원 정보가 업데이트되었습니다. 다시 로그인 해야합니다." },
-      { status: 200 },
+      {
+        success: true,
+        user: updateResult.rows[0],
+        message: "회원 정보가 업데이트되었습니다. 다시 로그인 해야합니다.",
+      },
+      { status: 200 }
     );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { success: false, error: error.message, message: "회원 정보 업데이트에 실패했습니다." },
-      { status: 500 },
+      {
+        success: false,
+        error: error.message,
+        message: "회원 정보 업데이트에 실패했습니다.",
+      },
+      { status: 500 }
     );
   } finally {
     client.release();
