@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run migrate && npm run generate && next build",
-    "vercel-build": "prisma migrate deploy && prisma generate && next build",
+    "vercel-build": "prisma migrate resolve --rolled-back 20250729092638_add_account_lock_fields && prisma migrate deploy && prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
