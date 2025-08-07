@@ -16,12 +16,10 @@ async function main() {
     create: {
       username: "admin",
       email: "admin@example.com",
-      all_posts: 0,
-      all_views: 0,
       authority: 0, // 관리자 권한
       password: hashedPassword,
       user_nickname: "관리자",
-      profile: null,
+      // 나머지 컬럼들은 기본값 사용 (마이그레이션에서 DEFAULT 설정됨)
     },
   });
 
