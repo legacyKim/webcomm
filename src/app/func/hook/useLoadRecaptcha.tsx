@@ -4,7 +4,7 @@ import { useCallback } from "react";
 
 export function useLoadRecaptcha(setRecaptchaToken: (token: string) => void) {
   const loadRecaptcha = useCallback(() => {
-    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    const siteKey = process.env.RECAPTCHA_SITE_KEY;
     if (!siteKey) {
       console.error("reCAPTCHA site key 누락");
       return;
@@ -16,9 +16,11 @@ export function useLoadRecaptcha(setRecaptchaToken: (token: string) => void) {
     script.onload = () => {
       if (window.grecaptcha) {
         window.grecaptcha.ready(() => {
-          window.grecaptcha.execute(siteKey, { action: "signup" }).then((token) => {
-            setRecaptchaToken(token);
-          });
+          window.grecaptcha
+            .execute(siteKey, { action: "signup" })
+            .then((token) => {
+              setRecaptchaToken(token);
+            });
         });
       }
     };
