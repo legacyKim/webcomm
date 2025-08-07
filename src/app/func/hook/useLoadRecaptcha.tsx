@@ -4,7 +4,8 @@ import { useCallback } from "react";
 
 export function useLoadRecaptcha(setRecaptchaToken: (token: string) => void) {
   const loadRecaptcha = useCallback(() => {
-    const siteKey = process.env.RECAPTCHA_SITE_KEY;
+    const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    console.log("reCAPTCHA Site Key:", siteKey ? "로드됨" : "누락됨");
     if (!siteKey) {
       console.error("reCAPTCHA site key 누락");
       return;
