@@ -22,9 +22,7 @@ export async function POST(request) {
     const { endpoint, keys } = subscription;
     const { p256dh, auth } = keys;
 
-    // 해당 사용자의 기존 구독 중에서 현재 endpoint가 아닌 것들을 삭제
-    // (동일한 사용자가 여러 기기/브라우저에서 구독하는 경우를 방지)
-    const deletedSubscriptions = await prisma.pushSubscription.deleteMany({
+    await prisma.pushSubscription.deleteMany({
       where: {
         user_id: user.id,
         endpoint: {

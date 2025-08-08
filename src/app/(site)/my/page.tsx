@@ -127,14 +127,16 @@ export default function Mypage() {
     } catch (error: unknown) {
       console.error("이메일 인증 요청 중 오류:", error);
       if (error instanceof Error && "response" in error) {
-        const axiosError = error as any;
+        const axiosError = error as {
+          response?: { data?: { error?: string }; status?: number };
+        };
         console.error("응답 데이터:", axiosError.response?.data);
         console.error("응답 상태:", axiosError.response?.status);
         alert(
           `서버 오류가 발생했습니다: ${axiosError.response?.data?.error || axiosError.response?.status}`
         );
       } else if (error instanceof Error && "request" in error) {
-        const axiosError = error as any;
+        const axiosError = error as { request?: unknown };
         console.error("요청이 전송되지 않음:", axiosError.request);
         alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
       } else if (error instanceof Error) {

@@ -25,7 +25,7 @@ export async function POST(req) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const result = await resend.emails.send({
+    await resend.emails.send({
       from: "noreply@tokti.net",
       to: userEmail,
       subject: "인증번호 이메일입니다.",
