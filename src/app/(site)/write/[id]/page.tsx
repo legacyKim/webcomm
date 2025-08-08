@@ -202,7 +202,7 @@ export default function Write() {
           className="board_category"
           value={boardInfo.url_slug}
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            const selectedBoard = boardData.boards.rows.find(
+            const selectedBoard = boardData?.boards?.rows.find(
               (b: { board_name: string; url_slug: string }) =>
                 b.url_slug === e.target.value
             );
