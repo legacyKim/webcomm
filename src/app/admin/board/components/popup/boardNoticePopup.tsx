@@ -26,8 +26,14 @@ export default function BoardNoticePopup({
   editingNotice: Notice | null;
   setEditingNotice: (notice: Notice | null) => void;
 }) {
-  const { data: boardData } = useQuery({ queryKey: ["boardData"], queryFn: fetchBoard });
-  const [boardInfo, setBoardInfo] = useState<{ board_name: string; url_slug: string }>({
+  const { data: boardData } = useQuery({
+    queryKey: ["boardData"],
+    queryFn: fetchBoard,
+  });
+  const [boardInfo, setBoardInfo] = useState<{
+    board_name: string;
+    url_slug: string;
+  }>({
     board_name: "",
     url_slug: "",
   });
@@ -111,22 +117,23 @@ export default function BoardNoticePopup({
   };
 
   return (
-    <div className='admin_popup_bg'>
-      <div className='admin_popup'>
-        <div className='admin_popup_header'>
+    <div className="admin_popup_bg">
+      <div className="admin_popup">
+        <div className="admin_popup_header">
           <h6>공지사항 작성</h6>
           <button onClick={() => setPopupOpen(false)}>
-            <i className='icon-cancel'></i>
+            <i className="icon-cancel"></i>
           </button>
         </div>
 
-        <div className='admin_popup_content'>
+        <div className="admin_popup_content">
           <select
-            className='board_category'
+            className="board_category"
             value={boardInfo.url_slug}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              const selectedBoard = boardData.boards.find(
-                (b: { board_name: string; url_slug: string }) => b.url_slug === e.target.value,
+              const selectedBoard = boardData?.boards?.find(
+                (b: { board_name: string; url_slug: string }) =>
+                  b.url_slug === e.target.value
               );
               if (selectedBoard) {
                 setBoardInfo({
@@ -136,31 +143,39 @@ export default function BoardNoticePopup({
               } else {
                 setBoardInfo({ board_name: "", url_slug: "" });
               }
-            }}>
+            }}
+          >
             <option>선택</option>
             {boardData &&
-              boardData?.boards?.map((b: { board_name: string; url_slug: string }) => (
-                <option key={b.board_name} value={b.url_slug}>
-                  {b.board_name}
-                </option>
-              ))}
+              boardData?.boards?.map(
+                (b: { board_name: string; url_slug: string }) => (
+                  <option key={b.board_name} value={b.url_slug}>
+                    {b.board_name}
+                  </option>
+                )
+              )}
           </select>
           <input
-            className='notice_title_input'
-            placeholder='제목을 입력하세요'
+            className="notice_title_input"
+            placeholder="제목을 입력하세요"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <EditorContent editor={editor} className='notice_editor' />
+          <EditorContent editor={editor} className="notice_editor" />
         </div>
 
-        <div className='admin_popup_footer'>
-          {editingNotice ? <button onClick={noticeCorrect}>수정</button> : <button onClick={noticeSubmit}>저장</button>}
+        <div className="admin_popup_footer">
+          {editingNotice ? (
+            <button onClick={noticeCorrect}>수정</button>
+          ) : (
+            <button onClick={noticeSubmit}>저장</button>
+          )}
           <button
             onClick={() => {
               setPopupOpen(false);
               setEditingNotice(null);
-            }}>
+            }}
+          >
             취소
           </button>
         </div>
