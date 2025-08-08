@@ -113,34 +113,36 @@ export default function Mypage() {
     }
 
     try {
-      console.log("이메일 인증 요청:", { userEmail });
       const response = await axios.post("/api/user/email", { userEmail });
-      console.log("이메일 API 응답:", response.data);
 
       if (response.data.success) {
         setCertifyNumCheck(response.data.verifyCode);
         alert("인증번호가 이메일로 전송되었습니다.");
-        console.log("인증번호 설정 완료:", response.data.verifyCode);
       } else {
         console.error("이메일 전송 실패:", response.data);
         alert(
           "이메일 전송 실패: " + (response.data.error || "알 수 없는 오류")
         );
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("이메일 인증 요청 중 오류:", error);
-      if (error.response) {
-        console.error("응답 데이터:", error.response.data);
-        console.error("응답 상태:", error.response.status);
+      if (error instanceof Error && "response" in error) {
+        const axiosError = error as any;
+        console.error("응답 데이터:", axiosError.response?.data);
+        console.error("응답 상태:", axiosError.response?.status);
         alert(
-          `서버 오류가 발생했습니다: ${error.response.data?.error || error.response.status}`
+          `서버 오류가 발생했습니다: ${axiosError.response?.data?.error || axiosError.response?.status}`
         );
-      } else if (error.request) {
-        console.error("요청이 전송되지 않음:", error.request);
+      } else if (error instanceof Error && "request" in error) {
+        const axiosError = error as any;
+        console.error("요청이 전송되지 않음:", axiosError.request);
         alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
-      } else {
+      } else if (error instanceof Error) {
         console.error("오류 설정:", error.message);
         alert("서버 오류가 발생했습니다: " + error.message);
+      } else {
+        console.error("알 수 없는 오류:", error);
+        alert("알 수 없는 오류가 발생했습니다.");
       }
     }
   };

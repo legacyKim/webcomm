@@ -366,14 +366,8 @@ export default function User() {
         return;
       }
     } else {
-      console.log("로컬 환경: reCAPTCHA 검증 건너뛰기");
       currentRecaptchaToken = "local-development-bypass";
     }
-
-    console.log(
-      "reCAPTCHA 토큰 전송:",
-      currentRecaptchaToken ? "있음" : "없음"
-    );
 
     const formData = new FormData();
 

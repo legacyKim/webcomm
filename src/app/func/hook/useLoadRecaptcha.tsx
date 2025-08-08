@@ -8,13 +8,11 @@ export function useLoadRecaptcha(setRecaptchaToken: (token: string) => void) {
 
     // 로컬 환경에서는 reCAPTCHA 건너뛰기
     if (isLocalEnvironment) {
-      console.log("로컬 환경: reCAPTCHA 로딩 건너뛰기");
       setRecaptchaToken("local-development-bypass");
       return;
     }
 
     const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-    console.log("reCAPTCHA Site Key:", siteKey ? "로드됨" : "누락됨");
 
     if (!siteKey) {
       console.error("reCAPTCHA site key 누락");

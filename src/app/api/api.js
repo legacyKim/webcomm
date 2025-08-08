@@ -46,8 +46,6 @@ export const fetchBoard = async () => {
     });
     const data = await res.json();
 
-    console.log("fetchBoard response:", data); // 디버깅용 로그
-
     // API 응답 구조 확인 및 전체 객체 반환
     if (data && data.boards && Array.isArray(data.boards)) {
       return { boards: data.boards };

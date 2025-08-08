@@ -42,12 +42,6 @@ export async function POST(req) {
         );
       }
 
-      console.log("reCAPTCHA 검증 시작:", {
-        hasToken: !!recaptchaToken,
-        hasSecretKey: !!process.env.RECAPTCHA_SECRET_KEY,
-        tokenLength: recaptchaToken.length,
-      });
-
       const verifyRes = await axios.post(
         "https://www.google.com/recaptcha/api/siteverify",
         null,
@@ -65,14 +59,6 @@ export async function POST(req) {
         action,
         "error-codes": errorCodes,
       } = verifyRes.data;
-
-      console.log("reCAPTCHA 검증 결과:", {
-        success,
-        score,
-        action,
-        errorCodes,
-        expectedAction: "signup",
-      });
 
       if (!success || score < 0.3 || action !== "signup") {
         console.error("reCAPTCHA 검증 실패:", {

@@ -267,8 +267,7 @@ export async function PUT(req, context) {
         }),
       });
     } catch (sseError) {
-      console.log("SSE 알림 전송 실패:", sseError);
-      // SSE 실패는 무시하고 계속 진행
+      console.error(sseError);
     }
 
     return NextResponse.json(
@@ -318,7 +317,7 @@ export async function DELETE(req, context) {
         }),
       });
     } catch (sseError) {
-      console.log("SSE 알림 전송 실패:", sseError);
+      console.error("SSE 알림 전송 실패:", sseError);
       // SSE 실패는 무시하고 계속 진행
     }
 

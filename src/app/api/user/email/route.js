@@ -6,14 +6,11 @@ export async function POST(req) {
   try {
     const { userEmail } = await req.json();
     const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    console.log("이메일 인증 요청 수신:", { userEmail, verifyCode });
 
     // 로컬 환경에서는 이메일 발송 건너뛰기
     const isLocalEnvironment = process.env.NODE_ENV === "development";
 
     if (isLocalEnvironment) {
-      console.log("로컬 환경: 이메일 발송 건너뛰기, 인증번호:", verifyCode);
       return NextResponse.json({ success: true, verifyCode }, { status: 200 });
     }
 
@@ -25,11 +22,6 @@ export async function POST(req) {
         { status: 500 }
       );
     }
-
-    console.log("Resend API로 이메일 발송 시도:", { 
-      to: userEmail, 
-      hasApiKey: !!process.env.RESEND_API_KEY 
-    });
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -52,7 +44,6 @@ export async function POST(req) {
       </div>`,
     });
 
-    console.log("이메일 발송 성공:", result);
     return NextResponse.json({ success: true, verifyCode }, { status: 200 });
   } catch (error) {
     console.error("이메일 발송 실패:", error);

@@ -59,25 +59,13 @@ export async function POST(request) {
 
     // 다른 subscription이 없으면 notification_enabled를 false로 업데이트
     if (remainingSubscriptions.length === 0) {
-      // 업데이트 전 상태 확인
-      const userBefore = await prisma.member.findUnique({
-        where: { id: user.id },
-        select: { id: true, notification_enabled: true },
-      });
-
-      const updateResult = await prisma.member.update({
+      await prisma.member.update({
         where: {
           id: user.id,
         },
         data: {
           notification_enabled: false,
         },
-      });
-
-      // 업데이트 후 상태 확인
-      const userAfter = await prisma.member.findUnique({
-        where: { id: user.id },
-        select: { id: true, notification_enabled: true },
       });
     }
 
