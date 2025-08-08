@@ -17,7 +17,12 @@ export default function BoardManage() {
   });
 
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
-  const [popupCorr, setPopupCorr] = useState<{ id: number; seq: number; board_name: string; url_slug: string }>({
+  const [popupCorr, setPopupCorr] = useState<{
+    id: number;
+    seq: number;
+    board_name: string;
+    url_slug: string;
+  }>({
     id: 0,
     seq: 0,
     board_name: "",
@@ -27,7 +32,12 @@ export default function BoardManage() {
 
   // 게시판 삭제
   const handleDeleteBoard = async (boardId: number, boardName: string) => {
-    if (!confirm(`'${boardName}' 게시판을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`)) return;
+    if (
+      !confirm(
+        `'${boardName}' 게시판을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.`
+      )
+    )
+      return;
 
     try {
       const response = await fetch("/api/admin/boards/delete", {
@@ -44,7 +54,9 @@ export default function BoardManage() {
         throw new Error(error.message || "삭제 실패");
       }
     } catch (error) {
-      alert(`게시판 삭제 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+      alert(
+        `게시판 삭제 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+      );
     }
   };
 
@@ -89,20 +101,20 @@ export default function BoardManage() {
   };
 
   return (
-    <div className='admin_content_wrap'>
-      <div className='admin_title'>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
         <h4>게시판 관리</h4>
-        <div className='admin_btn'>
+        <div className="admin_btn">
           <button onClick={openAddPopup}>게시판 추가</button>
         </div>
       </div>
 
-      <div className='admin_content'>
+      <div className="admin_content">
         {isLoading ? (
-          <div className='loading'>로딩 중...</div>
+          <div className="loading">로딩 중...</div>
         ) : (
-          <ol className='table'>
-            <li className='table_header'>
+          <ol className="table">
+            <li className="table_header">
               <span>순서</span>
               <span>게시판</span>
               <span>URL</span>
@@ -112,34 +124,39 @@ export default function BoardManage() {
             </li>
             {boardData?.boards?.map((b: Board, index: number) => (
               <li key={b.id}>
-                <span className='board-seq'>
+                <span className="board-seq">
                   {b.seq}
-                  <div className='seq-controls'>
+                  <div className="seq-controls">
                     <button
                       onClick={() => handleMoveBoard(b.id, "up")}
                       disabled={index === 0}
-                      className='seq-btn'
-                      title='위로 이동'>
+                      className="seq-btn"
+                      title="위로 이동"
+                    >
                       ↑
                     </button>
                     <button
                       onClick={() => handleMoveBoard(b.id, "down")}
                       disabled={index === boardData.boards.length - 1}
-                      className='seq-btn'
-                      title='아래로 이동'>
+                      className="seq-btn"
+                      title="아래로 이동"
+                    >
                       ↓
                     </button>
                   </div>
                 </span>
-                <span className='board-name'>{b.board_name}</span>
-                <span className='board-url'>/{b.url_slug}</span>
+                <span className="board-name">{b.board_name}</span>
+                <span className="board-url">/{b.url_slug}</span>
                 <span>{b.post_count || 0}</span>
                 <span>{b.total_views || 0}</span>
-                <span className='board-actions'>
-                  <button onClick={() => openEditPopup(b)} className='edit-btn'>
+                <span className="board-actions">
+                  <button onClick={() => openEditPopup(b)} className="edit-btn">
                     수정
                   </button>
-                  <button onClick={() => handleDeleteBoard(b.id, b.board_name)} className='delete-btn'>
+                  <button
+                    onClick={() => handleDeleteBoard(b.id, b.board_name)}
+                    className="delete-btn"
+                  >
                     삭제
                   </button>
                 </span>
@@ -149,7 +166,7 @@ export default function BoardManage() {
         )}
       </div>
 
-      {popupOpen && (
+      {popupOpen && boardData && (
         <BoardManagePopup
           setPopupOpen={setPopupOpen}
           boardData={boardData}
