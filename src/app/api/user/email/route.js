@@ -3,13 +3,37 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 export async function POST(req) {
-  const { userEmail } = await req.json();
-  const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-
   try {
+    const { userEmail } = await req.json();
+    const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    console.log("이메일 인증 요청 수신:", { userEmail, verifyCode });
+
+    // 로컬 환경에서는 이메일 발송 건너뛰기
+    const isLocalEnvironment = process.env.NODE_ENV === "development";
+
+    if (isLocalEnvironment) {
+      console.log("로컬 환경: 이메일 발송 건너뛰기, 인증번호:", verifyCode);
+      return NextResponse.json({ success: true, verifyCode }, { status: 200 });
+    }
+
+    // 운영 환경에서는 RESEND_API_KEY 체크
+    if (!process.env.RESEND_API_KEY) {
+      console.error("RESEND_API_KEY 환경변수가 설정되지 않았습니다.");
+      return NextResponse.json(
+        { success: false, error: "이메일 서비스 설정 오류" },
+        { status: 500 }
+      );
+    }
+
+    console.log("Resend API로 이메일 발송 시도:", { 
+      to: userEmail, 
+      hasApiKey: !!process.env.RESEND_API_KEY 
+    });
+
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "noreply@tokti.net",
       to: userEmail,
       subject: "인증번호 이메일입니다.",
@@ -28,9 +52,13 @@ export async function POST(req) {
       </div>`,
     });
 
+    console.log("이메일 발송 성공:", result);
     return NextResponse.json({ success: true, verifyCode }, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    console.error("이메일 발송 실패:", error);
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   }
 }

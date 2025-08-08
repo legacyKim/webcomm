@@ -318,8 +318,13 @@ export default function CommentTree({
                 </div>
 
                 <div className="comment_content">
-                  <TiptapViewer content={comment.content} />
-                  <i className="comment_content_likes">{comment.likes}</i>
+                  {/* 수정 중이 아닐 때만 댓글 내용 표시 */}
+                  {!isEditingComment && (
+                    <>
+                      <TiptapViewer content={comment.content} />
+                      <i className="comment_content_likes">{comment.likes}</i>
+                    </>
+                  )}
                 </div>
 
                 {(isWritingComment ||

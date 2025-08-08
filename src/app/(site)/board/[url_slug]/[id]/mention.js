@@ -1,8 +1,58 @@
-import { Extension } from "@tiptap/core";
+import { Node } from "@tiptap/core";
 import Suggestion from "@tiptap/suggestion";
 
-const Mention = Extension.create({
+const Mention = Node.create({
   name: "mention",
+
+  group: "inline",
+  inline: true,
+  selectable: false,
+  atom: true,
+
+  addAttributes() {
+    return {
+      id: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-id"),
+        renderHTML: (attributes) => {
+          if (!attributes.id) {
+            return {};
+          }
+          return {
+            "data-id": attributes.id,
+          };
+        },
+      },
+      label: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-label"),
+        renderHTML: (attributes) => {
+          if (!attributes.label) {
+            return {};
+          }
+          return {
+            "data-label": attributes.label,
+          };
+        },
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: "span[data-mention]",
+      },
+    ];
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    return [
+      "span",
+      { "data-mention": "", ...HTMLAttributes, class: "mention" },
+      `@${node.attrs.label}`,
+    ];
+  },
 
   addOptions() {
     return {
@@ -15,7 +65,7 @@ const Mention = Extension.create({
             .focus()
             .insertContentAt(range, [
               {
-                type: "mention",
+                type: this.name,
                 attrs: props,
               },
               {
@@ -26,12 +76,14 @@ const Mention = Extension.create({
             .run();
         },
         allow: () => {
-          // 필요시 @ 가능 여부 커스텀
           return true;
         },
         items: ({ query }) => {
-          // 쿼리값으로 사용자 리스트 필터링
-          return users.filter((user) => user.name.toLowerCase().startsWith(query.toLowerCase())).slice(0, 5);
+          return users
+            .filter((user) =>
+              user.name.toLowerCase().startsWith(query.toLowerCase())
+            )
+            .slice(0, 5);
         },
       },
     };
@@ -44,30 +96,6 @@ const Mention = Extension.create({
         ...this.options.suggestion,
       }),
     ];
-  },
-
-  addNode() {
-    return {
-      name: "mention",
-      inline: true,
-      group: "inline",
-      selectable: false,
-      atom: true,
-      attrs: {
-        id: {},
-        label: {},
-      },
-      parseHTML() {
-        return [
-          {
-            tag: "span[data-mention]",
-          },
-        ];
-      },
-      renderHTML({ node, HTMLAttributes }) {
-        return ["span", { "data-mention": "", ...HTMLAttributes, class: "mention" }, `@${node.attrs.label}`];
-      },
-    };
   },
 });
 

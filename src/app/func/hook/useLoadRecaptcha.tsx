@@ -4,8 +4,18 @@ import { useCallback } from "react";
 
 export function useLoadRecaptcha(setRecaptchaToken: (token: string) => void) {
   const loadRecaptcha = useCallback(() => {
+    const isLocalEnvironment = process.env.NODE_ENV === "development";
+
+    // 로컬 환경에서는 reCAPTCHA 건너뛰기
+    if (isLocalEnvironment) {
+      console.log("로컬 환경: reCAPTCHA 로딩 건너뛰기");
+      setRecaptchaToken("local-development-bypass");
+      return;
+    }
+
     const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
     console.log("reCAPTCHA Site Key:", siteKey ? "로드됨" : "누락됨");
+
     if (!siteKey) {
       console.error("reCAPTCHA site key 누락");
       return;
@@ -21,9 +31,15 @@ export function useLoadRecaptcha(setRecaptchaToken: (token: string) => void) {
             .execute(siteKey, { action: "signup" })
             .then((token) => {
               setRecaptchaToken(token);
+            })
+            .catch((error) => {
+              console.error("reCAPTCHA 토큰 생성 실패:", error);
             });
         });
       }
+    };
+    script.onerror = () => {
+      console.error("reCAPTCHA 스크립트 로딩 실패");
     };
     document.head.appendChild(script);
   }, [setRecaptchaToken]);

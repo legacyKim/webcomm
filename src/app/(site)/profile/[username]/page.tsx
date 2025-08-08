@@ -19,9 +19,11 @@ async function getUserData(
 ): Promise<ProfileResponse | null> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const url = `${baseUrl}/api/user/profile?username=${encodeURIComponent(username)}&current_user=${currentUserId || ""}&tab=${tab}`;
 
-    const response = await fetch(url, {
+    // 먼저 username으로 시도
+    let url = `${baseUrl}/api/user/profile?username=${encodeURIComponent(username)}&current_user=${currentUserId || ""}&tab=${tab}`;
+
+    let response = await fetch(url, {
       next: {
         // ISR: 24시간마다 재생성, 프로필은 자주 변경되지 않으므로
         revalidate: 86400, // 24시간 = 24 * 60 * 60
@@ -34,6 +36,23 @@ async function getUserData(
       // 서버 컴포넌트에서 캐시 최적화
       cache: "force-cache",
     });
+
+    // username으로 찾지 못하면 nickname으로 시도
+    if (!response.ok && response.status === 404) {
+      url = `${baseUrl}/api/user/profile?nickname=${encodeURIComponent(username)}&current_user=${currentUserId || ""}&tab=${tab}`;
+
+      response = await fetch(url, {
+        next: {
+          revalidate: 86400,
+          tags: [
+            `profile-${username}`,
+            `user-activity-${username}-${tab}`,
+            "profiles",
+          ],
+        },
+        cache: "force-cache",
+      });
+    }
 
     if (!response.ok) {
       console.warn(

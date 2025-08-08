@@ -38,7 +38,7 @@ export default function DropDownMenu({
 
       try {
         const response = await axios.get(
-          `/api/user/profile?username=${userInfoInDropMenu.userNickname}&current_user=${isUserId}`
+          `/api/user/profile?nickname=${encodeURIComponent(userInfoInDropMenu.userNickname)}&current_user=${isUserId}`
         );
 
         if (response.data.profile) {

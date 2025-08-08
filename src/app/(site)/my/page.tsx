@@ -83,12 +83,9 @@ export default function Mypage() {
   const [certifyNumCheck, setCertifyNumCheck] = useState<string>("");
   const [, setCertifyAgree] = useState<boolean>(false);
 
-  // 마케팅 수신 동의 상태
-  const [marketingConsent, setMarketingConsent] = useState<boolean>(false);
-  const [notificationConsent, setNotificationConsent] =
-    useState<boolean>(false);
-
   const emailCheck = async () => {
+    const isLocalEnvironment = process.env.NODE_ENV === "development";
+
     if (!userEmail) {
       alert("이메일을 입력하세요.");
       inputEmailRef.current?.focus();
@@ -106,20 +103,47 @@ export default function Mypage() {
       return;
     }
 
+    // 로컬 환경에서는 자동으로 인증번호 설정
+    if (isLocalEnvironment) {
+      const localVerifyCode = "123456";
+      setCertifyNumCheck(localVerifyCode);
+      setCertifyNum(localVerifyCode);
+      alert("로컬 환경: 자동으로 인증번호가 설정되었습니다. (123456)");
+      return;
+    }
+
     try {
+      console.log("이메일 인증 요청:", { userEmail });
       const response = await axios.post("/api/user/email", { userEmail });
+      console.log("이메일 API 응답:", response.data);
+
       if (response.data.success) {
         setCertifyNumCheck(response.data.verifyCode);
         alert("인증번호가 이메일로 전송되었습니다.");
+        console.log("인증번호 설정 완료:", response.data.verifyCode);
       } else {
-        alert("이메일 전송 실패.");
+        console.error("이메일 전송 실패:", response.data);
+        alert(
+          "이메일 전송 실패: " + (response.data.error || "알 수 없는 오류")
+        );
       }
-    } catch (error) {
-      console.error(error);
-      alert("서버 오류가 발생했습니다.");
+    } catch (error: any) {
+      console.error("이메일 인증 요청 중 오류:", error);
+      if (error.response) {
+        console.error("응답 데이터:", error.response.data);
+        console.error("응답 상태:", error.response.status);
+        alert(
+          `서버 오류가 발생했습니다: ${error.response.data?.error || error.response.status}`
+        );
+      } else if (error.request) {
+        console.error("요청이 전송되지 않음:", error.request);
+        alert("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
+      } else {
+        console.error("오류 설정:", error.message);
+        alert("서버 오류가 발생했습니다: " + error.message);
+      }
     }
   };
-
   useEffect(() => {
     if (
       inputCertifyNumRef.current &&
@@ -130,7 +154,7 @@ export default function Mypage() {
     } else {
       setCertifyAgree(false);
     }
-  }, [inputCertifyNumRef.current?.value, certifyNum]);
+  }, [certifyNum, certifyNumCheck]);
 
   // 회원가입 요청
   const inputPwRef = useRef<HTMLInputElement>(null);
@@ -147,11 +171,6 @@ export default function Mypage() {
         const response = await axios.get(`/api/my/bio`);
         if (response.data.success && response.data.user) {
           setNewBio(response.data.user.bio || "");
-          // 마케팅 수신 동의 상태도 함께 가져오기
-          setMarketingConsent(response.data.user.marketing_enabled || false);
-          setNotificationConsent(
-            response.data.user.notification_enabled || false
-          );
         }
       } catch (error) {
         console.error("Bio 가져오기 실패:", error);
@@ -167,6 +186,7 @@ export default function Mypage() {
     e.preventDefault();
 
     const nickRegex = /^[a-zA-Z0-9가-힣]{2,12}$/;
+    const isLocalEnvironment = process.env.NODE_ENV === "development";
 
     if (!newNick) {
       alert("닉네임을 입력해 주세요!");
@@ -190,7 +210,8 @@ export default function Mypage() {
       return;
     }
 
-    if (isUserEmail !== userEmail && !certifyNumCheck) {
+    // 로컬 환경이 아닐 때만 이메일 인증 체크
+    if (!isLocalEnvironment && isUserEmail !== userEmail && !certifyNumCheck) {
       alert("이메일을 인증해 주세요.");
       inputCertifyNumRef.current?.focus();
       return;
@@ -203,9 +224,11 @@ export default function Mypage() {
     formData.append("userBio", newBio);
     formData.append("userPassword", newPassword);
     formData.append("userEmail", userEmail);
-    formData.append("recaptchaToken", recaptchaToken || "");
-    formData.append("marketingConsent", marketingConsent.toString());
-    formData.append("notificationConsent", notificationConsent.toString());
+    // 로컬 환경에서는 reCAPTCHA 토큰 건너뛰기
+    formData.append(
+      "recaptchaToken",
+      isLocalEnvironment ? "local-development-bypass" : recaptchaToken || ""
+    );
 
     if (file) {
       formData.append("profileImage", file);
@@ -481,63 +504,6 @@ export default function Mypage() {
                   비밀번호 분실 또는 수정 등 사이트 활동에 필요한 사항이 메일로
                   발송되니 정확히 입력해주세요.
                 </p>
-              </div>
-            </div>
-
-            {/* 마케팅 수신 동의 설정 */}
-            <div className="mypage_info ">
-              <span>알림 설정</span>
-              <div className="input_box">
-                <div className="toggle_section">
-                  <div className="toggle_item">
-                    <div>
-                      <span className="toggle_label">마케팅 정보 수신</span>
-                      <p className="notice">
-                        마케팅 정보: 새로운 기능, 이벤트, 프로모션 소식을
-                        이메일로 받아보실 수 있습니다.
-                      </p>
-                    </div>
-                    <div className="toggle_container">
-                      <input
-                        type="checkbox"
-                        id="marketingToggle"
-                        checked={marketingConsent}
-                        onChange={(e) => setMarketingConsent(e.target.checked)}
-                        className="toggle_input"
-                      />
-                      <label
-                        htmlFor="marketingToggle"
-                        className="toggle_switch"
-                      ></label>
-                    </div>
-                  </div>
-
-                  <div className="toggle_item">
-                    <div>
-                      <span className="toggle_label">알림 수신</span>
-
-                      <p className="notice">
-                        알림 수신: 댓글, 좋아요, 멘션 등의 알림을 받아보실 수
-                        있습니다.
-                      </p>
-                    </div>
-                    <div className="toggle_container">
-                      <input
-                        type="checkbox"
-                        id="notificationToggle"
-                        checked={notificationConsent}
-                        onChange={(e) =>
-                          setNotificationConsent(e.target.checked)
-                        }
-                        className="toggle_input"
-                      />
-                      <label
-                        htmlFor="notificationToggle"
-                        className="toggle_switch"
-                      ></label>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 

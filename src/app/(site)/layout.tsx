@@ -34,7 +34,8 @@ export default async function RootLayout({
   const token = (await cookieStore).get("authToken")?.value ?? "";
 
   // 게시판 데이터 가져오기
-  const boardList = await fetchBoard();
+  const boardData = await fetchBoard();
+  const boardList = boardData?.boards || [];
 
   let username = "";
   let userId = null;

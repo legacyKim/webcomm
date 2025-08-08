@@ -61,13 +61,14 @@ export function MenuProvider({
     if (!isUserId && boards.length === 0) {
       const loadPopularityBasedBoards = async () => {
         try {
-          const response = await fetch("/api/boards/settings");
+          const response = await fetch("/api/board");
           if (response.ok) {
             const data = await response.json();
+            // API는 { boards: [...] } 구조로 반환
             setBoards(data.boards || []);
           }
         } catch (error) {
-          console.error("인기도 기반 게시판 로드 실패:", error);
+          console.error("게시판 로드 실패:", error);
         }
       };
       loadPopularityBasedBoards();

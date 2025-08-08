@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 import MyHeader from "../myHeader";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +13,59 @@ export default function MyNotice() {
 
   const [permission, setPermission] = useState("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
+
+  // 마케팅 수신 동의 상태
+  const [marketingConsent, setMarketingConsent] = useState<boolean>(false);
+
+  // 사용자의 마케팅 수신 동의 상태 가져오기
+  useEffect(() => {
+    const fetchUserSettings = async () => {
+      if (!isUserId) return;
+
+      try {
+        const response = await axios.get(`/api/my/bio`);
+        if (response.data.success && response.data.user) {
+          setMarketingConsent(response.data.user.marketing_enabled || false);
+        }
+      } catch (error) {
+        console.error("사용자 설정 가져오기 실패:", error);
+      }
+    };
+
+    fetchUserSettings();
+  }, [isUserId]);
+
+  // 마케팅 수신 동의 설정 업데이트
+  const updateMarketingConsent = async (consent: boolean) => {
+    if (!isUserId) return;
+
+    try {
+      const formData = new FormData();
+      formData.append("userid", String(isUserId));
+      formData.append("marketingConsent", consent.toString());
+      // 다른 필드들은 변경하지 않도록 현재 값 전송
+      formData.append("userNickname", ""); // 빈 값으로 전송하여 변경하지 않음
+      formData.append("userBio", "");
+      formData.append("userPassword", "");
+      formData.append("userEmail", "");
+
+      const response = await axios.put("/api/user", formData);
+
+      if (response.data.success) {
+        setMarketingConsent(consent);
+        alert(
+          consent
+            ? "마케팅 정보 수신이 활성화되었습니다."
+            : "마케팅 정보 수신이 비활성화되었습니다."
+        );
+      } else {
+        alert("설정 변경에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("마케팅 설정 업데이트 실패:", error);
+      alert("서버 오류가 발생했습니다.");
+    }
+  };
 
   // 테스트 알림 생성 함수
   // const createTestNotification = async () => {
@@ -70,11 +124,32 @@ export default function MyNotice() {
                   isSubscribed={isSubscribed}
                   setIsSubscribed={setIsSubscribed}
                 />
+
+                {/* 마케팅 정보 수신 설정 */}
+                <div className="notification-manager">
+                  <div className="notification-controls">
+                    <p className="notice">
+                      마케팅 정보: 새로운 기능, 이벤트, 프로모션 소식을 이메일로
+                      받아보실 수 있습니다.
+                    </p>
+                    <div className="toggle-container">
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={marketingConsent}
+                          onChange={(e) =>
+                            updateMarketingConsent(e.target.checked)
+                          }
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* 알림 목록은 항상 표시하도록 변경 */}
               <div className="notification-list-section">
-                <h2>알림 목록</h2>
                 <NotificationList isUserId={isUserId} limit={50} />
               </div>
             </div>

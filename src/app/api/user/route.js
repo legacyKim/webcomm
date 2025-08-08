@@ -23,61 +23,75 @@ export async function POST(req) {
     const marketingConsent = formData.get("marketingConsent") === "true";
     const notificationConsent = formData.get("notificationConsent") === "true";
 
-    // recaptcha check
-    if (!recaptchaToken || typeof recaptchaToken !== "string") {
-      return NextResponse.json(
-        { success: false, message: "reCAPTCHA 토큰 누락" },
-        { status: 400 }
-      );
-    }
+    // recaptcha check - 로컬 환경에서는 건너뛰기
+    const isLocalEnvironment = process.env.NODE_ENV === "development";
 
-    console.log("reCAPTCHA 검증 시작:", {
-      hasToken: !!recaptchaToken,
-      hasSecretKey: !!process.env.RECAPTCHA_SECRET_KEY,
-      tokenLength: recaptchaToken.length,
-    });
-
-    const verifyRes = await axios.post(
-      "https://www.google.com/recaptcha/api/siteverify",
-      null,
-      {
-        params: {
-          secret: process.env.RECAPTCHA_SECRET_KEY,
-          response: recaptchaToken,
-        },
+    if (!isLocalEnvironment) {
+      if (!recaptchaToken || typeof recaptchaToken !== "string") {
+        return NextResponse.json(
+          { success: false, message: "reCAPTCHA 토큰 누락" },
+          { status: 400 }
+        );
       }
-    );
 
-    const {
-      success,
-      score,
-      action,
-      "error-codes": errorCodes,
-    } = verifyRes.data;
+      if (!process.env.RECAPTCHA_SECRET_KEY) {
+        console.error("RECAPTCHA_SECRET_KEY 환경변수가 설정되지 않았습니다.");
+        return NextResponse.json(
+          { success: false, message: "reCAPTCHA 설정 오류" },
+          { status: 500 }
+        );
+      }
 
-    console.log("reCAPTCHA 검증 결과:", {
-      success,
-      score,
-      action,
-      errorCodes,
-      expectedAction: "signup",
-    });
+      console.log("reCAPTCHA 검증 시작:", {
+        hasToken: !!recaptchaToken,
+        hasSecretKey: !!process.env.RECAPTCHA_SECRET_KEY,
+        tokenLength: recaptchaToken.length,
+      });
 
-    if (!success || score < 0.3 || action !== "signup") {
-      console.error("reCAPTCHA 검증 실패:", {
+      const verifyRes = await axios.post(
+        "https://www.google.com/recaptcha/api/siteverify",
+        null,
+        {
+          params: {
+            secret: process.env.RECAPTCHA_SECRET_KEY,
+            response: recaptchaToken,
+          },
+        }
+      );
+
+      const {
+        success,
+        score,
+        action,
+        "error-codes": errorCodes,
+      } = verifyRes.data;
+
+      console.log("reCAPTCHA 검증 결과:", {
         success,
         score,
         action,
         errorCodes,
-        threshold: 0.3,
+        expectedAction: "signup",
       });
-      return NextResponse.json(
-        {
-          success: false,
-          message: `reCAPTCHA 검증 실패: ${errorCodes ? errorCodes.join(", ") : "점수 또는 액션 불일치"}`,
-        },
-        { status: 403 }
-      );
+
+      if (!success || score < 0.3 || action !== "signup") {
+        console.error("reCAPTCHA 검증 실패:", {
+          success,
+          score,
+          action,
+          errorCodes,
+          threshold: 0.3,
+        });
+        return NextResponse.json(
+          {
+            success: false,
+            message: `reCAPTCHA 검증 실패: ${errorCodes ? errorCodes.join(", ") : "점수 또는 액션 불일치"}`,
+          },
+          { status: 403 }
+        );
+      }
+    } else {
+      console.log("로컬 환경: reCAPTCHA 검증 건너뛰기");
     }
 
     // 프로필 이미지 용량 제한
@@ -113,11 +127,11 @@ export async function POST(req) {
       const uploadCommand = new PutObjectCommand(s3Params);
       await s3.send(uploadCommand);
 
-      imgPath = `https://du1qll7elnsez.cloudfront.net/${filename}`;
+      imgPath = `https://du1qll7elnsez.cloudfront.net/profile/${filename}`;
     }
 
     const insertResult = await client.query(
-      "INSERT INTO members (username, password, email, user_nickname, bio, profile, authority, marketing_enabled, notification_enabled) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+      "INSERT INTO members (username, password, email, user_nickname, bio, profile, authority, marketing_enabled, notification_enabled, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW()) RETURNING *",
       [
         userid,
         hashedPassword,
@@ -191,7 +205,11 @@ export async function PUT(req) {
     let valueIndex = 1;
 
     // 닉네임 변경
-    if (userNickname && userNickname !== user.usernickname) {
+    if (
+      userNickname &&
+      userNickname !== "" &&
+      userNickname !== user.user_nickname
+    ) {
       const dupCheck = await client.query(
         "SELECT 1 FROM members WHERE user_nickname = $1 AND id != $2",
         [userNickname, userid]
@@ -239,7 +257,7 @@ export async function PUT(req) {
     }
 
     // 비밀번호 변경 (입력값이 있을 경우에만 해싱 후 업데이트)
-    if (userPassword) {
+    if (userPassword && userPassword !== "") {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(userPassword, saltRounds);
       updateFields.push(`password = $${valueIndex++}`);
@@ -247,7 +265,7 @@ export async function PUT(req) {
     }
 
     // 이메일 변경
-    if (userEmail && userEmail !== user.email) {
+    if (userEmail && userEmail !== "" && userEmail !== user.email) {
       updateFields.push(`email = $${valueIndex++}`);
       updateValues.push(userEmail);
     }
@@ -267,7 +285,7 @@ export async function PUT(req) {
 
       const s3Params = {
         Bucket: bucketName,
-        Key: filename,
+        Key: `profile/${filename}`,
         Body: buffer,
         ContentType: profileImage.type || "application/octet-stream",
       };
@@ -275,7 +293,7 @@ export async function PUT(req) {
       const uploadCommand = new PutObjectCommand(s3Params);
       await s3.send(uploadCommand);
 
-      imgPath = `https://du1qll7elnsez.cloudfront.net/${filename}`;
+      imgPath = `https://du1qll7elnsez.cloudfront.net/profile/${filename}`;
       updateFields.push(`profile = $${valueIndex++}`);
       updateValues.push(imgPath);
     }
@@ -301,6 +319,10 @@ export async function PUT(req) {
         { status: 400 }
       );
     }
+
+    // updated_at 필드 추가
+    updateFields.push(`updated_at = $${valueIndex++}`);
+    updateValues.push(new Date().toISOString());
 
     // 업데이트 쿼리 실행
     const updateQuery = `

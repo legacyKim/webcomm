@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-
-// Prisma 클라이언트 - 글로벌 객체에서 가져오기
-const prisma = global.prisma;
+import prisma from "@/lib/prisma";
 
 async function getUserProfileFromDB(
   usernameOrNickname,
@@ -250,25 +248,28 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const username = searchParams.get("username");
+    const nickname = searchParams.get("nickname");
     const currentUserParam = searchParams.get("current_user");
     const tab = searchParams.get("tab") || "summary";
 
-    if (!username) {
+    const userIdentifier = username || nickname;
+
+    if (!userIdentifier) {
       return NextResponse.json(
-        { error: "Username is required" },
+        { error: "Username or nickname is required" },
         { status: 400 }
       );
     }
 
     // URL 디코딩 (한글 사용자명 지원)
-    const decodedUsername = decodeURIComponent(username);
+    const decodedUserIdentifier = decodeURIComponent(userIdentifier);
     const currentUserId = currentUserParam
       ? parseInt(currentUserParam)
       : undefined;
 
     // 데이터베이스에서 사용자 프로필 조회 (캐싱 적용)
     const userData = await getUserProfileFromDB(
-      decodedUsername,
+      decodedUserIdentifier,
       currentUserId,
       tab
     );
@@ -289,14 +290,16 @@ export async function GET(request) {
     // Vercel/Next.js ISR 태그
     response.headers.set(
       "x-cache-tags",
-      `profile-${decodedUsername},user-activity-${decodedUsername}-${tab},profiles`
+      `profile-${decodedUserIdentifier},user-activity-${decodedUserIdentifier}-${tab},profiles`
     );
 
     return response;
   } catch (error) {
     console.error("Profile API error:", error);
+    console.error("Error details:", error.message);
+    console.error("Stack trace:", error.stack);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", details: error.message },
       { status: 500 }
     );
   }

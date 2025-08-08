@@ -4,9 +4,12 @@ import { serverTokenCheck } from "@/lib/serverTokenCheck";
 // GET - 사용자 테마 설정 조회
 export async function GET(request) {
   try {
-    const tokenResult = await serverTokenCheck(request);
-    if (!tokenResult.success) {
-      return NextResponse.json({ success: false, message: "로그인이 필요합니다." }, { status: 401 });
+    const user = await serverTokenCheck();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "로그인이 필요합니다." },
+        { status: 401 }
+      );
     }
 
     // 세션에서 다크모드 설정 조회
@@ -23,7 +26,7 @@ export async function GET(request) {
         success: false,
         message: "테마 설정을 조회할 수 없습니다.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -31,9 +34,12 @@ export async function GET(request) {
 // POST - 사용자 테마 설정 저장
 export async function POST(request) {
   try {
-    const tokenResult = await serverTokenCheck(request);
-    if (!tokenResult.success) {
-      return NextResponse.json({ success: false, message: "로그인이 필요합니다." }, { status: 401 });
+    const user = await serverTokenCheck();
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "로그인이 필요합니다." },
+        { status: 401 }
+      );
     }
 
     const { darkMode } = await request.json();
@@ -59,7 +65,7 @@ export async function POST(request) {
         success: false,
         message: "테마 설정을 저장할 수 없습니다.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -4,12 +4,23 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(request) {
   try {
-    const user = await serverTokenCheck(request);
-    if (!user.success) {
+    const user = await serverTokenCheck();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { endpoint } = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (jsonError) {
+      console.error("JSON parsing error:", jsonError);
+      return NextResponse.json(
+        { error: "Invalid JSON format" },
+        { status: 400 }
+      );
+    }
+
+    const { endpoint } = body;
 
     if (!endpoint) {
       return NextResponse.json(
@@ -18,27 +29,63 @@ export async function POST(request) {
       );
     }
 
+    // 먼저 해당 subscription이 존재하는지 확인
+    const existingSubscription = await prisma.pushSubscription.findUnique({
+      where: {
+        endpoint: endpoint,
+      },
+    });
+
+    if (!existingSubscription) {
+      return NextResponse.json(
+        { error: "Subscription not found" },
+        { status: 404 }
+      );
+    }
+
+    // subscription 삭제
     await prisma.pushSubscription.delete({
       where: {
         endpoint: endpoint,
       },
     });
 
-    // members 테이블의 notification_enabled도 false로 업데이트
-    await prisma.member.update({
+    // 해당 사용자의 다른 subscription이 있는지 확인
+    const remainingSubscriptions = await prisma.pushSubscription.findMany({
       where: {
-        id: user.id,
-      },
-      data: {
-        notification_enabled: false,
+        user_id: user.id,
       },
     });
+
+    // 다른 subscription이 없으면 notification_enabled를 false로 업데이트
+    if (remainingSubscriptions.length === 0) {
+      // 업데이트 전 상태 확인
+      const userBefore = await prisma.member.findUnique({
+        where: { id: user.id },
+        select: { id: true, notification_enabled: true },
+      });
+
+      const updateResult = await prisma.member.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          notification_enabled: false,
+        },
+      });
+
+      // 업데이트 후 상태 확인
+      const userAfter = await prisma.member.findUnique({
+        where: { id: user.id },
+        select: { id: true, notification_enabled: true },
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Failed to unsubscribe:", err);
     return NextResponse.json(
-      { error: "Failed to unsubscribe" },
+      { error: "Failed to unsubscribe", details: err.message },
       { status: 500 }
     );
   }

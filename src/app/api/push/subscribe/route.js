@@ -22,6 +22,25 @@ export async function POST(request) {
     const { endpoint, keys } = subscription;
     const { p256dh, auth } = keys;
 
+    console.log("Subscribing user:", user.id, "endpoint:", endpoint);
+
+    // 해당 사용자의 기존 구독 중에서 현재 endpoint가 아닌 것들을 삭제
+    // (동일한 사용자가 여러 기기/브라우저에서 구독하는 경우를 방지)
+    const deletedSubscriptions = await prisma.pushSubscription.deleteMany({
+      where: {
+        user_id: user.id,
+        endpoint: {
+          not: endpoint,
+        },
+      },
+    });
+
+    if (deletedSubscriptions.count > 0) {
+      console.log(
+        `Deleted ${deletedSubscriptions.count} old subscriptions for user ${user.id}`
+      );
+    }
+
     // 기존 구독이 있다면 업데이트, 없다면 생성
     await prisma.pushSubscription.upsert({
       where: {
@@ -30,6 +49,7 @@ export async function POST(request) {
       update: {
         p256dh: p256dh,
         auth: auth,
+        user_id: user.id, // user_id도 업데이트하여 확실히 현재 사용자로 설정
       },
       create: {
         user_id: user.id,
@@ -38,6 +58,18 @@ export async function POST(request) {
         auth: auth,
       },
     });
+
+    // members 테이블의 notification_enabled를 true로 업데이트
+    await prisma.member.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        notification_enabled: true,
+      },
+    });
+
+    console.log("Subscription saved successfully for user:", user.id);
 
     return NextResponse.json({ success: true });
   } catch (error) {

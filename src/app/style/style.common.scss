@@ -132,6 +132,14 @@ button {
 .btn_width {
   max-width: 200px;
 }
+.btn_width_80 {
+  max-width: 80px;
+}
+.btn_notify_all {
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
 .btn_line_grey {
   font-weight: 600;
   color: $grey-c-color;
@@ -733,12 +741,24 @@ sub .board_list {
   box-shadow: $box-shadow;
   border-radius: 8px;
 }
+.block_list {
+  @include flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
 .block_list li {
-  padding: 4px;
-  margin-bottom: 4px;
+  padding: 16px;
+  width: calc((100% - 24px) / 3);
+  border: $border-grey;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
 }
 .block_list li:last-child {
   margin-bottom: 0;
+}
+.block_list_factor {
+  @include space-between;
+  margin-bottom: 12px;
 }
 .block_list .writer {
   @include flex-start;
@@ -1699,6 +1719,11 @@ sub .board_list {
 
 .notification-list {
   padding-bottom: 12px;
+}
+
+.notification-header {
+  @include space-between;
+  margin-bottom: 12px;
 }
 
 .notification-items {
@@ -2779,6 +2804,9 @@ h2.mypage_title {
 }
 
 /* 알림 토글 스위치 */
+.notification-manager {
+  margin-bottom: 8px;
+}
 .notification-manager .toggle-container {
   @include flex-start;
   height: 28px;
@@ -2909,6 +2937,7 @@ h2.mypage_title {
   content: "";
   position: absolute;
   top: 50%;
+  transform: translateY(-50%);
   left: 4px;
   width: 18px;
   height: 18px;

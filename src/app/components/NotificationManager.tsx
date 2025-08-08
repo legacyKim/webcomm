@@ -149,6 +149,9 @@ export default function NotificationManager({
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({
+            endpoint: subscription.endpoint,
+          }),
         });
 
         setIsSubscribed(false);

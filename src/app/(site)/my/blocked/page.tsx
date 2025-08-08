@@ -69,23 +69,27 @@ export default function MyBlocked() {
                 <span>차단한 유저가 없습니다.</span>
               </div>
             ) : (
-              <ul className="block_list board_list">
+              <ul className="block_list">
                 {blockedUsers.map((user) => (
                   <li key={user.id}>
-                    <div className="writer">
-                      <img
-                        className="profile_img"
-                        src={user.profile ?? "/profile/basic.png"}
-                        alt={user.user_nickname}
-                        width={32}
-                        height={32}
-                      />
-                      <span className="writer_name">{user.user_nickname}</span>
-                    </div>
+                    <div className="block_list_factor">
+                      <div className="writer">
+                        <img
+                          className="profile_img"
+                          src={user.profile ?? "/profile/basic.png"}
+                          alt={user.user_nickname}
+                          width={32}
+                          height={32}
+                        />
+                        <span className="writer_name">
+                          {user.user_nickname}
+                        </span>
+                      </div>
 
-                    <span className="date">
-                      {new Date(user.created_at).toLocaleDateString()}
-                    </span>
+                      <span className="date">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
 
                     <button
                       className="block_btn btn_line_grey"

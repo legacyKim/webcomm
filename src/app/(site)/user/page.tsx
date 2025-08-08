@@ -134,6 +134,7 @@ export default function User() {
       }
     } catch (error) {
       console.error(error);
+      console.log(error);
       alert("서버 오류가 발생했습니다.");
     }
   };
@@ -193,6 +194,8 @@ export default function User() {
   const [certifyAgree, setCertifyAgree] = useState<boolean>(false);
 
   const emailCheck = async () => {
+    const isLocalEnvironment = process.env.NODE_ENV === "development";
+
     if (!userEmail) {
       alert("이메일을 입력하세요.");
       inputEmailRef.current?.focus();
@@ -202,6 +205,15 @@ export default function User() {
     if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(userEmail)) {
       alert("이메일 형식이 올바르지 않습니다.");
       inputEmailRef.current?.focus();
+      return;
+    }
+
+    // 로컬 환경에서는 자동으로 인증번호 설정
+    if (isLocalEnvironment) {
+      const localVerifyCode = "123456";
+      setCertifyNumCheck(localVerifyCode);
+      setCertifyNum(localVerifyCode);
+      alert("로컬 환경: 자동으로 인증번호가 설정되었습니다. (123456)");
       return;
     }
 
@@ -278,6 +290,8 @@ export default function User() {
     const passwordRegex =
       /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z\d!@#$%^&*]{4,}$/;
 
+    const isLocalEnvironment = process.env.NODE_ENV === "development";
+
     if (!idDupliCheck) {
       alert("아이디 및 별명 중복 체크를 해주세요.");
       inputIdRef.current?.focus();
@@ -293,45 +307,67 @@ export default function User() {
       return;
     }
 
-    if (!certifyNumCheck) {
+    // 로컬 환경이 아닐 때만 이메일 인증 체크
+    if (!isLocalEnvironment && !certifyNumCheck) {
       alert("이메일을 인증해 주세요.");
       inputCertifyNumRef.current?.focus();
       return;
     }
 
-    // reCAPTCHA 토큰 새로 생성
+    // reCAPTCHA 토큰 새로 생성 (로컬 환경에서는 건너뛰기)
     let currentRecaptchaToken = recaptchaToken;
 
-    if (!currentRecaptchaToken) {
-      try {
-        const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-        if (siteKey && window.grecaptcha) {
-          currentRecaptchaToken = await new Promise<string>((resolve) => {
-            window.grecaptcha.ready(() => {
-              window.grecaptcha
-                .execute(siteKey, { action: "signup" })
-                .then((token) => {
-                  resolve(token);
+    if (!isLocalEnvironment) {
+      if (!currentRecaptchaToken) {
+        try {
+          const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+          if (!siteKey) {
+            console.error("reCAPTCHA Site Key가 설정되지 않았습니다.");
+            alert("reCAPTCHA 설정 오류입니다. 관리자에게 문의하세요.");
+            return;
+          }
+
+          if (window.grecaptcha) {
+            currentRecaptchaToken = await new Promise<string>(
+              (resolve, reject) => {
+                window.grecaptcha.ready(() => {
+                  window.grecaptcha
+                    .execute(siteKey, { action: "signup" })
+                    .then((token) => {
+                      resolve(token);
+                    })
+                    .catch((error) => {
+                      reject(error);
+                    });
                 });
-            });
-          });
+              }
+            );
+          } else {
+            throw new Error("reCAPTCHA 스크립트가 로드되지 않았습니다.");
+          }
+        } catch (error) {
+          console.error("reCAPTCHA 토큰 생성 실패:", error);
+          alert(
+            "reCAPTCHA 검증에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요."
+          );
+          return;
         }
-      } catch (error) {
-        console.error("reCAPTCHA 토큰 생성 실패:", error);
-        alert("reCAPTCHA 검증에 실패했습니다. 다시 시도해주세요.");
+      }
+
+      if (!currentRecaptchaToken) {
+        console.error("reCAPTCHA 토큰이 없습니다:", {
+          recaptchaToken,
+          currentRecaptchaToken,
+          recaptchaLoaded,
+          hasGrecaptcha: !!window.grecaptcha,
+          hasSiteKey: !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+        });
+        alert("reCAPTCHA 검증이 필요합니다. 페이지를 새로고침해주세요.");
         return;
       }
-    }
-
-    if (!currentRecaptchaToken) {
-      console.error("reCAPTCHA 토큰이 없습니다:", {
-        recaptchaToken,
-        currentRecaptchaToken,
-        recaptchaLoaded,
-        hasGrecaptcha: !!window.grecaptcha,
-      });
-      alert("reCAPTCHA 검증이 필요합니다. 페이지를 새로고침해주세요.");
-      return;
+    } else {
+      console.log("로컬 환경: reCAPTCHA 검증 건너뛰기");
+      currentRecaptchaToken = "local-development-bypass";
     }
 
     console.log(
@@ -796,6 +832,9 @@ export default function User() {
               <div className="btn_wrap">
                 <button
                   onClick={(e) => {
+                    const isLocalEnvironment =
+                      process.env.NODE_ENV === "development";
+
                     if (!idDupliCheck) {
                       e.preventDefault();
                       alert("아이디 중복을 확인해 주세요.");
@@ -806,7 +845,8 @@ export default function User() {
                       alert("비밀번호가 올바르지 않습니다.");
                       return;
                     }
-                    if (!certifyAgree) {
+                    // 로컬 환경이 아닐 때만 인증번호 확인
+                    if (!isLocalEnvironment && !certifyAgree) {
                       e.preventDefault();
                       alert("인증번호를 확인해 주세요.");
                       return;
@@ -814,13 +854,20 @@ export default function User() {
                     return;
                   }}
                   type="submit"
-                  className={`btn ${
-                    certifyAgree &&
-                    idDupliCheck &&
-                    userPassword === userPasswordCheck
+                  className={`btn ${(() => {
+                    const isLocalEnvironment =
+                      process.env.NODE_ENV === "development";
+                    const emailVerified = isLocalEnvironment
+                      ? true
+                      : certifyAgree;
+
+                    return emailVerified &&
+                      idDupliCheck &&
+                      userPassword === userPasswordCheck &&
+                      userPassword !== ""
                       ? ""
-                      : "btn_nonactive"
-                  }`}
+                      : "btn_nonactive";
+                  })()}`}
                 >
                   회원가입
                 </button>

@@ -229,25 +229,56 @@ export async function POST(req, context) {
   }
 }
 
-export async function PUT(req) {
+export async function PUT(req, context) {
   const client = await pool.connect();
+  const { id: postId } = await context.params;
 
   try {
     const { comment, id } = await req.json();
 
-    await client.query(
+    const result = await client.query(
       "UPDATE comments SET content = $2 WHERE id = $1 RETURNING *;",
       [id, comment]
     );
+
+    if (result.rowCount === 0) {
+      return NextResponse.json(
+        { success: false, message: "댓글이 존재하지 않습니다." },
+        { status: 404 }
+      );
+    }
+
+    const updatedComment = result.rows[0];
+
+    // SSE로 수정 이벤트 전송
+    try {
+      await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          event: "UPDATE",
+          post_id: postId,
+          content: comment,
+          likes: updatedComment.likes,
+          updated_at: new Date().toISOString(),
+        }),
+      });
+    } catch (sseError) {
+      console.log("SSE 알림 전송 실패:", sseError);
+      // SSE 실패는 무시하고 계속 진행
+    }
 
     return NextResponse.json(
       { success: true, message: "댓글이 수정되었습니다." },
       { status: 200 }
     );
   } catch (error) {
-    console.error("댓글 삭제 오류:", error);
+    console.error("댓글 수정 오류:", error);
     return NextResponse.json(
-      { success: false, message: "댓글 삭제 중 오류 발생" },
+      { success: false, message: "댓글 수정 중 오류 발생" },
       { status: 500 }
     );
   } finally {
@@ -255,8 +286,9 @@ export async function PUT(req) {
   }
 }
 
-export async function DELETE(req) {
+export async function DELETE(req, context) {
   const client = await pool.connect();
+  const { id: postId } = await context.params;
 
   try {
     const { id } = await req.json();
@@ -270,6 +302,24 @@ export async function DELETE(req) {
         { success: false, message: "댓글이 존재하지 않습니다." },
         { status: 404 }
       );
+    }
+
+    // SSE로 삭제 이벤트 전송
+    try {
+      await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          event: "DELETE",
+          post_id: postId,
+        }),
+      });
+    } catch (sseError) {
+      console.log("SSE 알림 전송 실패:", sseError);
+      // SSE 실패는 무시하고 계속 진행
     }
 
     return NextResponse.json(

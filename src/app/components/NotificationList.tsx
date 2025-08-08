@@ -200,8 +200,13 @@ export default function NotificationList({
   return (
     <div className="notification-list">
       <div className="notification-header">
+        <h2>알림 목록</h2>
+
         {unreadCount > 0 && (
-          <button onClick={markAllAsRead} className="mark-all-read-btn">
+          <button
+            onClick={markAllAsRead}
+            className="btn btn_width_80 btn_notify_all"
+          >
             모두 읽음
           </button>
         )}

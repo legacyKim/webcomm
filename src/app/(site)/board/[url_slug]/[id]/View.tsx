@@ -198,14 +198,33 @@ export default function View({
 
   // 댓글 좋아요
   const commentLike = async (commentId: number) => {
+    if (!commentList) return;
+
+    // 현재 댓글 찾기
+    const currentComment = commentList.find((c) => c.id === commentId);
+    if (!currentComment) return;
+
+    // 낙관적 업데이트를 위한 백업
+    const prevCommentList = [...commentList];
+
     try {
+      // 낙관적 업데이트: 즉시 UI 변경
+      setCommentList(
+        (prev) =>
+          prev?.map((comment) =>
+            comment.id === commentId
+              ? { ...comment, likes: comment.likes + 1 }
+              : comment
+          ) || null
+      );
+
       const response = await axios.post("/api/comment/action/like", {
         isUserId,
         id: commentId,
       });
 
       if (response.data.success) {
-        // 댓글 목록 새로고침 대신 해당 댓글의 좋아요 정보만 업데이트
+        // 서버 응답이 성공이면 최신 데이터로 다시 동기화
         try {
           const detailResponse = await axios.get(
             `/api/post/${params.url_slug}/${params.id}?userId=${isUserId}`
@@ -222,19 +241,23 @@ export default function View({
             );
             setCommentLikers(updatedCommentLikers);
 
-            // 댓글 목록도 업데이트 (좋아요 수 반영)
+            // 댓글 목록도 업데이트 (정확한 좋아요 수 반영)
             setCommentList(detailResponse.data.comments);
           }
         } catch (fetchError) {
           console.error("댓글 좋아요 목록 새로고침 실패:", fetchError);
-          // 실패 시 페이지 새로고침
-          location.reload();
+          // 실패 시 이전 상태로 롤백
+          setCommentList(prevCommentList);
         }
       } else {
+        // 서버 응답이 실패면 롤백
         console.error("댓글 좋아요 처리 실패:", response.data.error);
+        setCommentList(prevCommentList);
       }
     } catch (error) {
+      // 에러 발생 시 롤백
       console.error("댓글 좋아요 요청 실패:", error);
+      setCommentList(prevCommentList);
     }
   };
 
@@ -245,15 +268,12 @@ export default function View({
 
     try {
       const res = await axios.post("/api/post/action/report", {
-        isUserId,
         id: params.id,
         reason,
       });
 
       if (res.data.success) {
         alert("신고가 접수되었습니다.");
-      } else if (!res.data.success) {
-        alert("이미 신고한 게시글입니다.");
       } else {
         alert(res.data.message || "신고에 실패했습니다.");
       }
@@ -321,7 +341,7 @@ export default function View({
               created_at: data.created_at,
               updated_at: data.updated_at,
               event: data.event,
-              post_id: data.post_id,
+              post_id: data.post_id || (params.id as string) || "0",
               children: [],
             };
 
@@ -329,8 +349,24 @@ export default function View({
               return [newComment];
             }
 
+            // 중복 댓글 확인 및 제거
+            const existingCommentIndex = prev.findIndex(
+              (c) => c.id === newComment.id
+            );
+            if (existingCommentIndex !== -1) {
+              // 이미 존재하는 댓글이면 업데이트
+              const updatedList = [...prev];
+              updatedList[existingCommentIndex] = newComment;
+              return updatedList;
+            }
+
+            // 새 댓글 추가 - 시간순으로 정렬
             const updatedList = [...prev, newComment];
-            return updatedList;
+            return updatedList.sort(
+              (a, b) =>
+                new Date(a.created_at).getTime() -
+                new Date(b.created_at).getTime()
+            );
           });
         } else if (data.event === "DELETE") {
           setCommentList((prev: CommentTreeNode[] | null) => {
@@ -682,7 +718,7 @@ export default function View({
                   stroke: isLiked ? "#ff4757" : "currentColor",
                 }}
               />
-              공감 {likeCount > 0 && `(${likeCount})`}
+              공감 {likeCount > 0 && `${likeCount}`}
             </button>
           </div>
         )}

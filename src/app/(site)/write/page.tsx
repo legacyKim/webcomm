@@ -12,6 +12,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ImageWithBlob, VideoWithBlob } from "@/type/type";
 
 interface boards {
+  id: number;
+  board_name: string;
+  url_slug: string;
+}
+
+interface boardInfo {
   board_id: number | null;
   board_name: string;
   url_slug: string;
@@ -42,7 +48,7 @@ export default function Write() {
   const [imageFiles, setImageFiles] = useState<ImageWithBlob[]>([]);
   const [videoFiles, setVideoFiles] = useState<VideoWithBlob[]>([]);
 
-  const [boardInfo, setBoardInfo] = useState<boards>({
+  const [boardInfo, setBoardInfo] = useState<boardInfo>({
     board_id: null,
     board_name: "",
     url_slug: "",
@@ -154,7 +160,7 @@ export default function Write() {
         <select
           className="board_category"
           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-            const selectedBoard = boardData.boards.find(
+            const selectedBoard = boardData?.boards?.find(
               (b: boards) => b.url_slug === e.target.value
             );
             if (selectedBoard) {
@@ -171,7 +177,7 @@ export default function Write() {
           <option>선택</option>
           {boardData &&
             boardData?.boards?.map((b: boards) => (
-              <option key={b.board_name} value={b.url_slug}>
+              <option key={b.id} value={b.url_slug}>
                 {b.board_name}
               </option>
             ))}
