@@ -35,7 +35,13 @@ export default function BoardManagePopup({
     setPutId(popupCorr.id);
   }, [popupCorr]);
 
-  const postBoard = async ({ boardName, urlSlug }: { boardName: string; urlSlug: string }) => {
+  const postBoard = async ({
+    boardName,
+    urlSlug,
+  }: {
+    boardName: string;
+    urlSlug: string;
+  }) => {
     if (boardName === "") {
       alert("게시판 명을 입력해 주세요.");
       return;
@@ -127,23 +133,24 @@ export default function BoardManagePopup({
   };
 
   return (
-    <div className='admin_popup_bg'>
-      <div className='admin_popup admin_popup_mo'>
-        <div className='admin_popup_header'>
+    <div className="admin_popup_bg">
+      <div className="admin_popup admin_popup_mo">
+        <div className="admin_popup_header">
           <h6>게시판 추가</h6>
           <button
             onClick={() => {
               setPopupOpen(false);
-            }}>
-            <i className='icon-cancel'></i>
+            }}
+          >
+            <i className="icon-cancel"></i>
           </button>
         </div>
 
-        <div className='admin_popup_content'>
-          <div className='input_box'>
+        <div className="admin_popup_content">
+          <div className="input_box">
             <span>게시판 순서</span>
             <input
-              type='text'
+              type="text"
               value={seq}
               onChange={(e) => {
                 const value = e.target.value;
@@ -156,20 +163,20 @@ export default function BoardManagePopup({
               }}
             />
           </div>
-          <div className='input_box'>
+          <div className="input_box">
             <span>게시판 이름</span>
             <input
-              type='text'
+              type="text"
               value={boardName}
               onChange={(e) => {
                 setBoardName(e.target.value);
               }}
             />
           </div>
-          <div className='input_box'>
+          <div className="input_box">
             <span>게시판 URL 설정</span>
             <input
-              type='text'
+              type="text"
               value={urlSlug}
               onChange={(e) => {
                 setUrlSlug(e.target.value);
@@ -178,16 +185,20 @@ export default function BoardManagePopup({
           </div>
         </div>
 
-        <div className='admin_popup_footer'>
+        <div className="admin_popup_footer">
           {popupOption === "save" ? (
             <>
               <button
                 onClick={() => {
                   postBoard({ boardName, urlSlug });
-                }}>
+                }}
+              >
                 저장
               </button>
-              <button onClick={() => setPopupOpen(false)} className='cancel-btn'>
+              <button
+                onClick={() => setPopupOpen(false)}
+                className="cancel-btn"
+              >
                 취소
               </button>
             </>
@@ -198,10 +209,14 @@ export default function BoardManagePopup({
                   if (id && seq) {
                     putBoard({ id, seq, boardName, urlSlug });
                   }
-                }}>
+                }}
+              >
                 저장
               </button>
-              <button onClick={() => setPopupOpen(false)} className='cancel-btn'>
+              <button
+                onClick={() => setPopupOpen(false)}
+                className="cancel-btn"
+              >
                 취소
               </button>
             </>
