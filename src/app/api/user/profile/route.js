@@ -7,12 +7,6 @@ async function getUserProfileFromDB(
   tab = "summary"
 ) {
   try {
-    console.log("getUserProfileFromDB 호출:", {
-      usernameOrNickname,
-      currentUserId,
-      tab,
-    });
-
     // 사용자 기본 정보 조회 - username 또는 user_nickname으로 검색
     const user = await prisma.member.findFirst({
       where: {
@@ -39,11 +33,6 @@ async function getUserProfileFromDB(
         notification_enabled: true,
       },
     });
-
-    console.log(
-      "사용자 조회 결과:",
-      user ? `찾음 (ID: ${user.id})` : "찾지 못함"
-    );
 
     if (!user) {
       return null;
@@ -292,18 +281,9 @@ export async function GET(request) {
     const currentUserParam = searchParams.get("current_user");
     const tab = searchParams.get("tab") || "summary";
 
-    console.log("여긴 동적 라우팅이 아닌 곳:", {
-      username,
-      nickname,
-      currentUserParam,
-      tab,
-      url: request.url,
-    });
-
     const userIdentifier = username || nickname;
 
     if (!userIdentifier) {
-      console.log("사용자 식별자 없음");
       return NextResponse.json(
         { error: "Username or nickname is required" },
         { status: 400 }
@@ -315,9 +295,6 @@ export async function GET(request) {
     const currentUserId = currentUserParam
       ? parseInt(currentUserParam)
       : undefined;
-
-    console.log("디코딩된 사용자 식별자:", decodedUserIdentifier);
-    console.log("현재 사용자 ID:", currentUserId);
 
     // 데이터베이스에서 사용자 프로필 조회 (캐싱 적용)
     const userData = await getUserProfileFromDB(

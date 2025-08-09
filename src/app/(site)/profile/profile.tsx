@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import TiptapViewer from "@/components/tiptapViewer";
-import { useAuth } from "@/contexts/AuthContext";
 
 import { UserProfile, UserActivity } from "@/type/type";
 
@@ -32,8 +31,6 @@ export default function Profile({
   const [activeTab, setActiveTab] = useState<
     "summary" | "posts" | "comments" | "likes" | "follower"
   >(currentTab ?? "summary");
-
-  console.log("혹시....????");
 
   // 서버에서 받은 팔로우 상태로 초기화
   useEffect(() => {

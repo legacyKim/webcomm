@@ -22,16 +22,8 @@ async function getUserData(
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-    console.log("Profile Page - getUserData 호출:", {
-      userNickname,
-      currentUserId,
-      tab,
-    });
-
     // API 라우트 호출: /api/user/profile/[username]
     const url = `${baseUrl}/api/user/profile/${encodeURIComponent(userNickname)}?current_user=${currentUserId || ""}&tab=${tab}`;
-
-    console.log("Profile Page - Fetch URL:", url);
 
     const response = await fetch(url, {
       next: {
@@ -44,8 +36,6 @@ async function getUserData(
       },
       cache: "force-cache",
     });
-
-    console.log(response);
 
     if (!response.ok) {
       console.warn(
@@ -76,9 +66,6 @@ export default async function Page({
   // URL 디코딩 (한글 사용자명 지원)
   const decodedUserNickname = decodeURIComponent(userNickname);
 
-  console.log("Profile Page - Original userNickname:", userNickname);
-  console.log("Profile Page - Decoded userNickname:", decodedUserNickname);
-
   // JWT에서 현재 로그인한 사용자 ID 가져오기
   let currentUserId: number | undefined;
   try {
@@ -92,7 +79,7 @@ export default async function Page({
       currentUserId = decoded.id;
     }
   } catch (error) {
-    console.log("JWT 디코딩 실패 또는 토큰 없음:", error);
+    console.log(error);
     currentUserId = undefined;
   }
 
@@ -122,11 +109,7 @@ export async function generateMetadata({
 }) {
   const { userNickname } = await params;
 
-  console.log(userNickname, "userNickname");
-
   const decodedUserNickname = decodeURIComponent(userNickname);
-
-  console.log(decodedUserNickname);
 
   const userData = await getUserData(decodedUserNickname);
 

@@ -10,12 +10,6 @@ async function getUserProfileFromDB(
   tab = "summary"
 ) {
   try {
-    console.log("getUserProfileFromDB 호출 (API):", {
-      userNickname,
-      currentUserId,
-      tab,
-    });
-
     // URL 디코딩
     const decodedUserNickname = decodeURIComponent(userNickname);
 
@@ -42,11 +36,6 @@ async function getUserProfileFromDB(
         notification_enabled: true,
       },
     });
-
-    console.log(
-      "사용자 조회 결과 (API):",
-      user ? `찾음 (ID: ${user.id})` : "찾지 못함"
-    );
 
     if (!user) {
       return null;
@@ -356,15 +345,6 @@ export async function GET(request, { params }) {
     const currentUserParam = searchParams.get("current_user");
     const tab = searchParams.get("tab") || "summary";
 
-    console.log("동적 라우팅인 곳. 이리로 들어오야하제:", {
-      userNickname,
-      rawUserNickname: userNickname,
-      decodedUserNickname: decodeURIComponent(userNickname),
-      currentUserParam,
-      tab,
-      url: request.url,
-    });
-
     if (!userNickname) {
       return NextResponse.json(
         { error: "User userNickname is required" },
@@ -387,8 +367,6 @@ export async function GET(request, { params }) {
     }
 
     const response = NextResponse.json(userData);
-
-    console.log(response);
 
     // 캐싱 헤더 설정
     response.headers.set(

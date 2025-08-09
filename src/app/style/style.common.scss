@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "./var.scss" as *; /* var css */
 html,
 body {
@@ -3059,7 +3060,7 @@ h2.mypage_title {
         color: white;
 
         &:hover {
-          background-color: darken($main-color, 10%);
+          background-color: color.adjust($main-color, $lightness: -10%);
         }
       }
 

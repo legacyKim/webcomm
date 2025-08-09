@@ -91,8 +91,6 @@ async function main() {
     },
   });
   */
-
-  console.log("관리자의 기본 메뉴 설정이 완료되었습니다.");
 }
 
 main()
