@@ -22,11 +22,6 @@ const TiptapViewer = ({ content }: { content?: string }) => {
     </div>
   );
 
-  // content가 없으면 스켈레톤 표시
-  if (!content) {
-    return <ContentSkeleton />;
-  }
-
   const editor = useEditor({
     extensions: [
       CustomTextStyle,
@@ -43,10 +38,15 @@ const TiptapViewer = ({ content }: { content?: string }) => {
       Video,
       LinkUrl,
     ],
-    content: content,
+    content: content || "",
     editable: false,
     immediatelyRender: false,
   });
+
+  // content가 없으면 스켈레톤 표시
+  if (!content) {
+    return <ContentSkeleton />;
+  }
 
   if (!editor) return <ContentSkeleton />;
 

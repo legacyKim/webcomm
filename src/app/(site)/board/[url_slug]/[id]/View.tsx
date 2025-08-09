@@ -48,6 +48,24 @@ export default function View({
   comment: CommentTreeNode[] | null;
   page: number;
 }) {
+  const pathname = usePathname();
+  const params = useParams();
+  const router = useRouter();
+  const loginCheck = useLoginCheck();
+
+  const {
+    isUserId,
+    isUserNick,
+    messageToUser,
+    boardType,
+    setRedirectPath,
+    initData,
+  } = useAuth();
+
+  useEffect(() => {
+    setRedirectPath(pathname);
+  }, [pathname, setRedirectPath]);
+
   // 게시물 스켈레톤 컴포넌트
   const PostSkeleton = () => (
     <div className="boardview">
@@ -80,25 +98,6 @@ export default function View({
   if (!post) {
     return <PostSkeleton />;
   }
-  const pathname = usePathname();
-
-  useEffect(() => {
-    setRedirectPath(pathname);
-  }, []);
-
-  const params = useParams();
-  const router = useRouter();
-
-  const loginCheck = useLoginCheck();
-
-  const {
-    isUserId,
-    isUserNick,
-    messageToUser,
-    boardType,
-    setRedirectPath,
-    initData,
-  } = useAuth();
   // const [limit, setLimit] = useState(10);
 
   const [viewPost] = useState<Posts | null>(post);

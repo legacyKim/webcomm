@@ -86,7 +86,9 @@ export default async function Page({
     const token = cookieStore.get("token")?.value;
 
     if (token && process.env.JWT_SECRET) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET) as {
+        id: number;
+      };
       currentUserId = decoded.id;
     }
   } catch (error) {

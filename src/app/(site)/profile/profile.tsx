@@ -23,7 +23,6 @@ export default function Profile({
   currentTab,
   isLoading = false,
 }: ProfileProps) {
-  const { isUserId } = useAuth();
   const [isFollowing, setIsFollowing] = useState(
     userProfile?.isFollowing || false
   );
