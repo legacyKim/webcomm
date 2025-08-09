@@ -40,10 +40,22 @@ export async function POST(req) {
       );
     }
 
+    // post_actions 테이블에 신고 기록
     await client.query(
-      `INSERT INTO post_actions (user_id, post_id, action_type, reason) VALUES ($1, $2, 'report', $3)`,
-      [user.id, postId, reason]
+      `INSERT INTO post_actions (user_id, post_id, action_type) VALUES ($1, $2, 'report')`,
+      [user.id, postId]
     );
+
+    // 만약 reports 테이블이 있다면 reason과 함께 저장
+    try {
+      await client.query(
+        `INSERT INTO reports (user_id, post_id, reason, created_at) VALUES ($1, $2, $3, NOW())`,
+        [user.id, postId, reason]
+      );
+    } catch (reportError) {
+      // reports 테이블이 없으면 무시하고 계속 진행
+      console.log("Reports 테이블이 없거나 오류 발생:", reportError.message);
+    }
 
     // posts 테이블의 reports 수 증가
     await client.query(`UPDATE posts SET reports = reports + 1 WHERE id = $1`, [

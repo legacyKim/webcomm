@@ -16,6 +16,7 @@ import "@/style/fontello/css/fontello.css";
 import "@/style/fontello/css/animation.css";
 import "@/style/style.common.scss";
 import "@/style/checkbox.scss";
+import "@/style/darkTheme.scss";
 
 export const metadata: Metadata = {
   title: "Tokti",

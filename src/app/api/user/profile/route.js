@@ -7,6 +7,12 @@ async function getUserProfileFromDB(
   tab = "summary"
 ) {
   try {
+    console.log("getUserProfileFromDB 호출:", {
+      usernameOrNickname,
+      currentUserId,
+      tab,
+    });
+
     // 사용자 기본 정보 조회 - username 또는 user_nickname으로 검색
     const user = await prisma.member.findFirst({
       where: {
@@ -34,6 +40,11 @@ async function getUserProfileFromDB(
       },
     });
 
+    console.log(
+      "사용자 조회 결과:",
+      user ? `찾음 (ID: ${user.id})` : "찾지 못함"
+    );
+
     if (!user) {
       return null;
     }
@@ -58,24 +69,40 @@ async function getUserProfileFromDB(
     });
 
     // 팔로워 수 계산
-    const followerCount = await prisma.follow.count({
-      where: { following_id: user.id },
-    });
+    let followerCount = 0;
+    let followingCount = 0;
+    let isFollowing = null;
 
-    // 팔로잉 수 계산
-    const followingCount = await prisma.follow.count({
-      where: { follower_id: user.id },
-    });
+    try {
+      followerCount = await prisma.follow.count({
+        where: { following_id: user.id },
+      });
+    } catch (error) {
+      console.error("팔로워 수 계산 오류:", error);
+    }
 
-    // 현재 사용자가 이 사용자를 팔로우하고 있는지 확인
-    const isFollowing = currentUserId
-      ? await prisma.follow.findFirst({
-          where: {
-            follower_id: currentUserId,
-            following_id: user.id,
-          },
-        })
-      : null;
+    try {
+      // 팔로잉 수 계산
+      followingCount = await prisma.follow.count({
+        where: { follower_id: user.id },
+      });
+    } catch (error) {
+      console.error("팔로잉 수 계산 오류:", error);
+    }
+
+    try {
+      // 현재 사용자가 이 사용자를 팔로우하고 있는지 확인
+      isFollowing = currentUserId
+        ? await prisma.follow.findFirst({
+            where: {
+              follower_id: currentUserId,
+              following_id: user.id,
+            },
+          })
+        : null;
+    } catch (error) {
+      console.error("팔로우 상태 확인 오류:", error);
+    }
 
     // 최근 게시글 조회
     const recentPosts = await prisma.post.findMany({
@@ -120,24 +147,30 @@ async function getUserProfileFromDB(
     });
 
     // 팔로워 목록 조회 (요약 탭에서만)
-    const followers =
-      tab === "summary" || tab === "activity"
-        ? await prisma.follow.findMany({
-            where: { following_id: user.id },
-            take: 10,
-            orderBy: { created_at: "desc" },
-            include: {
-              follower: {
-                select: {
-                  id: true,
-                  username: true,
-                  user_nickname: true,
-                  profile: true,
+    let followers = [];
+    try {
+      followers =
+        tab === "summary" || tab === "activity"
+          ? await prisma.follow.findMany({
+              where: { following_id: user.id },
+              take: 10,
+              orderBy: { created_at: "desc" },
+              include: {
+                follower: {
+                  select: {
+                    id: true,
+                    username: true,
+                    user_nickname: true,
+                    profile: true,
+                  },
                 },
               },
-            },
-          })
-        : [];
+            })
+          : [];
+    } catch (error) {
+      console.error("팔로워 목록 조회 오류:", error);
+      followers = [];
+    }
 
     // 관심 게시판 통계 (게시글과 댓글 활동 기반)
     let favoriteBoards = [];
@@ -238,6 +271,13 @@ async function getUserProfileFromDB(
     return profileData;
   } catch (error) {
     console.error("Database query error:", error);
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      usernameOrNickname,
+      currentUserId,
+      tab,
+    });
     // 데이터베이스 오류 시 null 반환 (더미 데이터 폴백 제거)
     return null;
   }
@@ -252,9 +292,18 @@ export async function GET(request) {
     const currentUserParam = searchParams.get("current_user");
     const tab = searchParams.get("tab") || "summary";
 
+    console.log("여긴 동적 라우팅이 아닌 곳:", {
+      username,
+      nickname,
+      currentUserParam,
+      tab,
+      url: request.url,
+    });
+
     const userIdentifier = username || nickname;
 
     if (!userIdentifier) {
+      console.log("사용자 식별자 없음");
       return NextResponse.json(
         { error: "Username or nickname is required" },
         { status: 400 }
@@ -266,6 +315,9 @@ export async function GET(request) {
     const currentUserId = currentUserParam
       ? parseInt(currentUserParam)
       : undefined;
+
+    console.log("디코딩된 사용자 식별자:", decodedUserIdentifier);
+    console.log("현재 사용자 ID:", currentUserId);
 
     // 데이터베이스에서 사용자 프로필 조회 (캐싱 적용)
     const userData = await getUserProfileFromDB(

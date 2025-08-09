@@ -70,7 +70,7 @@ export default function Boardlist({
   const { isUserId, messageToUser } = useAuth();
   // const [postData, setPostData] = useState<initDataPosts>(initData || { posts: [] });
 
-  const { data: postData } = useQuery({
+  const { data: postData, isLoading } = useQuery({
     queryKey: [url_slug, page, limit, isUserId],
     queryFn: getBoardQueryFn(boardType),
     staleTime: 0,
@@ -126,7 +126,12 @@ export default function Boardlist({
             <CalendarIcon className="icon" />
           </div>
         </li>
-        {postData?.posts?.length > 0 ? (
+        {isLoading ? (
+          <div className="loading_spinner_container">
+            <div className="loading_spinner"></div>
+            <p>게시글을 불러오는 중...</p>
+          </div>
+        ) : postData?.posts?.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link

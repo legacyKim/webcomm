@@ -8,12 +8,12 @@ datasource db {
 }
 
 model Board {
-  id         Int    @id @default(autoincrement())
-  board_name String @unique @db.VarChar(255)
-  url_slug   String @unique @db.VarChar(255)
-  seq        Int    @default(autoincrement())
-  posts      Post[]
+  id          Int          @id @default(autoincrement())
+  board_name  String       @unique @db.VarChar(255)
+  url_slug    String       @unique @db.VarChar(255)
+  seq         Int          @default(autoincrement())
   menuCustoms MenuCustom[]
+  posts       Post[]
 
   @@map("boards")
 }
@@ -46,12 +46,14 @@ model Member {
   permanent_lock        Boolean            @default(false)
   marketing_enabled     Boolean            @default(false)
   notification_enabled  Boolean            @default(false)
+  email_updated_at      DateTime?          @map("email_updated_at")
   blockedUsers          BlockedUser[]      @relation("BlockedUsers")
   blockedBy             BlockedUser[]      @relation("BlockedBy")
   commentActions        CommentAction[]    @relation("MemberCommentActions")
   comments              Comment[]          @relation("MemberComments")
   following             Follow[]           @relation("UserFollowing")
   followers             Follow[]           @relation("UserFollowers")
+  menuCustoms           MenuCustom[]
   receivedNotifications Notification[]     @relation("NotificationReceiver")
   sentNotifications     Notification[]     @relation("NotificationSender")
   postActions           PostAction[]       @relation("MemberPostActions")
@@ -61,7 +63,7 @@ model Member {
   sentMessages          UserMessage[]      @relation("SentMessages")
   reportedUsers         UserReport[]       @relation("ReportedUsers")
   reportedBy            UserReport[]       @relation("ReportedBy")
-  menuCustoms           MenuCustom[]
+  reports               Report[]
 
   @@map("members")
 }
@@ -87,6 +89,7 @@ model Post {
   notifications Notification[]
   postActions   PostAction[]
   images        PostImage[]
+  reportList    Report[]
   board         Board          @relation(fields: [board_id], references: [id])
   author        Member         @relation("MemberPosts", fields: [user_id], references: [id])
 
@@ -273,9 +276,22 @@ model MenuCustom {
   is_visible Boolean  @default(true)
   created_at DateTime @default(now())
   updated_at DateTime @default(now())
-  user       Member   @relation(fields: [user_id], references: [id], onDelete: Cascade)
   board      Board    @relation(fields: [board_id], references: [id], onDelete: Cascade)
+  user       Member   @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, board_id], name: "unique_user_board")
   @@map("menu_customs")
+}
+
+model Report {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  post_id    Int
+  reason     String   @db.VarChar(500)
+  created_at DateTime @default(now())
+  post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user       Member   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, post_id], name: "unique_user_post_report")
+  @@map("reports")
 }

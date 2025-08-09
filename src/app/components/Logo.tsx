@@ -26,5 +26,13 @@ export default function Logo() {
     fetchSiteSettings();
   }, []);
 
-  return <Image src={logoUrl} width={100} height={40} alt={`${siteName} Logo`} priority />;
+  return (
+    <Image
+      src={logoUrl}
+      width={100}
+      height={40}
+      alt={`${siteName} Logo`}
+      priority
+    />
+  );
 }

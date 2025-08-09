@@ -31,27 +31,6 @@ export default function DropDownMenu({
   const { isUserId, messageToUser, setMessageToUser } = useAuth();
   const loginCheck = useLoginCheck();
 
-  // 팔로우 상태 확인
-  useEffect(() => {
-    const checkFollowStatus = async () => {
-      if (!isUserId) return;
-
-      try {
-        const response = await axios.get(
-          `/api/user/profile?nickname=${encodeURIComponent(userInfoInDropMenu.userNickname)}&current_user=${isUserId}`
-        );
-
-        if (response.data.profile) {
-          setIsFollowing(response.data.profile.isFollowing);
-        }
-      } catch (error) {
-        console.error("팔로우 상태 확인 실패:", error);
-      }
-    };
-
-    checkFollowStatus();
-  }, [userInfoInDropMenu.userNickname, isUserId]);
-
   // 프로필 보기
   const viewProfile = () => {
     router.push(`/profile/${userInfoInDropMenu.userNickname}`);

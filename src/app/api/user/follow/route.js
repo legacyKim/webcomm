@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
-
-// Prisma 클라이언트
-const prisma = global.prisma;
+import prisma from "@/lib/prisma.js";
 
 export async function POST(request) {
   try {
@@ -118,22 +116,91 @@ export async function POST(request) {
   }
 }
 
-// 팔로우 목록 조회
+// 팔로우 상태 확인 및 목록 조회 API (통합)
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
-    const type = searchParams.get("type"); // followers, following
+    const targetUserId = searchParams.get("targetUserId");
+    const userId = searchParams.get("userId"); // 기존 API 호환성
+    const type = searchParams.get("type"); // "status", "list", "followers", "following"
 
-    if (!userId || !type || !["followers", "following"].includes(type)) {
-      return NextResponse.json(
-        { error: "userId와 type(followers/following)이 필요합니다." },
-        { status: 400 }
-      );
+    // JWT에서 현재 사용자 ID 추출 (status와 list의 경우)
+    let tokenData;
+    let currentUserId;
+    
+    if (type === "status" || type === "list") {
+      tokenData = await serverTokenCheck(request);
+      if (!tokenData) {
+        return NextResponse.json(
+          { error: "로그인이 필요합니다." },
+          { status: 401 }
+        );
+      }
+      currentUserId = tokenData.id;
     }
 
-    // 실제 Prisma 쿼리로 팔로우 목록 조회
-    try {
+    if (type === "status" && targetUserId) {
+      // 특정 사용자에 대한 팔로우 상태 확인
+      const followStatus = await prisma.follow.findUnique({
+        where: {
+          unique_follow: {
+            follower_id: currentUserId,
+            following_id: parseInt(targetUserId),
+          },
+        },
+      });
+
+      return NextResponse.json({
+        isFollowing: !!followStatus,
+      });
+    } else if (type === "list") {
+      // 내 팔로우 목록 조회 (로그인 필요)
+      const followType = searchParams.get("followType") || "following"; // "following" 또는 "followers"
+      
+      let users;
+      if (followType === "following") {
+        // 내가 팔로우하는 사람들
+        const follows = await prisma.follow.findMany({
+          where: { follower_id: currentUserId },
+          include: {
+            following: {
+              select: {
+                id: true,
+                username: true,
+                user_nickname: true,
+                profile: true,
+                bio: true,
+              },
+            },
+          },
+        });
+        users = follows.map(f => f.following);
+      } else {
+        // 나를 팔로우하는 사람들
+        const follows = await prisma.follow.findMany({
+          where: { following_id: currentUserId },
+          include: {
+            follower: {
+              select: {
+                id: true,
+                username: true,
+                user_nickname: true,
+                profile: true,
+                bio: true,
+              },
+            },
+          },
+        });
+        users = follows.map(f => f.follower);
+      }
+
+      return NextResponse.json({
+        users,
+        total: users.length,
+        type: followType,
+      });
+    } else if ((type === "followers" || type === "following") && userId) {
+      // 특정 사용자의 팔로우 목록 조회 (공개, 로그인 불필요)
       const followData = await prisma.follow.findMany({
         where:
           type === "followers"
@@ -188,20 +255,14 @@ export async function GET(request) {
           },
         }
       );
-    } catch (dbError) {
-      console.error("팔로우 목록 DB 조회 오류:", dbError);
-      // DB 오류 시 빈 결과 반환
+    } else {
       return NextResponse.json(
-        {
-          users: [],
-          total: 0,
-          type,
-        },
-        { status: 500 }
+        { error: "올바른 파라미터를 제공해주세요. type은 status, list, followers, following 중 하나여야 합니다." },
+        { status: 400 }
       );
     }
   } catch (error) {
-    console.error("팔로우 목록 조회 오류:", error);
+    console.error("팔로우 API 오류:", error);
     return NextResponse.json(
       { error: "서버 오류가 발생했습니다." },
       { status: 500 }

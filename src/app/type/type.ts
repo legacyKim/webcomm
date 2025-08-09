@@ -117,6 +117,9 @@ export interface UserProfile {
   follower_count: number;
   following_count: number;
   total_likes_received: number;
+  posts_count: number;
+  comments_count: number;
+  liked_posts_count: number;
   isFollowing?: boolean;
   isOwnProfile?: boolean;
 }
@@ -138,6 +141,15 @@ export interface UserActivity {
     board_name: string;
     post_url_slug: string;
     created_at: string;
+    likes: number;
+  }[];
+  liked_posts: {
+    id: number;
+    title: string;
+    board_name: string;
+    url_slug: string;
+    created_at: string;
+    views: number;
     likes: number;
   }[];
   favorite_boards: {

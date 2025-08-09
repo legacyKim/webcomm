@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import TiptapViewer from "@/components/tiptapViewer";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { UserProfile, UserActivity } from "@/type/type";
 
@@ -13,13 +14,16 @@ interface ProfileProps {
   userProfile?: UserProfile | null;
   userActivity?: UserActivity | null;
   currentTab?: "summary" | "posts" | "comments" | "likes" | "follower";
+  isLoading?: boolean;
 }
 
 export default function Profile({
   userProfile,
   userActivity,
   currentTab,
+  isLoading = false,
 }: ProfileProps) {
+  const { isUserId } = useAuth();
   const [isFollowing, setIsFollowing] = useState(
     userProfile?.isFollowing || false
   );
@@ -29,6 +33,18 @@ export default function Profile({
   const [activeTab, setActiveTab] = useState<
     "summary" | "posts" | "comments" | "likes" | "follower"
   >(currentTab ?? "summary");
+
+  console.log("혹시....????");
+
+  // 서버에서 받은 팔로우 상태로 초기화
+  useEffect(() => {
+    if (userProfile?.isFollowing !== undefined) {
+      setIsFollowing(userProfile.isFollowing);
+    }
+    if (userProfile?.follower_count !== undefined) {
+      setFollowerCount(userProfile.follower_count);
+    }
+  }, [userProfile?.isFollowing, userProfile?.follower_count]);
 
   // 팔로우/언팔로우 핸들러
   const handleFollowToggle = async () => {
@@ -100,6 +116,46 @@ export default function Profile({
       return `${Math.floor(diffInMinutes / 1440)}일 전`;
     return formatDate(dateString);
   };
+
+  // 프로필 스켈레톤 컴포넌트
+  const ProfileSkeleton = () => (
+    <div className="profile_container">
+      <div className="profile_header">
+        <div className="user_info">
+          <div className="user_avatar skeleton">
+            <div className="skeleton_avatar large"></div>
+          </div>
+          <div className="user_details">
+            <div className="skeleton_line skeleton_username"></div>
+            <div className="skeleton_line skeleton_nickname"></div>
+            <div className="skeleton_line skeleton_bio long"></div>
+          </div>
+        </div>
+      </div>
+
+      <div className="user_stats skeleton">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="stat_item">
+            <div className="skeleton_line stat_label"></div>
+            <div className="skeleton_line stat_number"></div>
+          </div>
+        ))}
+      </div>
+
+      <div className="profile_tabs skeleton">
+        <div className="tab_list">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="skeleton_button tab"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // 로딩 중일 때 스켈레톤 표시
+  if (isLoading || !userProfile) {
+    return <ProfileSkeleton />;
+  }
 
   return (
     <div className="profile_info">
@@ -180,11 +236,13 @@ export default function Profile({
       <div className="user_stats">
         <div className="stat_item">
           <span className="stat_label">게시글</span>
-          <span className="stat_number">{userProfile?.all_posts ?? null}</span>
+          <span className="stat_number">{userProfile?.posts_count || 0}</span>
         </div>
         <div className="stat_item">
           <span className="stat_label">조회수</span>
-          <span className="stat_number">{userProfile?.all_views ?? null}</span>
+          <span className="stat_number">
+            {userProfile?.all_views?.toLocaleString() || 0}
+          </span>
         </div>
         <div className="stat_item">
           <span className="stat_label">팔로워</span>
@@ -193,13 +251,13 @@ export default function Profile({
         <div className="stat_item">
           <span className="stat_label">팔로잉</span>
           <span className="stat_number">
-            {userProfile?.following_count ?? null}
+            {userProfile?.following_count || 0}
           </span>
         </div>
         <div className="stat_item">
           <span className="stat_label">받은 좋아요</span>
           <span className="stat_number">
-            {userProfile?.total_likes_received ?? null}
+            {userProfile?.total_likes_received || 0}
           </span>
         </div>
       </div>
@@ -217,19 +275,19 @@ export default function Profile({
             className={`tab_btn ${activeTab === "posts" ? "active" : ""}`}
             onClick={() => setActiveTab("posts")}
           >
-            게시글 ({userProfile?.all_posts})
+            게시글 ({userProfile?.posts_count || 0})
           </button>
           <button
             className={`tab_btn ${activeTab === "comments" ? "active" : ""}`}
             onClick={() => setActiveTab("comments")}
           >
-            댓글
+            댓글 ({userProfile?.comments_count || 0})
           </button>
           <button
             className={`tab_btn ${activeTab === "likes" ? "active" : ""}`}
             onClick={() => setActiveTab("likes")}
           >
-            좋아요한 글
+            좋아요한 글 ({userProfile?.liked_posts_count || 0})
           </button>
           <button
             className={`tab_btn ${activeTab === "follower" ? "active" : ""}`}
@@ -255,9 +313,7 @@ export default function Profile({
                       href={`/board/${board.url_slug}`}
                       className="board_tag"
                     >
-                      <span>
-                        {board.board_name} ({board.activity_count})
-                      </span>
+                      <span>{board.board_name}</span>
                     </Link>
                   ))}
                 </div>
@@ -396,11 +452,38 @@ export default function Profile({
           </div>
         )}
 
-        {activeTab === "likes" && (
+        {activeTab === "likes" && userActivity && (
           <div className="likes_tab">
-            <div className="empty_state">
-              <p>좋아요한 글 목록은 준비 중입니다.</p>
-              <p className="sub_text">향후 업데이트에서 제공될 예정입니다.</p>
+            <div className="posts_list">
+              {userActivity.liked_posts &&
+              userActivity.liked_posts.length > 0 ? (
+                userActivity.liked_posts.map((post) => (
+                  <div key={post.id} className="post_card">
+                    <div className="post_header">
+                      <Link
+                        href={`/board/${post.url_slug}/${post.id}`}
+                        className="post_title"
+                      >
+                        <h4>{post.title}</h4>
+                      </Link>
+                      <span className="post_board">{post.board_name}</span>
+                    </div>
+                    <div className="post_meta">
+                      <span className="post_date">
+                        {formatDate(post.created_at)}
+                      </span>
+                      <div className="post_stats">
+                        <span>조회 {post.views.toLocaleString()}</span>
+                        <span>좋아요 {post.likes.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="empty_state">
+                  <p>좋아요한 글이 없습니다.</p>
+                </div>
+              )}
             </div>
           </div>
         )}

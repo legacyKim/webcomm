@@ -14,15 +14,15 @@ export async function GET(req, context) {
   const client = await pool.connect();
 
   try {
-    // 1. 전체 개수
     const countQuery = `
       SELECT COUNT(*) AS total
-      FROM posts
-      WHERE user_id NOT IN (
-        SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
-      )
+      FROM posts p
+      WHERE p.deleted = FALSE
+        AND ($1 = 0 OR p.user_id NOT IN (
+          SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
+        ))
     `;
-    const countResult = await client.query(countQuery, [userId]);
+    const countResult = await client.query(countQuery, [userId || 0]);
     const totalPosts = parseInt(countResult.rows[0].total);
     const totalPages = Math.ceil(totalPosts / limitNum);
 
@@ -46,17 +46,22 @@ export async function GET(req, context) {
       LEFT JOIN (
           SELECT post_id, COUNT(*) AS comment_count
           FROM comments
+          WHERE is_deleted = FALSE
           GROUP BY post_id
       ) c ON p.id = c.post_id
       LEFT JOIN members m ON p.user_id = m.id
       WHERE p.deleted = FALSE
-      AND p.user_id NOT IN (
-        SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
-      )
+        AND ($1 = 0 OR p.user_id NOT IN (
+          SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
+        ))
       ORDER BY score DESC
       LIMIT $2 OFFSET $3
     `;
-    const postResult = await client.query(postQuery, [userId, limitNum, offset]);
+    const postResult = await client.query(postQuery, [
+      userId || 0,
+      limitNum,
+      offset,
+    ]);
 
     return NextResponse.json({
       posts: postResult.rows,

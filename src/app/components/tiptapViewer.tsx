@@ -11,7 +11,22 @@ import TextAlign from "@tiptap/extension-text-align";
 import Underline from "@tiptap/extension-underline";
 
 // tiptap viewer
-const TiptapViewer = ({ content }: { content: string }) => {
+const TiptapViewer = ({ content }: { content?: string }) => {
+  // 콘텐츠 스켈레톤 컴포넌트
+  const ContentSkeleton = () => (
+    <div className="content_skeleton">
+      <div className="skeleton_line content_line"></div>
+      <div className="skeleton_line content_line short"></div>
+      <div className="skeleton_line content_line"></div>
+      <div className="skeleton_line content_line short"></div>
+    </div>
+  );
+
+  // content가 없으면 스켈레톤 표시
+  if (!content) {
+    return <ContentSkeleton />;
+  }
+
   const editor = useEditor({
     extensions: [
       CustomTextStyle,
@@ -33,7 +48,7 @@ const TiptapViewer = ({ content }: { content: string }) => {
     immediatelyRender: false,
   });
 
-  if (!editor) return <p>로딩 중...</p>;
+  if (!editor) return <ContentSkeleton />;
 
   return <EditorContent editor={editor} />;
 };

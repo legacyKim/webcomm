@@ -242,6 +242,7 @@ export default function NotificationList({
                   )}
                 </div>
               </div>
+              <div className="unread-dot"></div>
             </li>
           ))}
         </ul>

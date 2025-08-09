@@ -48,6 +48,38 @@ export default function View({
   comment: CommentTreeNode[] | null;
   page: number;
 }) {
+  // 게시물 스켈레톤 컴포넌트
+  const PostSkeleton = () => (
+    <div className="boardview">
+      <div className="boardview_head">
+        <div className="skeleton_line skeleton_title"></div>
+        <div className="skeleton_line skeleton_meta"></div>
+        <div className="boardview_head_user skeleton">
+          <div className="skeleton_avatar"></div>
+          <div className="user_info">
+            <div className="skeleton_line skeleton_nickname"></div>
+            <div className="skeleton_line skeleton_date"></div>
+          </div>
+        </div>
+      </div>
+      <div className="boardview_content skeleton">
+        <div className="skeleton_line content_line"></div>
+        <div className="skeleton_line content_line"></div>
+        <div className="skeleton_line content_line"></div>
+        <div className="skeleton_line content_line short"></div>
+      </div>
+      <div className="boardview_actions skeleton">
+        <div className="skeleton_button action"></div>
+        <div className="skeleton_button action"></div>
+        <div className="skeleton_button action"></div>
+      </div>
+    </div>
+  );
+
+  // 데이터가 없으면 스켈레톤 표시
+  if (!post) {
+    return <PostSkeleton />;
+  }
   const pathname = usePathname();
 
   useEffect(() => {

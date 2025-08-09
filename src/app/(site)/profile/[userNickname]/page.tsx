@@ -1,5 +1,7 @@
 import Profile from "../profile";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 import { UserProfile, UserActivity } from "@/type/type";
 
@@ -11,52 +13,43 @@ interface ProfileResponse {
   activity: UserActivity;
 }
 
-// ISR과 캐싱이 적용된 사용자 데이터 가져오기 (단일 API 호출)
+// ISR과 캐싱이 적용된 사용자 데이터 가져오기 (API 라우트 사용)
 async function getUserData(
-  username: string,
+  userNickname: string,
   currentUserId?: number,
   tab: string = "summary"
 ): Promise<ProfileResponse | null> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
-    // 먼저 username으로 시도
-    let url = `${baseUrl}/api/user/profile?username=${encodeURIComponent(username)}&current_user=${currentUserId || ""}&tab=${tab}`;
+    console.log("Profile Page - getUserData 호출:", {
+      userNickname,
+      currentUserId,
+      tab,
+    });
 
-    let response = await fetch(url, {
+    // API 라우트 호출: /api/user/profile/[username]
+    const url = `${baseUrl}/api/user/profile/${encodeURIComponent(userNickname)}?current_user=${currentUserId || ""}&tab=${tab}`;
+
+    console.log("Profile Page - Fetch URL:", url);
+
+    const response = await fetch(url, {
       next: {
-        // ISR: 24시간마다 재생성, 프로필은 자주 변경되지 않으므로
-        revalidate: 86400, // 24시간 = 24 * 60 * 60
+        revalidate: 86400,
         tags: [
-          `profile-${username}`, // 사용자별 캐시 태그
-          `user-activity-${username}-${tab}`, // 탭별 캐시 태그
-          "profiles", // 전체 프로필 캐시 태그
+          `profile-${userNickname}`,
+          `user-activity-${userNickname}-${tab}`,
+          "profiles",
         ],
       },
-      // 서버 컴포넌트에서 캐시 최적화
       cache: "force-cache",
     });
 
-    // username으로 찾지 못하면 nickname으로 시도
-    if (!response.ok && response.status === 404) {
-      url = `${baseUrl}/api/user/profile?nickname=${encodeURIComponent(username)}&current_user=${currentUserId || ""}&tab=${tab}`;
-
-      response = await fetch(url, {
-        next: {
-          revalidate: 86400,
-          tags: [
-            `profile-${username}`,
-            `user-activity-${username}-${tab}`,
-            "profiles",
-          ],
-        },
-        cache: "force-cache",
-      });
-    }
+    console.log(response);
 
     if (!response.ok) {
       console.warn(
-        `Failed to fetch user data for ${username}: ${response.status}`
+        `Failed to fetch user data for ${userNickname}: ${response.status}`
       );
       return null;
     }
@@ -72,22 +65,37 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: Promise<{ username: string }>;
+  params: Promise<{ userNickname: string }>;
   searchParams: Promise<{
     tab?: "summary" | "posts" | "comments" | "likes" | "follower";
   }>;
 }) {
-  const { username } = await params;
+  const { userNickname } = await params;
   const { tab = "summary" } = await searchParams;
 
   // URL 디코딩 (한글 사용자명 지원)
-  const decodedUsername = decodeURIComponent(username);
+  const decodedUserNickname = decodeURIComponent(userNickname);
 
-  // TODO: 현재 로그인한 사용자 ID 가져오기 (JWT에서)
-  const currentUserId = undefined; // JWT에서 추출 예정
+  console.log("Profile Page - Original userNickname:", userNickname);
+  console.log("Profile Page - Decoded userNickname:", decodedUserNickname);
+
+  // JWT에서 현재 로그인한 사용자 ID 가져오기
+  let currentUserId: number | undefined;
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (token && process.env.JWT_SECRET) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET) as any;
+      currentUserId = decoded.id;
+    }
+  } catch (error) {
+    console.log("JWT 디코딩 실패 또는 토큰 없음:", error);
+    currentUserId = undefined;
+  }
 
   // SSR + ISR: 단일 API 호출로 모든 데이터 가져오기
-  const userData = await getUserData(decodedUsername, currentUserId, tab);
+  const userData = await getUserData(decodedUserNickname, currentUserId, tab);
 
   if (!userData) {
     notFound();
@@ -108,12 +116,17 @@ export default async function Page({
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ username: string }>;
+  params: Promise<{ userNickname: string }>;
 }) {
-  const { username } = await params;
-  const decodedUsername = decodeURIComponent(username);
+  const { userNickname } = await params;
 
-  const userData = await getUserData(decodedUsername);
+  console.log(userNickname, "userNickname");
+
+  const decodedUserNickname = decodeURIComponent(userNickname);
+
+  console.log(decodedUserNickname);
+
+  const userData = await getUserData(decodedUserNickname);
 
   if (!userData) {
     return {

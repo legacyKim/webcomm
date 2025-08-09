@@ -140,7 +140,6 @@ export async function POST(req) {
       { status: 201 }
     );
   } catch (err) {
-    console.log(err);
     if (err.code === "23505") {
       if (err.detail.includes("email")) {
         return NextResponse.json(
@@ -216,10 +215,14 @@ export async function PUT(req) {
         lastUpdated &&
         now.getTime() - lastUpdated.getTime() < 1000 * 60 * 60 * 24 * 14
       ) {
+        const remainingDays = Math.ceil(
+          (14 * 24 * 60 * 60 * 1000 - (now.getTime() - lastUpdated.getTime())) /
+            (1000 * 60 * 60 * 24)
+        );
         return NextResponse.json(
           {
             success: false,
-            message: "닉네임은 2주에 한 번만 변경할 수 있습니다.",
+            message: `${remainingDays}일 후에 닉네임 변경이 가능합니다.`,
           },
           { status: 400 }
         );
@@ -252,8 +255,35 @@ export async function PUT(req) {
 
     // 이메일 변경
     if (userEmail && userEmail !== "" && userEmail !== user.email) {
+      // 이메일 변경 빈도 제한 (14일에 1번)
+      const now = new Date();
+      const lastEmailUpdated = user.email_updated_at
+        ? new Date(user.email_updated_at)
+        : null;
+
+      if (
+        lastEmailUpdated &&
+        now.getTime() - lastEmailUpdated.getTime() < 1000 * 60 * 60 * 24 * 14
+      ) {
+        const remainingDays = Math.ceil(
+          (14 * 24 * 60 * 60 * 1000 -
+            (now.getTime() - lastEmailUpdated.getTime())) /
+            (1000 * 60 * 60 * 24)
+        );
+        return NextResponse.json(
+          {
+            success: false,
+            message: `${remainingDays}일 후에 이메일 변경이 가능합니다.`,
+          },
+          { status: 400 }
+        );
+      }
+
       updateFields.push(`email = $${valueIndex++}`);
       updateValues.push(userEmail);
+
+      updateFields.push(`email_updated_at = $${valueIndex++}`);
+      updateValues.push(now.toISOString());
     }
 
     // Bio 변경

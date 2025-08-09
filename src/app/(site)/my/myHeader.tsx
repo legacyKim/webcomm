@@ -14,6 +14,7 @@ import {
   EnvelopeIcon,
   ExclamationTriangleIcon,
   Cog6ToothIcon,
+  UserPlusIcon,
 } from "@heroicons/react/24/outline";
 
 export default function MyHeader() {
@@ -33,6 +34,8 @@ export default function MyHeader() {
       setMypageMenu("알림 메세지를");
     } else if (pathname === "/my/blocked") {
       setMypageMenu("차단한 유저를");
+    } else if (pathname === "/my/following") {
+      setMypageMenu("팔로우 목록을");
     } else if (pathname === "/my/menu-settings") {
       setMypageMenu("메뉴 설정을");
     }
@@ -77,6 +80,13 @@ export default function MyHeader() {
         >
           <ExclamationTriangleIcon className="icon" />
           차단
+        </Link>
+        <Link
+          href="/my/following"
+          className={`${pathname === "/my/following" ? "active" : ""}`}
+        >
+          <UserPlusIcon className="icon" />
+          팔로우
         </Link>
         <Link
           href="/my/menu-settings"

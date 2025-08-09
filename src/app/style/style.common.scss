@@ -758,7 +758,7 @@ sub .board_list {
 }
 .block_list_factor {
   @include space-between;
-  margin-bottom: 12px;
+  margin-bottom: 15px;
 }
 .block_list .writer {
   @include flex-start;
@@ -1731,18 +1731,34 @@ sub .board_list {
   gap: 12px;
 }
 
-.notification-content {
+.notification-items li {
+  @include re-bl;
+  opacity: 0.4;
+  border-radius: 4px;
   box-shadow: $box-shadow2;
+}
+.notification-items li:hover {
+  opacity: 1;
+}
+.notification-items li.unread {
+  opacity: 1;
+  border: $border-grey;
+}
+.notification-items li .unread-dot {
+  display: none;
+}
+.notification-items li.unread .unread-dot {
+  display: block;
+}
+.notification-items li .unread-dot {
+  top: 9px;
+  right: 9px;
+}
+
+.notification-content {
   padding: 12px 8px;
-  opacity: 0.7;
   cursor: pointer;
   border-radius: 4px;
-}
-.notification-content:hover {
-  opacity: 1;
-}
-.notification-content.unread {
-  opacity: 1;
 }
 
 /* 알림 드롭다운 스타일 개선 */
@@ -1880,282 +1896,6 @@ sub .board_list {
 }
 
 /* send message */
-
-/* Dark Mode Styles */
-[data-theme="dark"] {
-  /* Base colors */
-  html,
-  body {
-    background-color: $dark-bg !important;
-    color: $dark-text !important;
-  }
-
-  /* Header */
-  header {
-    background-color: $dark-bg-secondary !important;
-    border-bottom: 1px solid $dark-border !important;
-  }
-
-  /* Navigation and links */
-  a {
-    color: $dark-text !important;
-  }
-
-  a:hover {
-    color: $dark-main-color !important;
-  }
-
-  /* Buttons */
-  .btn {
-    background-color: $dark-main-color !important;
-    color: $dark-text !important;
-  }
-
-  .btn:hover {
-    background-color: $dark-main-hover !important;
-  }
-
-  .btn_line_grey {
-    color: $dark-text-secondary !important;
-    border: 1px solid $dark-border !important;
-    background-color: $dark-bg-secondary !important;
-  }
-
-  .btn_line_grey:hover {
-    color: $dark-text !important;
-    background-color: $dark-bg-tertiary !important;
-  }
-
-  /* Board and content areas */
-  .board_list {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-  }
-
-  .board_list li a:hover {
-    background-color: $dark-bg-tertiary !important;
-  }
-
-  .board_list_header {
-    background-color: $dark-bg-tertiary !important;
-  }
-
-  /* Form elements */
-  input,
-  textarea,
-  select {
-    color: $dark-text !important;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: $dark-text-secondary !important;
-  }
-
-  /* Search */
-  .search {
-    border: 2px solid $dark-border !important;
-    background-color: $dark-bg-secondary !important;
-  }
-
-  .search input {
-    background-color: transparent !important;
-    border: none !important;
-    color: $dark-text !important;
-  }
-
-  .search button {
-    background-color: $dark-bg-tertiary !important;
-    color: $dark-text-secondary !important;
-  }
-
-  /* View content */
-  .view_content,
-  .view_info_area {
-    background-color: $dark-bg-secondary !important;
-    color: $dark-text !important;
-    border: 1px solid $dark-border !important;
-  }
-
-  /* Comments */
-  .comment_box_inner {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-  }
-
-  .comment_add .tiptap {
-    background-color: $dark-bg-tertiary !important;
-    color: $dark-text !important;
-  }
-
-  /* Footer */
-  footer {
-    background-color: $dark-bg-secondary !important;
-  }
-
-  /* Categories and badges */
-  .category {
-    color: $dark-text-secondary !important;
-  }
-
-  .board_list .category {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-    color: $dark-text-secondary !important;
-  }
-
-  /* Notification styles */
-  .message {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-    color: $dark-text !important;
-  }
-
-  .message_box:hover {
-    background-color: $dark-bg-tertiary !important;
-  }
-
-  .notice_btn {
-    background-color: $dark-bg-tertiary !important;
-    color: $dark-main-color !important;
-  }
-
-  .notice_btn:hover {
-    background-color: $dark-main-color !important;
-    color: $dark-text !important;
-  }
-
-  /* MyPage */
-  .mypage_content {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-  }
-
-  .mypage_list a {
-    color: $dark-text-secondary !important;
-  }
-
-  .mypage_list a:hover {
-    background-color: $dark-bg-tertiary !important;
-    color: $dark-text !important;
-  }
-
-  .mypage_list a.active {
-    background-color: $dark-main-color !important;
-    color: $dark-text !important;
-  }
-
-  /* Write editor */
-  .write .write_box {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-  }
-
-  .write .write_box > div {
-    background-color: $dark-bg-secondary !important;
-    color: $dark-text !important;
-  }
-
-  /* Dropdowns and modals */
-  .dropDownMenu {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-  }
-
-  .dropDownMenu li button {
-    color: $dark-text !important;
-  }
-
-  .send_message_box {
-    background-color: $dark-bg-secondary !important;
-    border: 1px solid $dark-border !important;
-  }
-
-  /* Pagination */
-  .pagination a {
-    color: $dark-text-secondary !important;
-  }
-
-  .pagination a:hover {
-    color: $dark-main-color !important;
-  }
-
-  .pagination a.active {
-    background-color: $dark-main-color !important;
-    color: $dark-text !important;
-  }
-
-  /* Text colors */
-  .title > span,
-  .date,
-  .like,
-  .view,
-  .comment {
-    color: $dark-text-secondary !important;
-  }
-
-  .writer > .writer_name {
-    color: $dark-text !important;
-  }
-
-  /* Special elements */
-  .view_header .category {
-    color: #fff !important;
-    border: none;
-  }
-
-  .view_header .view_title {
-    color: #fff !important;
-  }
-
-  .icon.notice {
-    color: $dark-main-color !important;
-  }
-
-  .go_to_login_for_comment {
-    background-color: $dark-bg-tertiary !important;
-    color: $dark-text-secondary !important;
-    border-radius: 4px !important;
-  }
-
-  /* Admin styles */
-  .admin_content {
-    background-color: $dark-bg-secondary !important;
-  }
-
-  /* Error and success states */
-  .red {
-    color: #ff6b6b !important;
-  }
-
-  .blue {
-    color: $dark-main-color !important;
-  }
-
-  /* Shadows for dark mode */
-  .board_list,
-  .view_content,
-  .comment_box_inner {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-  }
-
-  /* Data states */
-  .data_wait,
-  .data_none {
-    color: $dark-text-secondary !important;
-  }
-
-  .data_wait svg,
-  .data_none svg {
-    color: $dark-text-secondary !important;
-  }
-
-  .checkbox .custom_checkbox span,
-  .checkbox .custom_checkbox b {
-    font-size: 15px;
-    color: #fff;
-  }
-}
 
 /* mypage styles */
 .mypage_list {
@@ -3197,6 +2937,343 @@ h2.mypage_title {
     &:disabled {
       opacity: 0.4;
       cursor: not-allowed;
+    }
+  }
+}
+
+/* 팔로우 목록 스타일 */
+.tab_menu {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+
+  button {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.2s ease;
+
+    &.active {
+      color: $main-color;
+      border-bottom-color: $main-color;
+      font-weight: 600;
+    }
+
+    &:hover {
+      color: $main-color;
+    }
+  }
+}
+
+.user_list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .user_item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: #ddd;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .user_info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #eee;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .user_details {
+        .nickname {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
+          margin-bottom: 2px;
+        }
+
+        .username {
+          font-size: 14px;
+          color: #666;
+          margin-bottom: 4px;
+        }
+
+        .bio {
+          font-size: 13px;
+          color: #888;
+          max-width: 200px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    .actions {
+      .follow_btn,
+      .unfollow_btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        .icon {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      .follow_btn {
+        background-color: $main-color;
+        color: white;
+
+        &:hover {
+          background-color: darken($main-color, 10%);
+        }
+      }
+
+      .unfollow_btn {
+        background-color: #f8f9fa;
+        color: #666;
+        border: 1px solid #ddd;
+
+        &:hover {
+          background-color: #e9ecef;
+          color: #495057;
+        }
+      }
+    }
+  }
+}
+
+.empty_state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+
+  .empty_icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    color: #ccc;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+}
+
+/* Loading Spinner Styles */
+.loading_spinner_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+
+  p {
+    margin-top: 16px;
+    color: #666;
+    font-size: 14px;
+  }
+}
+
+.loading_spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f0f0f0;
+  border-top: 3px solid $main-color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Skeleton Loading Styles */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  &.user_item {
+    pointer-events: none;
+  }
+
+  .skeleton_avatar {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 50%;
+
+    &:not(.large) {
+      width: 50px;
+      height: 50px;
+    }
+
+    &.large {
+      width: 120px;
+      height: 120px;
+    }
+  }
+
+  .skeleton_line {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+    margin-bottom: 8px;
+
+    &.skeleton_nickname {
+      width: 120px;
+      height: 18px;
+    }
+
+    &.skeleton_username {
+      width: 80px;
+      height: 14px;
+    }
+
+    &.skeleton_bio {
+      width: 200px;
+      height: 14px;
+
+      &.long {
+        width: 300px;
+        height: 16px;
+      }
+    }
+
+    &.stat_label {
+      width: 60px;
+      height: 14px;
+      margin-bottom: 4px;
+    }
+
+    &.stat_number {
+      width: 40px;
+      height: 20px;
+      margin-bottom: 0;
+    }
+  }
+
+  .skeleton_button {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+
+    &:not(.tab) {
+      width: 80px;
+      height: 36px;
+    }
+
+    &.tab {
+      width: 100px;
+      height: 40px;
+      margin-right: 8px;
+    }
+
+    &.action {
+      width: 60px;
+      height: 32px;
+      margin-right: 8px;
+    }
+  }
+}
+
+/* Post Detail Skeleton Styles */
+.skeleton {
+  .skeleton_title {
+    width: 70%;
+    height: 28px;
+    margin-bottom: 12px;
+  }
+
+  .skeleton_meta {
+    width: 40%;
+    height: 16px;
+    margin-bottom: 16px;
+  }
+
+  .skeleton_date {
+    width: 80px;
+    height: 12px;
+  }
+
+  .content_line {
+    width: 100%;
+    height: 18px;
+    margin-bottom: 12px;
+
+    &.short {
+      width: 60%;
+    }
+  }
+}
+
+/* Content Skeleton for TiptapViewer */
+.content_skeleton {
+  padding: 20px 0;
+
+  .content_line {
+    width: 100%;
+    height: 18px;
+    margin-bottom: 16px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+
+    &.short {
+      width: 65%;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
     }
   }
 }
