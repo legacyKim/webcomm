@@ -66,53 +66,13 @@ export default function View({
     setRedirectPath(pathname);
   }, [pathname, setRedirectPath]);
 
-  // 게시물 스켈레톤 컴포넌트
-  const PostSkeleton = () => (
-    <div className="boardview">
-      <div className="boardview_head">
-        <div className="skeleton_line skeleton_title"></div>
-        <div className="skeleton_line skeleton_meta"></div>
-        <div className="boardview_head_user skeleton">
-          <div className="skeleton_avatar"></div>
-          <div className="user_info">
-            <div className="skeleton_line skeleton_nickname"></div>
-            <div className="skeleton_line skeleton_date"></div>
-          </div>
-        </div>
-      </div>
-      <div className="boardview_content skeleton">
-        <div className="skeleton_line content_line"></div>
-        <div className="skeleton_line content_line"></div>
-        <div className="skeleton_line content_line"></div>
-        <div className="skeleton_line content_line short"></div>
-      </div>
-      <div className="boardview_actions skeleton">
-        <div className="skeleton_button action"></div>
-        <div className="skeleton_button action"></div>
-        <div className="skeleton_button action"></div>
-      </div>
-    </div>
-  );
-
-  // 데이터가 없으면 스켈레톤 표시
-  if (!post) {
-    return <PostSkeleton />;
-  }
-  // const [limit, setLimit] = useState(10);
-
   const [viewPost] = useState<Posts | null>(post);
-
-  // 좋아요 상태 관리 (SSR 데이터 활용)
   const [isLiked, setIsLiked] = useState<boolean>(
     post?.is_liked_by_user || false
   );
   const [likeCount, setLikeCount] = useState<number>(post?.likes || 0);
   const [isLikeLoading, setIsLikeLoading] = useState<boolean>(false);
-
-  // 좋아요한 사용자 목록
   const [likers, setLikers] = useState<PostLiker[]>(post?.likers || []);
-
-  // 댓글별 좋아요한 사용자 목록
   const [commentLikers, setCommentLikers] = useState<{
     [key: number]: PostLiker[];
   }>({});
@@ -125,12 +85,9 @@ export default function View({
       setLikers(post.likers || []);
     }
 
-    // 댓글별 좋아요 사용자 정보 초기화
     if (comment) {
       const initialCommentLikers: { [key: number]: PostLiker[] } = {};
       comment.forEach((c: CommentTreeNode) => {
-        // Note: likers property should be added to CommentTreeNode type if needed
-        // For now, we'll initialize empty
         initialCommentLikers[c.id] = [];
       });
       setCommentLikers(initialCommentLikers);
@@ -616,6 +573,39 @@ export default function View({
         </div>
       </div>
     );
+
+  // 게시물 스켈레톤 컴포넌트
+  const PostSkeleton = () => (
+    <div className="boardview">
+      <div className="boardview_head">
+        <div className="skeleton_line skeleton_title"></div>
+        <div className="skeleton_line skeleton_meta"></div>
+        <div className="boardview_head_user skeleton">
+          <div className="skeleton_avatar"></div>
+          <div className="user_info">
+            <div className="skeleton_line skeleton_nickname"></div>
+            <div className="skeleton_line skeleton_date"></div>
+          </div>
+        </div>
+      </div>
+      <div className="boardview_content skeleton">
+        <div className="skeleton_line content_line"></div>
+        <div className="skeleton_line content_line"></div>
+        <div className="skeleton_line content_line"></div>
+        <div className="skeleton_line content_line short"></div>
+      </div>
+      <div className="boardview_actions skeleton">
+        <div className="skeleton_button action"></div>
+        <div className="skeleton_button action"></div>
+        <div className="skeleton_button action"></div>
+      </div>
+    </div>
+  );
+
+  // 데이터가 없으면 스켈레톤 표시
+  if (!post) {
+    return <PostSkeleton />;
+  }
 
   return (
     <sub className="sub">
