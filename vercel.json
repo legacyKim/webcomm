@@ -2,7 +2,8 @@
   "installCommand": "npm install --omit=",
   "build": {
     "env": {
-      "NODE_ENV": "production"
+      "NODE_ENV": "production",
+      "NEXT_PUBLIC_SITE_URL": "https://tokti.net"
     }
   },
   "redirects": [
