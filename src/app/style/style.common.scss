@@ -541,7 +541,8 @@ main,
 sub {
   // flex: 5;
   // margin-right: 24px;
-  min-width: 788px;
+  // min-width: 788px;
+  width: 100%;
 }
 sub {
   line-height: initial;
