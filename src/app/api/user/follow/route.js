@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
-import prisma from "@/lib/prisma.js";
+import prisma from "@/lib/prisma";
 
 export async function POST(request) {
   try {

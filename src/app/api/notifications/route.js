@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import webpush from "web-push";
-import prisma from "@/lib/prisma.js";
+import prisma from "@/lib/prisma";
 
 // VAPID 키 설정 (환경변수로 관리)
 webpush.setVapidDetails(
