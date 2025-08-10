@@ -3097,6 +3097,21 @@ h2.mypage_title {
   }
 }
 
+/* policy */
+.policy-page {
+  width: 100%;
+}
+.policy-content {
+  padding: 20px;
+  border: $border-grey;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+.policy-footer {
+  margin-bottom: 100px;
+  display: flex;
+  flex-direction: row-reverse;
+}
 /* Loading Spinner Styles */
 .loading_spinner_container {
   display: flex;

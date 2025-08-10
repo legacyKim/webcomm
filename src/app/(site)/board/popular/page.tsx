@@ -65,5 +65,12 @@ export default async function Page({
 
   const data = await fetchBoardPop(page, 20, userId);
 
-  return <Board url_slug={url_slug} page={Number(page)} boardType={"popular"} initData={data} />;
+  return (
+    <Board
+      url_slug={url_slug}
+      page={Number(page)}
+      boardType={"popular"}
+      initData={data}
+    />
+  );
 }

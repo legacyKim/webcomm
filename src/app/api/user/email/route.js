@@ -34,12 +34,12 @@ export async function POST(req) {
         <div style="background-color: #0070f3; padding: 16px; color: white; font-weight: bold; font-size: 18px;">
           Tokti 이메일 인증번호 발급 안내
         </div>
-        <div style="padding: 20px; font-size: 14px; line-height: 1.6; color: #333;">
-          <p>안녕하세요, <strong>Tokti</strong> 입니다.</p>
-          <p>이메일 인증 번호는 다음과 같습니다.</p>
+        <div style="padding: 20px; font-size: 14px; line-height: 1.6; ">
+          <p style="color: #333;">안녕하세요, <strong>Tokti</strong> 입니다.</p>
+          <p style="color: #333;">이메일 인증 번호는 다음과 같습니다.</p>
           <p style="font-size: 24px; font-weight: bold; color: #0070f3; margin: 16px 0;">${verifyCode}</p>
-          <p>위 번호를 <strong>인증번호</strong> 칸에 입력해 주세요.</p>
-          <p style="margin-top: 24px;">감사합니다.</p>
+          <p style="color: #333;">위 번호를 <strong>인증번호</strong> 칸에 입력해 주세요.</p>
+          <p style="margin-top: 24px; color: #333;">감사합니다.</p>
         </div>
       </div>`,
     });

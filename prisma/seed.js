@@ -23,13 +23,13 @@ async function main() {
     },
   });
 
-  // 게시판 생성 (베스트, 자유게시판, 건의사항)
+  // 게시판 생성 (베스트게시판, 자유게시판, 건의사항)
   const bestBoard = await prisma.board.upsert({
     where: { id: 1 },
     update: {},
     create: {
       board_name: "베스트게시판",
-      url_slug: "best",
+      url_slug: "popular",
       seq: 1,
     },
   });

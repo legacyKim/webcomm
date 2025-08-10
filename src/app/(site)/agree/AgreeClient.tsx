@@ -8,13 +8,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import styles from "@/style/Login.module.scss";
 
 interface AgreeClientProps {
-  termsContent?: string;
   privacyContent?: string;
+  signupTermsContent?: string;
 }
 
 export default function AgreeClient({
-  termsContent,
   privacyContent,
+  signupTermsContent,
 }: AgreeClientProps) {
   const { setAgreeCheck } = useAuth();
 
@@ -46,7 +46,7 @@ export default function AgreeClient({
             <div className={styles.membership_contents}>
               <div
                 dangerouslySetInnerHTML={{
-                  __html: termsContent || "이용약관을 불러오는 중...",
+                  __html: signupTermsContent || "회원가입약관을 불러오는 중...",
                 }}
               />
             </div>

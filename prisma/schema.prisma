@@ -246,6 +246,15 @@ model Policy {
   @@map("policy")
 }
 
+model SignupTerms {
+  id         Int      @id @default(autoincrement())
+  content    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("signup_terms")
+}
+
 model SiteSettings {
   id         Int      @id @default(autoincrement())
   logo_url   String?  @db.VarChar(255)

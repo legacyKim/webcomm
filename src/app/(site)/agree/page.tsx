@@ -4,26 +4,35 @@ import AgreeClient from "./AgreeClient";
 // 서버에서 데이터 가져오기
 async function getPoliciesData() {
   try {
-    const [terms, policy] = await Promise.all([
-      prisma.terms.findFirst({
+    const [policy, signupTerms] = await Promise.all([
+      prisma.policy.findFirst({
         orderBy: { created_at: "desc" },
       }),
-      prisma.policy.findFirst({
+      prisma.signupTerms.findFirst({
         orderBy: { created_at: "desc" },
       }),
     ]);
 
     return {
-      termsContent: terms?.content,
       privacyContent: policy?.content,
+      signupTermsContent: signupTerms?.content,
     };
   } catch (error) {
     console.error("약관 데이터 로딩 오류:", error);
+    return {
+      privacyContent: "",
+      signupTermsContent: "",
+    };
   }
 }
 
 export default async function Member() {
-  const { termsContent, privacyContent } = (await getPoliciesData()) || {};
+  const { privacyContent, signupTermsContent } = await getPoliciesData();
 
-  return <AgreeClient termsContent={termsContent} privacyContent={privacyContent} />;
+  return (
+    <AgreeClient
+      privacyContent={privacyContent}
+      signupTermsContent={signupTermsContent}
+    />
+  );
 }

@@ -96,7 +96,7 @@ export default function Boardlist({
   return (
     <>
       <ol className="board_list">
-        {isUserId && isUserId !== userInfoInDropMenu.userId && writerDrop && (
+        {writerDrop && (
           <DropDownMenu
             style={{
               top: `${dropPosition.top + (writerRef.current?.offsetHeight ?? 0)}px`,

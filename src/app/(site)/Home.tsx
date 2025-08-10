@@ -86,7 +86,7 @@ export default function Home({
     <main>
       <Search />
 
-      {isUserId && isUserId !== userInfoInDropMenu.userId && writerDrop && (
+      {writerDrop && (
         <DropDownMenu
           style={{
             top: `${dropPosition.top + (writerRef.current?.offsetHeight ?? 0)}px`,

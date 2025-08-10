@@ -4,16 +4,18 @@ import { useState } from "react";
 import SiteSettingsManage from "./components/SiteSettingsManage";
 import CommUsePolicy from "./components/commUsePolicy";
 import CommUseTerm from "./components/commUseTerm";
+import CommSignupTerm from "./components/commSignupTerm";
 
 export default function AdminSitePage() {
   const [section, setSection] = useState<string>("general");
 
   return (
-    <div className='admin_page'>
-      <menu className='left_menu'>
+    <div className="admin_page">
+      <menu className="left_menu">
         <button onClick={() => setSection("general")}>일반 설정</button>
         <button onClick={() => setSection("terms")}>이용약관</button>
         <button onClick={() => setSection("policy")}>개인정보처리방침</button>
+        <button onClick={() => setSection("signup")}>회원가입약관</button>
       </menu>
 
       {section === "general" ? (
@@ -22,6 +24,8 @@ export default function AdminSitePage() {
         <CommUseTerm />
       ) : section === "policy" ? (
         <CommUsePolicy />
+      ) : section === "signup" ? (
+        <CommSignupTerm />
       ) : null}
     </div>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import TiptapViewer from "@/components/tiptapViewer";
 
 export default function TermsOfServicePage() {
   const [content, setContent] = useState<string>("");
@@ -29,8 +30,8 @@ export default function TermsOfServicePage() {
 
   if (isLoading) {
     return (
-      <div className='policy-page'>
-        <div className='policy-container'>
+      <div className="policy-page">
+        <div className="policy-container">
           <h1>이용약관</h1>
           <p>로딩 중...</p>
         </div>
@@ -39,61 +40,16 @@ export default function TermsOfServicePage() {
   }
 
   return (
-    <div className='policy-page'>
-      <div className='policy-container'>
+    <div className="policy-page">
+      <div className="policy-container">
         <h1>이용약관</h1>
-        <div className='policy-content'>
-          {content.split("\n").map((line, index) => (
-            <p key={index}>{line}</p>
-          ))}
+        <div className="policy-content">
+          <TiptapViewer content={content} />
         </div>
-        <div className='policy-footer'>
+        <div className="policy-footer">
           <p>최종 업데이트: {new Date().toLocaleDateString("ko-KR")}</p>
         </div>
       </div>
-
-      <style jsx>{`
-        .policy-page {
-          min-height: 100vh;
-          background: #f8f9fa;
-          padding: 40px 20px;
-        }
-
-        .policy-container {
-          max-width: 800px;
-          margin: 0 auto;
-          background: white;
-          padding: 40px;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-          color: #333;
-          border-bottom: 2px solid #007bff;
-          padding-bottom: 15px;
-          margin-bottom: 30px;
-          font-size: 28px;
-        }
-
-        .policy-content {
-          line-height: 1.8;
-          color: #555;
-          margin-bottom: 30px;
-        }
-
-        .policy-content p {
-          margin-bottom: 16px;
-        }
-
-        .policy-footer {
-          border-top: 1px solid #eee;
-          padding-top: 20px;
-          text-align: right;
-          color: #777;
-          font-size: 14px;
-        }
-      `}</style>
     </div>
   );
 }

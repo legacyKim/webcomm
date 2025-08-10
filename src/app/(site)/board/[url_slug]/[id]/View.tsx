@@ -609,7 +609,7 @@ export default function View({
 
   return (
     <sub className="sub">
-      {isUserId !== userInfoInDropMenu.userId && writerDrop && (
+      {writerDrop && (
         <DropDownMenu
           style={{
             top: `${dropPosition.top + (writerRef.current?.offsetHeight ?? 0) / 2}px`,

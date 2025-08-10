@@ -138,46 +138,51 @@ export default function DropDownMenu({
         <li>
           <button onClick={viewProfile}>프로필 보기</button>
         </li>
-        <li>
-          <button onClick={toggleFollow}>
-            {isFollowing ? "언팔로우" : "팔로우"}
-          </button>
-        </li>
+
         <li>
           <button onClick={searchPosts}>작성글 검색</button>
         </li>
         <li>
           <button onClick={searchComments}>댓글 검색</button>
         </li>
-        <li>
-          <button onClick={sendMessage}>쪽지 보내기</button>
-        </li>
-        <li>
-          <button
-            onClick={async () => {
-              const ok = await loginCheck();
-              if (!ok) return;
+        {isUserId && isUserId !== userInfoInDropMenu.userId && (
+          <>
+            <li>
+              <button onClick={toggleFollow}>
+                {isFollowing ? "언팔로우" : "팔로우"}
+              </button>
+            </li>
+            <li>
+              <button onClick={sendMessage}>쪽지 보내기</button>
+            </li>
+            <li>
+              <button
+                onClick={async () => {
+                  const ok = await loginCheck();
+                  if (!ok) return;
 
-              blockUserConfirm();
-            }}
-            disabled={isBlocked}
-            style={{ color: isBlocked ? "gray" : "inherit" }}
-          >
-            {isBlocked ? "차단됨" : "차단하기"}
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={async () => {
-              const ok = await loginCheck();
-              if (!ok) return;
+                  blockUserConfirm();
+                }}
+                disabled={isBlocked}
+                style={{ color: isBlocked ? "gray" : "inherit" }}
+              >
+                {isBlocked ? "차단됨" : "차단하기"}
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={async () => {
+                  const ok = await loginCheck();
+                  if (!ok) return;
 
-              reportUser();
-            }}
-          >
-            신고하기
-          </button>
-        </li>
+                  reportUser();
+                }}
+              >
+                신고하기
+              </button>
+            </li>
+          </>
+        )}
       </ul>
 
       {messageToUser !== null && (
