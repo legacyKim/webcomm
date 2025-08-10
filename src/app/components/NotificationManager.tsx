@@ -251,9 +251,6 @@ export default function NotificationManager({
               />
               <span className="toggle-slider"></span>
             </label>
-            {/* <span className='toggle-label'>
-              {isLoading ? "처리중..." : isSubscribed ? "푸시 알림 켜짐" : "푸시 알림 꺼짐"}
-            </span> */}
           </div>
         )}
       </div>
