@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  SiteSettingsManage,
-  CommUsePolicy,
-  CommUseTerm,
-  CommSignupTerm,
-} from "./components";
+import SiteSettingsManage from "./components/SiteSettingsManage";
+import CommUsePolicy from "./components/commUsePolicy";
+import CommUseTerm from "./components/commUseTerm";
+import CommSignupTerm from "./components/CommSignupTerm";
 
 export default function AdminSitePage() {
   const [section, setSection] = useState<string>("general");
