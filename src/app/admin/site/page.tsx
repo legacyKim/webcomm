@@ -4,7 +4,7 @@ import { useState } from "react";
 import SiteSettingsManage from "./components/SiteSettingsManage";
 import CommUsePolicy from "./components/commUsePolicy";
 import CommUseTerm from "./components/commUseTerm";
-import CommSignupTerm from "./components/commSignupTerm";
+import CommSignupTerm from "./components/CommSignupTerm";
 
 export default function AdminSitePage() {
   const [section, setSection] = useState<string>("general");

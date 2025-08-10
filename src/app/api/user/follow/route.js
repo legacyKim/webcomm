@@ -127,7 +127,7 @@ export async function GET(request) {
     // JWT에서 현재 사용자 ID 추출 (status와 list의 경우)
     let tokenData;
     let currentUserId;
-    
+
     if (type === "status" || type === "list") {
       tokenData = await serverTokenCheck(request);
       if (!tokenData) {
@@ -156,7 +156,7 @@ export async function GET(request) {
     } else if (type === "list") {
       // 내 팔로우 목록 조회 (로그인 필요)
       const followType = searchParams.get("followType") || "following"; // "following" 또는 "followers"
-      
+
       let users;
       if (followType === "following") {
         // 내가 팔로우하는 사람들
@@ -174,7 +174,7 @@ export async function GET(request) {
             },
           },
         });
-        users = follows.map(f => f.following);
+        users = follows.map((f) => f.following);
       } else {
         // 나를 팔로우하는 사람들
         const follows = await prisma.follow.findMany({
@@ -191,7 +191,7 @@ export async function GET(request) {
             },
           },
         });
-        users = follows.map(f => f.follower);
+        users = follows.map((f) => f.follower);
       }
 
       return NextResponse.json({
@@ -257,7 +257,10 @@ export async function GET(request) {
       );
     } else {
       return NextResponse.json(
-        { error: "올바른 파라미터를 제공해주세요. type은 status, list, followers, following 중 하나여야 합니다." },
+        {
+          error:
+            "올바른 파라미터를 제공해주세요. type은 status, list, followers, following 중 하나여야 합니다.",
+        },
         { status: 400 }
       );
     }
