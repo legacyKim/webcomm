@@ -32,9 +32,9 @@ export default function DropDownMenu({
   const loginCheck = useLoginCheck();
 
   // 프로필 보기
-  const viewProfile = () => {
-    router.push(`/profile/${userInfoInDropMenu.userNickname}`);
-  };
+  // const viewProfile = () => {
+  //   router.push(`/profile/${userInfoInDropMenu.userNickname}`);
+  // };
 
   // 팔로우/언팔로우
   const toggleFollow = async () => {
@@ -135,9 +135,9 @@ export default function DropDownMenu({
   return (
     <>
       <ul className="dropDownMenu" style={style}>
-        <li>
+        {/* <li>
           <button onClick={viewProfile}>프로필 보기</button>
-        </li>
+        </li> */}
 
         <li>
           <button onClick={searchPosts}>작성글 검색</button>
