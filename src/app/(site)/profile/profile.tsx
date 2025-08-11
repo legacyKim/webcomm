@@ -159,8 +159,8 @@ export default function Profile({
         {/* 프로필 이미지 */}
         <div className="profile_img">
           <Image
-            src={userProfile?.profile || "/profile/basic.png"}
-            alt={`${userProfile?.user_nickname || userProfile?.username || "프로필"} 프로필`}
+            src={userProfile?.profile ?? "/profile/basic.png"}
+            alt={`${userProfile?.user_nickname || "프로필"} 프로필`}
             width={200}
             height={200}
             className="rounded-full"
