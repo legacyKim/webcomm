@@ -20,7 +20,7 @@ async function getUserData(
   tab: string = "summary"
 ): Promise<ProfileResponse | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     // API 라우트 호출: /api/user/profile/[username]
     const url = `${baseUrl}/api/user/profile/${encodeURIComponent(userNickname)}?current_user=${currentUserId || ""}&tab=${tab}`;
