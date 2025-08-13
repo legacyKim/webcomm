@@ -170,7 +170,12 @@ export default function Boardlist({
                     });
                   }}
                 >
-                  {b.user_nickname}
+                  <img
+                    className="profile_img"
+                    src={b.user_profile ?? "/profile/basic.png"}
+                    alt={`${b.user_nickname}의 프로필`}
+                  />
+                  <span className="writer_name">{b.user_nickname}</span>
                 </span>
                 <div className="like">
                   <i></i>
