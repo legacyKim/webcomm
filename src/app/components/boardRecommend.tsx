@@ -3,13 +3,14 @@
 import { useState } from "react";
 import axios from "axios";
 
-export default function BoardRecommend({
-  boardRecommendPopup,
-  setBoardRecommendPopup,
-}: {
+interface BoardRecommendProps {
   boardRecommendPopup: boolean;
   setBoardRecommendPopup: (value: boolean) => void;
-}) {
+}
+
+export default function BoardRecommend({
+  setBoardRecommendPopup,
+}: BoardRecommendProps) {
   const [boardName, setBoardName] = useState("");
   const [reason, setReason] = useState("");
 
@@ -36,10 +37,9 @@ export default function BoardRecommend({
         setBoardName("");
         setReason("");
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.error || "게시판 추천 중 오류가 발생했습니다.";
-      alert(errorMessage);
+    } catch (error) {
+      console.log(error);
+      alert("게시판 추천 중 오류가 발생했습니다.");
     } finally {
       setBoardRecommendPopup(false);
     }

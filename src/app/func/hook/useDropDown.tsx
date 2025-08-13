@@ -6,14 +6,10 @@ export function useDropDown({
 }: {
   messageToUser: number | null;
 }) {
-  const { loginStatus } = useAuth();
-
   const [writerDrop, setWriterDrop] = useState<boolean>(false);
   const [dropPosition, setDropPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-    // if (!loginStatus) return;
-
     const clickOutSide = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const dropdownEl = document.querySelector(".dropDownMenu");
@@ -42,8 +38,6 @@ export function useDropDown({
   }, [messageToUser]);
 
   const userClick = (e: React.MouseEvent<HTMLElement>) => {
-    // if (!loginStatus) return;
-
     const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
 

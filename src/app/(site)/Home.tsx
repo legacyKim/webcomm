@@ -29,7 +29,7 @@ export default function Home({
 }: {
   popBoardposts: initDataPosts;
 }) {
-  const { setBoardType, messageToUser } = useAuth();
+  const { messageToUser } = useAuth();
 
   // const { data: homeData } = useQuery({
   //   queryKey: ["home", isUserId],

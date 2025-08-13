@@ -25,7 +25,7 @@ export default function Board({
   boardType: string;
   initData?: initDataPosts;
 }) {
-  const { isUserId, setBoardType, setRedirectPath, setInitData } = useAuth();
+  const { isUserId, setRedirectPath, setInitData } = useAuth();
   const pathname = usePathname();
 
   useEffect(() => {

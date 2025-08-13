@@ -139,10 +139,9 @@ export default function BoardRecommendConfirm() {
         setSelectedRecommendation(null);
         setAdminResponse("");
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.error || "상태 업데이트에 실패했습니다.";
-      alert(errorMessage);
+    } catch (error) {
+      console.error(error);
+      alert("상태 업데이트에 실패했습니다.");
     }
   };
 
