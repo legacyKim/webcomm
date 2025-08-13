@@ -97,7 +97,7 @@ export default function Home({
       )}
 
       <div className="board_wrap">
-        <div className="board_single">
+        <div className="board_single board_renew">
           {/* board best */}
           <div className="board">
             <div className="board_top">
@@ -105,11 +105,10 @@ export default function Home({
               <Link
                 className="more"
                 href="/board/popular"
-                onClick={() => {
-                  setBoardType("popular");
-                }}
+                // onClick={() => {
+                //   setBoardType("popular");
+                // }}
               >
-                <span>더 보기</span>
                 <ChevronRightIcon />
               </Link>
             </div>
@@ -128,50 +127,56 @@ export default function Home({
                   <li key={post.id}>
                     <Link
                       href={`/board/popular/${post.id}`}
-                      onClick={() => setBoardType("popular")}
+                      // onClick={() => setBoardType("popular")}
                     >
                       <div className="title">
                         <b className="category">{post.board_name}</b>
                         <span>{post.title}</span>
                       </div>
                       <div className="board_list_info_wrap">
-                        <div className="comment flex-start">
-                          <ChatBubbleLeftEllipsisIcon className="icon" />
-                          <span className="icon_text">{post.comments}</span>
-                        </div>
-                        <div
-                          className="writer"
-                          ref={writerRef}
-                          onClick={async (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
+                        <div className="flex-start">
+                          <div className="comment flex-start">
+                            <ChatBubbleLeftEllipsisIcon className="icon" />
+                            <span className="icon_text">{post.comments}</span>
+                          </div>
 
-                            userClick(e);
-                            setUserInfoInDropMenu({
-                              userId: Number(post.user_id),
-                              userNickname: post.user_nickname,
-                            });
-                          }}
-                        >
-                          <img
-                            className="profile_img"
-                            src={post.user_profile ?? "/profile/basic.png"}
-                            alt={`${post.user_nickname}의 프로필`}
-                          />
-                          <span className="writer_name">
-                            {post.user_nickname}
-                          </span>
+                          <div className="like flex-start">
+                            <HeartIcon className="icon" />
+                            <span className="icon_text">{post.likes}</span>
+                          </div>
+                          <div className="view flex-start">
+                            <EyeIcon className="icon" />
+                            <span className="icon_text">{post.views}</span>
+                          </div>
                         </div>
-                        <div className="like flex-start">
-                          <HeartIcon className="icon" />
-                          <span className="icon_text">{post.likes}</span>
-                        </div>
-                        <div className="view flex-start">
-                          <EyeIcon className="icon" />
-                          <span className="icon_text">{post.views}</span>
-                        </div>
-                        <div className="date flex-start">
-                          {formatPostDate(post.created_at)}
+
+                        <div className="flex-start">
+                          <div
+                            className="writer"
+                            ref={writerRef}
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              userClick(e);
+                              setUserInfoInDropMenu({
+                                userId: Number(post.user_id),
+                                userNickname: post.user_nickname,
+                              });
+                            }}
+                          >
+                            <img
+                              className="profile_img"
+                              src={post.user_profile ?? "/profile/basic.png"}
+                              alt={`${post.user_nickname}의 프로필`}
+                            />
+                            <span className="writer_name">
+                              {post.user_nickname}
+                            </span>
+                          </div>
+                          <div className="date flex-start">
+                            {formatPostDate(post.created_at)}
+                          </div>
                         </div>
                       </div>
                     </Link>

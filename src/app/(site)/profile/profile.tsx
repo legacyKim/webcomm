@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import TiptapViewer from "@/components/tiptapViewer";
+import CountUpAnimation from "@/components/CountUpAnimation";
 
 import { UserProfile, UserActivity } from "@/type/type";
 
+import { EyeIcon, HeartIcon, CalendarIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "@/contexts/AuthContext";
 // 타입 정의
 
 interface ProfileProps {
@@ -22,6 +25,8 @@ export default function Profile({
   currentTab,
   isLoading = false,
 }: ProfileProps) {
+  const { isUserId } = useAuth();
+
   const [isFollowing, setIsFollowing] = useState(
     userProfile?.isFollowing || false
   );
@@ -113,44 +118,13 @@ export default function Profile({
     return formatDate(dateString);
   };
 
-  // 프로필 스켈레톤 컴포넌트
-  const ProfileSkeleton = () => (
-    <div className="profile_container">
-      <div className="profile_header">
-        <div className="user_info">
-          <div className="user_avatar skeleton">
-            <div className="skeleton_avatar large"></div>
-          </div>
-          <div className="user_details">
-            <div className="skeleton_line skeleton_username"></div>
-            <div className="skeleton_line skeleton_nickname"></div>
-            <div className="skeleton_line skeleton_bio long"></div>
-          </div>
-        </div>
-      </div>
-
-      <div className="user_stats skeleton">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="stat_item">
-            <div className="skeleton_line stat_label"></div>
-            <div className="skeleton_line stat_number"></div>
-          </div>
-        ))}
-      </div>
-
-      <div className="profile_tabs skeleton">
-        <div className="tab_list">
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="skeleton_button tab"></div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  // 로딩 중일 때 스켈레톤 표시
+  // 로딩 중일 때 메시지 표시
   if (isLoading || !userProfile) {
-    return <ProfileSkeleton />;
+    return (
+      <div className="profile_container">
+        <div className="loading-message">프로필 로딩 중...</div>
+      </div>
+    );
   }
 
   return (
@@ -161,8 +135,8 @@ export default function Profile({
           <Image
             src={userProfile?.profile ?? "/profile/basic.png"}
             alt={`${userProfile?.user_nickname || "프로필"} 프로필`}
-            width={200}
-            height={200}
+            width={160}
+            height={160}
             className="rounded-full"
           />
           {userProfile?.is_online && <div className="online_indicator"></div>}
@@ -210,14 +184,14 @@ export default function Profile({
           </div>
 
           {/* 팔로우 버튼 */}
-          {!userProfile?.isOwnProfile && (
+          {isUserId !== userProfile?.id && !userProfile?.isOwnProfile && (
             <div className="follow_section">
               <button
                 className={`follow_btn ${isFollowing ? "following" : "follow"}`}
                 onClick={handleFollowToggle}
               >
                 <span className="follow_btn_text">
-                  {isFollowing ? "팔로잉" : "팔로우"}
+                  {isFollowing ? "" : "팔로우"}
                 </span>
               </button>
               <p className="follow_description">
@@ -232,286 +206,338 @@ export default function Profile({
       <div className="user_stats">
         <div className="stat_item">
           <span className="stat_label">게시글</span>
-          <span className="stat_number">{userProfile?.posts_count || 0}</span>
+          <CountUpAnimation
+            end={userProfile?.posts_count || 0}
+            className="stat_number"
+            duration={1200}
+          />
         </div>
+        <div className="bar"></div>
         <div className="stat_item">
           <span className="stat_label">조회수</span>
-          <span className="stat_number">
-            {userProfile?.all_views?.toLocaleString() || 0}
-          </span>
+          <CountUpAnimation
+            end={userProfile?.all_views || 0}
+            className="stat_number"
+            duration={1500}
+            formatNumber={true}
+          />
         </div>
+        <div className="bar"></div>
         <div className="stat_item">
           <span className="stat_label">팔로워</span>
-          <span className="stat_number">{followerCount}</span>
+          <CountUpAnimation
+            end={followerCount}
+            className="stat_number"
+            duration={1000}
+          />
         </div>
+        <div className="bar"></div>
         <div className="stat_item">
           <span className="stat_label">팔로잉</span>
-          <span className="stat_number">
-            {userProfile?.following_count || 0}
-          </span>
+          <CountUpAnimation
+            end={userProfile?.following_count || 0}
+            className="stat_number"
+            duration={1100}
+          />
         </div>
+        <div className="bar"></div>
         <div className="stat_item">
           <span className="stat_label">받은 좋아요</span>
-          <span className="stat_number">
-            {userProfile?.total_likes_received || 0}
-          </span>
+          <CountUpAnimation
+            end={userProfile?.total_likes_received || 0}
+            className="stat_number"
+            duration={1400}
+          />
         </div>
       </div>
 
-      {/* 탭 메뉴 */}
-      <div className="profile_tabs">
-        <div className="tab_list">
-          <button
-            className={`tab_btn ${activeTab === "summary" ? "active" : ""}`}
-            onClick={() => setActiveTab("summary")}
-          >
-            요약
-          </button>
-          <button
-            className={`tab_btn ${activeTab === "posts" ? "active" : ""}`}
-            onClick={() => setActiveTab("posts")}
-          >
-            게시글 ({userProfile?.posts_count || 0})
-          </button>
-          <button
-            className={`tab_btn ${activeTab === "comments" ? "active" : ""}`}
-            onClick={() => setActiveTab("comments")}
-          >
-            댓글 ({userProfile?.comments_count || 0})
-          </button>
-          <button
-            className={`tab_btn ${activeTab === "likes" ? "active" : ""}`}
-            onClick={() => setActiveTab("likes")}
-          >
-            좋아요한 글 ({userProfile?.liked_posts_count || 0})
-          </button>
-          <button
-            className={`tab_btn ${activeTab === "follower" ? "active" : ""}`}
-            onClick={() => setActiveTab("follower")}
-          >
-            팔로워
-          </button>
-        </div>
-      </div>
-
-      {/* 탭 컨텐츠 */}
-      <div className="tab_content">
-        {activeTab === "summary" && userActivity && (
-          <div className="summary_tab">
-            {/* 관심 게시판 */}
-            {userActivity.favorite_boards.length > 0 && (
-              <div className="section">
-                <h3>주요 활동 게시판</h3>
-                <div className="favorite_boards">
-                  {userActivity.favorite_boards.slice(0, 5).map((board) => (
-                    <Link
-                      key={board.url_slug}
-                      href={`/board/${board.url_slug}`}
-                      className="board_tag"
-                    >
-                      <span>{board.board_name}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 최근 게시글 */}
-            {userActivity.recent_posts.length > 0 && (
-              <div className="section">
-                <h3>최근 게시글</h3>
-                <div className="recent_posts">
-                  {userActivity.recent_posts.slice(0, 5).map((post) => (
-                    <div key={post.id} className="post_item">
-                      <Link
-                        href={`/board/${post.url_slug}/${post.id}`}
-                        className="post_title"
-                      >
-                        {post.title}
-                      </Link>
-                      <div className="post_meta">
-                        <span className="post_date">
-                          {getRelativeTime(post.created_at)}
-                        </span>
-                        &middot;
-                        <span className="post_stats">조회 {post.views}</span>
-                        &middot;
-                        <span className="post_stats">좋아요 {post.likes}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 최근 댓글 */}
-            {userActivity.recent_comments.length > 0 && (
-              <div className="section">
-                <h3>최근 댓글</h3>
-                <div className="recent_comments">
-                  {userActivity.recent_comments.slice(0, 5).map((comment) => (
-                    <Link
-                      key={comment.id}
-                      href={`/board/${comment.post_url_slug}/${comment.id}`}
-                      className="comment_item"
-                    >
-                      <div className="comment_content">
-                        <TiptapViewer content={comment.content} />
-                      </div>
-                      <div className="comment_meta">
-                        <div className="post_title">{comment.post_title}</div>
-                        <span className="board_name">{comment.board_name}</span>
-                        <span className="comment_date">
-                          {getRelativeTime(comment.created_at)}
-                        </span>
-                        <span className="comment_likes">
-                          좋아요 {comment.likes}
-                        </span>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
+      <div className="profile_tabs_wrap">
+        {/* 탭 메뉴 */}
+        <div className="profile_tabs">
+          <div className="tab_list">
+            <button
+              className={`tab_btn ${activeTab === "summary" ? "active" : ""}`}
+              onClick={() => setActiveTab("summary")}
+            >
+              요약
+            </button>
+            <span>&middot;</span>
+            <button
+              className={`tab_btn ${activeTab === "posts" ? "active" : ""}`}
+              onClick={() => setActiveTab("posts")}
+            >
+              게시글 ({userProfile?.posts_count || 0})
+            </button>
+            <span>&middot;</span>
+            <button
+              className={`tab_btn ${activeTab === "comments" ? "active" : ""}`}
+              onClick={() => setActiveTab("comments")}
+            >
+              댓글 ({userProfile?.comments_count || 0})
+            </button>
+            <span>&middot;</span>
+            <button
+              className={`tab_btn ${activeTab === "likes" ? "active" : ""}`}
+              onClick={() => setActiveTab("likes")}
+            >
+              좋아요한 글 ({userProfile?.liked_posts_count || 0})
+            </button>
+            <span>&middot;</span>
+            <button
+              className={`tab_btn ${activeTab === "follower" ? "active" : ""}`}
+              onClick={() => setActiveTab("follower")}
+            >
+              팔로워
+            </button>
           </div>
-        )}
+        </div>
 
-        {activeTab === "posts" && userActivity && (
-          <div className="posts_tab">
-            <div className="posts_list">
-              {userActivity.recent_posts.length > 0 ? (
-                userActivity.recent_posts.map((post) => (
-                  <div key={post.id} className="post_card">
-                    <div className="post_header">
+        {/* 탭 컨텐츠 */}
+        <div className="tab_content" key={activeTab}>
+          {activeTab === "summary" && userActivity && (
+            <div className="summary_tab tab">
+              {/* 관심 게시판 */}
+              {userActivity.favorite_boards.length > 0 && (
+                <div className="section">
+                  <h3>주요 활동 게시판</h3>
+                  <div className="favorite_boards">
+                    {userActivity.favorite_boards.slice(0, 5).map((board) => (
+                      <Link
+                        key={board.url_slug}
+                        href={`/board/${board.url_slug}`}
+                        className="board_tag"
+                      >
+                        <span>{board.board_name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 최근 게시글 */}
+              {userActivity.recent_posts.length > 0 && (
+                <div className="section">
+                  <h3>최근 게시글</h3>
+                  <div className="recent_posts">
+                    {userActivity.recent_posts.slice(0, 5).map((post) => (
                       <Link
                         href={`/board/${post.url_slug}/${post.id}`}
-                        className="post_title"
+                        key={post.id}
+                        className="post_item"
                       >
-                        <h4>{post.title}</h4>
+                        <span className="board_name">{post.board_name}</span>
+                        <div className="post_title">{post.title}</div>
+                        <div className="post_meta">
+                          <div className="post_date">
+                            <CalendarIcon className="icon" />
+                            {getRelativeTime(post.created_at)}
+                          </div>
+                          &middot;
+                          <div className="post_stats">
+                            <EyeIcon className="icon" /> {post.views}
+                          </div>
+                          &middot;
+                          <div className="post_stats">
+                            <HeartIcon className="icon" /> {post.likes}
+                          </div>
+                        </div>
                       </Link>
-                      <span className="post_board">{post.board_name}</span>
-                    </div>
-                    <div className="post_meta">
-                      <span className="post_date">
-                        {formatDate(post.created_at)}
-                      </span>
-                      <div className="post_stats">
-                        <span>조회 {post.views.toLocaleString()}</span>
-                        <span>좋아요 {post.likes.toLocaleString()}</span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))
-              ) : (
-                <div className="empty_state">
-                  <p>작성한 게시글이 없습니다.</p>
+                </div>
+              )}
+
+              {/* 최근 댓글 */}
+              {userActivity.recent_comments.length > 0 && (
+                <div className="section">
+                  <h3>최근 댓글</h3>
+                  <div className="recent_comments">
+                    {userActivity.recent_comments.slice(0, 5).map((comment) => (
+                      <Link
+                        key={comment.id}
+                        href={`/board/${comment.post_url_slug}/${comment.id}`}
+                        className="comment_item"
+                      >
+                        <div className="comment_content">
+                          <TiptapViewer content={comment.content} />
+                        </div>
+                        <div className="comment_meta">
+                          <span className="board_name">
+                            {comment.board_name}
+                          </span>
+                          <div className="post_title">{comment.post_title}</div>
+                          &middot;
+                          <span className="comment_date">
+                            <CalendarIcon className="icon" />
+                            {getRelativeTime(comment.created_at)}
+                          </span>
+                          &middot;
+                          <span className="comment_likes">
+                            <HeartIcon className="icon" />
+                            {comment.likes}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === "comments" && userActivity && (
-          <div className="comments_tab">
-            <div className="comments_list">
-              {userActivity.recent_comments.length > 0 ? (
-                userActivity.recent_comments.map((comment) => (
-                  <div key={comment.id} className="comment_card">
-                    <div className="comment_content">
-                      <TiptapViewer content={comment.content} />
-                    </div>
-                    <div className="comment_meta">
+          {activeTab === "posts" && userActivity && (
+            <section>
+              <div className="posts_tab tab">
+                <div className="section">
+                  <h3>게시글 목록</h3>
+                  <div className="recent_posts">
+                    {userActivity.recent_posts.length > 0 ? (
+                      userActivity.recent_posts.map((post) => (
+                        <Link
+                          href={`/board/${post.url_slug}/${post.id}`}
+                          key={post.id}
+                          className="post_item"
+                        >
+                          <div className="board_name">{post.board_name}</div>
+                          <div className="post_title">{post.title}</div>
+                          <div className="post_meta">
+                            <div className="post_date">
+                              <CalendarIcon className="icon" />
+                              {formatDate(post.created_at)}
+                            </div>
+                            <div className="post_stats">
+                              <EyeIcon className="icon" />
+                              {post.views.toLocaleString()}
+                            </div>
+                            <div>
+                              <HeartIcon className="icon" />
+                              {post.likes.toLocaleString()}
+                            </div>
+                          </div>
+                        </Link>
+                      ))
+                    ) : (
+                      <div className="empty_state">
+                        <p>작성한 게시글이 없습니다.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {activeTab === "comments" && userActivity && (
+            <div className="comments_tab tab">
+              <div className="section">
+                <h3>댓글 목록</h3>
+                <div className="recent_comments">
+                  {userActivity.recent_comments.length > 0 ? (
+                    userActivity.recent_comments.map((comment) => (
                       <Link
                         href={`/board/${comment.post_url_slug}/${comment.id}`}
-                        className="post_link"
+                        key={comment.id}
+                        className="comment_item"
                       >
-                        {comment.post_title}
+                        <div className="comment_content">
+                          <TiptapViewer content={comment.content} />
+                        </div>
+                        <div className="comment_meta">
+                          <span className="board_name">
+                            {comment.board_name}
+                          </span>
+                          <div className="post_title">{comment.post_title}</div>
+                          &middot;
+                          <span className="comment_date">
+                            <CalendarIcon className="icon" />
+                            {formatDate(comment.created_at)}
+                          </span>
+                          &middot;
+                          <span className="comment_likes">
+                            <HeartIcon className="icon" /> {comment.likes}
+                          </span>
+                        </div>
                       </Link>
-                      <div className="comment_info">
-                        <span className="board_name">{comment.board_name}</span>
-                        <span className="comment_date">
-                          {formatDate(comment.created_at)}
-                        </span>
-                        <span className="comment_likes">
-                          좋아요 {comment.likes}
-                        </span>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="empty_state">
+                      <p>작성한 댓글이 없습니다.</p>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <div className="empty_state">
-                  <p>작성한 댓글이 없습니다.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "likes" && userActivity && (
-          <div className="likes_tab">
-            <div className="posts_list">
-              {userActivity.liked_posts &&
-              userActivity.liked_posts.length > 0 ? (
-                userActivity.liked_posts.map((post) => (
-                  <div key={post.id} className="post_card">
-                    <div className="post_header">
-                      <Link
-                        href={`/board/${post.url_slug}/${post.id}`}
-                        className="post_title"
-                      >
-                        <h4>{post.title}</h4>
-                      </Link>
-                      <span className="post_board">{post.board_name}</span>
-                    </div>
-                    <div className="post_meta">
-                      <span className="post_date">
-                        {formatDate(post.created_at)}
-                      </span>
-                      <div className="post_stats">
-                        <span>조회 {post.views.toLocaleString()}</span>
-                        <span>좋아요 {post.likes.toLocaleString()}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="empty_state">
-                  <p>좋아요한 글이 없습니다.</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "follower" && userActivity && (
-          <div className="follower_tab">
-            {/* 팔로워 목록 */}
-            {userActivity.followers.length > 0 && (
-              <div className="section">
-                <h3>팔로워</h3>
-                <div className="followers_list">
-                  {userActivity.followers.slice(0, 10).map((follower) => (
-                    <Link
-                      key={follower.id}
-                      href={`/profile/${follower.username}`}
-                      className="follower_item"
-                    >
-                      <Image
-                        src={follower.profile || "/profile/basic.png"}
-                        alt={follower.user_nickname || follower.username}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <span>{follower.user_nickname || follower.username}</span>
-                    </Link>
-                  ))}
+                  )}
                 </div>
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          )}
+
+          {activeTab === "likes" && userActivity && (
+            <div className="likes_tab tab">
+              <div className="section">
+                <h3>좋아요한 글 목록</h3>
+                <div className="recent_posts">
+                  {userActivity.liked_posts &&
+                  userActivity.liked_posts.length > 0 ? (
+                    userActivity.liked_posts.map((post) => (
+                      <Link
+                        href={`/board/${post.url_slug}/${post.id}`}
+                        key={post.id}
+                        className="post_item"
+                      >
+                        <span className="board_name">{post.board_name}</span>
+                        <div className="post_title">{post.title}</div>
+                        <div className="post_meta">
+                          <div className="post_date">
+                            <CalendarIcon className="icon" />
+                            {formatDate(post.created_at)}
+                          </div>
+                          <div className="post_stats">
+                            <EyeIcon className="icon" />
+                            {post.views.toLocaleString()}
+                          </div>
+                          <div>
+                            <HeartIcon className="icon" />
+                            {post.likes.toLocaleString()}
+                          </div>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="empty_state">
+                      <p>좋아요한 글이 없습니다.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "follower" && userActivity && (
+            <div className="follower_tab tab">
+              {userActivity.followers.length > 0 && (
+                <div className="section">
+                  <h3>팔로워 목록</h3>
+                  <div className="followers_list">
+                    {userActivity.followers.slice(0, 10).map((follower) => (
+                      <Link
+                        key={follower.id}
+                        href={`/profile/${follower.user_nickname}`}
+                        className="follower_item"
+                      >
+                        <Image
+                          src={follower.profile || "/profile/basic.png"}
+                          alt={follower.user_nickname}
+                          width={40}
+                          height={40}
+                          className="rounded-full"
+                        />
+                        <span>{follower.user_nickname}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -6,36 +6,48 @@ import BoardManage from "./components/boardManage";
 import BoardConManage from "./components/boardConManage";
 import BoardStorage from "./components/boardStorage";
 import BoardNoticeManage from "./components/boardNoticeManage";
+import BoardRecommendConfirm from "./components/boardRecommendConfirm";
 
 export default function Board() {
   const [section, setSection] = useState<string>("boardNoticeManage");
 
   return (
-    <div className='admin_page'>
-      <menu className='left_menu'>
+    <div className="admin_page">
+      <menu className="left_menu">
         <button
           onClick={() => {
             setSection("boardNoticeManage");
-          }}>
+          }}
+        >
           공지 관리
         </button>
         <button
           onClick={() => {
             setSection("boardManage");
-          }}>
+          }}
+        >
           게시판 관리
         </button>
         <button
           onClick={() => {
             setSection("boardConManage");
-          }}>
+          }}
+        >
           게시글 관리
         </button>
         <button
           onClick={() => {
             setSection("boardStorage");
-          }}>
+          }}
+        >
           게시글 보관
+        </button>
+        <button
+          onClick={() => {
+            setSection("boardRecommendConfirm");
+          }}
+        >
+          게시판 추천
         </button>
       </menu>
 
@@ -47,6 +59,8 @@ export default function Board() {
         <BoardStorage />
       ) : section === "boardNoticeManage" ? (
         <BoardNoticeManage />
+      ) : section === "boardRecommendConfirm" ? (
+        <BoardRecommendConfirm />
       ) : null}
     </div>
   );

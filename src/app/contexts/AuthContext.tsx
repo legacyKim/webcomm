@@ -53,6 +53,9 @@ export function AuthProvider({
 
   const [boardType, setBoardType] = useState<string | null>("board");
   const [messageToUser, setMessageToUser] = useState<number | null>(null);
+  const [boardRecommendPopup, setBoardRecommendPopup] = useState<
+    boolean | null
+  >(null);
   const [redirectPath, setRedirectPath] = useState<string | null>(null);
 
   const [initData, setInitData] = useState<{ posts: Posts[] } | null>(null);
@@ -101,6 +104,8 @@ export function AuthProvider({
         setInitData,
         agreeCheck,
         setAgreeCheck,
+        boardRecommendPopup,
+        setBoardRecommendPopup,
       }}
     >
       {children}

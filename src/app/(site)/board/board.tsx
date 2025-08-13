@@ -11,7 +11,7 @@ import Boardlist from "@/(site)/board/boardlist";
 
 import { useAuth } from "@/contexts/AuthContext";
 
-import { PencilSquareIcon } from "@heroicons/react/24/outline";
+import { PencilIcon } from "@heroicons/react/24/solid";
 import { initDataPosts } from "@/type/type";
 
 export default function Board({
@@ -33,9 +33,9 @@ export default function Board({
     setInitData(initData || null);
   }, [initData]);
 
-  useEffect(() => {
-    setBoardType(boardType);
-  }, [boardType]);
+  // useEffect(() => {
+  //   setBoardType(boardType);
+  // }, [boardType]);
 
   // const [limit, setLimit] = useState(20);
 
@@ -58,11 +58,10 @@ export default function Board({
 
             <div></div>
 
-            {isUserId !== null && (
+            {isUserId !== null && pathname !== "/board/popular" && (
               <div>
-                <Link href="/write">
-                  <PencilSquareIcon className="icon" />
-                  <span>글쓰기</span>
+                <Link href="/write" className="write">
+                  <PencilIcon className="icon" />
                 </Link>
               </div>
             )}

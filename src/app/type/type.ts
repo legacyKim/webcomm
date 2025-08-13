@@ -96,6 +96,8 @@ export interface AuthContextType {
   setInitData: (data: { posts: Posts[] } | null) => void;
   agreeCheck: boolean | null;
   setAgreeCheck: (agreeCheck: boolean | null) => void;
+  boardRecommendPopup: boolean | null;
+  setBoardRecommendPopup: (agreeCheck: boolean | null) => void;
 }
 
 // profile
@@ -169,5 +171,16 @@ export interface PostLiker {
   user_id: number;
   user_nickname: string;
   user_profile?: string;
+  created_at: string;
+}
+
+export interface myActivityType {
+  id: number;
+  board_name: string;
+  url_slug: string;
+  title: string;
+  comments: string;
+  likes: number;
+  views: number;
   created_at: string;
 }

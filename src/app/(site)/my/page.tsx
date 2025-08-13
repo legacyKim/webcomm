@@ -1,7 +1,6 @@
 "use client";
 
 import axios from "axios";
-import "@/style/style.common.scss";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";

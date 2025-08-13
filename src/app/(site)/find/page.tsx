@@ -5,7 +5,6 @@ import axios from "axios";
 import { useState, useRef, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-import "@/style/style.common.scss";
 import styles from "@/style/Login.module.scss";
 
 import { handleBlur, handleFocus } from "@/func/inputActive";
@@ -53,7 +52,8 @@ export default function Info() {
               <div className={styles.header_login}>
                 <h2 className={styles.header_text}>ID/PW 찾기</h2>
                 <p className={styles.header_subtext}>
-                  회원가입 시 입력한 이메일로 새로운 비밀번호를 <br /> 보내 드립니다.
+                  회원가입 시 입력한 이메일로 새로운 비밀번호를 <br /> 보내
+                  드립니다.
                 </p>
               </div>
 
@@ -61,7 +61,11 @@ export default function Info() {
               <div className={styles.input_group}>
                 <div className={styles.input_box} ref={boxEmailRef}>
                   <div className={styles.input_bg}></div>
-                  <label className={styles.label_common} htmlFor='user_email' ref={labelEmailRef}>
+                  <label
+                    className={styles.label_common}
+                    htmlFor="user_email"
+                    ref={labelEmailRef}
+                  >
                     이메일
                   </label>
                   <input
@@ -69,24 +73,27 @@ export default function Info() {
                     ref={inputEmailRef}
                     onFocus={() => handleFocus(labelEmailRef, boxEmailRef)}
                     onBlur={() => {
-                      if (inputEmailRef.current && inputEmailRef.current.value === "") {
+                      if (
+                        inputEmailRef.current &&
+                        inputEmailRef.current.value === ""
+                      ) {
                         handleBlur(labelEmailRef, boxEmailRef);
                       }
                     }}
-                    type='text'
-                    id='user_email'
-                    name='user_email'
+                    type="text"
+                    id="user_email"
+                    name="user_email"
                     value={userEmail}
                     onChange={(e) => setUserEmail(e.target.value)}
                   />
                 </div>
               </div>
 
-              {error && <span className='notice'>{error}</span>}
+              {error && <span className="notice">{error}</span>}
 
               {/* 버튼 */}
-              <div className='btn_wrap'>
-                <button type='submit' className={`btn`}>
+              <div className="btn_wrap">
+                <button type="submit" className={`btn`}>
                   확인
                 </button>
               </div>

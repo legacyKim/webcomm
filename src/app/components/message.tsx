@@ -41,27 +41,33 @@ export default function Message({
 
   return (
     <div
-      className='send_message'
+      className="send_message"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-      }}>
-      <div className='send_message_box'>
-        <div className='send_to'>
+      }}
+    >
+      <div className="send_message_box">
+        <div className="send_to">
           <h4>{messageToUserNickname}</h4> 님에게 쪽지를 보냅니다.
         </div>
-        <div className='send_message_textarea'>
-          <textarea value={message} onChange={(e) => setMessage(e.target.value)} placeholder='내용을 입력하세요.' />
+        <div className="send_message_textarea">
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="내용을 입력하세요."
+          />
         </div>
-        <div className='btn_wrap'>
-          <button className='btn' onClick={sendMessage}>
+        <div className="btn_wrap">
+          <button className="btn" onClick={sendMessage}>
             보내기
           </button>
           <button
-            className='cancel'
+            className="cancel"
             onClick={() => {
               setMessageToUser(null);
-            }}>
+            }}
+          >
             취소
           </button>
         </div>

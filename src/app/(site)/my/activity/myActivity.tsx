@@ -16,18 +16,21 @@ export default function MyActivity() {
         >
           내가 쓴 글
         </Link>
+        &middot;
         <Link
           href="/my/activity/comment"
           className={`${pathname === "/my/activity/comment" ? "active" : ""}`}
         >
           내가 쓴 댓글
         </Link>
+        &middot;
         <Link
           href="/my/activity/like-post"
           className={`${pathname === "/my/activity/like-post" ? "active" : ""}`}
         >
           공감한 글
         </Link>
+        &middot;
         <Link
           href="/my/activity/like-comment"
           className={`${pathname === "/my/activity/like-comment" ? "active" : ""}`}

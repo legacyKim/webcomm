@@ -265,8 +265,8 @@ async function getUserProfileFromDB(
       });
     }
 
-    if (tab === "follower") {
-      // 팔로워 목록 조회
+    if (tab === "summary" || tab === "follower") {
+      // 팔로워 목록 조회 (summary 탭에서도 필요)
       const followers = await prisma.follow.findMany({
         where: { following_id: user.id },
         take: 20,

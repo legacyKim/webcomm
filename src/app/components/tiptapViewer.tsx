@@ -12,16 +12,6 @@ import Underline from "@tiptap/extension-underline";
 
 // tiptap viewer
 const TiptapViewer = ({ content }: { content?: string }) => {
-  // 콘텐츠 스켈레톤 컴포넌트
-  const ContentSkeleton = () => (
-    <div className="content_skeleton">
-      <div className="skeleton_line content_line"></div>
-      <div className="skeleton_line content_line short"></div>
-      <div className="skeleton_line content_line"></div>
-      <div className="skeleton_line content_line short"></div>
-    </div>
-  );
-
   const editor = useEditor({
     extensions: [
       CustomTextStyle,
@@ -43,12 +33,12 @@ const TiptapViewer = ({ content }: { content?: string }) => {
     immediatelyRender: false,
   });
 
-  // content가 없으면 스켈레톤 표시
+  // content가 없으면 로딩 표시
   if (!content) {
-    return <ContentSkeleton />;
+    return <div className="loading-message">콘텐츠 로딩 중...</div>;
   }
 
-  if (!editor) return <ContentSkeleton />;
+  if (!editor) return <div className="loading-message">에디터 로딩 중...</div>;
 
   return <EditorContent editor={editor} />;
 };

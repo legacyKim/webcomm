@@ -81,6 +81,25 @@ export default async function RootLayout({
 
   return (
     <html lang="kor">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const darkMode = sessionStorage.getItem('darkMode') || 
+                                  localStorage.getItem('darkMode') || 
+                                  (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'true' : 'false');
+                  
+                  document.documentElement.setAttribute('data-theme', darkMode === 'true' ? 'dark' : 'light');
+                } catch (e) {
+                  document.documentElement.setAttribute('data-theme', 'light');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         <AuthProvider
           username={username}

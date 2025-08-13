@@ -4,11 +4,15 @@ html,
 body {
   max-width: 100vw;
 }
+html {
+  overflow: auto;
+}
 body {
   color: $font-color;
   background: #fff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: $grey-f8-color;
 }
 * {
   box-sizing: border-box;
@@ -42,6 +46,7 @@ button {
   display: block;
   width: 100%;
   max-width: 1200px;
+  min-width: 1200px;
   margin: 0 auto;
 }
 .container {
@@ -184,13 +189,13 @@ button {
 }
 .btn_withdrawal {
   color: $red-color;
-  opacity: 0.6;
+  opacity: 0.78;
 }
 .btn_withdrawal:hover {
   opacity: 1;
 }
 .cancel {
-  font-size: 15px;
+  font-size: 14px;
   color: $grey6-color;
 }
 .block_btn {
@@ -215,6 +220,7 @@ header {
   height: $header-height;
   display: flex;
   border-bottom: $border-grey;
+  background-color: #fff;
 }
 .header_top {
   @include space-between;
@@ -383,8 +389,9 @@ header {
 footer {
   position: relative;
   display: block;
-  background-color: $grey-f8-color;
+  background-color: $grey5-color;
   padding: 32px 0;
+  min-width: 1200px;
   height: $footer-height;
 }
 .footer_list {
@@ -416,7 +423,7 @@ footer {
   color: $font2-color;
 }
 .footer_list li a:hover {
-  color: $font-color;
+  color: $main-color;
 }
 /* footer end */
 
@@ -503,6 +510,23 @@ footer {
   }
 }
 
+.board_recommend {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 0px;
+
+  .btn {
+    max-width: 88px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 4px;
+    &:hover {
+      background-color: $main-hover-color;
+    }
+  }
+}
+
 /* menu end */
 
 /* search */
@@ -515,6 +539,7 @@ footer {
   border-radius: 100px;
   padding: 2px 5px 3px 24px;
   box-shadow: $box-shadow;
+  background-color: #fff;
 }
 .search input {
   height: 52px;
@@ -620,13 +645,23 @@ main .title {
   font-size: 13px;
   font-weight: 400;
   line-height: 1.6;
-  padding: 4px 4px 4px 7px;
+  padding: 4px 10px 4px 7px;
   border-radius: 4px;
   height: 34px;
-  border: $border-grey;
+}
+.board_top a.write {
+  @include flex-center;
+  padding: 0;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  background-color: $main-color;
+  box-shadow: $box-shadow3;
+  color: #fff;
 }
 .board_top a.more {
   border: none;
+  color: $grey3-color;
 }
 .board_top a.more span {
   font-size: 14px;
@@ -635,14 +670,19 @@ main .title {
 .board_top a svg {
   width: 16px;
   height: 16px;
-  color: $grey-c-color;
+  color: $grey9-color;
 }
-.board_top a:hover {
-  color: $main-hover-color;
+
+.board_top a.write svg {
+  color: #fff;
 }
-.board_top a:hover svg,
-.board_top a:hover span {
-  color: $main-hover-color;
+
+.board_top a.write:hover {
+  background-color: $main-hover-color;
+}
+.board_top a.write:hover svg,
+.board_top a.write:hover span {
+  color: #fff;
 }
 .board_top select {
   border: $border-grey;
@@ -657,9 +697,9 @@ main .title {
   flex-direction: column;
   column-gap: 16px;
   box-shadow: $box-shadow;
-  border-radius: 4px;
-  padding-bottom: 12px;
+  border-radius: 5px;
   overflow: hidden;
+  background-color: #fff;
 }
 .board_list li {
   cursor: pointer;
@@ -671,7 +711,7 @@ main .board_list {
   padding: 8px 0;
 }
 main .board_list li a {
-  padding: 5px 12px;
+  padding: 16px;
 }
 sub .board_list {
   position: relative;
@@ -685,8 +725,7 @@ sub .board_list {
   align-items: center;
   width: 100%;
   padding: 12px;
-  margin-bottom: 5px;
-  background-color: $grey-f8-color;
+  background-color: $grey-ed-color;
 }
 .board_list .writer {
   @include flex-start;
@@ -712,19 +751,20 @@ sub .board_list {
   align-items: center;
   width: 100%;
 }
+.board_list li:first-child {
+  margin-bottom: 0;
+}
 .board_list li:last-child {
   margin-bottom: 0;
+  padding-bottom: 4px;
 }
 .board_list li a {
   position: relative;
   @include space-between;
 
-  padding: 4px 12px;
+  padding: 6px 12px;
   align-items: center;
   width: 100%;
-}
-.board_list li a:hover {
-  background-color: $grey-f8-color;
 }
 .board_list_info_wrap {
   @include space-between;
@@ -768,12 +808,12 @@ sub .board_list {
 .category {
   position: relative;
   display: block;
-  font-size: 11px;
-  font-weight: 400;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.4;
-  padding: 1px 6px 2px;
-  border: 1px solid $grey-c-color;
-  color: $grey9-color;
+  padding: 3px 8px 4px;
+  border: 1px solid $main-color;
+  color: $main-color !important;
   border-radius: 3px;
   text-align: center;
 }
@@ -785,7 +825,7 @@ sub .board_list {
   font-size: 14px;
   font-weight: 500;
   max-width: 100%;
-  gap: 4px;
+  gap: 8px;
   margin-right: 8px;
 }
 .title > span {
@@ -816,7 +856,7 @@ sub .board_list {
   min-width: 50px;
   white-space: nowrap;
   font-weight: 400;
-  color: $grey6-color;
+  color: $grey5-color;
 }
 
 .flex-start {
@@ -830,6 +870,69 @@ sub .board_list {
 .icon_text {
   position: relative;
 }
+
+/* board renew */
+.board_renew {
+  .board_top {
+    border-bottom: none;
+  }
+
+  .board_list {
+    box-shadow: $box-shadow;
+    border: none;
+    border-radius: 12px;
+    padding: 0;
+    min-height: initial;
+  }
+
+  .board_list li {
+    padding-bottom: 0;
+
+    &:last-child a {
+      border-bottom: none;
+    }
+  }
+
+  .board_list li a {
+    display: block;
+    border-bottom: $border-grey;
+    padding: 12px 16px;
+
+    .board_list_info_wrap {
+      @include space-between;
+
+      & > div {
+        gap: 16px;
+      }
+
+      .like,
+      .view,
+      .comment,
+      .date {
+        min-width: initial;
+      }
+    }
+
+    .title {
+      margin-bottom: 6px;
+    }
+
+    .title span {
+      font-size: 16px;
+      color: $grey3-color;
+    }
+
+    .writer {
+      max-width: initial;
+      margin-right: 12px;
+      .writer_name {
+        white-space: break-spaces;
+      }
+    }
+  }
+}
+
+/* messasge 박스 */
 
 .message {
   position: relative;
@@ -896,7 +999,7 @@ sub .board_list {
   display: block;
   text-align: center;
   min-width: 55px;
-  color: $grey6-color;
+  color: $grey3-color;
 }
 .board_list_header > * {
   @include flex-center;
@@ -1007,6 +1110,7 @@ sub .board_list {
   color: $grey-c-color;
   width: 27px;
   height: 27px;
+  padding-right: 1px;
   @include flex-center;
 }
 .pagination a:hover {
@@ -1211,7 +1315,7 @@ sub .board_list {
   @include space-between;
   padding: 18px 14px;
   padding-left: 16px;
-  background-color: $grey-f8-color;
+  background-color: $grey-ed-color;
   box-shadow: $box-shadow;
   border-radius: 4px 4px 0 0;
 }
@@ -1228,11 +1332,12 @@ sub .board_list {
   font-size: 16px;
   font-weight: 500;
   margin-right: 8px;
-  color: $grey6-color;
+  color: $grey3-color;
 }
 .view_info .writer .profile_img {
   width: 36px;
   height: 36px;
+  box-shadow: $box-shadow;
 }
 .view_info span {
   font-size: 16px;
@@ -1286,8 +1391,8 @@ sub .board_list {
   line-height: 2;
   background-color: $grey9-color;
   color: #fff;
-  border-radius: 2px;
   padding-top: 1px;
+  border-radius: 8px;
 }
 .view_btn a:hover,
 .view_btn button:hover {
@@ -1329,6 +1434,7 @@ sub .board_list {
 }
 .comment_top .comment_num {
   font-size: 15px;
+  font-weight: 600;
 }
 .comment_top .icon {
   margin-right: 8px;
@@ -1379,6 +1485,10 @@ sub .board_list {
   align-items: flex-start;
   padding: 14px 18px 0px 16px;
   border-radius: 4px;
+
+  .profile_img {
+    box-shadow: $box-shadow;
+  }
 }
 .comment_info .bar {
   width: 1px;
@@ -1386,8 +1496,8 @@ sub .board_list {
   background-color: $grey9-color;
 }
 .comment_info .ball {
-  min-width: 2px;
-  min-height: 2px;
+  min-width: 3px;
+  min-height: 3px;
   background-color: $grey-c-color;
   border-radius: 50%;
 }
@@ -1497,9 +1607,11 @@ sub .board_list {
   box-shadow: $box-shadow;
   outline: none;
   height: 100%;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 12px;
   min-height: 96px;
+  background-color: #fff;
+  overflow: hidden;
 }
 .comment_box_inner .comment_add {
   padding: 0 12px 12px 12px;
@@ -1533,6 +1645,7 @@ sub .board_list {
   border-radius: 4px;
   min-width: 80px;
   height: 32px;
+  background-color: #fff;
 }
 .comment_add button:hover {
   border: 1px solid $grey6-color;
@@ -1610,6 +1723,7 @@ sub .board_list {
   padding: 20px 16px 14px;
   max-width: 376px;
   width: 100%;
+  box-shadow: $box-shadow;
 }
 .send_message_box .btn_wrap {
   flex-direction: column;
@@ -1617,6 +1731,7 @@ sub .board_list {
 .send_message_box .btn_wrap .btn {
   width: 100%;
   margin-bottom: 8px;
+  box-shadow: $box-shadow;
 }
 .send_to {
   margin-bottom: 16px;
@@ -1629,11 +1744,25 @@ sub .board_list {
   margin-bottom: 8px;
 }
 
+.send_message_textarea input {
+  border: $border-grey;
+  box-shadow: $box-shadow;
+  border-radius: 4px;
+  outline: none;
+
+  padding: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+  min-height: 48px;
+}
+
 .send_message_textarea textarea {
   resize: none;
   width: 100%;
   padding: 16px 8px;
   border: $border-grey;
+  box-shadow: $box-shadow;
+
   border-radius: 4px;
   outline: none;
   min-height: 276px;
@@ -1911,7 +2040,7 @@ sub .board_list {
   font-weight: 600;
   line-height: 1.4;
   color: #999;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 8px 16px 8px 11px;
   gap: 4px;
 }
@@ -1932,13 +2061,12 @@ sub .board_list {
 
 .mypage_content {
   margin-bottom: 100px;
-  border: $border-grey;
-  border-right: 0px;
-  border-left: 0px;
+  background-color: #fff;
+  box-shadow: $box-shadow;
+  border-radius: 12px;
 }
 .mypage_inner {
-  padding: 12px;
-  padding-left: 4px;
+  padding: 32px;
 }
 .mypage_info_pw {
   flex: 1;
@@ -1983,6 +2111,7 @@ sub .board_list {
   display: block;
   width: 100%;
   box-shadow: $box-shadow;
+  border: $border-grey;
   border: none;
   resize: none;
   padding: 12px 8px;
@@ -2029,6 +2158,7 @@ sub .board_list {
   padding: 10px 16px 12px;
   font-size: 14px;
   font-weight: 400;
+  box-shadow: $box-shadow;
 }
 .mypage_info .input_box button:hover {
   border: 1px solid $main-color;
@@ -2065,6 +2195,7 @@ sub .board_list {
 
   font-size: 14px;
   font-weight: 400;
+  box-shadow: $box-shadow;
 }
 .mypage_info .input_img:hover .file_name_label {
   border: 1px solid $main-color;
@@ -2082,7 +2213,7 @@ sub .board_list {
   margin-bottom: 8px;
   height: 200px;
   width: 200px;
-  border-radius: 4px;
+  border-radius: 50%;
   border: $border-grey;
   overflow: hidden;
 }
@@ -2123,6 +2254,28 @@ h2.mypage_title {
     box-shadow: none !important;
     margin-bottom: 0 !important;
     border-radius: 0;
+
+    .comment,
+    .like,
+    .view {
+      @include flex-start;
+      align-items: center;
+      gap: 4px;
+      .icon {
+        width: 16px;
+        height: 16px;
+        margin-top: 1px;
+      }
+    }
+
+    .category {
+      border: $border-grey;
+      color: $grey6-color !important;
+    }
+
+    li a {
+      padding: 8px 12px;
+    }
   }
 }
 .mypage_boardlist_single {
@@ -2131,9 +2284,11 @@ h2.mypage_title {
 }
 .mypage_list_sub {
   @include space-between;
+  align-items: center;
   width: 100%;
   border-bottom: 1px solid $grey-c-color;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
+  color: $grey6-color;
 }
 .mypage_list_sub a,
 .mypage_list_sub button {
@@ -2142,7 +2297,7 @@ h2.mypage_title {
   line-height: 1.4;
   color: #999;
   border-radius: 4px;
-  padding: 8px 16px;
+  padding: 12px 16px;
 }
 .mypage_list_sub a,
 .mypage_list_sub button {
@@ -2218,9 +2373,12 @@ h2.mypage_title {
 
 /* profile */
 .profile {
-  max-width: 768px;
+  position: relative;
+  display: block;
   width: 100%;
-  padding-top: 48px;
+  max-width: 768px;
+  margin: 0 auto;
+  padding-top: 24px;
   padding-bottom: 48px;
 }
 .profile_info {
@@ -2232,13 +2390,14 @@ h2.mypage_title {
   @include flex-start;
   align-items: flex-start;
   width: 100%;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
   .profile_img {
-    width: 200px;
-    height: 200px;
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
     overflow: hidden;
-    margin-right: 32px;
+    margin-right: 16px;
+    box-shadow: $box-shadow;
   }
 }
 
@@ -2246,11 +2405,10 @@ h2.mypage_title {
 }
 .profile_user_info {
   flex: 1;
-  padding-top: 40px;
 
   .user_header {
     .username {
-      font-size: 32px;
+      font-size: 24px;
       font-weight: 600;
       line-height: 1.6;
       margin: 0;
@@ -2259,15 +2417,10 @@ h2.mypage_title {
 
   .user_bio {
     @include re-bl;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 1.4;
-    margin-bottom: 8px;
-    border: $border-grey;
-    border-top: 2px solid $main-color;
-    padding: 8px 12px;
-    border-radius: 4px 4px 12px 4px;
-    min-height: 101px;
+    margin-bottom: 16px;
   }
 }
 
@@ -2297,23 +2450,35 @@ h2.mypage_title {
   @include flex-start;
   gap: 24px;
   width: 100%;
-  margin-bottom: 40px;
-}
-.stat_item {
-  @include flex-column;
-  align-items: center;
-  flex: 1;
-}
-.stat_number {
-  font-size: 32px;
-  font-weight: 600;
-}
-.stat_label {
-  @include re-bl;
-  font-size: 14px;
-  font-weight: 400;
-  margin-bottom: 8px;
-  opacity: 0.7;
+  margin-bottom: 16px;
+  box-shadow: $box-shadow;
+  border: $border-grey;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #fff;
+
+  .stat_item {
+    @include flex-column;
+    align-items: center;
+    flex: 1;
+  }
+  .stat_number {
+    font-size: 32px;
+    font-weight: 600;
+  }
+  .stat_label {
+    @include re-bl;
+    font-size: 12px;
+    font-weight: 400;
+    margin-bottom: 8px;
+    color: $grey3-color;
+  }
+
+  .bar {
+    width: 1px;
+    height: 12px;
+    background-color: $grey8-color;
+  }
 }
 .follow_section {
 }
@@ -2343,16 +2508,39 @@ h2.mypage_title {
   }
 
   &.following {
-    background: linear-gradient(45deg, $main-color, #fff, $main-hover-color);
-    background-size: 300% 300%;
+    background-color: #6b7280;
+    color: #fff;
+
+    .follow_btn_text {
+      &::before {
+        content: "팔로잉";
+      }
+    }
+
+    &:hover {
+      background-color: #ef4444;
+
+      .follow_btn_text::before {
+        content: "언팔로우";
+      }
+    }
   }
 }
 
 .follow_description {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 300;
   opacity: 0.7;
   padding: 4px 0;
+}
+.profile_tabs_wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+  box-shadow: $box-shadow;
+  border: $border-grey;
+  background-color: #fff;
+  border-radius: 12px;
 }
 .profile_tabs {
   position: relative;
@@ -2361,30 +2549,43 @@ h2.mypage_title {
 }
 .tab_list {
   @include flex-start;
-  border-top: $border-grey;
   border-bottom: $border-grey;
+
+  button {
+    position: relative;
+    flex: 1;
+    padding: 14px 0;
+    font-weight: 400;
+    color: $grey6-color;
+
+    &:hover {
+      color: $main-hover-color;
+    }
+  }
+
+  .tab_btn.active {
+    font-weight: 600;
+    color: $main-color;
+  }
+
+  span {
+    font-size: 20px;
+    color: $grey8-color;
+  }
 }
-.tab_btn {
-  flex: 1;
-  padding: 8px 0;
-  font-weight: 400;
-}
-.tab_btn.active {
-  font-weight: 600;
-  color: $main-color;
-}
+
 .tab_content {
   width: 100%;
-  padding: 32px 16px;
+  padding: 16px 16px;
 }
-.summary_tab {
+.tab {
   @include flex-column;
   gap: 20px;
 
   .section {
     h3 {
       @include re-bl;
-      font-size: 18px;
+      font-size: 15px;
       font-weight: 600;
       margin-bottom: 12px;
     }
@@ -2399,16 +2600,17 @@ h2.mypage_title {
   @include re-bl;
   position: relative;
   display: inline-block;
-  padding: 2px;
+  padding: 1.5px;
   border-radius: 8px;
-  background: linear-gradient(45deg, $main-color, #fff, $main-hover-color);
+  background: linear-gradient(30deg, $main-color, #fff, $main-hover-color);
   background-size: 300% 300%;
-  animation: gradientShift 3s ease infinite;
-  transition: all 1 ease-in-out;
+  transition: background-position 0.3s ease-in-out;
+  box-shadow: $box-shadow2;
+  background-position: 100% 50%;
 
   span {
     @include re-bl;
-    font-size: 15px;
+    font-size: 13px;
     color: $main-color;
     background-color: #fff;
     padding: 8px 16px;
@@ -2417,50 +2619,63 @@ h2.mypage_title {
   }
 
   &:hover {
-    transform: translateY(-2px);
-
+    background-position: 0% 50%;
     span {
       background-color: rgba(255, 255, 255, 0.95);
     }
   }
 }
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
 .recent_posts {
   position: relative;
   @include flex-column;
   gap: 12px;
 }
 .post_item {
-  border: $border-grey;
   border-radius: 4px;
-  padding: 12px;
+  padding: 14px 12px;
+  border-radius: 8px;
+  border: $border-grey;
   box-shadow: $box-shadow;
+  opacity: 0.78;
+  transition: all 0.3s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+    border: 1px solid $main-color;
+  }
+
+  .board_name {
+    position: relative;
+    display: inline-block;
+    border: $border-grey;
+    font-size: 12px;
+    padding: 4px 6px 5px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+    color: $grey3-color;
+    box-shadow: $box-shadow;
+  }
 
   .post_title {
     @include re-bl;
     font-size: 16px;
-    font-weight: 400;
-    padding-bottom: 8px;
+    font-weight: 500;
+    padding-bottom: 12px;
+    padding-left: 2px;
+    line-height: 1.4;
   }
   .post_meta {
     @include flex-start;
     gap: 8px;
-    .board_name {
-    }
-    .post_date {
-    }
-    .post_stats {
+    & > div {
+      @include flex-start;
+      gap: 4px;
+      color: $grey9-color;
+      & .icon {
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 }
@@ -2470,56 +2685,87 @@ h2.mypage_title {
   gap: 12px;
 
   .comment_item {
+    border-radius: 4px;
+    padding: 14px 12px;
+    border-radius: 8px;
     border: $border-grey;
-    padding: 12px;
     box-shadow: $box-shadow;
+    opacity: 0.78;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+      opacity: 1;
+      border: 1px solid $main-color;
+    }
 
     .comment_content {
+      position: relative;
+      display: block;
       padding: 0;
-      padding-bottom: 8px;
-      font-size: 16px;
-      font-weight: 400;
+
+      p {
+        font-size: 16px;
+        font-weight: 500;
+        padding-bottom: 12px;
+        line-height: 1.4;
+      }
+    }
+
+    .comment_meta {
+      .board_name {
+        border: $border-grey;
+        font-size: 12px;
+        padding: 4px 6px 5px;
+        border-radius: 4px;
+        color: $grey3-color;
+        box-shadow: $box-shadow;
+        margin-right: 4px;
+      }
+      @include flex-start;
+      gap: 4px;
+      color: #999;
+
+      .post_title {
+        max-width: 530px;
+        @include ellipsis;
+      }
+
+      span {
+        @include flex-start;
+        gap: 4px;
+        .icon {
+          width: 16px;
+          height: 16px;
+        }
+      }
     }
   }
 }
 
-.comment_meta {
-}
-.comment_date {
-}
-.comment_likes {
-}
 .followers_list {
-}
-.follower_item {
-}
-.posts_tab {
-}
-.posts_list {
-}
-.post_card {
-}
-.post_header {
-}
-.post_board {
-}
-.comments_tab {
-}
-.comments_list {
-}
-.comment_card {
-}
-.comment_info {
-}
-.post_link {
-}
-.likes_tab {
-}
-.empty_state {
-}
-.sub_text {
-}
+  @include flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
 
+  .follower_item {
+    @include flex-start;
+    flex: calc(1 / 3);
+    border: $border-grey;
+    box-shadow: $box-shadow;
+    padding: 12px;
+    gap: 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+      border-color: $main-color;
+    }
+
+    img {
+      border-radius: 50%;
+    }
+  }
+}
 /* notification styles */
 
 .notification-settings {
@@ -2965,37 +3211,37 @@ h2.mypage_title {
       border-bottom-color: $main-color;
       font-weight: 600;
     }
-
-    &:hover {
+    user_item &:hover {
       color: $main-color;
     }
   }
 }
 
 .user_list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  @include flex-start;
+  flex-wrap: wrap;
+  align-items: normal;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-top: 8px;
+  padding: 16px;
 
   .user_item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    width: calc((100% - 32px) / 3);
     padding: 15px;
     background: #fff;
-    border: 1px solid #eee;
+    border: $border-grey;
     border-radius: 8px;
     transition: all 0.2s ease;
 
     &:hover {
-      border-color: #ddd;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .user_info {
       display: flex;
-      align-items: center;
       gap: 12px;
+      margin-bottom: 12px;
 
       .avatar {
         width: 50px;
@@ -3012,6 +3258,7 @@ h2.mypage_title {
       }
 
       .user_details {
+        flex: 1;
         .nickname {
           font-size: 16px;
           font-weight: 600;
@@ -3021,58 +3268,39 @@ h2.mypage_title {
 
         .username {
           font-size: 14px;
-          color: #666;
+          color: $grey6-color;
           margin-bottom: 4px;
         }
 
         .bio {
           font-size: 13px;
-          color: #888;
-          max-width: 200px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          color: $grey6-color;
+          @include ellipsis-multiline(3);
         }
       }
     }
 
     .actions {
-      .follow_btn,
-      .unfollow_btn {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
+      @include flex-start;
+      gap: 8px;
+      a,
+      button {
+        @include flex-start;
+        gap: 4px;
+        padding: 6px 16px;
+        border: $border-grey;
+        height: 36px;
+        border-radius: 8px;
+        box-shadow: $box-shadow;
         .icon {
           width: 16px;
           height: 16px;
         }
-      }
-
-      .follow_btn {
-        background-color: $main-color;
-        color: white;
 
         &:hover {
-          background-color: color.adjust($main-color, $lightness: -10%);
-        }
-      }
-
-      .unfollow_btn {
-        background-color: #f8f9fa;
-        color: #666;
-        border: 1px solid #ddd;
-
-        &:hover {
-          background-color: #e9ecef;
-          color: #495057;
+          border-color: $main-color;
+          background-color: $main-color;
+          color: #fff;
         }
       }
     }
@@ -3145,152 +3373,10 @@ h2.mypage_title {
   }
 }
 
-/* Skeleton Loading Styles */
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.skeleton {
-  &.user_item {
-    pointer-events: none;
-  }
-
-  .skeleton_avatar {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200px 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 50%;
-
-    &:not(.large) {
-      width: 50px;
-      height: 50px;
-    }
-
-    &.large {
-      width: 120px;
-      height: 120px;
-    }
-  }
-
-  .skeleton_line {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200px 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-    margin-bottom: 8px;
-
-    &.skeleton_nickname {
-      width: 120px;
-      height: 18px;
-    }
-
-    &.skeleton_username {
-      width: 80px;
-      height: 14px;
-    }
-
-    &.skeleton_bio {
-      width: 200px;
-      height: 14px;
-
-      &.long {
-        width: 300px;
-        height: 16px;
-      }
-    }
-
-    &.stat_label {
-      width: 60px;
-      height: 14px;
-      margin-bottom: 4px;
-    }
-
-    &.stat_number {
-      width: 40px;
-      height: 20px;
-      margin-bottom: 0;
-    }
-  }
-
-  .skeleton_button {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200px 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 6px;
-
-    &:not(.tab) {
-      width: 80px;
-      height: 36px;
-    }
-
-    &.tab {
-      width: 100px;
-      height: 40px;
-      margin-right: 8px;
-    }
-
-    &.action {
-      width: 60px;
-      height: 32px;
-      margin-right: 8px;
-    }
-  }
-}
-
-/* Post Detail Skeleton Styles */
-.skeleton {
-  .skeleton_title {
-    width: 70%;
-    height: 28px;
-    margin-bottom: 12px;
-  }
-
-  .skeleton_meta {
-    width: 40%;
-    height: 16px;
-    margin-bottom: 16px;
-  }
-
-  .skeleton_date {
-    width: 80px;
-    height: 12px;
-  }
-
-  .content_line {
-    width: 100%;
-    height: 18px;
-    margin-bottom: 12px;
-
-    &.short {
-      width: 60%;
-    }
-  }
-}
-
-/* Content Skeleton for TiptapViewer */
-.content_skeleton {
-  padding: 20px 0;
-
-  .content_line {
-    width: 100%;
-    height: 18px;
-    margin-bottom: 16px;
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200px 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-
-    &.short {
-      width: 65%;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+/* Loading Message Styles */
+.loading-message {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
 }

@@ -12,7 +12,7 @@ export function useDropDown({
   const [dropPosition, setDropPosition] = useState({ top: 0, left: 0 });
 
   useEffect(() => {
-    if (!loginStatus) return;
+    // if (!loginStatus) return;
 
     const clickOutSide = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -42,7 +42,7 @@ export function useDropDown({
   }, [messageToUser]);
 
   const userClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (!loginStatus) return;
+    // if (!loginStatus) return;
 
     const target = e.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();

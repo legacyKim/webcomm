@@ -64,6 +64,7 @@ model Member {
   reportedUsers         UserReport[]       @relation("ReportedUsers")
   reportedBy            UserReport[]       @relation("ReportedBy")
   reports               Report[]
+  boardRecommends       BoardRecommend[]
 
   @@map("members")
 }
@@ -303,4 +304,17 @@ model Report {
 
   @@unique([user_id, post_id], name: "unique_user_post_report")
   @@map("reports")
+}
+
+model BoardRecommend {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  board_name      String    @db.VarChar(255)
+  reason          String?   @db.Text
+  status          String    @default("pending") @db.VarChar(20) // pending, approved, rejected
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @default(now()) @updatedAt
+  user            Member    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("board_recommends")
 }

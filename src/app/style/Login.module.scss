@@ -122,7 +122,8 @@
   @include flex-center;
   margin-bottom: 8px;
   height: 200px;
-  border-radius: 4px;
+  border-radius: 50%;
+  overflow: hidden;
   border: $border-grey;
 }
 .img_preview img {
@@ -153,6 +154,7 @@
   opacity: 0.5;
   margin-bottom: 4px;
   transition: none;
+  box-shadow: $box-shadow;
 }
 .file_name_label.after {
   transform: translateY(-145%) !important;
@@ -224,7 +226,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
-  color: $grey-c-color;
+  color: $grey6-color;
 }
 .find_info a:hover {
   color: $main-color;
@@ -394,16 +396,16 @@
   }
 
   .img_preview {
-    background-color: #2d2d2d;
-    border: 1px solid #404040;
+    background-color: $grey-2d-color;
+    border: 1px solid $grey-40-color;
   }
 
   .find_info a {
-    color: #b0b0b0;
+    color: $grey3-color;
   }
 
   .find_info a:hover {
-    color: #4fc3f7;
+    color: $main-color;
   }
 
   .notice {

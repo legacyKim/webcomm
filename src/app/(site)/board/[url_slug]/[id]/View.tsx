@@ -29,11 +29,11 @@ import {
   EyeIcon,
   HeartIcon,
   ListBulletIcon,
-  PencilSquareIcon,
   FlagIcon,
   PhotoIcon,
   ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
+import { PencilIcon } from "@heroicons/react/24/solid";
 
 import { CommentImage, CommentTreeNode } from "@/type/commentType";
 
@@ -574,37 +574,13 @@ export default function View({
       </div>
     );
 
-  // 게시물 스켈레톤 컴포넌트
-  const PostSkeleton = () => (
-    <div className="boardview">
-      <div className="boardview_head">
-        <div className="skeleton_line skeleton_title"></div>
-        <div className="skeleton_line skeleton_meta"></div>
-        <div className="boardview_head_user skeleton">
-          <div className="skeleton_avatar"></div>
-          <div className="user_info">
-            <div className="skeleton_line skeleton_nickname"></div>
-            <div className="skeleton_line skeleton_date"></div>
-          </div>
-        </div>
-      </div>
-      <div className="boardview_content skeleton">
-        <div className="skeleton_line content_line"></div>
-        <div className="skeleton_line content_line"></div>
-        <div className="skeleton_line content_line"></div>
-        <div className="skeleton_line content_line short"></div>
-      </div>
-      <div className="boardview_actions skeleton">
-        <div className="skeleton_button action"></div>
-        <div className="skeleton_button action"></div>
-        <div className="skeleton_button action"></div>
-      </div>
-    </div>
-  );
-
-  // 데이터가 없으면 스켈레톤 표시
+  // 데이터가 없으면 로딩 메시지 표시
   if (!post) {
-    return <PostSkeleton />;
+    return (
+      <div className="view_page">
+        <div className="loading-message">게시물 로딩 중...</div>
+      </div>
+    );
   }
 
   return (
@@ -859,9 +835,8 @@ export default function View({
             <span>목록으로</span>
           </Link>
           {isUserId !== null && (
-            <Link href={`/write`}>
-              <PencilSquareIcon className="icon" />
-              <span>글쓰기</span>
+            <Link href={`/write`} className="write">
+              <PencilIcon className="icon" />
             </Link>
           )}
         </div>

@@ -8,10 +8,10 @@ export default function Search() {
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
 
-  const { setBoardType } = useAuth();
+  // const { setBoardType } = useAuth();
 
   const handleSearch = async () => {
-    setBoardType("search");
+    // setBoardType("search");
     if (!keyword.trim()) {
       alert("검색어를 입력해 주세요.");
       return;

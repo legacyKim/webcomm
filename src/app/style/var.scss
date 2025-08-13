@@ -36,6 +36,13 @@
   text-overflow: ellipsis;
   overflow: hidden;
 }
+@mixin ellipsis-multiline($lines) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 $main-color: #0070f3;
 $main-hover-color: #005bb5;
@@ -46,7 +53,10 @@ $font2-color: #999;
 
 $grey-c-color: #ccc;
 $grey-ef-color: #efefef;
+$grey-ed-color: #ededed;
 $grey-f8-color: #f8f8f8;
+$grey-40-color: #404040;
+$grey-2d-color: #2d2d2d;
 
 $grey1-color: #111;
 $grey2-color: #222;
@@ -72,7 +82,7 @@ $dark-font-color: #e0e0e0;
 $red-color: rgb(255, 122, 122);
 $blue-color: rgb(77, 145, 255);
 
-$header-height: 80px;
+$header-height: 56px;
 $footer-height: 166px;
 $menu-height: 44px;
 
@@ -88,5 +98,8 @@ $box-shadow:
 $box-shadow2:
   0 0px 7px 0 rgba(0, 0, 0, 0.1),
   0 1.5px 3px 0 rgba(0, 0, 0, 0.14) !important;
+$box-shadow3:
+  0px 0px 10px 2px rgba(0, 0, 0, 0.22),
+  0 1.5px 8px 0 rgba(0, 0, 0, 0.14) !important;
 
 $zIndexFirst: 9999999999;

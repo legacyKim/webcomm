@@ -7,21 +7,17 @@ import { useSearchParams } from "next/navigation";
 
 import MyHeader from "@/(site)/my/myHeader";
 import MyActivity from "../myActivity";
+import { myActivityType } from "@/type/type";
 
 import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
 
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
-
-interface comment {
-  id: number;
-  url_slug: string;
-  title: string;
-  comments: string;
-  likes: number;
-  views: number;
-  created_at: string;
-}
+import {
+  ChatBubbleLeftEllipsisIcon,
+  EyeIcon,
+  HeartIcon,
+} from "@heroicons/react/24/outline";
 
 export default function MyLikeComment() {
   const { isUserId } = useAuth();
@@ -57,21 +53,26 @@ export default function MyLikeComment() {
                   </div>
                 ) : likeCommentBoards && likeCommentBoards.posts.length > 0 ? (
                   likeCommentBoards.posts.map(
-                    (comment: comment, index: number) => (
+                    (comment: myActivityType, index: number) => (
                       <li key={comment.id}>
                         <a href={`/board/${comment.url_slug}/${comment.id}`}>
                           <span className="num">{index + 1}</span>
-                          <span className="title">{comment.title}</span>
+                          <span className="title">
+                            <span className="category">
+                              {comment.board_name}
+                            </span>
+                            {comment.title}
+                          </span>
                           <div className="comment">
-                            <i></i>
+                            <ChatBubbleLeftEllipsisIcon className="icon" />
                             {comment.comments}
                           </div>
                           <div className="like">
-                            <i></i>
+                            <HeartIcon className="icon" />
                             {comment.likes}
                           </div>
                           <div className="view">
-                            <i></i>
+                            <EyeIcon className="icon" />
                             {comment.views}
                           </div>
                           {/* <span className="comment"><i></i>33</span> */}

@@ -5,8 +5,9 @@ import axios from "axios";
 import MyHeader from "../myHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import Link from "next/link";
 
-import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/solid";
+import { UserPlusIcon, UserMinusIcon } from "@heroicons/react/24/outline";
 
 interface FollowUser {
   id: number;
@@ -112,18 +113,20 @@ export default function MyFollowing() {
                           />
                         ) : (
                           <img
-                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/profile/basic.png`}
+                            src={`/profile/basic.png`}
                             alt={user.user_nickname}
                           />
                         )}
                       </div>
                       <div className="user_details">
                         <div className="nickname">{user.user_nickname}</div>
-                        <div className="username">@{user.username}</div>
                         {user.bio && <div className="bio">{user.bio}</div>}
                       </div>
                     </div>
                     <div className="actions">
+                      <Link href={`/profile/${user.user_nickname}`}>
+                        프로필 보기
+                      </Link>
                       {activeTab === "following" ? (
                         <button
                           className="unfollow_btn"
@@ -133,12 +136,13 @@ export default function MyFollowing() {
                           언팔로우
                         </button>
                       ) : (
+                        // 팔로워 탭에서는 상호 팔로우 상태 확인 필요
                         <button
                           className="follow_btn"
                           onClick={() => handleFollow(user.id)}
                         >
                           <UserPlusIcon className="icon" />
-                          맞팔로우
+                          팔로우
                         </button>
                       )}
                     </div>

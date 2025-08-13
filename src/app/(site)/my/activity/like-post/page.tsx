@@ -7,21 +7,17 @@ import { useSearchParams } from "next/navigation";
 
 import MyHeader from "@/(site)/my/myHeader";
 import MyActivity from "../myActivity";
+import { myActivityType } from "@/type/type";
 
 import formatPostDate from "@/components/formatDate";
 import Pagination from "@/components/pagination";
 
 import { NoSymbolIcon } from "@heroicons/react/24/solid";
-
-interface post {
-  id: number;
-  url_slug: string;
-  title: string;
-  comments: string;
-  likes: number;
-  views: number;
-  created_at: string;
-}
+import {
+  ChatBubbleLeftEllipsisIcon,
+  EyeIcon,
+  HeartIcon,
+} from "@heroicons/react/24/outline";
 
 export default function MyLike() {
   const { isUserId } = useAuth();
@@ -56,29 +52,34 @@ export default function MyLike() {
                     </div>
                   </div>
                 ) : likePostBoards && likePostBoards.posts.length > 0 ? (
-                  likePostBoards.posts.map((post: post, index: number) => (
-                    <li key={post.id}>
-                      <a href={`/board/${post.url_slug}/${post.id}`}>
-                        <span className="num">{index + 1}</span>
-                        <span className="title">{post.title}</span>
-                        <div className="comment">
-                          <i></i>
-                          {post.comments}
-                        </div>
-                        <div className="like">
-                          <i></i>
-                          {post.likes}
-                        </div>
-                        <div className="view">
-                          <i></i>
-                          {post.views}
-                        </div>
-                        <div className="date">
-                          {formatPostDate(post.created_at)}
-                        </div>
-                      </a>
-                    </li>
-                  ))
+                  likePostBoards.posts.map(
+                    (post: myActivityType, index: number) => (
+                      <li key={post.id}>
+                        <a href={`/board/${post.url_slug}/${post.id}`}>
+                          <span className="num">{index + 1}</span>
+                          <span className="title">
+                            <span className="category">{post.board_name}</span>
+                            {post.title}
+                          </span>
+                          <div className="comment">
+                            <ChatBubbleLeftEllipsisIcon className="icon" />
+                            {post.comments}
+                          </div>
+                          <div className="like">
+                            <HeartIcon className="icon" />
+                            {post.likes}
+                          </div>
+                          <div className="view">
+                            <EyeIcon className="icon" />
+                            {post.views}
+                          </div>
+                          <div className="date">
+                            {formatPostDate(post.created_at)}
+                          </div>
+                        </a>
+                      </li>
+                    )
+                  )
                 ) : (
                   <div className="data_none">
                     <NoSymbolIcon />

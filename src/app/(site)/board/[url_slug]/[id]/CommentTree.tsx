@@ -247,35 +247,37 @@ export default function CommentTree({
                   {isUserId !== null && (
                     <div className="comment_btn">
                       {comment.depth < 3 && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (isUserId === 0) {
-                              const isConfirmed =
-                                confirm("로그인이 필요합니다.");
-                              if (isConfirmed) {
-                                router.push("/login");
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isUserId === 0) {
+                                const isConfirmed =
+                                  confirm("로그인이 필요합니다.");
+                                if (isConfirmed) {
+                                  router.push("/login");
+                                }
+                                return;
                               }
-                              return;
-                            }
 
-                            setCommentAdd?.({
-                              user_id: comment.user_id,
-                              id: comment.id,
-                            });
-                            setRecommentAdd?.(null);
-                            setCommentCorrect(null);
-                            setRecommentCorrect(null);
-                          }}
-                        >
-                          <ChatBubbleLeftRightIcon className="icon" />
-                          <span>대댓글</span>
-                        </button>
+                              setCommentAdd?.({
+                                user_id: comment.user_id,
+                                id: comment.id,
+                              });
+                              setRecommentAdd?.(null);
+                              setCommentCorrect(null);
+                              setRecommentCorrect(null);
+                            }}
+                          >
+                            <ChatBubbleLeftRightIcon className="icon" />
+                            <span>대댓글</span>
+                          </button>
+                          <div className="ball"></div>
+                        </>
                       )}
 
                       {comment.user_id !== isUserId && (
                         <>
-                          {comment.depth < 3 && <div className="ball"></div>}
                           <button onClick={() => commentLike(comment.id)}>
                             <HeartIcon className="icon" />
                             <span>공감</span>
@@ -293,7 +295,6 @@ export default function CommentTree({
 
                       {comment.user_id === isUserId && (
                         <>
-                          <div className="ball"></div>
                           <button
                             onClick={() => {
                               setCommentAdd?.(null);

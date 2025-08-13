@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import "@/style/style.common.scss";
 import styles from "@/style/Login.module.scss";
 
 import { handleBlur, handleFocus } from "@/func/inputActive";
@@ -296,6 +295,7 @@ export default function LoginPage() {
             {/* 아이디/비밀번호 찾기 및 회원가입 */}
             <div className={styles.find_info}>
               <Link href="/find">아이디/비밀번호 찾기</Link>
+              &middot;
               <Link href="/agree">회원가입</Link>
             </div>
           </form>
