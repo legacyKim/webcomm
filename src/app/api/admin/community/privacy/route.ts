@@ -11,7 +11,10 @@ export async function GET() {
     return NextResponse.json({ content: policy?.content || "" });
   } catch (error) {
     console.error("개인정보처리방침 불러오기 오류:", error);
-    return NextResponse.json({ error: "서버 오류가 발생했습니다" }, { status: 500 });
+    return NextResponse.json(
+      { error: "서버 오류가 발생했습니다" },
+      { status: 500 }
+    );
   }
 }
 
@@ -20,13 +23,19 @@ export async function POST(request: NextRequest) {
     // 관리자 권한 확인
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
-      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+      return NextResponse.json(
+        { error: "관리자 권한이 필요합니다" },
+        { status: 403 }
+      );
     }
 
     const { content } = await request.json();
 
     if (!content || content.trim() === "") {
-      return NextResponse.json({ error: "내용이 비어있습니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "내용이 비어있습니다" },
+        { status: 400 }
+      );
     }
 
     // DB에 저장 (새로운 레코드 생성)
@@ -40,6 +49,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("개인정보처리방침 저장 오류:", error);
-    return NextResponse.json({ error: "서버 오류가 발생했습니다" }, { status: 500 });
+    return NextResponse.json(
+      { error: "서버 오류가 발생했습니다" },
+      { status: 500 }
+    );
   }
 }

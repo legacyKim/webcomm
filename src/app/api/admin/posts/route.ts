@@ -7,7 +7,10 @@ export async function GET(req: Request) {
     // 관리자 권한 확인
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
-      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+      return NextResponse.json(
+        { error: "관리자 권한이 필요합니다." },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(req.url);
@@ -15,13 +18,13 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get("limit") || "20");
     const search = searchParams.get("search") || "";
     const board = searchParams.get("board") || "";
-    const archived = searchParams.get("archived") === "true"; // 보관된 게시물인지 확인
+    const archived = searchParams.get("archived") === "true";
 
     const offset = (page - 1) * limit;
 
     // 검색 조건 구성
     const whereCondition: Record<string, unknown> = {
-      deleted: archived, // archived가 true면 삭제된 것(보관된 것), false면 일반 게시물
+      deleted: archived,
     };
 
     if (board && board !== "all" && board !== "") {
@@ -50,7 +53,7 @@ export async function GET(req: Request) {
         created_at: "desc",
       },
       skip: offset,
-      take: limit + 1, // 다음 페이지 존재 여부 확인
+      take: limit + 1,
     });
 
     const hasMore = posts.length > limit;
@@ -78,7 +81,7 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("Posts fetch error:", error);
-    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+    return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }
 
@@ -87,16 +90,21 @@ export async function DELETE(req: Request) {
   try {
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
-      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+      return NextResponse.json(
+        { error: "관리자 권한이 필요합니다." },
+        { status: 403 }
+      );
     }
 
     const { postIds } = await req.json();
 
     if (!Array.isArray(postIds) || postIds.length === 0) {
-      return NextResponse.json({ error: "삭제할 게시물 ID가 필요합니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "삭제할 게시물 ID가 필요합니다." },
+        { status: 400 }
+      );
     }
 
-    // 게시물 삭제 (soft delete)
     await prisma.post.updateMany({
       where: {
         id: { in: postIds },
@@ -109,6 +117,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Posts delete error:", error);
-    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+    return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }

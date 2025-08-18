@@ -6,7 +6,10 @@ export async function POST(req: Request) {
   try {
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
-      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+      return NextResponse.json(
+        { error: "관리자 권한이 필요합니다" },
+        { status: 403 }
+      );
     }
 
     const { boardId, direction } = await req.json();
@@ -22,7 +25,10 @@ export async function POST(req: Request) {
     });
 
     if (!currentBoard) {
-      return NextResponse.json({ error: "게시판을 찾을 수 없습니다" }, { status: 404 });
+      return NextResponse.json(
+        { error: "게시판을 찾을 수 없습니다" },
+        { status: 404 }
+      );
     }
 
     const currentSeq = currentBoard.seq;
@@ -36,7 +42,10 @@ export async function POST(req: Request) {
     });
 
     if (!targetBoard) {
-      return NextResponse.json({ error: "이동할 위치가 없습니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "이동할 위치가 없습니다" },
+        { status: 400 }
+      );
     }
 
     // 순서 교체 (트랜잭션 사용)
@@ -58,9 +67,12 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    return NextResponse.json({ success: true, message: "게시판 순서가 변경되었습니다" });
+    return NextResponse.json({
+      success: true,
+      message: "게시판 순서가 변경되었습니다",
+    });
   } catch (error) {
     console.error("Board move error:", error);
-    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+    return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }

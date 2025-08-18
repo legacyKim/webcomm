@@ -13,13 +13,7 @@ import BoardNoticePopup from "./popup/boardNoticePopup";
 import BoardNoticeViewPopup from "./popup/boardNoticeViewPopup";
 import TiptapViewer from "@/components/tiptapViewer";
 
-interface Notice {
-  url_slug: string;
-  id: number;
-  title: string;
-  content: string;
-  created_at: string;
-}
+import type { Notice } from "@/types/adminType";
 
 export default function BoardNoticeManage() {
   const fetchNotices = async (page: number, limit: number = 10) => {
@@ -31,11 +25,21 @@ export default function BoardNoticeManage() {
     };
   };
 
-  const { data, loading, loadingMore, hasMore, lastElementRef, refresh, error } = useInfiniteScrollQuery<Notice>({
+  const {
+    data,
+    loading,
+    loadingMore,
+    hasMore,
+    lastElementRef,
+    refresh,
+    error,
+  } = useInfiniteScrollQuery<Notice>({
     queryKey: ["notices"],
     queryFn: fetchNotices,
     limit: 10,
   });
+
+  console.log(data);
 
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
   const [viewPopupOpen, setViewPopupOpen] = useState<boolean>(false);
@@ -57,28 +61,29 @@ export default function BoardNoticeManage() {
   const [editingNotice, setEditingNotice] = useState<Notice | null>(null);
 
   return (
-    <div className='admin_content_wrap'>
-      <div className='admin_title'>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
         <h4>공지 관리</h4>
-        <div className='admin_btn'>
+        <div className="admin_btn">
           <button
             onClick={() => {
               setPopupOpen(true);
               setEditingNotice(null);
-            }}>
+            }}
+          >
             공지 추가
           </button>
         </div>
       </div>
-      <div className='admin_content'>
-        <ol className='table'>
-          <li className='table_header'>
-            <span>No</span>
-            <span className='table_board'>게시판</span>
-            <span className='table_title'>제목</span>
-            <span className='table_content'>내용</span>
-            <span className='table_date'>날짜</span>
-            <span className='table_btn'>관리</span>
+      <div className="admin_content">
+        <ol className="table">
+          <li className="table_header">
+            <span className="table_no">No</span>
+            <span className="table_board">게시판</span>
+            <span className="table_title">제목</span>
+            <span className="table_content">내용</span>
+            <span className="table_date">날짜</span>
+            <span className="table_btn">관리</span>
           </li>
 
           <QueryInfiniteScrollContainer
@@ -91,26 +96,30 @@ export default function BoardNoticeManage() {
             onRetry={() => refresh()}
             renderItem={(notice: Notice) => (
               <li key={notice.id}>
-                <span>{notice.id}</span>
-                <span className='table_board'>{notice.url_slug}</span>
-                <span className='table_title'>{notice.title}</span>
-                <span className='table_content'>
+                <span className="table_no">{notice.id}</span>
+                <span className="table_board">{notice.url_slug}</span>
+                <span className="table_title">{notice.title}</span>
+                <span className="table_content">
                   <TiptapViewer content={notice.content ?? ""} />
                 </span>
-                <span className='table_date'>{formatPostDate(notice.created_at)}</span>
-                <span className='table_btn btn_wrap'>
+                <span className="table_date">
+                  <span className="table_board">{notice.board_name}</span>
+                </span>
+                <span className="table_btn btn_wrap">
                   <button
                     onClick={() => {
                       setSelectedNotice(notice);
                       setViewPopupOpen(true);
-                    }}>
+                    }}
+                  >
                     보기
                   </button>
                   <button
                     onClick={() => {
                       setEditingNotice(notice);
                       setPopupOpen(true);
-                    }}>
+                    }}
+                  >
                     수정
                   </button>
                   <button onClick={() => noticeDelete(notice.id)}>삭제</button>

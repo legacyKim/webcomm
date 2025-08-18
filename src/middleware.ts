@@ -16,7 +16,11 @@ const PROTECTED_PATHS = [
   "/api/post/action/scrap",
 ];
 
-const EXCLUDE_PATHS = ["/api/user/duplicate", "/api/user/email", "/api/user/profile"];
+const EXCLUDE_PATHS = [
+  "/api/user/duplicate",
+  "/api/user/email",
+  "/api/user/profile",
+];
 
 function getJwtSecretKey() {
   const secret = process.env.JWT_SECRET;
@@ -48,7 +52,10 @@ export async function middleware(req: NextRequest) {
 
   if (!token) {
     return pathname.startsWith("/api")
-      ? NextResponse.json({ success: false, message: "로그인이 필요합니다." }, { status: 401 })
+      ? NextResponse.json(
+          { success: false, message: "로그인이 필요합니다." },
+          { status: 401 }
+        )
       : NextResponse.redirect(new URL("/login", req.url));
   }
 
@@ -58,7 +65,10 @@ export async function middleware(req: NextRequest) {
 
     if (pathname.startsWith("/admin") && authority !== 0) {
       return pathname.startsWith("/api")
-        ? NextResponse.json({ success: false, message: "관리자 권한이 필요합니다." }, { status: 403 })
+        ? NextResponse.json(
+            { success: false, message: "관리자 권한이 필요합니다." },
+            { status: 403 }
+          )
         : NextResponse.redirect(new URL("/", req.url));
     }
 
@@ -66,7 +76,10 @@ export async function middleware(req: NextRequest) {
   } catch (err) {
     console.error("JWT Verify Error:", err);
     return pathname.startsWith("/api")
-      ? NextResponse.json({ success: false, message: "토큰 검증 실패" }, { status: 401 })
+      ? NextResponse.json(
+          { success: false, message: "토큰 검증 실패" },
+          { status: 401 }
+        )
       : NextResponse.redirect(new URL("/login", req.url));
   }
 }

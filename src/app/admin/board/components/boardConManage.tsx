@@ -140,14 +140,14 @@ export default function BoardConManage() {
 
         <ol className="table">
           <li className="table_header">
-            <span>No</span>
+            <span className="table_no">No</span>
             <span className="table_board">게시판</span>
             <span className="table_title">제목</span>
-            <span>닉네임</span>
-            <span>조회수</span>
-            <span>좋아요</span>
-            <span>싫어요</span>
-            <span>신고</span>
+            <span className="table_nickname">닉네임</span>
+            <span className="table_views">조회수</span>
+            <span className="table_likes">좋아요</span>
+            <span className="table_dislikes">싫어요</span>
+            <span className="table_reports">신고</span>
             <span className="table_date">날짜</span>
             <span className="table_btn">관리</span>
           </li>
@@ -162,7 +162,7 @@ export default function BoardConManage() {
               onRetry={() => refresh()}
               renderItem={(post: Posts, index: number) => (
                 <li key={post.id}>
-                  <span>{index + 1}</span>
+                  <span className="table_no">{index + 1}</span>
                   <span className="table_board">{post.board_name}</span>
                   <span className="table_title">{post.title}</span>
                   <span>{post.user_nickname}</span>

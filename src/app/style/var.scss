@@ -44,40 +44,142 @@
   text-overflow: ellipsis;
 }
 
-$main-color: #0070f3;
-$main-hover-color: #005bb5;
-$sub-color: rgb(130, 193, 255);
+// 테마별 색상 시스템 (CSS 커스텀 프로퍼티)
+:root {
+  // Light mode (기본값)
+  --main-color: #0070f3;
+  --main-hover-color: #005bb5;
+  --sub-color: rgb(130, 193, 255);
 
-$font-color: #000;
-$font2-color: #999;
+  --header-bg-color: #fff;
+  --bg-color: #f8f8f8;
+  --box-color: #ffffff;
+  --box2-color: #ffffff;
 
-$grey-c-color: #ccc;
-$grey-ef-color: #efefef;
-$grey-ed-color: #ededed;
-$grey-f8-color: #f8f8f8;
-$grey-40-color: #404040;
-$grey-2d-color: #2d2d2d;
+  --footer-box-color: #dddddd;
+  --board-list-header-color: #f3f3f3;
+  --search-box-color: #fff;
+  --search-btn-color: #0070f3;
 
-$grey1-color: #111;
-$grey2-color: #222;
-$grey3-color: #333;
-$grey4-color: #444;
-$grey5-color: #555;
-$grey6-color: #666;
-$grey7-color: #777;
-$grey8-color: #888;
-$grey9-color: #999;
+  --btn-line-grey-color: #fff;
+  --btn-line-grey-hover-color: #f0f0f0;
 
-// Dark mode colors
-$dark-bg: #252a2f;
-$dark-bg-secondary: #222;
-$dark-bg-tertiary: #2d2d2d;
-$dark-text: #ffffff;
-$dark-text-secondary: #e2e2e2;
-$dark-border: #404040;
-$dark-main-color: #4fc3f7;
-$dark-main-hover: #0072e4;
-$dark-font-color: #e0e0e0;
+  --btn-nonactive-color: #ccc;
+
+  --go_to_login_for_comment: #e7e7e7;
+
+  // 배경색
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f8;
+  --bg-tertiary: #efefef;
+  --bg-quaternary: #ededed;
+
+  // 텍스트색
+  --font-color: #000000;
+  --font2-color: #787878;
+
+  // 보더/구분선
+  --border-color: #cccccc;
+  --border-grey: #cccccc;
+  --search-border-grey: #494949;
+
+  // 그레이 스케일
+  --grey-1: #111111;
+  --grey-2: #222222;
+  --grey-3: #333333;
+  --grey-4: #444444;
+  --grey-5: #555555;
+  --grey-6: #666666;
+  --grey-7: #777777;
+  --grey-8: #888888;
+  --grey-9: #999999;
+
+  --grey-c: #cccccc;
+  --grey-ef: #efefef;
+  --grey-ed: #ededed;
+  --grey-f8: #f8f8f8;
+  --grey-40: #404040;
+  --grey-2d: #2d2d2d;
+  --grey-f3: #f3f3f3;
+
+  // 박스 쉐도우
+  --box-shadow:
+    0 3.5px 7px 0 rgba(0, 0, 0, 0.05), 0 1.5px 3px 0 rgba(0, 0, 0, 0.07);
+  --box-shadow2:
+    0 0px 7px 0 rgba(0, 0, 0, 0.1), 0 1.5px 3px 0 rgba(0, 0, 0, 0.14);
+  --box-shadow3:
+    0px 0px 10px 2px rgba(0, 0, 0, 0.22), 0 1.5px 8px 0 rgba(0, 0, 0, 0.14);
+}
+
+// Dark mode
+[data-theme="dark"] {
+  --main-color: #2857c5;
+  --main-hover-color: #0072e4;
+  --sub-color: rgb(100, 160, 220);
+
+  --header-bg-color: #34363b;
+  --bg-color: #34363b;
+  --box-color: #272727;
+  --box2-color: #313131;
+
+  --footer-box-color: #272727;
+  --board-list-header-color: #1b1b1b;
+  --search-box-color: #272727;
+
+  --btn-line-grey-color: #444;
+  --btn-line-grey-hover-color: #222;
+
+  --btn-nonactive-color: #555;
+
+  --go_to_login_for_comment: #1b1b1b;
+
+  // 배경색
+  --bg-primary: #252a2f;
+  --bg-secondary: #222222;
+  --bg-tertiary: #2d2d2d;
+  --bg-quaternary: #333333;
+
+  // 텍스트색
+  --font-color: #ffffff;
+  --font2-color: #e2e2e2;
+
+  // 보더/구분선
+  --border-color: #404040;
+  --border-grey: #404040;
+  --search-border-grey: #4e4e4e;
+
+  // 그레이 스케일 (다크모드에서는 밝게)
+  --grey-999: #999999;
+  --grey-888: #888888;
+  --grey-777: #777777;
+  --grey-666: #666666;
+  --grey-555: #555555;
+  --grey-444: #444444;
+  --grey-333: #333333;
+  --grey-222: #222222;
+  --grey-111: #111111;
+
+  --grey-eee: #eeeeee;
+  --grey-ddd: #dddddd;
+  --grey-ccc: #cccccc;
+  --grey-bbb: #bbbbbb;
+  --grey-aaa: #aaaaaa;
+
+  --grey-ef: #efefef;
+  --grey-ed: #ededed;
+  --grey-f8: #f8f8f8;
+  --grey-40: #404040;
+  --grey-2d: #2d2d2d;
+  --grey-f3: #f3f3f3;
+
+  // 박스 쉐도우 (다크모드용)
+  --box-shadow:
+    0 3.5px 7px 0 rgba(0, 0, 0, 0.3), 0 1.5px 3px 0 rgba(0, 0, 0, 0.4);
+  --box-shadow2:
+    0 0px 7px 0 rgba(0, 0, 0, 0.4), 0 1.5px 3px 0 rgba(0, 0, 0, 0.5);
+  --box-shadow3:
+    0px 0px 10px 2px rgba(66, 66, 66, 0.6), 0 1.5px 8px 0 rgba(0, 0, 0, 0.5);
+}
 
 $red-color: rgb(255, 122, 122);
 $blue-color: rgb(77, 145, 255);
@@ -90,16 +192,57 @@ $menu-height: 44px;
 $admin_header_height: 54px;
 $admin_left_width: 200px;
 
+// 하위 호환성을 위한 SCSS 변수들 (기존 코드와의 호환성)
+$main-color: var(--main-color);
+$main-hover-color: var(--main-hover-color);
+$sub-color: var(--sub-color);
+$font-color: var(--font-color);
+$font2-color: var(--font2-color);
+
+$grey-c-color: var(--grey-c);
+$grey-ef-color: var(--grey-ef);
+$grey-ed-color: var(--grey-ed);
+$grey-f8-color: var(--grey-f8);
+$grey-40-color: var(--grey-40);
+$grey-2d-color: var(--grey-2d);
+$grey-f3-color: var(--grey-f3);
+
+$grey1-color: var(--grey-1);
+$grey2-color: var(--grey-2);
+$grey3-color: var(--grey-3);
+$grey4-color: var(--grey-4);
+$grey5-color: var(--grey-5);
+$grey6-color: var(--grey-6);
+$grey7-color: var(--grey-7);
+$grey8-color: var(--grey-8);
+$grey9-color: var(--grey-9);
+
 /* border */
-$border-grey: 1px solid $grey-c-color;
-$box-shadow:
-  0 3.5px 7px 0 rgba(0, 0, 0, 0.05),
-  0 1.5px 3px 0 rgba(0, 0, 0, 0.07) !important;
-$box-shadow2:
-  0 0px 7px 0 rgba(0, 0, 0, 0.1),
-  0 1.5px 3px 0 rgba(0, 0, 0, 0.14) !important;
-$box-shadow3:
-  0px 0px 10px 2px rgba(0, 0, 0, 0.22),
-  0 1.5px 8px 0 rgba(0, 0, 0, 0.14) !important;
+$border-grey: 1px solid var(--border-grey);
+$search-border-grey: var(--search-border-grey);
+
+$box-shadow: var(--box-shadow) !important;
+$box-shadow2: var(--box-shadow2) !important;
+$box-shadow3: var(--box-shadow3) !important;
+
+$header-bg: var(--header-bg-color);
+$bg-color: var(--bg-color);
+$white-color: #fff !important;
+
+$box-color: var(--box-color);
+$box2-color: var(--box2-color);
+
+$footer-box-color: var(--footer-box-color);
+
+$board-list-header-color: var(--board-list-header-color);
+$search-box-color: var(--search-box-color);
+$search-btn-color: var(--search-btn-color);
+
+$btn-line-grey-color: var(--btn-line-grey-color);
+$btn-line-grey-hover-color: var(--btn-line-grey-hover-color);
+
+$btn-nonactive-color: var(--btn-nonactive-color);
+
+$go_to_login_for_comment: var(--go_to_login_for_comment);
 
 $zIndexFirst: 9999999999;

@@ -176,7 +176,8 @@ async function getUserProfileFromDB(
       });
 
       activityData.recent_comments = recentComments.map((comment) => ({
-        id: comment.id,
+        id: comment.post_id,
+        comment_id: comment.id,
         content: comment.content,
         post_title: comment.post?.title || "",
         board_name: comment.post?.board?.board_name || "알 수 없음",

@@ -1,17 +1,10 @@
-@use "@/style/var.scss" as *; /* Login.module.css */
-@use "@/style/checkbox.scss" as *; /* checkbox css */
+@use "sass:color";
+@use "./var.scss" as *; /* Login.module.css */
 
 .flex_center {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-.page {
-  position: relative;
-  width: 100%;
-  max-width: 788px;
-  margin: 0 auto;
-  padding-bottom: 60px;
 }
 .login_page {
   position: relative;
@@ -34,7 +27,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-bottom: 200px;
+  padding-bottom: 100px;
 }
 .header_login {
   position: relative;
@@ -59,7 +52,7 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.4;
-  color: red;
+  color: $red-color;
   margin-bottom: 10px;
 }
 .form {
@@ -78,7 +71,7 @@
   min-width: 80px;
   white-space: pre-line;
 }
-.input_box {
+.login_input_box {
   position: relative;
   display: flex;
   justify-content: flex-end;
@@ -90,11 +83,11 @@
   overflow: hidden;
   box-shadow: $box-shadow;
 }
-.input_box .input_bg {
+.login_input_box .input_bg {
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: #fff;
+  background-color: $box-color;
 }
 .input_img .label_img {
   position: relative;
@@ -106,6 +99,7 @@
   height: 60px;
   cursor: pointer;
   overflow: hidden;
+  background-color: $box-color;
 }
 .input_img:hover {
   border: 1px solid $main-color;
@@ -154,7 +148,6 @@
   opacity: 0.5;
   margin-bottom: 4px;
   transition: none;
-  box-shadow: $box-shadow;
 }
 .file_name_label.after {
   transform: translateY(-145%) !important;
@@ -176,16 +169,16 @@
   background-color: transparent !important;
 }
 .input_common:-webkit-autofill {
-  background-color: #fff !important;
-  color: #333 !important;
+  background-color: $white-color !important;
+  color: $font-color !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 .input_common:-webkit-autofill:focus {
-  background-color: #fff !important;
-  color: #333 !important;
+  background-color: $white-color !important;
+  color: $font-color !important;
 }
 .input_common:-moz-placeholder {
-  background-color: #fff !important;
+  background-color: $white-color !important;
 }
 .label_common {
   position: absolute;
@@ -206,6 +199,7 @@
   resize: none;
   min-height: 200px;
   padding-top: 28px;
+  color: $font-color;
 }
 
 /* login ad */
@@ -233,7 +227,7 @@
 }
 .notice {
   @include re-bl;
-  color: $grey5-color;
+  color: $font2-color;
   margin-bottom: 8px;
   font-size: 15px;
   font-weight: 400;
@@ -262,7 +256,7 @@
   position: relative;
   display: block;
   padding-bottom: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 100px;
   border-bottom: $border-grey;
 }
 .membership_tit {
@@ -287,7 +281,7 @@
   border-radius: 8px;
   margin-bottom: 16px;
   overflow-y: scroll;
-  background-color: #fafafa;
+  background-color: $box-color;
   box-shadow: $box-shadow;
 }
 .membership_box::-webkit-scrollbar {
@@ -312,150 +306,4 @@
 
 .membership_contents h2:first-child {
   padding-top: 12px;
-}
-
-/* Dark Mode Styles */
-:global([data-theme="dark"]) {
-  .login_page {
-    background-color: $dark-bg;
-    color: #ffffff;
-  }
-
-  .header_text {
-    color: #ffffff;
-  }
-
-  .header_subtext {
-    color: #b0b0b0;
-  }
-
-  .error {
-    color: #ff6b6b;
-  }
-
-  .input_box {
-    border: 1px solid #404040;
-    background-color: #2d2d2d;
-  }
-
-  .input_box .input_bg {
-    background-color: #2d2d2d;
-  }
-
-  .input_common {
-    color: #ffffff;
-  }
-
-  .input_common:-webkit-autofill {
-    background-color: #2d2d2d !important;
-    color: #ffffff !important;
-    -webkit-box-shadow: 0 0 0 1000px #2d2d2d inset !important;
-    -webkit-text-fill-color: #ffffff !important;
-  }
-
-  .input_common:-webkit-autofill:focus {
-    background-color: #2d2d2d !important;
-    color: #ffffff !important;
-    -webkit-box-shadow: 0 0 0 1000px #2d2d2d inset !important;
-    -webkit-text-fill-color: #ffffff !important;
-  }
-
-  .label_common {
-    color: #b0b0b0;
-  }
-
-  .input_box:focus-within {
-    border-color: #4fc3f7;
-  }
-
-  .input_box:focus-within .label_common {
-    color: #fff;
-  }
-
-  .file_name {
-    background-color: #2d2d2d !important;
-    color: #ffffff;
-  }
-
-  .file_name_label {
-    color: #b0b0b0;
-  }
-
-  .file_name_label.after {
-    color: #4fc3f7 !important;
-  }
-
-  .input_img .label_img {
-    background-color: #2d2d2d;
-    border: 1px solid #404040;
-  }
-
-  .input_img:hover .label_img {
-    border-color: #4fc3f7;
-    color: #4fc3f7;
-  }
-
-  .img_preview {
-    background-color: $grey-2d-color;
-    border: 1px solid $grey-40-color;
-  }
-
-  .find_info a {
-    color: $grey3-color;
-  }
-
-  .find_info a:hover {
-    color: $main-color;
-  }
-
-  .notice {
-    color: #b0b0b0;
-  }
-
-  .notice_true {
-    color: #4fc3f7;
-  }
-
-  .notice_false {
-    color: #ff6b6b;
-  }
-
-  .blue {
-    color: #4fc3f7;
-  }
-
-  .red {
-    color: #ff6b6b;
-  }
-
-  .membership_box {
-    background-color: #1e1e1e;
-    border: 1px solid #404040;
-    color: #ffffff;
-  }
-
-  .membership_box::-webkit-scrollbar-thumb {
-    background-color: #4fc3f7;
-  }
-
-  .membership_contents p,
-  .membership_contents li {
-    color: #ffffff;
-  }
-
-  .membership_contents h2 {
-    color: #ffffff;
-  }
-
-  .membership_tit {
-    color: #ffffff;
-  }
-
-  .membership_tit svg {
-    color: #4fc3f7;
-  }
-
-  .login_ad {
-    background-color: #2d2d2d;
-  }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "@/style/Login.module.scss";
+import "@/style/Login.scss";
 
 import axios from "axios";
 
@@ -401,31 +401,29 @@ export default function User() {
   };
 
   return (
-    <div className={`${styles.container} ${styles.login_page}`}>
-      <div className={styles.page}>
-        <div className={styles.inside}>
-          <div className={styles.box_inner}>
-            <form onSubmit={userPost} className={styles.form}>
-              <div className={styles.header_login}>
-                <h2 className={styles.header_text}>회원가입</h2>
-                <p className={styles.header_subtext}>
-                  새로운 계정을 생성합니다.
-                </p>
+    <div className={`container login_page`}>
+      <div className={`page`}>
+        <div className={`inside`}>
+          <div className={`box_inner`}>
+            <form onSubmit={userPost} className={`form`}>
+              <div className={`header_login`}>
+                <h2 className={`header_text`}>회원가입</h2>
+                <p className={`header_subtext`}>새로운 계정을 생성합니다.</p>
               </div>
 
               {/* id */}
-              <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxIdRef}>
-                  <div className={styles.input_bg}></div>
+              <div className={`input_group`}>
+                <div className={`input_box`} ref={boxIdRef}>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="userid"
                     ref={labelIdRef}
                   >
                     아이디
                   </label>
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputIdRef}
                     onFocus={() => handleFocus(labelIdRef, boxIdRef)}
                     onBlur={() => {
@@ -442,18 +440,18 @@ export default function User() {
               </div>
 
               {/* 별명 */}
-              <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxNickRef}>
-                  <div className={styles.input_bg}></div>
+              <div className={`input_group`}>
+                <div className={`input_box`} ref={boxNickRef}>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="userid"
                     ref={labelNickRef}
                   >
                     별명
                   </label>
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputNickRef}
                     onFocus={() => handleFocus(labelNickRef, boxNickRef)}
                     onBlur={() => {
@@ -473,21 +471,21 @@ export default function User() {
               </div>
 
               {/* 자기소개 */}
-              <div className={styles.input_group}>
+              <div className={`input_group`}>
                 <div
-                  className={`${styles.input_box} ${styles.textarea_box}`}
+                  className={`${`input_box`} ${`textarea_box`}`}
                   ref={boxBioRef}
                 >
-                  <div className={styles.input_bg}></div>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="userBio"
                     ref={labelBioRef}
                   >
                     자기소개 (선택)
                   </label>
                   <textarea
-                    className={`${styles.input_common} ${styles.textarea_bio}`}
+                    className={`${`input_common`} ${`textarea_bio`}`}
                     ref={inputBioRef}
                     onFocus={() => handleFocus(labelBioRef, boxBioRef)}
                     onBlur={() => {
@@ -524,24 +522,22 @@ export default function User() {
               )}
 
               {/* 프로필 이미지 */}
-              <div className={styles.input_group}>
-                <div className={`${styles.input_box} ${styles.input_img}`}>
+              <div className={`input_group`}>
+                <div className={`${`input_box`} ${`input_img`}`}>
                   <label
-                    className={`${styles.label_img}`}
+                    className={`${`label_img`}`}
                     htmlFor="profileImage"
                     ref={labelProfileImgRef}
                   >
                     {fileName ? (
                       <>
-                        <span
-                          className={`${styles.file_name_label} ${styles.after}`}
-                        >
+                        <span className={`${`file_name_label`} ${`after`}`}>
                           프로필 이미지
                         </span>
-                        <p className={styles.file_name}>{fileName}</p>
+                        <p className={`file_name`}>{fileName}</p>
                       </>
                     ) : (
-                      <span className={styles.file_name_label}>
+                      <span className={`file_name_label`}>
                         프로필 이미지 (선택)
                       </span>
                     )}
@@ -549,7 +545,7 @@ export default function User() {
 
                   {/* 파일 선택 버튼 (커스텀 스타일링) */}
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputProfileImgRef}
                     type="file"
                     id="profileImage"
@@ -563,31 +559,31 @@ export default function User() {
                 </div>
               </div>
 
-              <span className={`${styles.notice}`}>
-                용량이 <b className={`${styles.red}`}>1MB</b> 이하인 이미지만
+              <span className={`${`notice`}`}>
+                용량이 <b className={`${`red`}`}>1MB</b> 이하인 이미지만
                 업로드가 가능합니다.
               </span>
 
               {/* 미리보기 이미지 */}
               {profileImage && (
-                <div className={styles.img_preview}>
+                <div className={`img_preview`}>
                   <img src={profileImage} alt="Profile Preview" />
                 </div>
               )}
 
               {/* 비밀번호 */}
-              <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxPwRef}>
-                  <div className={styles.input_bg}></div>
+              <div className={`input_group`}>
+                <div className={`input_box`} ref={boxPwRef}>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="user_password"
                     ref={labelPwRef}
                   >
                     비밀번호
                   </label>
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputPwRef}
                     onFocus={() => handleFocus(labelPwRef, boxPwRef)}
                     onBlur={() => {
@@ -605,18 +601,18 @@ export default function User() {
                 </div>
               </div>
 
-              <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxPwcRef}>
-                  <div className={styles.input_bg}></div>
+              <div className={`input_group`}>
+                <div className={`input_box`} ref={boxPwcRef}>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="user_password_check"
                     ref={labelPwcRef}
                   >
                     비밀번호 확인
                   </label>
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputPwcRef}
                     onFocus={() => handleFocus(labelPwcRef, boxPwcRef)}
                     onBlur={() => {
@@ -638,11 +634,11 @@ export default function User() {
               </div>
 
               <span
-                className={`${styles.notice} ${
+                className={`${`notice`} ${
                   userPasswordNotice === "비밀번호가 일치하지 않습니다!"
-                    ? styles.notice_false
+                    ? `notice_false`
                     : userPasswordNotice === "비밀번호가 일치합니다."
-                      ? styles.notice_true
+                      ? `notice_true`
                       : ""
                 }`}
               >
@@ -650,18 +646,18 @@ export default function User() {
               </span>
 
               {/* email */}
-              <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxEmailRef}>
-                  <div className={styles.input_bg}></div>
+              <div className={`input_group`}>
+                <div className={`input_box`} ref={boxEmailRef}>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="user_email"
                     ref={labelEmailRef}
                   >
                     이메일
                   </label>
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputEmailRef}
                     onFocus={() => handleFocus(labelEmailRef, boxEmailRef)}
                     onBlur={() => {
@@ -692,18 +688,18 @@ export default function User() {
               </div>
 
               {/* certify num */}
-              <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxCertifyNumRef}>
-                  <div className={styles.input_bg}></div>
+              <div className={`input_group`}>
+                <div className={`input_box`} ref={boxCertifyNumRef}>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="certify_num"
                     ref={labelCertifyNumRef}
                   >
                     인증번호
                   </label>
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputCertifyNumRef}
                     onFocus={() =>
                       handleFocus(labelCertifyNumRef, boxCertifyNumRef)
@@ -733,12 +729,9 @@ export default function User() {
                     id="marketingConsent"
                     checked={marketingConsent}
                     onChange={(e) => setMarketingConsent(e.target.checked)}
-                    className={styles.checkbox}
+                    className={`checkbox`}
                   />
-                  <label
-                    htmlFor="marketingConsent"
-                    className={styles.consent_label}
-                  >
+                  <label htmlFor="marketingConsent" className={`consent_label`}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
@@ -781,11 +774,11 @@ export default function User() {
                     id="notificationConsent"
                     checked={notificationConsent}
                     onChange={(e) => setNotificationConsent(e.target.checked)}
-                    className={styles.checkbox}
+                    className={`checkbox`}
                   />
                   <label
                     htmlFor="notificationConsent"
-                    className={styles.consent_label}
+                    className={`consent_label`}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

@@ -54,17 +54,18 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   }
 
   return (
-    <div className='admin-tiptap-editor'>
+    <div className="admin-tiptap-editor">
       {/* 툴바 */}
       <div
-        className='editor-toolbar'
+        className="editor-toolbar"
         style={{
           display: "flex",
           gap: "8px",
           padding: "12px",
           borderBottom: "1px solid #e0e0e0",
           backgroundColor: "#f9f9f9",
-        }}>
+        }}
+      >
         {/* 헤딩 */}
         <select
           onChange={(e) => {
@@ -79,11 +80,16 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                 .run();
             }
           }}
-          style={{ padding: "4px", borderRadius: "4px", border: "1px solid #ccc" }}>
-          <option value='0'>본문</option>
-          <option value='1'>제목 1</option>
-          <option value='2'>제목 2</option>
-          <option value='3'>제목 3</option>
+          style={{
+            padding: "4px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
+          <option value="0">본문</option>
+          <option value="1">제목 1</option>
+          <option value="2">제목 2</option>
+          <option value="3">제목 3</option>
         </select>
 
         {/* 굵기 */}
@@ -96,8 +102,9 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             borderRadius: "4px",
             backgroundColor: editor.isActive("bold") ? "#007bff" : "white",
             color: editor.isActive("bold") ? "white" : "black",
-          }}>
-          <BoldIcon className='w-4 h-4' />
+          }}
+        >
+          <BoldIcon className="w-4 h-4" />
         </button>
 
         {/* 이탤릭 */}
@@ -110,8 +117,9 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             borderRadius: "4px",
             backgroundColor: editor.isActive("italic") ? "#007bff" : "white",
             color: editor.isActive("italic") ? "white" : "black",
-          }}>
-          <ItalicIcon className='w-4 h-4' />
+          }}
+        >
+          <ItalicIcon className="w-4 h-4" />
         </button>
 
         {/* 밑줄 */}
@@ -124,8 +132,9 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             borderRadius: "4px",
             backgroundColor: editor.isActive("underline") ? "#007bff" : "white",
             color: editor.isActive("underline") ? "white" : "black",
-          }}>
-          <UnderlineIcon className='w-4 h-4' />
+          }}
+        >
+          <UnderlineIcon className="w-4 h-4" />
         </button>
 
         {/* 하이라이트 */}
@@ -138,8 +147,9 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             borderRadius: "4px",
             backgroundColor: editor.isActive("highlight") ? "#007bff" : "white",
             color: editor.isActive("highlight") ? "white" : "black",
-          }}>
-          <PaintBrushIcon className='w-4 h-4' />
+          }}
+        >
+          <PaintBrushIcon className="w-4 h-4" />
         </button>
 
         {/* 텍스트 정렬 */}
@@ -150,23 +160,31 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             padding: "6px",
             border: "1px solid #ccc",
             borderRadius: "4px",
-            backgroundColor: editor.isActive({ textAlign: "left" }) ? "#007bff" : "white",
+            backgroundColor: editor.isActive({ textAlign: "left" })
+              ? "#007bff"
+              : "white",
             color: editor.isActive({ textAlign: "left" }) ? "white" : "black",
-          }}>
-          <Bars3BottomLeftIcon className='w-4 h-4' />
+          }}
+        >
+          <Bars3BottomLeftIcon className="w-4 h-4" />
         </button>
 
         <button
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
-          className={editor.isActive({ textAlign: "center" }) ? "is-active" : ""}
+          className={
+            editor.isActive({ textAlign: "center" }) ? "is-active" : ""
+          }
           style={{
             padding: "6px",
             border: "1px solid #ccc",
             borderRadius: "4px",
-            backgroundColor: editor.isActive({ textAlign: "center" }) ? "#007bff" : "white",
+            backgroundColor: editor.isActive({ textAlign: "center" })
+              ? "#007bff"
+              : "white",
             color: editor.isActive({ textAlign: "center" }) ? "white" : "black",
-          }}>
-          <Bars3BottomCenterIcon className='w-4 h-4' />
+          }}
+        >
+          <Bars3BottomCenterIcon className="w-4 h-4" />
         </button>
 
         <button
@@ -176,10 +194,13 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             padding: "6px",
             border: "1px solid #ccc",
             borderRadius: "4px",
-            backgroundColor: editor.isActive({ textAlign: "right" }) ? "#007bff" : "white",
+            backgroundColor: editor.isActive({ textAlign: "right" })
+              ? "#007bff"
+              : "white",
             color: editor.isActive({ textAlign: "right" }) ? "white" : "black",
-          }}>
-          <Bars3BottomRightIcon className='w-4 h-4' />
+          }}
+        >
+          <Bars3BottomRightIcon className="w-4 h-4" />
         </button>
 
         {/* 리스트 */}
@@ -190,9 +211,12 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             padding: "6px",
             border: "1px solid #ccc",
             borderRadius: "4px",
-            backgroundColor: editor.isActive("bulletList") ? "#007bff" : "white",
+            backgroundColor: editor.isActive("bulletList")
+              ? "#007bff"
+              : "white",
             color: editor.isActive("bulletList") ? "white" : "black",
-          }}>
+          }}
+        >
           • 목록
         </button>
 
@@ -203,9 +227,12 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
             padding: "6px",
             border: "1px solid #ccc",
             borderRadius: "4px",
-            backgroundColor: editor.isActive("orderedList") ? "#007bff" : "white",
+            backgroundColor: editor.isActive("orderedList")
+              ? "#007bff"
+              : "white",
             color: editor.isActive("orderedList") ? "white" : "black",
-          }}>
+          }}
+        >
           1. 목록
         </button>
       </div>
@@ -221,52 +248,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
           borderRadius: "0 0 8px 8px",
         }}
       />
-
-      <style jsx>{`
-        .admin-tiptap-editor .ProseMirror {
-          outline: none;
-          min-height: 400px;
-        }
-
-        .admin-tiptap-editor .ProseMirror h1 {
-          font-size: 2rem;
-          font-weight: bold;
-          margin: 1rem 0;
-        }
-
-        .admin-tiptap-editor .ProseMirror h2 {
-          font-size: 1.5rem;
-          font-weight: bold;
-          margin: 0.8rem 0;
-        }
-
-        .admin-tiptap-editor .ProseMirror h3 {
-          font-size: 1.3rem;
-          font-weight: bold;
-          margin: 0.6rem 0;
-        }
-
-        .admin-tiptap-editor .ProseMirror p {
-          margin: 0.5rem 0;
-          line-height: 1.6;
-        }
-
-        .admin-tiptap-editor .ProseMirror ul,
-        ol {
-          padding-left: 1.5rem;
-          margin: 0.5rem 0;
-        }
-
-        .admin-tiptap-editor .ProseMirror li {
-          margin: 0.2rem 0;
-        }
-
-        .admin-tiptap-editor .ProseMirror mark {
-          background-color: #ffeb3b;
-          padding: 0.1rem 0.2rem;
-          border-radius: 0.2rem;
-        }
-      `}</style>
     </div>
   );
 }

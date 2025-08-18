@@ -226,7 +226,11 @@ export default function Write() {
         </select>
 
         <div className="write_top">
-          <input type="text" ref={writeTitle} />
+          <input
+            type="text"
+            ref={writeTitle}
+            placeholder="제목을 입력해 주세요."
+          />
         </div>
 
         <Editor

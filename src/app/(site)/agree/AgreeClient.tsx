@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/contexts/AuthContext";
 
-import styles from "@/style/Login.module.scss";
+import "@/style/Login.scss";
 
 interface AgreeClientProps {
   privacyContent?: string;
@@ -35,15 +35,15 @@ export default function AgreeClient({
   }, [allChecked, setAgreeCheck]);
 
   return (
-    <div className={styles.page}>
-      <div className={styles.membership_wrap}>
-        <div className={styles.membership}>
-          <h4 className={styles.membership_tit}>
+    <div className={`page`}>
+      <div className={`membership_wrap`}>
+        <div className={`membership`}>
+          <h4 className={`membership_tit`}>
             <CheckCircleIcon className="icon" />
             회원가입약관
           </h4>
-          <div className={styles.membership_box}>
-            <div className={styles.membership_contents}>
+          <div className={`membership_box`}>
+            <div className={`membership_contents`}>
               <div
                 dangerouslySetInnerHTML={{
                   __html: signupTermsContent || "회원가입약관을 불러오는 중...",
@@ -93,12 +93,12 @@ export default function AgreeClient({
             </label>
           </div>
 
-          <h4 className={styles.membership_tit}>
+          <h4 className={`membership_tit`}>
             <CheckCircleIcon className="icon" />
             개인정보처리방침
           </h4>
-          <div className={styles.membership_box}>
-            <div className={styles.membership_contents}>
+          <div className={`membership_box`}>
+            <div className={`membership_contents`}>
               <div
                 dangerouslySetInnerHTML={{
                   __html: privacyContent || "개인정보처리방침을 불러오는 중...",
@@ -192,7 +192,7 @@ export default function AgreeClient({
           <div className="btn_wrap">
             <Link
               href="/user"
-              className={`btn btn_width ${!allChecked ? styles.disabled : ""}`}
+              className={`btn btn_width ${!allChecked ? "disabled" : ""}`}
               tabIndex={allChecked ? 0 : -1}
               aria-disabled={!allChecked}
               onClick={(e) => {

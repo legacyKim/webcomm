@@ -229,11 +229,9 @@ export default function NotificationManager({
     <div className="notification-manager">
       <div className="notification-controls">
         {permission === "granted" && isSubscribed ? (
-          <p className="notice">푸시 알림이 활성화되었습니다.</p>
+          <p className="">푸시 알림이 활성화되었습니다.</p>
         ) : (
-          <p className="notice">
-            새로운 알림을 확인하고 푸시 알림을 설정하세요.
-          </p>
+          <p className="">새로운 알림을 확인하고 푸시 알림을 설정하세요.</p>
         )}
 
         {permission === "granted" && (

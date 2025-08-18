@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import styles from "@/style/Login.module.scss";
+import "@/style/Login.scss";
 
 import { handleBlur, handleFocus } from "@/func/inputActive";
 import Cookies from "js-cookie";
@@ -165,31 +165,31 @@ export default function LoginPage() {
   }, [capsLockOn]);
 
   return (
-    <div className={`${styles.login_page}`}>
-      <div className={styles.inside}>
+    <div className={`${`login_page`}`}>
+      <div className={`inside`}>
         {/* ad 영역 */}
-        {/* <div className={`${styles.login_ad} ${styles.box_inner}`}>
+        {/* <div className={`${login_ad} ${box_inner}`}>
 
             </div> */}
 
         {/* 로그인 폼 */}
-        <div className={styles.box_inner}>
-          <form onSubmit={handleLogin} className={styles.form}>
-            <div className={styles.header_login}>
-              <h2 className={styles.header_text}>LOGIN</h2>
+        <div className={`box_inner`}>
+          <form onSubmit={handleLogin} className={`form`}>
+            <div className={`header_login`}>
+              <h2 className={`header_text`}>LOGIN</h2>
             </div>
-            <div className={styles.input_group}>
-              <div className={styles.input_box} ref={boxIdRef}>
-                <div className={styles.input_bg}></div>
+            <div className={`input_group`}>
+              <div className={`login_input_box`} ref={boxIdRef}>
+                <div className={`input_bg`}></div>
                 <label
-                  className={styles.label_common}
+                  className={`label_common`}
                   htmlFor="userid"
                   ref={labelIdRef}
                 >
                   아이디
                 </label>
                 <input
-                  className={styles.input_common}
+                  className={`input_common`}
                   ref={inputIdRef}
                   onFocus={() => handleFocus(labelIdRef, boxIdRef)}
                   onBlur={() => {
@@ -205,18 +205,18 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-            <div className={styles.input_group}>
-              <div className={styles.input_box} ref={boxPwRef}>
-                <div className={styles.input_bg}></div>
+            <div className={`input_group`}>
+              <div className={`login_input_box`} ref={boxPwRef}>
+                <div className={`input_bg`}></div>
                 <label
-                  className={styles.label_common}
+                  className={`label_common`}
                   htmlFor="password"
                   ref={labelPwRef}
                 >
                   비밀번호
                 </label>
                 <input
-                  className={styles.input_common}
+                  className={`input_common`}
                   ref={inputPwRef}
                   onFocus={() => handleFocus(labelPwRef, boxPwRef)}
                   onBlur={() => {
@@ -281,9 +281,7 @@ export default function LoginPage() {
               </label>
             </div>
 
-            {error && (
-              <span className={`${styles.notice} ${styles.blue}`}>{error}</span>
-            )}
+            {error && <span className={`${`notice`} ${`blue`}`}>{error}</span>}
 
             {/* 버튼 */}
             <div className="btn_wrap">
@@ -293,7 +291,7 @@ export default function LoginPage() {
             </div>
 
             {/* 아이디/비밀번호 찾기 및 회원가입 */}
-            <div className={styles.find_info}>
+            <div className={`find_info`}>
               <Link href="/find">아이디/비밀번호 찾기</Link>
               &middot;
               <Link href="/agree">회원가입</Link>

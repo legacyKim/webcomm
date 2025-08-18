@@ -16,7 +16,10 @@ export async function POST(req) {
       ?.split("=")[1];
 
     if (!token) {
-      return NextResponse.json({ success: false, message: "로그인이 필요합니다." }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: "로그인이 필요합니다." },
+        { status: 401 }
+      );
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -24,7 +27,10 @@ export async function POST(req) {
 
     // 관리자 권한 확인
     if (Number(userAuthority) !== 0) {
-      return NextResponse.json({ success: false, message: "관리자만 공지를 작성할 수 있습니다." }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "관리자만 공지를 작성할 수 있습니다." },
+        { status: 403 }
+      );
     }
 
     const insertQuery = `
@@ -32,12 +38,23 @@ export async function POST(req) {
       VALUES ($1, $2, $3, $4, $5, $6, $7)
     `;
 
-    await client.query(insertQuery, [boardname, title, content, userId, url_slug, userNick, true]);
+    await client.query(insertQuery, [
+      boardname,
+      title,
+      content,
+      userId,
+      url_slug,
+      userNick,
+      true,
+    ]);
 
     return NextResponse.json({ success: true, message: "공지 등록 완료" });
   } catch (error) {
     console.error("공지 등록 오류:", error);
-    return NextResponse.json({ success: false, message: "공지 등록 실패" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "공지 등록 실패" },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }
@@ -53,7 +70,7 @@ export async function GET(req) {
     const offset = (page - 1) * limit;
 
     const query = `
-      SELECT id, title, content, created_at, user_nickname, url_slug
+      SELECT id, title, content, created_at, user_nickname, url_slug, board_name
       FROM posts
       WHERE notice = true
       ORDER BY created_at DESC
@@ -82,7 +99,10 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error("공지 불러오기 오류:", error);
-    return NextResponse.json({ success: false, message: "공지 불러오기 실패" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "공지 불러오기 실패" },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }
@@ -93,11 +113,16 @@ export async function DELETE(_, { params }) {
   const { id } = params;
 
   try {
-    await client.query("DELETE FROM posts WHERE id = $1 AND notice = true", [id]);
+    await client.query("DELETE FROM posts WHERE id = $1 AND notice = true", [
+      id,
+    ]);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("공지 삭제 오류:", error);
-    return NextResponse.json({ success: false, message: "공지 삭제 실패" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "공지 삭제 실패" },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }

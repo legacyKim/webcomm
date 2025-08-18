@@ -28,12 +28,11 @@ import {
   ChatBubbleLeftEllipsisIcon,
   EyeIcon,
   HeartIcon,
-  ListBulletIcon,
   FlagIcon,
   PhotoIcon,
   ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
-import { PencilIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, ListBulletIcon } from "@heroicons/react/24/solid";
 
 import { CommentImage, CommentTreeNode } from "@/type/commentType";
 

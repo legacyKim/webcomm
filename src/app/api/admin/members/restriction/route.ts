@@ -6,18 +6,27 @@ export async function POST(req: Request) {
   try {
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
-      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+      return NextResponse.json(
+        { error: "관리자 권한이 필요합니다" },
+        { status: 403 }
+      );
     }
 
     const { memberId, restrictionUntil, authority } = await req.json();
 
     if (!memberId) {
-      return NextResponse.json({ error: "멤버 ID가 필요합니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "멤버 ID가 필요합니다" },
+        { status: 400 }
+      );
     }
 
-    // 자기 자신은 제한할 수 없음
+    // 자기 자신을 제한할 수 없음
     if (memberId === userData.id) {
-      return NextResponse.json({ error: "자신에게는 제한을 설정할 수 없습니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "자신에게는 제한을 설정할 수 없습니다" },
+        { status: 400 }
+      );
     }
 
     // 멤버 제한 설정
@@ -30,8 +39,8 @@ export async function POST(req: Request) {
     });
 
     const message = restrictionUntil
-      ? `제한이 설정되었습니다. (해제 예정: ${new Date(restrictionUntil).toLocaleString()})`
-      : "제한이 해제되었습니다.";
+      ? `제한이 설정되었습니다 (해제 예정: ${new Date(restrictionUntil).toLocaleString()})`
+      : "제한이 해제되었습니다";
 
     return NextResponse.json({
       success: true,
@@ -39,6 +48,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("Member restriction error:", error);
-    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+    return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }

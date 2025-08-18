@@ -4,7 +4,11 @@ import { Member } from "@/type/type";
 import { useState } from "react";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
 import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
-import { useMemberAuthorityMutation, useMemberDeleteMutation, useStatsUpdateMutation } from "@/func/hook/useMutations";
+import {
+  useMemberAuthorityMutation,
+  useMemberDeleteMutation,
+  useStatsUpdateMutation,
+} from "@/func/hook/useMutations";
 import RestrictionPopup from "./popup/RestrictionPopup";
 import MemberDetailModal from "./MemberDetailModal";
 
@@ -71,11 +75,23 @@ export default function MemberManage() {
   };
 
   // 멤버 권한 변경
-  const handleAuthorityChange = async (memberId: number, newAuthority: number, selectElement: HTMLSelectElement) => {
-    const originalValue = selectElement.getAttribute("data-original-value") || "1";
+  const handleAuthorityChange = async (
+    memberId: number,
+    newAuthority: number,
+    selectElement: HTMLSelectElement
+  ) => {
+    const originalValue =
+      selectElement.getAttribute("data-original-value") || "1";
 
-    const authorityNames = { 0: "관리자", 1: "일반회원", 2: "경고회원", 3: "정지회원" };
-    const authorityName = authorityNames[newAuthority as keyof typeof authorityNames] || "알 수 없음";
+    const authorityNames = {
+      0: "관리자",
+      1: "일반회원",
+      2: "경고회원",
+      3: "정지회원",
+    };
+    const authorityName =
+      authorityNames[newAuthority as keyof typeof authorityNames] ||
+      "알 수 없음";
 
     if (!confirm(`회원 권한을 '${authorityName}'으로 변경하시겠습니까?`)) {
       selectElement.value = originalValue;
@@ -83,22 +99,33 @@ export default function MemberManage() {
     }
 
     try {
-      await authorityMutation.mutateAsync({ memberId, authority: newAuthority });
+      await authorityMutation.mutateAsync({
+        memberId,
+        authority: newAuthority,
+      });
       alert("권한이 변경되었습니다.");
-      selectElement.setAttribute("data-original-value", newAuthority.toString());
+      selectElement.setAttribute(
+        "data-original-value",
+        newAuthority.toString()
+      );
       refresh(); // 전체 목록 새로고침
     } catch (error) {
       console.error("권한 변경 오류:", error);
-      alert(`권한 변경 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+      alert(
+        `권한 변경 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+      );
       selectElement.value = originalValue;
     }
   };
 
   // 멤버 삭제
-  const handleDeleteMember = async (memberId: number, memberNickname: string) => {
+  const handleDeleteMember = async (
+    memberId: number,
+    memberNickname: string
+  ) => {
     if (
       !confirm(
-        `정말로 '${memberNickname}' 회원을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없으며, 회원의 모든 게시물과 댓글이 함께 삭제됩니다.`,
+        `정말로 '${memberNickname}' 회원을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없으며, 회원의 모든 게시물과 댓글이 함께 삭제됩니다.`
       )
     )
       return;
@@ -109,13 +136,20 @@ export default function MemberManage() {
       refresh(); // 전체 목록 새로고침
     } catch (error) {
       console.error("회원 삭제 오류:", error);
-      alert(`회원 삭제 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+      alert(
+        `회원 삭제 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+      );
     }
   };
 
   // 회원 통계 업데이트
   const handleUpdateStats = async () => {
-    if (!confirm("모든 회원의 게시물 수와 조회수를 다시 계산하시겠습니까? 시간이 오래 걸릴 수 있습니다.")) return;
+    if (
+      !confirm(
+        "모든 회원의 게시물 수와 조회수를 다시 계산하시겠습니까? 시간이 오래 걸릴 수 있습니다."
+      )
+    )
+      return;
 
     try {
       const result = await statsUpdateMutation.mutateAsync();
@@ -166,23 +200,38 @@ export default function MemberManage() {
       <span>{index + 1}</span>
       <span
         onClick={() => setMemberDetailModal({ isOpen: true, member })}
-        style={{ cursor: "pointer", color: "#007bff", textDecoration: "underline" }}>
+        style={{
+          cursor: "pointer",
+          color: "#007bff",
+          textDecoration: "underline",
+        }}
+      >
         {member.userid}
       </span>
       <span
         onClick={() => setMemberDetailModal({ isOpen: true, member })}
-        style={{ cursor: "pointer", color: "#007bff", textDecoration: "underline" }}>
+        style={{
+          cursor: "pointer",
+          color: "#007bff",
+          textDecoration: "underline",
+        }}
+      >
         {member.email}
       </span>
       <span>{member.all_posts}</span>
       <span>{member.comment_count || 0}</span>
-      <span className={getAuthorityClass(member.authority)}>{getAuthorityText(member.authority)}</span>
-      <span className='member-actions'>
+      <span className={getAuthorityClass(member.authority)}>
+        {getAuthorityText(member.authority)}
+      </span>
+      <span className="member-actions">
         <select
-          onChange={(e) => handleAuthorityChange(member.id, parseInt(e.target.value), e.target)}
+          onChange={(e) =>
+            handleAuthorityChange(member.id, parseInt(e.target.value), e.target)
+          }
           defaultValue={member.authority}
           data-original-value={member.authority}
-          disabled={authorityMutation.isPending}>
+          disabled={authorityMutation.isPending}
+        >
           <option value={0}>관리자</option>
           <option value={1}>일반회원</option>
           <option value={2}>경고회원</option>
@@ -190,11 +239,15 @@ export default function MemberManage() {
         </select>
         <button
           onClick={() => handleDeleteMember(member.id, member.user_nickname)}
-          className='delete-btn'
-          disabled={deleteMutation.isPending}>
+          className="delete-btn"
+          disabled={deleteMutation.isPending}
+        >
           {deleteMutation.isPending ? "삭제중..." : "삭제"}
         </button>
-        <button onClick={() => setRestrictionPopup({ isOpen: true, member })} className='restriction-btn'>
+        <button
+          onClick={() => setRestrictionPopup({ isOpen: true, member })}
+          className="restriction-btn"
+        >
           제한설정
         </button>
       </span>
@@ -202,31 +255,37 @@ export default function MemberManage() {
   );
 
   return (
-    <div className='admin_content_wrap'>
-      <div className='admin_title'>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
         <h4>회원 관리</h4>
-        <div className='admin_btn'>
-          <button onClick={handleUpdateStats} disabled={statsUpdateMutation.isPending}>
+        <div className="admin_btn">
+          <button
+            onClick={handleUpdateStats}
+            disabled={statsUpdateMutation.isPending}
+          >
             {statsUpdateMutation.isPending ? "업데이트중..." : "통계 업데이트"}
           </button>
         </div>
       </div>
 
-      <div className='admin_content'>
+      <div className="admin_content">
         {/* 검색 및 필터 */}
-        <div className='search-filters'>
-          <div className='search-group'>
-            <select value={filterAuthority} onChange={(e) => setFilterAuthority(e.target.value)}>
-              <option value='all'>전체 권한</option>
-              <option value='0'>관리자</option>
-              <option value='1'>일반회원</option>
-              <option value='2'>경고회원</option>
-              <option value='3'>정지회원</option>
+        <div className="search-filters">
+          <div className="search-group">
+            <select
+              value={filterAuthority}
+              onChange={(e) => setFilterAuthority(e.target.value)}
+            >
+              <option value="all">전체 권한</option>
+              <option value="0">관리자</option>
+              <option value="1">일반회원</option>
+              <option value="2">경고회원</option>
+              <option value="3">정지회원</option>
             </select>
 
             <input
-              type='text'
-              placeholder='닉네임, 이메일로 검색...'
+              type="text"
+              placeholder="닉네임, 이메일로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -235,8 +294,8 @@ export default function MemberManage() {
           </div>
         </div>
 
-        <ol className='table'>
-          <li className='table_header'>
+        <ol className="table">
+          <li className="table_header">
             <span>No</span>
             <span>닉네임</span>
             <span>이메일</span>
@@ -255,131 +314,10 @@ export default function MemberManage() {
             lastElementRef={lastElementRef}
             onRetry={() => refresh()}
             renderItem={renderMember}
-            emptyMessage='회원이 없습니다.'
+            emptyMessage="회원이 없습니다."
           />
         </ol>
       </div>
-
-      <style jsx>{`
-        .search-filters {
-          margin-bottom: 20px;
-          padding: 20px;
-          background: white;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-group {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-        }
-
-        .search-group select,
-        .search-group input {
-          padding: 8px 12px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-        }
-
-        .search-group input {
-          width: 300px;
-        }
-
-        .search-group button {
-          padding: 8px 16px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-
-        .search-group button:hover {
-          background-color: #0056b3;
-        }
-
-        .authority-admin {
-          color: #dc3545;
-          font-weight: bold;
-        }
-
-        .authority-user {
-          color: #28a745;
-        }
-
-        .authority-warning {
-          color: #fd7e14;
-          font-weight: bold;
-        }
-
-        .authority-banned {
-          color: #6c757d;
-          text-decoration: line-through;
-        }
-
-        .member-actions {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-        }
-
-        .member-actions select {
-          padding: 4px 8px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 12px;
-        }
-
-        .member-actions select:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .delete-btn {
-          background-color: #dc3545;
-          color: white;
-          border: none;
-          padding: 4px 8px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 12px;
-        }
-
-        .delete-btn:hover:not(:disabled) {
-          background-color: #c82333;
-        }
-
-        .delete-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .restriction-btn {
-          background-color: #6c757d;
-          color: white;
-          border: none;
-          padding: 4px 8px;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 12px;
-        }
-
-        .restriction-btn:hover {
-          background-color: #5a6268;
-        }
-
-        @media (max-width: 768px) {
-          .search-group {
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .search-group input {
-            width: 100%;
-          }
-        }
-      `}</style>
 
       {/* 제한 설정 팝업 */}
       {restrictionPopup.member && (

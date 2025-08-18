@@ -97,6 +97,7 @@ export default function Menu() {
               ))}
             </div>
             <div className="board_recommend page">
+              <span className="notice">게시판을 추천해 주세요!</span>
               <button
                 className="btn"
                 onClick={() => {

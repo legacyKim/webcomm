@@ -6,13 +6,19 @@ export async function POST(req: Request) {
   try {
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
-      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+      return NextResponse.json(
+        { error: "관리자 권한이 필요합니다" },
+        { status: 403 }
+      );
     }
 
     const { postIds } = await req.json();
 
     if (!Array.isArray(postIds) || postIds.length === 0) {
-      return NextResponse.json({ error: "삭제할 게시물 ID가 필요합니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "삭제할 게시물 ID가 필요합니다" },
+        { status: 400 }
+      );
     }
 
     // 게시물 삭제 (soft delete)
@@ -25,9 +31,12 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ success: true, message: "게시물이 삭제되었습니다." });
+    return NextResponse.json({
+      success: true,
+      message: "게시물이 삭제되었습니다",
+    });
   } catch (error) {
     console.error("Posts delete error:", error);
-    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+    return NextResponse.json({ error: "서버 오류" }, { status: 500 });
   }
 }

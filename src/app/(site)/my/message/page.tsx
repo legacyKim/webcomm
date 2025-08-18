@@ -178,7 +178,7 @@ export default function MyMessage() {
                             </button>
                           </div>
                         </div>
-                        <p className="message">{msg.content}</p>
+                        <p className="message_content">{msg.content}</p>
                       </div>
                     </li>
                   ))}

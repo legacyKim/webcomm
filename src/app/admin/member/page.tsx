@@ -2,22 +2,24 @@
 
 import { useState } from "react";
 
-import MemberManage from "./components/memberManage"
+import MemberManage from "./components/memberManage";
 
 export default function Member() {
+  const [section, setSection] = useState<string>("memberManage");
 
-    const [section, setSection] = useState<string>('memberManage');
+  return (
+    <div className="admin_page">
+      <menu className="left_menu">
+        <button
+          onClick={() => {
+            setSection("memberManage");
+          }}
+        >
+          회원관리
+        </button>
+      </menu>
 
-    return (
-        <div className="admin_page">
-            <menu className="left_menu">
-                <button onClick={() => { setSection('memberManage') }}>회원관리</button>
-            </menu>
-
-            {section === 'memberManage' ? (
-                <MemberManage />
-            ) : null}
-
-        </div>
-    )
+      {section === "memberManage" ? <MemberManage /> : null}
+    </div>
+  );
 }

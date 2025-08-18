@@ -41,11 +41,16 @@
 }
 .checkbox .custom_checkbox span {
   font-size: 15px;
-  color: #000;
+  color: $font-color;
 }
 .checkbox .custom_checkbox b {
   font-weight: 500;
+  color: $font-color;
 }
+.checkbox label b {
+  color: $font-color;
+}
+
 .checkbox:hover .custom_checkbox span {
   text-decoration: underline;
 }

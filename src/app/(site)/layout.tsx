@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import QueryProvider from "@/QueryProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import MenuProviderWrapper from "@/components/MenuProviderWrapper";
+// import OnlineStatusManager from "@/components/OnlineStatusManager";
 import { fetchBoard } from "@/api/api";
 
 import { cookies } from "next/headers";
@@ -16,7 +17,6 @@ import "@/style/fontello/css/fontello.css";
 import "@/style/fontello/css/animation.css";
 import "@/style/style.common.scss";
 import "@/style/checkbox.scss";
-import "@/style/darkTheme.scss";
 
 export const metadata: Metadata = {
   title: "Tokti",
@@ -114,6 +114,7 @@ export default async function RootLayout({
         >
           <MenuProviderWrapper initialBoards={boardList}>
             <QueryProvider>
+              {/* <OnlineStatusManager /> */}
               <LayoutWrapper>{children}</LayoutWrapper>
             </QueryProvider>
           </MenuProviderWrapper>

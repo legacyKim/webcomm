@@ -9,13 +9,8 @@ import { fetchBoard } from "@/api/api";
 
 import axios from "axios";
 
-interface Notice {
-  url_slug: string;
-  id: number;
-  title: string;
-  content: string;
-  created_at: string;
-}
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import { Notice } from "@/type/adminType";
 
 export default function BoardNoticePopup({
   setPopupOpen,
@@ -120,48 +115,60 @@ export default function BoardNoticePopup({
     <div className="admin_popup_bg">
       <div className="admin_popup">
         <div className="admin_popup_header">
-          <h6>공지사항 작성</h6>
+          <h3>공지사항 작성</h3>
           <button onClick={() => setPopupOpen(false)}>
-            <i className="icon-cancel"></i>
+            <XMarkIcon className="icon" />
           </button>
         </div>
 
         <div className="admin_popup_content">
-          <select
-            className="board_category"
-            value={boardInfo.url_slug}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-              const selectedBoard = boardData?.boards?.find(
-                (b: { board_name: string; url_slug: string }) =>
-                  b.url_slug === e.target.value
-              );
-              if (selectedBoard) {
-                setBoardInfo({
-                  board_name: selectedBoard.board_name,
-                  url_slug: selectedBoard.url_slug,
-                });
-              } else {
-                setBoardInfo({ board_name: "", url_slug: "" });
+          <div className="admin_notice_select_title">
+            <select
+              className="board_category"
+              value={boardInfo.url_slug}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                const selectedBoard = boardData?.boards?.find(
+                  (b: { board_name: string; url_slug: string }) =>
+                    b.url_slug === e.target.value
+                );
+                if (selectedBoard) {
+                  setBoardInfo({
+                    board_name: selectedBoard.board_name,
+                    url_slug: selectedBoard.url_slug,
+                  });
+                } else {
+                  setBoardInfo({ board_name: "", url_slug: "" });
+                }
+              }}
+            >
+              <option>선택</option>
+              {boardData &&
+                boardData?.boards?.map(
+                  (b: { board_name: string; url_slug: string }) => (
+                    <option key={b.board_name} value={b.url_slug}>
+                      {b.board_name}
+                    </option>
+                  )
+                )}
+            </select>
+            <input
+              className="notice_title_input"
+              placeholder="제목을 입력하세요"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+
+          <div
+            className="notice_editor_wrapper"
+            onClick={() => {
+              if (editor) {
+                editor.commands.focus();
               }
             }}
           >
-            <option>선택</option>
-            {boardData &&
-              boardData?.boards?.map(
-                (b: { board_name: string; url_slug: string }) => (
-                  <option key={b.board_name} value={b.url_slug}>
-                    {b.board_name}
-                  </option>
-                )
-              )}
-          </select>
-          <input
-            className="notice_title_input"
-            placeholder="제목을 입력하세요"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <EditorContent editor={editor} className="notice_editor" />
+            <EditorContent editor={editor} className="notice_editor" />
+          </div>
         </div>
 
         <div className="admin_popup_footer">

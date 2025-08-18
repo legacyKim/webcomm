@@ -30,7 +30,9 @@ export default function SiteSettingsManage() {
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -108,158 +110,75 @@ export default function SiteSettingsManage() {
   }
 
   return (
-    <div className='site-settings-manage'>
+    <div className="site-settings-manage">
       <h2>일반 설정</h2>
 
-      <div className='setting-group'>
-        <label htmlFor='siteName'>사이트 이름:</label>
+      <div className="setting-group">
+        <label htmlFor="siteName">사이트 이름:</label>
         <input
-          id='siteName'
-          type='text'
+          id="siteName"
+          type="text"
           value={siteName}
           onChange={(e) => setSiteName(e.target.value)}
-          placeholder='사이트 이름을 입력하세요'
+          placeholder="사이트 이름을 입력하세요"
         />
       </div>
 
-      <div className='setting-group'>
+      <div className="setting-group">
         <label>로고 이미지:</label>
 
         {/* 현재 로고 미리보기 */}
         {logoUrl && (
-          <div className='logo-preview'>
+          <div className="logo-preview">
             <p>현재 로고:</p>
-            <img src={logoUrl} alt='현재 로고' style={{ maxWidth: "200px", height: "auto", marginBottom: "10px" }} />
+            <img
+              src={logoUrl}
+              alt="현재 로고"
+              style={{
+                maxWidth: "200px",
+                height: "auto",
+                marginBottom: "10px",
+              }}
+            />
           </div>
         )}
 
         {/* 파일 업로드 */}
-        <div className='upload-section'>
+        <div className="upload-section">
           <input
             ref={fileInputRef}
-            type='file'
-            accept='image/*'
+            type="file"
+            accept="image/*"
             onChange={handleFileUpload}
             style={{ display: "none" }}
           />
           <button
-            type='button'
+            type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className='upload-btn'>
+            className="upload-btn"
+          >
             {isUploading ? "업로드 중..." : "로고 파일 선택"}
           </button>
-          <p className='upload-hint'>JPG, PNG, GIF 파일 (최대 5MB)</p>
+          <p className="upload-hint">JPG, PNG, GIF 파일 (최대 5MB)</p>
         </div>
 
         {/* 수동 URL 입력 */}
-        <div className='manual-url'>
-          <label htmlFor='logoUrl'>또는 직접 URL 입력:</label>
+        <div className="manual-url">
+          <label htmlFor="logoUrl">또는 직접 URL 입력:</label>
           <input
-            id='logoUrl'
-            type='text'
+            id="logoUrl"
+            type="text"
             value={logoUrl}
             onChange={(e) => setLogoUrl(e.target.value)}
-            placeholder='로고 이미지 URL을 입력하세요'
+            placeholder="로고 이미지 URL을 입력하세요"
           />
         </div>
       </div>
 
-      <button onClick={handleSave} disabled={isSaving} className='save-btn'>
+      <button onClick={handleSave} disabled={isSaving} className="save-btn">
         {isSaving ? "저장 중..." : "설정 저장"}
       </button>
-
-      <style jsx>{`
-        .site-settings-manage {
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 20px;
-        }
-
-        .setting-group {
-          margin-bottom: 25px;
-          padding: 20px;
-          border: 1px solid #e0e0e0;
-          border-radius: 8px;
-          background-color: #fafafa;
-        }
-
-        .setting-group label {
-          display: block;
-          margin-bottom: 8px;
-          font-weight: bold;
-          color: #333;
-        }
-
-        .setting-group input[type="text"] {
-          width: 100%;
-          padding: 10px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 14px;
-        }
-
-        .logo-preview {
-          margin: 15px 0;
-          padding: 15px;
-          background-color: #fff;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-        }
-
-        .upload-section {
-          margin: 15px 0;
-        }
-
-        .upload-btn {
-          padding: 10px 20px;
-          background-color: #007cba;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .upload-btn:hover:not(:disabled) {
-          background-color: #005a87;
-        }
-
-        .upload-btn:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
-
-        .upload-hint {
-          margin-top: 5px;
-          font-size: 12px;
-          color: #666;
-        }
-
-        .manual-url {
-          margin-top: 15px;
-        }
-
-        .save-btn {
-          padding: 12px 24px;
-          background-color: #28a745;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 16px;
-          font-weight: bold;
-        }
-
-        .save-btn:hover:not(:disabled) {
-          background-color: #218838;
-        }
-
-        .save-btn:disabled {
-          background-color: #ccc;
-          cursor: not-allowed;
-        }
-      `}</style>
     </div>
   );
 }

@@ -45,7 +45,8 @@ export const useProgressiveInfiniteScroll = <T,>({
   } = useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam = 1 }) => queryFn(pageParam, limit),
-    getNextPageParam: (lastPage, pages) => (lastPage.hasMore ? pages.length + 1 : undefined),
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.hasMore ? pages.length + 1 : undefined,
     initialPageParam: 1,
     staleTime,
     gcTime,
@@ -104,12 +105,12 @@ export const useProgressiveInfiniteScroll = <T,>({
         {
           rootMargin: "100px",
           threshold: 0.1,
-        },
+        }
       );
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasNextPage, isFetchingNextPage, fetchNextPage],
+    [loading, hasNextPage, isFetchingNextPage, fetchNextPage]
   );
 
   // 새로고침 함수
@@ -138,8 +139,11 @@ export const useProgressiveInfiniteScroll = <T,>({
 
 // 기존 useInfiniteScroll 훅 (Toast.tsx 방식 - sessionStorage 제거)
 export const useInfiniteScroll = <T,>(
-  fetchFunction: (page: number, limit: number) => Promise<{ data: T[]; hasMore: boolean }>,
-  limit: number = 20,
+  fetchFunction: (
+    page: number,
+    limit: number
+  ) => Promise<{ data: T[]; hasMore: boolean }>,
+  limit: number = 20
   // queryKey?: string[], // 현재 미사용
 ) => {
   const [data, setData] = useState<T[]>([]);
@@ -166,12 +170,12 @@ export const useInfiniteScroll = <T,>(
         {
           rootMargin: "100px",
           threshold: 0.1,
-        },
+        }
       );
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore],
+    [loading, hasMore]
   );
 
   const loadMore = useCallback(async () => {
@@ -193,7 +197,11 @@ export const useInfiniteScroll = <T,>(
 
       setHasMore(result.hasMore);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "데이터 로딩 중 오류가 발생했습니다.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "데이터 로딩 중 오류가 발생했습니다."
+      );
     } finally {
       setLoading(false);
     }
@@ -222,7 +230,11 @@ export const useInfiniteScroll = <T,>(
 };
 
 // 로딩 스피너 컴포넌트
-export const LoadingSpinner = ({ size = "medium" }: { size?: "small" | "medium" | "large" }) => {
+export const LoadingSpinner = ({
+  size = "medium",
+}: {
+  size?: "small" | "medium" | "large";
+}) => {
   const sizeClasses = {
     small: "w-4 h-4",
     medium: "w-8 h-8",
@@ -230,73 +242,28 @@ export const LoadingSpinner = ({ size = "medium" }: { size?: "small" | "medium" 
   };
 
   return (
-    <div className='loading-spinner'>
+    <div className="loading-spinner">
       <div className={`spinner ${sizeClasses[size]}`}></div>
-
-      <style jsx>{`
-        .loading-spinner {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-        }
-
-        .spinner {
-          border: 2px solid #f3f3f3;
-          border-top: 2px solid #3498db;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </div>
   );
 };
 
 // 에러 메시지 컴포넌트
-export const ErrorMessage = ({ message, onRetry }: { message: string; onRetry?: () => void }) => {
+export const ErrorMessage = ({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry?: () => void;
+}) => {
   return (
-    <div className='error-message'>
+    <div className="error-message">
       <p>{message}</p>
       {onRetry && (
-        <button onClick={onRetry} className='retry-button'>
+        <button onClick={onRetry} className="retry-button">
           다시 시도
         </button>
       )}
-
-      <style jsx>{`
-        .error-message {
-          text-align: center;
-          padding: 20px;
-          color: #e74c3c;
-          background-color: #fdf2f2;
-          border: 1px solid #fecaca;
-          border-radius: 6px;
-          margin: 10px 0;
-        }
-
-        .retry-button {
-          margin-top: 10px;
-          padding: 8px 16px;
-          background-color: #3498db;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-
-        .retry-button:hover {
-          background-color: #2980b9;
-        }
-      `}</style>
     </div>
   );
 };
@@ -331,25 +298,14 @@ export const InfiniteScrollContainer = <T,>({
 
   if (data.length === 0 && !loading) {
     return (
-      <div className='empty-message'>
+      <div className="empty-message">
         <p>{emptyMessage}</p>
-
-        <style jsx>{`
-          .empty-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            margin: 20px 0;
-          }
-        `}</style>
       </div>
     );
   }
 
   return (
-    <div className='infinite-scroll-container'>
+    <div className="infinite-scroll-container">
       {data.map((item, index) => {
         const isLast = index === data.length - 1;
         // 안정적인 key 생성 (id가 있으면 사용, 없으면 index)
@@ -358,7 +314,11 @@ export const InfiniteScrollContainer = <T,>({
             ? `item-${(item as Record<string, unknown>).id}`
             : `index-${index}`;
         return (
-          <div key={itemKey} ref={isLast ? lastElementRef : null} className='scroll-item'>
+          <div
+            key={itemKey}
+            ref={isLast ? lastElementRef : null}
+            className="scroll-item"
+          >
             {renderItem(item, index)}
           </div>
         );
@@ -367,28 +327,10 @@ export const InfiniteScrollContainer = <T,>({
       {loading && (loadingComponent || <LoadingSpinner />)}
 
       {!hasMore && data.length > 0 && (
-        <div className='end-message'>
+        <div className="end-message">
           <p>모든 데이터를 불러왔습니다.</p>
         </div>
       )}
-
-      <style jsx>{`
-        .infinite-scroll-container {
-          width: 100%;
-        }
-
-        .scroll-item {
-          margin-bottom: 1px;
-        }
-
-        .end-message {
-          text-align: center;
-          padding: 20px;
-          color: #666;
-          font-size: 14px;
-          border-top: 1px solid #eee;
-        }
-      `}</style>
     </div>
   );
 };

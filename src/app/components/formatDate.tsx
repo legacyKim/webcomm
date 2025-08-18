@@ -3,7 +3,9 @@ export default function formatPostDate(isoString: string): string {
   const now = new Date();
 
   const isToday =
-    date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() && date.getDate() === now.getDate();
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
 
   if (isToday) {
     const hours = date.getHours().toString().padStart(2, "0");

@@ -15,24 +15,36 @@ export async function POST(request: NextRequest) {
     // 관리자 권한 확인
     const userData = await serverTokenCheck();
     if (!userData || userData.userAuthority !== 0) {
-      return NextResponse.json({ error: "관리자 권한이 필요합니다" }, { status: 403 });
+      return NextResponse.json(
+        { error: "관리자 권한이 필요합니다" },
+        { status: 403 }
+      );
     }
 
     const formData = await request.formData();
     const file = formData.get("logo") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "파일이 선택되지 않았습니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "파일을 선택하지 않았습니다" },
+        { status: 400 }
+      );
     }
 
-    // 파일 타입 검증
+    // 파일 형식 검증
     if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "이미지 파일만 업로드 가능합니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "이미지 파일만 업로드 가능합니다" },
+        { status: 400 }
+      );
     }
 
-    // 파일 크기 검증 (5MB)
+    // 파일 크기 검증(5MB)
     if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "파일 크기는 5MB 이하여야 합니다" }, { status: 400 });
+      return NextResponse.json(
+        { error: "파일 크기는 5MB 이하여야 합니다" },
+        { status: 400 }
+      );
     }
 
     // 파일 확장자 가져오기
@@ -64,6 +76,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("로고 업로드 실패:", error);
-    return NextResponse.json({ error: "로고 업로드에 실패했습니다" }, { status: 500 });
+    return NextResponse.json(
+      { error: "로고 업로드에 실패했습니다" },
+      { status: 500 }
+    );
   }
 }

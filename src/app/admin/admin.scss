@@ -72,7 +72,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 .admin_title h4 {
   font-size: 16px;
@@ -85,15 +85,16 @@
 }
 .admin_btn button {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.4;
   border: $border-grey;
+  color: $grey3-color;
   border-radius: 4px;
-  padding: 3px 8px 4px;
+  padding: 6px 14px;
 }
 .admin_btn button:hover {
   background-color: $main-color;
-  color: #fff;
+  color: $white-color;
   border: 1px solid $main-color;
 }
 /* admin sub end*/
@@ -120,7 +121,7 @@
 .select_group button {
   padding: 4px 12px 5px;
   background-color: $main-color;
-  color: #fff;
+  color: $white-color;
   border-radius: 4px;
   font-size: 13px;
   font-weight: 600;
@@ -134,6 +135,7 @@
 
 /* admin board */
 .table {
+  position: relative;
   border: $border-grey;
   overflow-y: scroll;
   max-height: 588px;
@@ -143,9 +145,10 @@
   justify-content: flex-start;
   align-items: center;
   border-bottom: $border-grey;
-}
-.table li:last-child {
-  border-bottom: 0;
+
+  &:last-child {
+    border-bottom: 0;
+  }
 }
 .table li span {
   position: relative;
@@ -164,37 +167,40 @@
 .table li span:last-child {
   border-right: 0;
 }
+.table li span.table_no {
+  max-width: 50px;
+}
 .table li span.table_board {
   flex: 2;
 }
 .table li span.table_title {
-  flex: 3;
+  flex: 2;
 }
 .table li span.table_content {
   flex: 6;
 }
 .table li span.table_date {
-  flex: 3;
+  flex: 1;
 }
 .table li span.table_btn {
   flex: 2;
 }
-.table li span button {
-  padding: 2px 4px;
-  border: $border-grey;
-  border-radius: 4px;
-  font-size: 12px;
-}
-.table li span button:hover {
-  color: $main-color;
-  border: 1px solid $main-color;
-}
+
 .table_header {
-  background-color: $grey4-color;
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  background-color: $grey-f8-color;
 }
 .table_header span {
   font-weight: 300;
   font-size: 14px;
+}
+
+.end-message {
+  @include flex-center;
+  padding: 20px;
+  color: $grey-c-color;
 }
 /* admin board end */
 
@@ -212,7 +218,7 @@
 .admin_popup {
   position: relative;
   display: block;
-  background-color: #fff;
+  background-color: $white-color;
   max-width: 768px;
   width: 100%;
   padding: 16px;
@@ -318,7 +324,7 @@
     align-items: center;
     gap: 8px;
     padding: 12px;
-    background: #fff3cd;
+    background: $white-color;
     border: 1px solid #ffeaa7;
     border-radius: 6px;
     margin-top: 16px;
@@ -345,6 +351,38 @@
   position: relative;
   display: block;
   padding-bottom: 16px;
+
+  .admin_notice_select_title {
+    @include flex-start;
+    margin-bottom: 8px;
+  }
+
+  .board_category {
+    margin-right: 8px;
+    border: $border-grey;
+    border-radius: 4px;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .notice_title_input {
+    border-bottom: $border-grey;
+    height: 32px;
+    outline: none;
+    flex: 1;
+    padding-left: 8px;
+  }
+  .notice_editor {
+    min-height: 200px;
+    border: $border-grey;
+    border-radius: 8px;
+    padding: 16px;
+    .ProseMirror {
+      outline: none;
+      height: 100%;
+    }
+  }
 }
 .input_box {
   @include flex-start;
@@ -378,7 +416,7 @@
 }
 .admin_popup_footer {
   @include flex-center;
-  gap: 12px;
+  gap: 8px;
 }
 .admin_popup_footer button {
   padding: 8px 16px;
@@ -392,7 +430,7 @@
 }
 .admin_popup_footer button.btn_secondary {
   background-color: #6c757d;
-  color: #fff;
+  color: $white-color;
   border: 1px solid #6c757d;
 
   &:hover {
@@ -402,7 +440,7 @@
 }
 .admin_popup_footer button:not(.btn_secondary) {
   background-color: $main-color;
-  color: #fff;
+  color: $white-color;
   border: 1px solid $main-color;
 
   &:hover {
@@ -479,10 +517,6 @@
         background: $main-color;
         color: white;
         border-color: $main-color;
-
-        &:hover {
-          background: color.adjust($main-color, $lightness: -10%);
-        }
       }
 
       &.reset-btn {
@@ -500,24 +534,23 @@
 
 /* 관리 버튼 스타일 통일 */
 .table_btn {
+  @include flex-start;
+  gap: 2px;
+
   button {
-    padding: 4px 8px;
-    margin: 0 2px;
+    padding: 3px 7px 3px;
     border-radius: 4px;
     font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: 1px solid;
+    border: $border-grey;
+    color: $grey-c-color;
 
-    &:first-child {
-      background: #17a2b8;
-      color: white;
-      border-color: #17a2b8;
-
-      &:hover {
-        background: #138496;
-      }
+    &:hover {
+      background-color: $main-color;
+      border: 1px solid $main-color;
+      color: $white-color;
     }
 
     &.delete-btn {
@@ -527,16 +560,6 @@
 
       &:hover {
         background: #c82333;
-      }
-    }
-
-    &:not(:first-child):not(.delete-btn) {
-      background: #ffc107;
-      color: #212529;
-      border-color: #ffc107;
-
-      &:hover {
-        background: #e0a800;
       }
     }
   }
@@ -582,10 +605,6 @@
         cursor: pointer;
         font-size: 14px;
         transition: all 0.2s ease;
-
-        &:hover:not(:disabled) {
-          background: color.adjust($main-color, $lightness: -10%);
-        }
 
         &:disabled {
           opacity: 0.6;
@@ -651,10 +670,6 @@
       font-size: 14px;
       transition: all 0.2s ease;
 
-      &:hover:not(:disabled) {
-        background: color.adjust($main-color, $lightness: -10%);
-      }
-
       &:disabled {
         opacity: 0.6;
         cursor: not-allowed;
@@ -719,4 +734,29 @@
 
 .admin_editor_wrap h2:first-child {
   padding-top: 12px;
+}
+
+/* loading spinner */
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.spinner {
+  border: 2px solid $grey-f3-color;
+  border-top: 2px solid $main-color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

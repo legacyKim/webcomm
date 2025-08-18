@@ -12,7 +12,10 @@ export async function GET() {
     });
   } catch (error) {
     console.error("개인정보처리방침 조회 실패:", error);
-    return NextResponse.json({ error: "개인정보처리방침을 불러올 수 없습니다." }, { status: 500 });
+    return NextResponse.json(
+      { error: "개인정보처리방침을 불러올 수 없습니다." },
+      { status: 500 }
+    );
   }
 }
 
@@ -21,7 +24,10 @@ export async function POST(request: NextRequest) {
     const { content } = await request.json();
 
     if (!content || typeof content !== "string") {
-      return NextResponse.json({ error: "유효하지 않은 내용입니다." }, { status: 400 });
+      return NextResponse.json(
+        { error: "유효하지 않은 내용입니다" },
+        { status: 400 }
+      );
     }
 
     // 기존 개인정보처리방침이 있는지 확인
@@ -56,6 +62,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("개인정보처리방침 저장 실패:", error);
-    return NextResponse.json({ error: "개인정보처리방침 저장에 실패했습니다." }, { status: 500 });
+    return NextResponse.json(
+      { error: "개인정보처리방침 저장에 실패했습니다." },
+      { status: 500 }
+    );
   }
 }

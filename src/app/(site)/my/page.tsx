@@ -356,10 +356,10 @@ export default function Mypage() {
                     setNewNick(e.target.value);
                   }}
                 />
-                <p className="notice">
+                <p className="">
                   별명은 최대 한글 6자, 영문 12자까지 입력이 가능합니다.
                 </p>
-                <p className="notice blue">
+                <p className=" blue">
                   {getNicknameCooldownLeft(isUserNickUpdatedAt) === 0 ? (
                     <>별명은 14일마다 변경이 가능합니다.</>
                   ) : (
@@ -369,7 +369,7 @@ export default function Mypage() {
                     </>
                   )}
                 </p>
-                <p className="notice red">
+                <p className=" red">
                   부적절한 별명은 임의로 변경될 수 있습니다.
                 </p>
               </div>
@@ -445,7 +445,7 @@ export default function Mypage() {
                 )}
 
                 <p className="notice">
-                  최대 &nbsp;<b className="notice">1MB</b>&nbsp; 이하의 이미지만
+                  최대 &nbsp;<b className="red">1MB</b>&nbsp; 이하의 이미지만
                   업로드 가능합니다.
                 </p>
               </div>
@@ -472,7 +472,7 @@ export default function Mypage() {
                     setNewPasswordCon(e.target.value);
                   }}
                 />
-                <p>{userPasswordNotice}</p>
+                <p className="notice">{userPasswordNotice}</p>
               </div>
             </div>
 

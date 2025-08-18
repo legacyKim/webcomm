@@ -128,7 +128,7 @@ export default function MyNotice() {
                 {/* 마케팅 정보 수신 설정 */}
                 <div className="notification-manager">
                   <div className="notification-controls">
-                    <p className="notice">
+                    <p className="">
                       마케팅 정보: 새로운 기능, 이벤트, 프로모션 소식을 이메일로
                       받아보실 수 있습니다.
                     </p>

@@ -5,7 +5,7 @@ import axios from "axios";
 import { useState, useRef, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
-import styles from "@/style/Login.module.scss";
+import "@/style/Login.scss";
 
 import { handleBlur, handleFocus } from "@/func/inputActive";
 
@@ -44,32 +44,32 @@ export default function Info() {
   };
 
   return (
-    <div className={`${styles.container} ${styles.login_page}`}>
-      <div className={styles.page}>
-        <div className={styles.inside}>
-          <div className={styles.box_inner}>
-            <form onSubmit={findInfo} className={styles.form}>
-              <div className={styles.header_login}>
-                <h2 className={styles.header_text}>ID/PW 찾기</h2>
-                <p className={styles.header_subtext}>
+    <div className={`${`container`} ${`login_page`}`}>
+      <div className={`page`}>
+        <div className={`inside`}>
+          <div className={`box_inner`}>
+            <form onSubmit={findInfo} className={`form`}>
+              <div className={`header_login`}>
+                <h2 className={`header_text`}>ID/PW 찾기</h2>
+                <p className={`header_subtext`}>
                   회원가입 시 입력한 이메일로 새로운 비밀번호를 <br /> 보내
                   드립니다.
                 </p>
               </div>
 
               {/* email */}
-              <div className={styles.input_group}>
-                <div className={styles.input_box} ref={boxEmailRef}>
-                  <div className={styles.input_bg}></div>
+              <div className={`input_group`}>
+                <div className={`input_box`} ref={boxEmailRef}>
+                  <div className={`input_bg`}></div>
                   <label
-                    className={styles.label_common}
+                    className={`label_common`}
                     htmlFor="user_email"
                     ref={labelEmailRef}
                   >
                     이메일
                   </label>
                   <input
-                    className={styles.input_common}
+                    className={`input_common`}
                     ref={inputEmailRef}
                     onFocus={() => handleFocus(labelEmailRef, boxEmailRef)}
                     onBlur={() => {

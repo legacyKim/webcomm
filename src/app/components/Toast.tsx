@@ -171,31 +171,6 @@ export const LoadingSpinner = ({
   return (
     <div className="loading-spinner">
       <div className={`spinner ${sizeClasses[size]}`}></div>
-
-      <style jsx>{`
-        .loading-spinner {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 20px;
-        }
-
-        .spinner {
-          border: 2px solid #f3f3f3;
-          border-top: 2px solid #3498db;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
-        }
-      `}</style>
     </div>
   );
 };
@@ -216,32 +191,6 @@ export const ErrorMessage = ({
           다시 시도
         </button>
       )}
-
-      <style jsx>{`
-        .error-message {
-          text-align: center;
-          padding: 20px;
-          color: #e74c3c;
-          background-color: #fdf2f2;
-          border: 1px solid #fecaca;
-          border-radius: 6px;
-          margin: 10px 0;
-        }
-
-        .retry-button {
-          margin-top: 10px;
-          padding: 8px 16px;
-          background-color: #3498db;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-
-        .retry-button:hover {
-          background-color: #2980b9;
-        }
-      `}</style>
     </div>
   );
 };
@@ -278,17 +227,6 @@ export const InfiniteScrollContainer = <T,>({
     return (
       <div className="empty-message">
         <p>{emptyMessage}</p>
-
-        <style jsx>{`
-          .empty-message {
-            text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            margin: 20px 0;
-          }
-        `}</style>
       </div>
     );
   }
@@ -315,24 +253,6 @@ export const InfiniteScrollContainer = <T,>({
           <p>모든 데이터를 불러왔습니다.</p>
         </div>
       )}
-
-      <style jsx>{`
-        .infinite-scroll-container {
-          width: 100%;
-        }
-
-        .scroll-item {
-          margin-bottom: 1px;
-        }
-
-        .end-message {
-          text-align: center;
-          padding: 20px;
-          color: #666;
-          font-size: 14px;
-          border-top: 1px solid #eee;
-        }
-      `}</style>
     </div>
   );
 };
