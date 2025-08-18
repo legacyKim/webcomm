@@ -74,10 +74,10 @@ export const metadata: Metadata = {
     images: ["/logo.png"], // 실제 이미지 경로로 변경
   },
   verification: {
-    google: `<meta name="google-site-verification" content="Xs9n-dVFNWqn8Ts4OUr0653gRrIJI9p462ejmEekYJw" />`,
+    google: "Xs9n-dVFNWqn8Ts4OUr0653gRrIJI9p462ejmEekYJw", // content 값만
   },
   other: {
-    "naver-site-verification": `<meta name="naver-site-verification" content="113ec5b9421fac8a8f7a561c17556a50535999f5" />`,
+    "naver-site-verification": "113ec5b9421fac8a8f7a561c17556a50535999f5", // content 값만
   },
   alternates: {
     canonical: "https://tokti.net", // 실제 도메인으로 변경 필요
