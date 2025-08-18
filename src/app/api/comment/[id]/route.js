@@ -58,7 +58,7 @@ export async function GET(req, context) {
         ARRAY[]::JSONB[] AS children
       FROM comments c
       LEFT JOIN members m ON c.user_id = m.id
-      WHERE c.post_id = $1 AND c.parent_id IS NULL
+      WHERE c.post_id = $1 AND c.parent_id IS NULL AND (c.is_deleted = false OR c.is_deleted IS NULL)
 
       UNION ALL
 
@@ -69,6 +69,7 @@ export async function GET(req, context) {
       FROM comments c
       INNER JOIN comment_tree ct ON c.parent_id = ct.id
       LEFT JOIN members m ON c.user_id = m.id
+      WHERE (c.is_deleted = false OR c.is_deleted IS NULL)
     )
     SELECT *
     FROM comment_tree
@@ -290,18 +291,43 @@ export async function DELETE(req, context) {
   const { id: postId } = await context.params;
 
   try {
+    await client.query("BEGIN");
+
     const { id } = await req.json();
-    const result = await client.query(
-      "DELETE FROM comments WHERE id = $1 RETURNING *",
+
+    // 대댓글 존재 여부 확인
+    const hasReplies = await client.query(
+      "SELECT COUNT(*) as count FROM comments WHERE parent_id = $1 AND (is_deleted = false OR is_deleted IS NULL)",
       [id]
     );
 
+    let result;
+    if (parseInt(hasReplies.rows[0].count) > 0) {
+      // 대댓글이 있으면 내용만 변경하고 삭제 표시
+      result = await client.query(
+        "UPDATE comments SET content = '삭제된 댓글입니다', is_deleted = true, deleted_at = NOW() WHERE id = $1 AND (is_deleted = false OR is_deleted IS NULL) RETURNING *",
+        [id]
+      );
+    } else {
+      // 대댓글이 없으면 일반 삭제
+      result = await client.query(
+        "UPDATE comments SET is_deleted = true, deleted_at = NOW() WHERE id = $1 AND (is_deleted = false OR is_deleted IS NULL) RETURNING *",
+        [id]
+      );
+    }
+
     if (result.rowCount === 0) {
+      await client.query("ROLLBACK");
       return NextResponse.json(
-        { success: false, message: "댓글이 존재하지 않습니다." },
+        {
+          success: false,
+          message: "댓글이 존재하지 않거나 이미 삭제되었습니다.",
+        },
         { status: 404 }
       );
     }
+
+    await client.query("COMMIT");
 
     // SSE로 삭제 이벤트 전송
     try {
@@ -326,6 +352,7 @@ export async function DELETE(req, context) {
       { status: 200 }
     );
   } catch (error) {
+    await client.query("ROLLBACK");
     console.error("댓글 삭제 오류:", error);
     return NextResponse.json(
       { success: false, message: "댓글 삭제 중 오류 발생" },
