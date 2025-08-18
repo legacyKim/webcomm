@@ -12,7 +12,7 @@ import BoardNoticePopup from "./popup/boardNoticePopup";
 import BoardNoticeViewPopup from "./popup/boardNoticeViewPopup";
 import TiptapViewer from "@/components/tiptapViewer";
 
-import type { Notice } from "@/types/adminType";
+import type { Notice } from "@/type/adminType";
 
 export default function BoardNoticeManage() {
   const fetchNotices = async (page: number, limit: number = 10) => {
