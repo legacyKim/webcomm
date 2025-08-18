@@ -19,10 +19,73 @@ import "@/style/style.common.scss";
 import "@/style/checkbox.scss";
 
 export const metadata: Metadata = {
-  title: "Tokti",
-  description: "Tokti 커뮤니티",
+  title: {
+    default: "Tokti - 자유로운 소통의 공간",
+    template: "%s | Tokti",
+  },
+  description:
+    "Tokti는 다양한 주제로 자유롭게 소통할 수 있는 커뮤니티입니다. 유머, 정보 공유, 토론 등 다양한 게시판에서 활발한 커뮤니티 활동을 즐겨보세요.",
+  keywords: [
+    "커뮤니티",
+    "게시판",
+    "토론",
+    "유머",
+    "정보공유",
+    "소통",
+    "Tokti",
+    "온라인 커뮤니티",
+    "자유게시판",
+    "베스트 게시글",
+  ],
+  authors: [{ name: "Tokti" }],
+  creator: "Tokti",
+  publisher: "Tokti",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    url: "https://tokti.net", // 실제 도메인으로 변경 필요
+    siteName: "Tokti",
+    title: "Tokti - 자유로운 소통의 공간",
+    description: "다양한 주제로 자유롭게 소통할 수 있는 커뮤니티 플랫폼",
+    images: [
+      {
+        url: "/logo.png", // 실제 이미지 경로로 변경
+        width: 1200,
+        height: 630,
+        alt: "Tokti 로고",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tokti - 자유로운 소통의 공간",
+    description: "다양한 주제로 자유롭게 소통할 수 있는 커뮤니티 플랫폼",
+    images: ["/logo.png"], // 실제 이미지 경로로 변경
+  },
+  verification: {
+    google: `<meta name="google-site-verification" content="Xs9n-dVFNWqn8Ts4OUr0653gRrIJI9p462ejmEekYJw" />`,
+  },
+  other: {
+    "naver-site-verification": `<meta name="naver-site-verification" content="113ec5b9421fac8a8f7a561c17556a50535999f5" />`,
+  },
+  alternates: {
+    canonical: "https://tokti.net", // 실제 도메인으로 변경 필요
+  },
   icons: {
     icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/logo.png",
   },
 };
 

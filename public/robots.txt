@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# 관리자 페이지와 API는 크롤링 제외
+Disallow: /admin/
+Disallow: /api/
+
+# 사이트맵 위치
+Sitemap: https://tokti.net/sitemap.xml
