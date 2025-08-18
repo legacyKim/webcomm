@@ -5,7 +5,6 @@ import axios from "axios";
 import { useState } from "react";
 // import { useQuery } from "@tanstack/react-query";
 
-import formatPostDate from "@/components/formatDate";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
 import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 

@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import prisma from "@/lib/prisma";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 
@@ -98,7 +97,7 @@ export async function POST(request) {
 }
 
 // 잠긴 계정 목록 조회 (관리자 전용)
-export async function GET(request) {
+export async function GET() {
   try {
     // 관리자 권한 확인
     const userData = await serverTokenCheck();
