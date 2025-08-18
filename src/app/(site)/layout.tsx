@@ -20,26 +20,38 @@ import "@/style/checkbox.scss";
 
 export const metadata: Metadata = {
   title: {
-    default: "Tokti - 자유로운 소통의 공간",
-    template: "%s | Tokti",
+    default: "톡티(Tokti) - 자유로운 소통의 커뮤니티",
+    template: "%s | 톡티(Tokti)",
   },
   description:
-    "Tokti는 다양한 주제로 자유롭게 소통할 수 있는 커뮤니티입니다. 유머, 정보 공유, 토론 등 다양한 게시판에서 활발한 커뮤니티 활동을 즐겨보세요.",
+    "톡티(Tokti)는 한국의 자유로운 온라인 커뮤니티입니다. 유머, 일상, 정보공유, 베스트 게시글 등 다양한 주제로 소통하고 토론할 수 있는 공간입니다. 지금 가입하고 활발한 커뮤니티 활동을 시작해보세요!",
   keywords: [
+    "톡티",
+    "Tokti",
     "커뮤니티",
     "게시판",
-    "토론",
     "유머",
+    "베스트",
+    "자유게시판",
+    "온라인 커뮤니티",
+    "토론",
     "정보공유",
     "소통",
-    "Tokti",
-    "온라인 커뮤니티",
-    "자유게시판",
-    "베스트 게시글",
+    "한국 커뮤니티",
+    "인터넷 커뮤니티",
+    "게시글",
+    "댓글",
+    "회원가입",
+    "무료 커뮤니티",
+    "일상",
+    "취미",
+    "관심사",
+    "네티즌",
+    "온라인 소통",
   ],
-  authors: [{ name: "Tokti" }],
-  creator: "Tokti",
-  publisher: "Tokti",
+  authors: [{ name: "톡티(Tokti)" }],
+  creator: "톡티(Tokti)",
+  publisher: "톡티(Tokti)",
   robots: {
     index: true,
     follow: true,
@@ -54,23 +66,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: "https://tokti.net", // 실제 도메인으로 변경 필요
-    siteName: "Tokti",
-    title: "Tokti - 자유로운 소통의 공간",
-    description: "다양한 주제로 자유롭게 소통할 수 있는 커뮤니티 플랫폼",
+    url: "https://tokti.net",
+    siteName: "톡티(Tokti)",
+    title: "톡티(Tokti) - 자유로운 소통의 커뮤니티",
+    description:
+      "한국의 자유로운 온라인 커뮤니티. 유머, 일상, 정보공유 등 다양한 주제로 소통하고 토론할 수 있는 공간입니다.",
     images: [
       {
-        url: "/logo.png", // 실제 이미지 경로로 변경
+        url: "/logo.png",
         width: 1200,
         height: 630,
-        alt: "Tokti 로고",
+        alt: "톡티(Tokti) 로고 - 자유로운 커뮤니티",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Tokti - 자유로운 소통의 공간",
-    description: "다양한 주제로 자유롭게 소통할 수 있는 커뮤니티 플랫폼",
+    title: "톡티(Tokti) - 자유로운 소통의 커뮤니티",
+    description:
+      "한국의 자유로운 온라인 커뮤니티. 유머, 일상, 정보공유 등 다양한 주제로 소통하세요!",
     images: ["/logo.png"],
   },
   verification: {
@@ -143,7 +157,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="kor">
+    <html lang="ko">
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -160,6 +174,30 @@ export default async function RootLayout({
                 }
               })();
             `,
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "톡티(Tokti)",
+              alternateName: ["Tokti", "톡티", "tokti.net"],
+              url: "https://tokti.net",
+              description:
+                "한국의 자유로운 온라인 커뮤니티. 유머, 일상, 정보공유 등 다양한 주제로 소통하고 토론할 수 있는 공간입니다.",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://tokti.net/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+              publisher: {
+                "@type": "Organization",
+                name: "톡티(Tokti)",
+                url: "https://tokti.net",
+              },
+            }),
           }}
         />
       </head>
