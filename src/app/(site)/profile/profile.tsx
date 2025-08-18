@@ -27,8 +27,6 @@ export default function Profile({
 }: ProfileProps) {
   const { isUserId } = useAuth();
 
-  console.log(userActivity);
-
   const [isFollowing, setIsFollowing] = useState(
     userProfile?.isFollowing || false
   );

@@ -17,15 +17,18 @@ export async function PATCH(req, { params }) {
           title = $3,
           content = $4,
           updated_at = NOW()
-      WHERE id = $4 AND notice = true
+      WHERE id = $5 AND notice = true
     `,
-      [boardname, url_slug, title, content, id],
+      [boardname, url_slug, title, content, id]
     );
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("공지 수정 오류:", error);
-    return NextResponse.json({ success: false, message: "공지 수정 실패" }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: "공지 수정 실패" },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }

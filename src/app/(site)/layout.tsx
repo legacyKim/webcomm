@@ -71,16 +71,16 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tokti - 자유로운 소통의 공간",
     description: "다양한 주제로 자유롭게 소통할 수 있는 커뮤니티 플랫폼",
-    images: ["/logo.png"], // 실제 이미지 경로로 변경
+    images: ["/logo.png"],
   },
   verification: {
-    google: "Xs9n-dVFNWqn8Ts4OUr0653gRrIJI9p462ejmEekYJw", // content 값만
+    google: "Xs9n-dVFNWqn8Ts4OUr0653gRrIJI9p462ejmEekYJw",
   },
   other: {
-    "naver-site-verification": "113ec5b9421fac8a8f7a561c17556a50535999f5", // content 값만
+    "naver-site-verification": "113ec5b9421fac8a8f7a561c17556a50535999f5",
   },
   alternates: {
-    canonical: "https://tokti.net", // 실제 도메인으로 변경 필요
+    canonical: "https://tokti.net",
   },
   icons: {
     icon: "/favicon.ico",

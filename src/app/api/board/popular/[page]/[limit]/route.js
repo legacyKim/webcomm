@@ -17,8 +17,13 @@ export async function GET(req, context) {
     const countQuery = `
       SELECT COUNT(*) AS total
       FROM posts p
+      LEFT JOIN boards b ON p.url_slug = b.url_slug
       WHERE p.deleted = FALSE
-        AND p.board_id != 3
+        AND p.url_slug != 'suggestion'
+        AND (
+          (p.notice = TRUE AND b.url_slug = 'popular') OR 
+          (p.notice = FALSE OR p.notice IS NULL)
+        )
         AND ($1 = 0 OR p.user_id NOT IN (
           SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
         ))
@@ -39,6 +44,7 @@ export async function GET(req, context) {
           p.created_at, 
           p.board_name,
           p.url_slug,
+          p.notice,
           m.profile AS user_profile,
           COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY p.created_at DESC) + 1 AS post_number,
           COALESCE(c.comment_count, 0) AS comment_count,
@@ -51,12 +57,19 @@ export async function GET(req, context) {
           GROUP BY post_id
       ) c ON p.id = c.post_id
       LEFT JOIN members m ON p.user_id = m.id
+      LEFT JOIN boards b ON p.url_slug = b.url_slug
       WHERE p.deleted = FALSE
-        AND p.board_id != 3
+        AND p.url_slug != 'suggestion'
+        AND (
+          (p.notice = TRUE AND b.url_slug = 'popular') OR 
+          (p.notice = FALSE OR p.notice IS NULL)
+        )
         AND ($1 = 0 OR p.user_id NOT IN (
           SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $1
         ))
-      ORDER BY score DESC
+      ORDER BY 
+        CASE WHEN p.notice = TRUE AND b.url_slug = 'popular' THEN 0 ELSE 1 END,
+        score DESC
       LIMIT $2 OFFSET $3
     `;
     const postResult = await client.query(postQuery, [

@@ -141,14 +141,13 @@ export default function Boardlist({
                   }
                 )}`}
               >
-                {boardType !== "popular" &&
-                  (b.notice ? (
-                    <SpeakerWaveIcon className="icon notice" />
-                  ) : (
-                    <span className="num">{b.post_number}</span>
-                  ))}
+                {b.notice ? (
+                  <SpeakerWaveIcon className="icon notice" />
+                ) : (
+                  <span className="num">{b.post_number}</span>
+                )}
                 <span className="title">
-                  {boardType === "popular" && (
+                  {boardType === "popular" && !b.notice && (
                     <span className="category">{b.board_name}</span>
                   )}
                   {b.title}
