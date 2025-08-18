@@ -1,7 +1,6 @@
 // app/page.tsx
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import type { Metadata } from "next";
 
 import Home from "@/(site)/Home";
 import { fetchHomePop } from "@/api/api";

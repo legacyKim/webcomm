@@ -737,6 +737,12 @@ sub .board_list {
   padding: 12px;
   background-color: $board-list-header-color;
 }
+.board_renew {
+  .board_list .writer {
+    min-width: initial;
+    max-width: initial;
+  }
+}
 .board_list .writer {
   @include flex-start;
   gap: 4px;
