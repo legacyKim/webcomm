@@ -25,17 +25,24 @@ export async function GET(req, context) {
     // 게시물 조회 (페이지네이션 적용)
     const query = `
         SELECT
-        *,
-        COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY created_at DESC) + 1 AS post_number
-      FROM posts
-      WHERE title ILIKE '%' || $1 || '%'
-      AND user_id NOT IN (
+        p.*,
+        m.profile AS user_profile,
+        COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY p.created_at DESC) + 1 AS post_number
+      FROM posts p
+      LEFT JOIN members m ON p.user_id = m.id
+      WHERE p.title ILIKE '%' || $1 || '%'
+      AND p.user_id NOT IN (
         SELECT "blockedId" FROM blocked_users WHERE "blockerId" = $2
       )
-      ORDER BY created_at DESC
+      ORDER BY p.created_at DESC
       LIMIT $3 OFFSET $4
     `;
-    const result = await client.query(query, [keyword, blockerId, limit, offset]);
+    const result = await client.query(query, [
+      keyword,
+      blockerId,
+      limit,
+      offset,
+    ]);
 
     return NextResponse.json({
       posts: result.rows,

@@ -28,6 +28,8 @@ export const metadata: Metadata = {
   keywords: [
     "톡티",
     "Tokti",
+    "톡티넷",
+    "toktinet",
     "커뮤니티",
     "게시판",
     "유머",
@@ -48,6 +50,15 @@ export const metadata: Metadata = {
     "관심사",
     "네티즌",
     "온라인 소통",
+    "유머게시판",
+    "베스트게시글",
+    "실시간 소통",
+    "커뮤니티 사이트",
+    "토론 게시판",
+    "자유로운 소통",
+    "한국 게시판",
+    "온라인 게시판",
+    "커뮤니티 플랫폼",
   ],
   authors: [{ name: "톡티(Tokti)" }],
   creator: "톡티(Tokti)",
@@ -183,7 +194,7 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "톡티(Tokti)",
-              alternateName: ["Tokti", "톡티", "tokti.net"],
+              alternateName: ["Tokti", "톡티", "tokti.net", "톡티넷"],
               url: "https://tokti.net",
               description:
                 "한국의 자유로운 온라인 커뮤니티. 유머, 일상, 정보공유 등 다양한 주제로 소통하고 토론할 수 있는 공간입니다.",
@@ -196,7 +207,36 @@ export default async function RootLayout({
                 "@type": "Organization",
                 name: "톡티(Tokti)",
                 url: "https://tokti.net",
+                logo: {
+                  "@type": "ImageObject",
+                  url: "https://tokti.net/logo.png",
+                },
               },
+              mainEntity: {
+                "@type": "WebSite",
+                "@id": "https://tokti.net",
+                name: "톡티(Tokti)",
+                description: "한국 최고의 온라인 커뮤니티",
+                category: ["커뮤니티", "게시판", "소통", "토론"],
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "톡티(Tokti)",
+              alternateName: ["Tokti", "톡티넷"],
+              url: "https://tokti.net",
+              logo: "https://tokti.net/logo.png",
+              description: "한국의 자유로운 온라인 커뮤니티 플랫폼",
+              foundingDate: "2024",
+              serviceType: "온라인 커뮤니티",
+              areaServed: "대한민국",
+              sameAs: ["https://tokti.net"],
             }),
           }}
         />

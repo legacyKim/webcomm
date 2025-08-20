@@ -13,7 +13,10 @@ export async function GET(req, context) {
     const userResult = await client.query(userQuery, [nickname]);
 
     if (userResult.rowCount === 0) {
-      return NextResponse.json({ error: "사용자를 찾을 수 없습니다." }, { status: 404 });
+      return NextResponse.json(
+        { error: "사용자를 찾을 수 없습니다." },
+        { status: 404 }
+      );
     }
 
     const userId = userResult.rows[0].id;
@@ -27,11 +30,13 @@ export async function GET(req, context) {
     const postQuery = `
       SELECT 
         p.*, 
+        m.profile AS user_profile,
         COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY p.created_at DESC) + 1 AS post_number,
         COALESCE(c.comment_count, 0) AS comment_count
       FROM (
         SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3
       ) p
+      LEFT JOIN members m ON p.user_id = m.id
       LEFT JOIN (
         SELECT post_id, COUNT(*) AS comment_count 
         FROM comments 

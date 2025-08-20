@@ -26,9 +26,11 @@ export async function GET(req, context) {
         p.likes,
         p.notice,
         p.created_at,
+        m.profile AS user_profile,
         0 AS comment_count,
         0 AS post_number
       FROM posts p
+      LEFT JOIN members m ON p.user_id = m.id
       WHERE p.url_slug = $1
         AND p.deleted = FALSE
         AND p.notice = TRUE
@@ -68,10 +70,12 @@ export async function GET(req, context) {
         p.views,
         p.likes,
         p.created_at,
+        m.profile AS user_profile,
         COUNT(c.id) AS comment_count,
         COUNT(*) OVER () - ROW_NUMBER() OVER (ORDER BY p.created_at DESC) + 1 AS post_number
       FROM posts p
       LEFT JOIN comments c ON p.id = c.post_id
+      LEFT JOIN members m ON p.user_id = m.id
       WHERE p.url_slug = $1
         AND p.deleted = FALSE
         AND p.notice = FALSE
@@ -80,11 +84,16 @@ export async function GET(req, context) {
           FROM blocked_users
           WHERE "blockerId" = $2
         )
-      GROUP BY p.id
+      GROUP BY p.id, m.profile
       ORDER BY p.created_at DESC
       LIMIT $3 OFFSET $4
     `;
-    const result = await client.query(query, [url_slug, blockerId, limitNum, offset]);
+    const result = await client.query(query, [
+      url_slug,
+      blockerId,
+      limitNum,
+      offset,
+    ]);
 
     const posts = [...noticeResult.rows, ...result.rows];
 
