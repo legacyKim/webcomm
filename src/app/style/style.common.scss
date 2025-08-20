@@ -2186,6 +2186,10 @@ sub .board_list {
   box-shadow: $box-shadow;
   background-color: $box2-color;
 }
+.mypage_info .input_box input:disabled {
+  background-color: $bg-color;
+  cursor: not-allowed;
+}
 .mypage_info .input_box button {
   position: relative;
   border: $border-grey;

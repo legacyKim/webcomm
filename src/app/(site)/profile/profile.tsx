@@ -23,7 +23,6 @@ export default function Profile({
   userProfile,
   userActivity,
   currentTab,
-  isLoading = false,
 }: ProfileProps) {
   const { isUserId } = useAuth();
 
