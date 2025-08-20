@@ -413,7 +413,7 @@ export default function User() {
 
               {/* id */}
               <div className={`input_group`}>
-                <div className={`input_box`} ref={boxIdRef}>
+                <div className={`login_input_box`} ref={boxIdRef}>
                   <div className={`input_bg`}></div>
                   <label
                     className={`label_common`}
@@ -441,7 +441,7 @@ export default function User() {
 
               {/* 별명 */}
               <div className={`input_group`}>
-                <div className={`input_box`} ref={boxNickRef}>
+                <div className={`login_input_box`} ref={boxNickRef}>
                   <div className={`input_bg`}></div>
                   <label
                     className={`label_common`}
@@ -473,7 +473,7 @@ export default function User() {
               {/* 자기소개 */}
               <div className={`input_group`}>
                 <div
-                  className={`${`input_box`} ${`textarea_box`}`}
+                  className={`${`login_input_box`} ${`textarea_box`}`}
                   ref={boxBioRef}
                 >
                   <div className={`input_bg`}></div>
@@ -523,7 +523,7 @@ export default function User() {
 
               {/* 프로필 이미지 */}
               <div className={`input_group`}>
-                <div className={`${`input_box`} ${`input_img`}`}>
+                <div className={`${`login_input_box`} ${`input_img`}`}>
                   <label
                     className={`${`label_img`}`}
                     htmlFor="profileImage"
@@ -573,7 +573,7 @@ export default function User() {
 
               {/* 비밀번호 */}
               <div className={`input_group`}>
-                <div className={`input_box`} ref={boxPwRef}>
+                <div className={`login_input_box`} ref={boxPwRef}>
                   <div className={`input_bg`}></div>
                   <label
                     className={`label_common`}
@@ -602,7 +602,7 @@ export default function User() {
               </div>
 
               <div className={`input_group`}>
-                <div className={`input_box`} ref={boxPwcRef}>
+                <div className={`login_input_box`} ref={boxPwcRef}>
                   <div className={`input_bg`}></div>
                   <label
                     className={`label_common`}
@@ -647,7 +647,7 @@ export default function User() {
 
               {/* email */}
               <div className={`input_group`}>
-                <div className={`input_box`} ref={boxEmailRef}>
+                <div className={`login_input_box`} ref={boxEmailRef}>
                   <div className={`input_bg`}></div>
                   <label
                     className={`label_common`}
@@ -689,7 +689,7 @@ export default function User() {
 
               {/* certify num */}
               <div className={`input_group`}>
-                <div className={`input_box`} ref={boxCertifyNumRef}>
+                <div className={`login_input_box`} ref={boxCertifyNumRef}>
                   <div className={`input_bg`}></div>
                   <label
                     className={`label_common`}
@@ -746,14 +746,14 @@ export default function User() {
                         width="20"
                         height="20"
                         rx="4"
-                        fill="none"
+                        fill="#fff"
                         stroke="#ccc"
                         strokeWidth="1"
                       />
                       <path
                         className="svg_checkmark"
                         d="M6 12l4 4 8-8"
-                        fill="none"
+                        fill="#fff"
                         stroke="#007bff"
                         strokeWidth="2"
                       />
@@ -794,14 +794,14 @@ export default function User() {
                         width="20"
                         height="20"
                         rx="4"
-                        fill="none"
+                        fill="#fff"
                         stroke="#ccc"
                         strokeWidth="1"
                       />
                       <path
                         className="svg_checkmark"
                         d="M6 12l4 4 8-8"
-                        fill="none"
+                        fill="#fff"
                         stroke="#007bff"
                         strokeWidth="2"
                       />

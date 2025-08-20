@@ -118,15 +118,6 @@ export default function Profile({
     return formatDate(dateString);
   };
 
-  // 로딩 중일 때 메시지 표시
-  if (isLoading || !userProfile) {
-    return (
-      <div className="profile_container">
-        <div className="loading-message">프로필 로딩 중...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="profile_info">
       <div className="profile_info_box flex-start">

@@ -862,6 +862,7 @@ sub .board_list {
   height: 17px;
   color: $main-color;
   top: 1px;
+  margin-bottom: 0;
 }
 
 .like,
@@ -1693,6 +1694,7 @@ sub .board_list {
   font-size: 13px;
   font-weight: 400;
   color: $grey9-color;
+  margin-bottom: 0;
 }
 .comment_editor label .notice .red {
   color: $red-color;
@@ -2530,6 +2532,7 @@ h2.mypage_title {
   font-size: 16px;
   font-weight: 600;
   color: $white-color;
+  box-shadow: $box-shadow;
 
   display: inline-block;
   transition-duration: 0.3s;

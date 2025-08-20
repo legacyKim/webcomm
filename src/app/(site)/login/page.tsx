@@ -265,14 +265,14 @@ export default function LoginPage() {
                     width="20"
                     height="20"
                     rx="4"
-                    fill="none"
+                    fill="#fff"
                     stroke="#ccc"
                     strokeWidth="1"
                   />
                   <path
                     className="svg_checkmark"
                     d="M6 12l4 4 8-8"
-                    fill="none"
+                    fill="#fff"
                     stroke="#007bff"
                     strokeWidth="2"
                   />

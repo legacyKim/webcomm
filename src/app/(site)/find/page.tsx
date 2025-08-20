@@ -59,7 +59,7 @@ export default function Info() {
 
               {/* email */}
               <div className={`input_group`}>
-                <div className={`input_box`} ref={boxEmailRef}>
+                <div className={`login_input_box`} ref={boxEmailRef}>
                   <div className={`input_bg`}></div>
                   <label
                     className={`label_common`}

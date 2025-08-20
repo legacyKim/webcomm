@@ -121,7 +121,6 @@ export async function generateMetadata({
 
   const { profile } = userData;
 
-  // profile이 undefined인 경우를 방지
   if (!profile) {
     return {
       title: "Profile Not Found",

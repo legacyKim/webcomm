@@ -39,7 +39,7 @@ export default function AgreeClient({
       <div className={`membership_wrap`}>
         <div className={`membership`}>
           <h4 className={`membership_tit`}>
-            <CheckCircleIcon className="icon" />
+            <CheckCircleIcon className="icon" fill="#fff" />
             회원가입약관
           </h4>
           <div className={`membership_box`}>
@@ -77,14 +77,14 @@ export default function AgreeClient({
                   width="20"
                   height="20"
                   rx="4"
-                  fill="none"
+                  fill="#fff"
                   stroke="#ccc"
                   strokeWidth="1"
                 />
                 <path
                   className="svg_checkmark"
                   d="M6 12l4 4 8-8"
-                  fill="none"
+                  fill="#fff"
                   stroke="#007bff"
                   strokeWidth="2"
                 />
@@ -94,7 +94,7 @@ export default function AgreeClient({
           </div>
 
           <h4 className={`membership_tit`}>
-            <CheckCircleIcon className="icon" />
+            <CheckCircleIcon className="icon" fill="#fff" />
             개인정보처리방침
           </h4>
           <div className={`membership_box`}>
@@ -132,14 +132,14 @@ export default function AgreeClient({
                   width="20"
                   height="20"
                   rx="4"
-                  fill="none"
+                  fill="#fff"
                   stroke="#ccc"
                   strokeWidth="1"
                 />
                 <path
                   className="svg_checkmark"
                   d="M6 12l4 4 8-8"
-                  fill="none"
+                  fill="#fff"
                   stroke="#007bff"
                   strokeWidth="2"
                 />
@@ -173,14 +173,14 @@ export default function AgreeClient({
                   width="20"
                   height="20"
                   rx="4"
-                  fill="none"
+                  fill="#fff"
                   stroke="#ccc"
                   strokeWidth="1"
                 />
                 <path
                   className="svg_checkmark"
                   d="M6 12l4 4 8-8"
-                  fill="none"
+                  fill="#fff"
                   stroke="#007bff"
                   strokeWidth="2"
                 />
