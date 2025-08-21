@@ -193,7 +193,7 @@ export class NotificationService {
    * @param {number} receiverId - 수신자 ID
    * @param {number|null} postId - 게시글 ID
    * @param {number|null} commentId - 댓글 ID
-   * @param {number} hours - 중복 체크 시간 (기본 1시간)
+   * @param {number} hours - 중복 체크 시간
    * @returns {Promise<boolean>} 중복이 아니면 true, 중복이면 false
    */
   async preventDuplicateNotification(
