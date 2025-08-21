@@ -93,9 +93,6 @@ export default function View({
   const [likeCount, setLikeCount] = useState<number>(post?.likes || 0);
   const [isLikeLoading, setIsLikeLoading] = useState<boolean>(false);
   const [likers, setLikers] = useState<PostLiker[]>(post?.likers || []);
-  const [commentLikers, setCommentLikers] = useState<{
-    [key: number]: PostLiker[];
-  }>({});
 
   // 연타 방지를 위한 클릭 이력 관리 (사용자별)
   const [clickHistory, setClickHistory] = useState<number[]>([]);
@@ -116,7 +113,6 @@ export default function View({
       comment.forEach((c: CommentTreeNode) => {
         initialCommentLikers[c.id] = c.likers || [];
       });
-      setCommentLikers(initialCommentLikers);
     }
   }, [post, comment, isPostLikedByUser]);
 
@@ -207,71 +203,6 @@ export default function View({
       console.error("좋아요 요청 실패:", error);
     } finally {
       setIsLikeLoading(false);
-    }
-  };
-
-  // 댓글 좋아요
-  const commentLike = async (commentId: number) => {
-    if (!commentList) return;
-
-    // 현재 댓글 찾기
-    const currentComment = commentList.find((c) => c.id === commentId);
-    if (!currentComment) return;
-
-    // 낙관적 업데이트를 위한 백업
-    const prevCommentList = [...commentList];
-
-    try {
-      // 낙관적 업데이트: 즉시 UI 변경
-      setCommentList(
-        (prev) =>
-          prev?.map((comment) =>
-            comment.id === commentId
-              ? { ...comment, likes: comment.likes + 1 }
-              : comment
-          ) || null
-      );
-
-      const response = await axios.post("/api/comment/action/like", {
-        isUserId,
-        id: commentId,
-      });
-
-      if (response.data.success) {
-        // 서버 응답이 성공이면 최신 데이터로 다시 동기화
-        try {
-          const detailResponse = await axios.get(
-            `/api/post/${params.url_slug}/${params.id}?userId=${isUserId}`
-          );
-          if (detailResponse.data.response && detailResponse.data.comments) {
-            // 댓글별 좋아요 사용자 정보 업데이트
-            const updatedCommentLikers: { [key: number]: PostLiker[] } = {};
-            detailResponse.data.comments.forEach(
-              (c: CommentTreeNode & { likers?: PostLiker[] }) => {
-                if (c.likers) {
-                  updatedCommentLikers[c.id] = c.likers;
-                }
-              }
-            );
-            setCommentLikers(updatedCommentLikers);
-
-            // 댓글 목록도 업데이트 (정확한 좋아요 수 반영)
-            setCommentList(detailResponse.data.comments);
-          }
-        } catch (fetchError) {
-          console.error("댓글 좋아요 목록 새로고침 실패:", fetchError);
-          // 실패 시 이전 상태로 롤백
-          setCommentList(prevCommentList);
-        }
-      } else {
-        // 서버 응답이 실패면 롤백
-        console.error("댓글 좋아요 처리 실패:", response.data.error);
-        setCommentList(prevCommentList);
-      }
-    } catch (error) {
-      // 에러 발생 시 롤백
-      console.error("댓글 좋아요 요청 실패:", error);
-      setCommentList(prevCommentList);
     }
   };
 

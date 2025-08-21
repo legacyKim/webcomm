@@ -84,14 +84,40 @@ export default function CommentTree({
   const isRateLimited = propIsRateLimited ?? localIsRateLimited;
   const setIsRateLimited = propSetIsRateLimited ?? setLocalIsRateLimited;
 
+  // 댓글 좋아요 상태 확인 함수
+  const getCommentLikeStatus = (comment: CommentTreeNode) => {
+    const localState = commentLikeStates[comment.id];
+
+    if (localState !== undefined) {
+      return localState.isLiked;
+    }
+    // fallback: 서버 데이터로 확인
+    return isCommentLikedByUser ? isCommentLikedByUser(comment) : false;
+  };
+
+  // 댓글 좋아요 수 확인 함수
+  const getCommentLikeCount = (comment: CommentTreeNode) => {
+    const localState = commentLikeStates[comment.id];
+    if (localState !== undefined) {
+      return localState.likeCount;
+    }
+    // fallback: 서버 데이터로 확인
+    return comment.likes || 0;
+  };
+
   // 초기 댓글 좋아요 상태 설정
   useEffect(() => {
     if (comments) {
       const initialStates: typeof commentLikeStates = {};
       comments.forEach((comment) => {
         const processComment = (c: CommentTreeNode) => {
+          // 서버 데이터를 기준으로 실제 좋아요 상태 확인
+          const isLikedByServer = isCommentLikedByUser
+            ? isCommentLikedByUser(c)
+            : false;
+
           initialStates[c.id] = {
-            isLiked: isCommentLikedByUser ? isCommentLikedByUser(c) : false,
+            isLiked: isLikedByServer,
             likeCount: c.likes || 0,
             likers: c.likers || [],
           };
@@ -103,7 +129,7 @@ export default function CommentTree({
       });
       setCommentLikeStates(initialStates);
     }
-  }, [comments, isUserId]);
+  }, [comments, isCommentLikedByUser, isUserId]);
 
   // 연타 제한 해제를 위한 타이머 (최상위 컴포넌트에서만 실행)
   useEffect(() => {
@@ -234,14 +260,19 @@ export default function CommentTree({
         id,
       });
 
-      // 서버 응답으로 정확한 데이터 동기화 (필요시)
-      if (response.data.success && response.data.likers) {
+      // 서버 응답으로 정확한 데이터 동기화
+      if (response.data.success) {
         setCommentLikeStates((prev) => ({
           ...prev,
           [id]: {
             ...prev[id],
-            likers: response.data.likers,
-            likeCount: response.data.likers.length,
+            isLiked: response.data.liked, // 서버에서 받은 실제 좋아요 상태
+            likers: response.data.likers || [],
+            likeCount: response.data.likers
+              ? response.data.likers.length
+              : response.data.liked
+                ? prev[id].likeCount
+                : prev[id].likeCount,
           },
         }));
       }
@@ -437,7 +468,7 @@ export default function CommentTree({
                           >
                             <HeartIcon className="icon" />
                             <span>
-                              {commentLikeStates[comment.id]?.isLiked
+                              {getCommentLikeStatus(comment)
                                 ? "공감해제"
                                 : "공감"}
                             </span>
@@ -484,8 +515,7 @@ export default function CommentTree({
                     <>
                       <TiptapViewer content={comment.content} />
                       <i className="comment_content_likes">
-                        {commentLikeStates[comment.id]?.likeCount ??
-                          comment.likes}
+                        {getCommentLikeCount(comment)}
                       </i>
                     </>
                   )}
@@ -623,6 +653,7 @@ export default function CommentTree({
                     commentPost={commentPost}
                     commentCorrect={commentCorrect}
                     setCommentCorrect={setCommentCorrect}
+                    isCommentLikedByUser={isCommentLikedByUser}
                     // 연타 방지 상태 전달
                     clickHistory={clickHistory}
                     setClickHistory={setClickHistory}
