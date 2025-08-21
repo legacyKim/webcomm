@@ -79,7 +79,7 @@ export default async function Page({
       currentUserId = decoded.id;
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     currentUserId = undefined;
   }
 

@@ -8,9 +8,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import TiptapViewer from "@/components/tiptapViewer";
 import CommentEditor from "./commentEditor";
-import { checkIsCommentLikedByUser } from "./View";
 
-import { CommentTreeProps } from "@/type/commentType";
+import { CommentTreeProps, CommentTreeNode } from "@/type/commentType";
 import { PostLiker } from "@/type/type";
 import { useCommentResizeObserver } from "@/func/hook/useCommentResizeObserver";
 
@@ -59,6 +58,10 @@ export default function CommentTree({
   commentCorrect,
   setCommentCorrect,
 
+  commentLike,
+  commentLikers,
+  isCommentLikedByUser,
+
   // 연타 방지 상태 (상위 컴포넌트에서 전달)
   clickHistory: propClickHistory,
   setClickHistory: propSetClickHistory,
@@ -88,9 +91,9 @@ export default function CommentTree({
     if (comments) {
       const initialStates: typeof commentLikeStates = {};
       comments.forEach((comment) => {
-        const processComment = (c: any) => {
+        const processComment = (c: CommentTreeNode) => {
           initialStates[c.id] = {
-            isLiked: checkIsCommentLikedByUser(c.likers || [], isUserId || 0),
+            isLiked: isCommentLikedByUser ? isCommentLikedByUser(c) : false,
             likeCount: c.likes || 0,
             likers: c.likers || [],
           };
@@ -161,7 +164,7 @@ export default function CommentTree({
   };
 
   // 댓글 좋아요
-  const commentLike = async (id: number) => {
+  const handleCommentLike = async (id: number) => {
     if (isUserId === 0) {
       const isConfirmed = confirm("로그인이 필요합니다.");
       if (isConfirmed) {
@@ -419,7 +422,7 @@ export default function CommentTree({
                       {comment.user_id !== isUserId && (
                         <>
                           <button
-                            onClick={() => commentLike(comment.id)}
+                            onClick={() => handleCommentLike(comment.id)}
                             disabled={Boolean(
                               isRateLimited && Date.now() < isRateLimited
                             )}

@@ -96,6 +96,18 @@ export async function POST(req) {
           [commentAuthorId]
         );
 
+        // 좋아요 취소 시 관련 알림 삭제 (자기 자신 제외)
+        if (commentAuthorId !== isUserId) {
+          await client.query(
+            `DELETE FROM notifications 
+             WHERE type = 'comment_like' 
+               AND sender_id = $1 
+               AND receiver_id = $2 
+               AND comment_id = $3`,
+            [isUserId, commentAuthorId, id]
+          );
+        }
+
         // 프로필 캐시 무효화 (실제 구현 시)
         // import { invalidateUserProfileCacheById } from "@/src/lib/cache-utils";
         // invalidateUserProfileCacheById(commentAuthorId);
@@ -103,14 +115,13 @@ export async function POST(req) {
 
       await client.query("COMMIT");
 
-      // 업데이트된 likers 정보 조회 (최대 100명으로 제한)
+      // 업데이트된 likers 정보 조회
       const likersQuery = await client.query(
-        `SELECT ca.user_id, m.nickname as user_nickname, m.profile as user_profile, ca.created_at
+        `SELECT ca.user_id, m.user_nickname, m.profile as user_profile, ca.created_at
          FROM comment_actions ca
          LEFT JOIN members m ON ca.user_id = m.id
          WHERE ca.comment_id = $1 AND ca.action_type = '1'
-         ORDER BY ca.created_at DESC
-         LIMIT 100`,
+         ORDER BY ca.created_at DESC`,
         [id]
       );
 
@@ -161,14 +172,13 @@ export async function POST(req) {
 
       await client.query("COMMIT");
 
-      // 업데이트된 likers 정보 조회 (최대 100명으로 제한)
+      // 업데이트된 likers 정보 조회
       const likersQuery = await client.query(
-        `SELECT ca.user_id, m.nickname as user_nickname, m.profile as user_profile, ca.created_at
+        `SELECT ca.user_id, m.user_nickname, m.profile as user_profile, ca.created_at
          FROM comment_actions ca
          LEFT JOIN members m ON ca.user_id = m.id
          WHERE ca.comment_id = $1 AND ca.action_type = '1'
-         ORDER BY ca.created_at DESC
-         LIMIT 100`,
+         ORDER BY ca.created_at DESC`,
         [id]
       );
 

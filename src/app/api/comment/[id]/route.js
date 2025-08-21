@@ -223,7 +223,6 @@ export async function POST(req, context) {
       );
 
       sseSuccess = sseResponse.ok;
-      console.log("SSE notification:", sseSuccess ? "success" : "failed");
     } catch (sseError) {
       console.error("SSE notification failed:", sseError);
       sseSuccess = false;

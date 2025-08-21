@@ -97,6 +97,12 @@ export default function View({
     [key: number]: PostLiker[];
   }>({});
 
+  // 연타 방지를 위한 클릭 이력 관리 (사용자별)
+  const [clickHistory, setClickHistory] = useState<number[]>([]);
+
+  // 연타 제한 상태 (사용자별 전체 차단)
+  const [isRateLimited, setIsRateLimited] = useState<number>(0); // 차단 해제 시간 (timestamp)
+
   // SSR 데이터가 변경되면 상태 업데이트
   useEffect(() => {
     if (post) {
@@ -128,7 +134,7 @@ export default function View({
           router.push(`/board/${params.url_slug}`);
         }
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
     }
   };
@@ -782,6 +788,11 @@ export default function View({
               setCommentCorrect={setCommentCorrect}
               commentLike={commentLike}
               commentLikers={commentLikers}
+              isCommentLikedByUser={isCommentLikedByUser}
+              clickHistory={clickHistory}
+              setClickHistory={setClickHistory}
+              isRateLimited={isRateLimited}
+              setIsRateLimited={setIsRateLimited}
             />
           </div>
         </div>

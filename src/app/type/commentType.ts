@@ -74,8 +74,9 @@ export interface CommentTreeProps {
 
   commentLike?: (commentId: number, isLiked: boolean) => void;
   commentLikers?: { [key: number]: PostLiker[] };
+  isCommentLikedByUser?: (comment: CommentTreeNode) => boolean;
 
-  // 연타 방지 상태 (상위 컴포넌트에서 관리)
+  // 연타 방지 상태
   clickHistory?: number[];
   setClickHistory?: React.Dispatch<React.SetStateAction<number[]>>;
   isRateLimited?: number;

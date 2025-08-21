@@ -38,7 +38,7 @@ export default function BoardRecommend({
         setReason("");
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       alert("게시판 추천 중 오류가 발생했습니다.");
     } finally {
       setBoardRecommendPopup(false);

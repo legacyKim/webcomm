@@ -51,7 +51,7 @@ export default function Write() {
           setWriteData(post);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
 
@@ -137,7 +137,7 @@ export default function Write() {
         router.push(`/board/${boardInfo.url_slug}/${id}`);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
       alert("게시글 수정에 실패했습니다.");
     }
   };

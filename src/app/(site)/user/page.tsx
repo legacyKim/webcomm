@@ -134,7 +134,7 @@ export default function User() {
       }
     } catch (error) {
       console.error(error);
-      console.log(error);
+      console.error(error);
       alert("서버 오류가 발생했습니다.");
     }
   };

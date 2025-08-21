@@ -26,10 +26,8 @@ export const callRevalidate = async (tag, path) => {
     });
 
     if (!res.ok) {
-      console.error("revalidate failed:", res.status, await res.text());
       return false;
     } else {
-      console.log("revalidate success:", { tag, path });
       return true;
     }
   } catch (error) {

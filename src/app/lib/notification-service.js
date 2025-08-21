@@ -158,6 +158,21 @@ export class NotificationService {
         return null;
       }
 
+      // 중복 알림 방지 (10분 내 같은 댓글에 대한 좋아요 알림 방지)
+      const isDuplicateAllowed = await this.preventDuplicateNotification(
+        "comment_like",
+        senderId,
+        receiverId,
+        postId,
+        commentId,
+        0.167 // 10분 = 1/6 시간
+      );
+
+      if (!isDuplicateAllowed) {
+        console.log(`중복 알림 방지: 댓글 ${commentId} 좋아요 알림 생략`);
+        return null;
+      }
+
       return this.createCommentLikeNotification(
         senderId,
         receiverId,

@@ -38,8 +38,6 @@ export default function BoardNoticeManage() {
     limit: 10,
   });
 
-  console.log(data);
-
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
   const [viewPopupOpen, setViewPopupOpen] = useState<boolean>(false);
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
