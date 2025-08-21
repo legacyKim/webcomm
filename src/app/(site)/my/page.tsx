@@ -403,7 +403,7 @@ export default function Mypage() {
                       htmlFor="profileImage"
                       ref={labelProfileImgRef}
                     >
-                      {fileName ? (
+                      {newProfile ? (
                         <>
                           <span className={`file_name_label after`}>
                             프로필 이미지

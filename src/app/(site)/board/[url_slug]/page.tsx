@@ -11,7 +11,7 @@ interface CustomJwtPayload {
   id: number;
 }
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600; // 10분 ISR 캐시
 
 export async function generateMetadata({
   params,

@@ -3,6 +3,7 @@ import pool from "@/db/db";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import { createNotificationService } from "@/lib/notification-service.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { revalidateComment } from "@/lib/revalidate";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -194,31 +195,43 @@ export async function POST(req, context) {
 
     await client.query("COMMIT");
 
+    // SSE 알림 전송 시도
+    let sseSuccess = false;
     try {
-      await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: commentId,
-          event: "INSERT",
-          post_id: id,
-          user_id: isUserId,
-          user_nickname: isUserNick,
-          content: processedComment,
-          parent_id: parentId,
-          profile: user.profile,
-          likes: 0,
-          depth: depth,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        }),
-      });
+      const sseResponse = await fetch(
+        `${process.env.SSE_BASE_URL}/api/comment/notify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: commentId,
+            event: "INSERT",
+            post_id: id,
+            user_id: isUserId,
+            user_nickname: isUserNick,
+            content: processedComment,
+            parent_id: parentId,
+            profile: user.profile,
+            likes: 0,
+            depth: depth,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          }),
+        }
+      );
 
-      // SSE 알림 전송 성공/실패는 댓글 등록에 영향을 주지 않음
-    } catch {
-      // SSE 서버 오류는 무시 (댓글 등록 자체는 성공)
+      sseSuccess = sseResponse.ok;
+      console.log("SSE notification:", sseSuccess ? "success" : "failed");
+    } catch (sseError) {
+      console.error("SSE notification failed:", sseError);
+      sseSuccess = false;
+    }
+
+    // SSE 성공 시 캐시 무효화 (실시간 업데이트되었으므로)
+    if (sseSuccess && urlSlug) {
+      await revalidateComment(id, urlSlug);
     }
 
     return NextResponse.json(
@@ -251,24 +264,42 @@ export async function PUT(req, context) {
 
     const updatedComment = result.rows[0];
 
+    // 게시글의 url_slug 조회 (캐시 무효화용)
+    const postSlugResult = await client.query(
+      "SELECT url_slug FROM posts WHERE id = $1",
+      [postId]
+    );
+    const urlSlug = postSlugResult.rows[0]?.url_slug;
+
     // SSE로 수정 이벤트 전송
+    let sseSuccess = false;
     try {
-      await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: id,
-          event: "UPDATE",
-          post_id: postId,
-          content: comment,
-          likes: updatedComment.likes,
-          updated_at: new Date().toISOString(),
-        }),
-      });
+      const sseResponse = await fetch(
+        `${process.env.SSE_BASE_URL}/api/comment/notify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: id,
+            event: "UPDATE",
+            post_id: postId,
+            content: comment,
+            likes: updatedComment.likes,
+            updated_at: new Date().toISOString(),
+          }),
+        }
+      );
+      sseSuccess = sseResponse.ok;
     } catch (sseError) {
-      console.error(sseError);
+      console.error("SSE notification failed:", sseError);
+      sseSuccess = false;
+    }
+
+    // SSE 성공 시 캐시 무효화 (실시간 업데이트되었으므로)
+    if (sseSuccess && urlSlug) {
+      await revalidateComment(postId, urlSlug);
     }
 
     return NextResponse.json(
@@ -329,22 +360,39 @@ export async function DELETE(req, context) {
 
     await client.query("COMMIT");
 
+    // 게시글의 url_slug 조회 (캐시 무효화용)
+    const postSlugResult = await client.query(
+      "SELECT url_slug FROM posts WHERE id = $1",
+      [postId]
+    );
+    const urlSlug = postSlugResult.rows[0]?.url_slug;
+
     // SSE로 삭제 이벤트 전송
+    let sseSuccess = false;
     try {
-      await fetch(`${process.env.SSE_BASE_URL}/api/comment/notify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: id,
-          event: "DELETE",
-          post_id: postId,
-        }),
-      });
+      const sseResponse = await fetch(
+        `${process.env.SSE_BASE_URL}/api/comment/notify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: id,
+            event: "DELETE",
+            post_id: postId,
+          }),
+        }
+      );
+      sseSuccess = sseResponse.ok;
     } catch (sseError) {
       console.error("SSE 알림 전송 실패:", sseError);
-      // SSE 실패는 무시하고 계속 진행
+      sseSuccess = false;
+    }
+
+    // SSE 성공 시 캐시 무효화 (실시간 업데이트되었으므로)
+    if (sseSuccess && urlSlug) {
+      await revalidateComment(postId, urlSlug);
     }
 
     return NextResponse.json(

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
+import { revalidatePost } from "@/lib/revalidate";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -90,7 +91,10 @@ export async function PUT(req) {
   try {
     const user = await serverTokenCheck();
     if (!user) {
-      return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: "인증되지 않은 사용자입니다." },
+        { status: 401 }
+      );
     }
 
     const formData = await req.formData();
@@ -110,17 +114,30 @@ export async function PUT(req) {
     const videoFiles = videoFilesData ? JSON.parse(videoFilesData) : [];
 
     // 서버에서 파일 업로드 및 HTML 처리
-    const processedContent = await replaceBlobsWithS3UrlsServer(content, imageFiles, videoFiles);
+    const processedContent = await replaceBlobsWithS3UrlsServer(
+      content,
+      imageFiles,
+      videoFiles
+    );
 
     const result = await client.query(
       `UPDATE posts SET board_name = $1, url_slug = $2, user_id = $3, user_nickname = $4, title = $5, content = $6 WHERE id = $7 RETURNING * `,
-      [boardname, url_slug, user_id, user_nickname, title, processedContent, id],
+      [boardname, url_slug, user_id, user_nickname, title, processedContent, id]
     );
 
-    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 200 });
+    // 게시물 수정 후 캐시 무효화
+    await revalidatePost(id, url_slug, "update");
+
+    return NextResponse.json(
+      { success: true, data: result.rows[0] },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }

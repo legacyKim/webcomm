@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
+import { revalidatePost } from "@/lib/revalidate.js";
 
 export async function GET(req, context) {
   const { id } = await context.params;
@@ -135,11 +136,15 @@ export async function GET(req, context) {
 }
 
 export async function POST(req, context) {
-  const { id } = context.params;
+  const { id, url_slug } = await context.params;
   const client = await pool.connect();
 
   try {
     await client.query(`UPDATE posts SET deleted = TRUE WHERE id = $1`, [id]);
+
+    // 게시글 삭제 후 캐시 무효화
+    await revalidatePost(id, url_slug, "delete");
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("삭제 실패:", err);

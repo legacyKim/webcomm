@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
+import { revalidatePost } from "@/lib/revalidate";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -76,18 +77,27 @@ export async function POST(req) {
   try {
     const user = await serverTokenCheck();
     if (!user) {
-      return NextResponse.json({ success: false, message: "인증되지 않은 사용자입니다." }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: "인증되지 않은 사용자입니다." },
+        { status: 401 }
+      );
     }
 
     // 권한 확인: 경고회원(authority: 2)과 정지회원(authority: 3)은 게시글 작성 불가
     if (user.userAuthority === 2) {
-      return NextResponse.json({ success: false, message: "경고회원은 게시글을 작성할 수 없습니다." }, { status: 403 });
+      return NextResponse.json(
+        { success: false, message: "경고회원은 게시글을 작성할 수 없습니다." },
+        { status: 403 }
+      );
     }
 
     if (user.userAuthority === 3) {
       return NextResponse.json(
-        { success: false, message: "정지된 회원은 게시글을 작성할 수 없습니다." },
-        { status: 403 },
+        {
+          success: false,
+          message: "정지된 회원은 게시글을 작성할 수 없습니다.",
+        },
+        { status: 403 }
       );
     }
 
@@ -109,7 +119,10 @@ export async function POST(req) {
 
     // 주의회원인 경우 제한 기간 확인 (DB에서 최신 정보 조회)
     if (user.userAuthority === 1) {
-      const memberResult = await client.query("SELECT restriction_until FROM members WHERE id = $1", [user_id]);
+      const memberResult = await client.query(
+        "SELECT restriction_until FROM members WHERE id = $1",
+        [user_id]
+      );
 
       if (memberResult.rows.length > 0) {
         const restrictionUntil = memberResult.rows[0].restriction_until;
@@ -119,25 +132,51 @@ export async function POST(req) {
               success: false,
               message: `게시글 작성이 제한되어 있습니다. 해제 예정: ${new Date(restrictionUntil).toLocaleString()}`,
             },
-            { status: 403 },
+            { status: 403 }
           );
         }
       }
     }
 
     // 서버에서 파일 업로드 및 HTML 처리
-    const processedContent = await replaceBlobsWithS3UrlsServer(content, imageFiles, videoFiles);
+    const processedContent = await replaceBlobsWithS3UrlsServer(
+      content,
+      imageFiles,
+      videoFiles
+    );
 
     const result = await client.query(
       "INSERT INTO posts (board_id, board_name, url_slug, user_id, user_nickname, title, content) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-      [boardId, boardname, url_slug, user_id, user_nickname, title, processedContent],
+      [
+        boardId,
+        boardname,
+        url_slug,
+        user_id,
+        user_nickname,
+        title,
+        processedContent,
+      ]
     );
 
-    await client.query("UPDATE members SET all_posts = all_posts + 1 WHERE id = $1", [user_id]);
-    return NextResponse.json({ success: true, data: result.rows[0] }, { status: 201 });
+    await client.query(
+      "UPDATE members SET all_posts = all_posts + 1 WHERE id = $1",
+      [user_id]
+    );
+
+    // 게시물 생성 후 캐시 무효화
+    const postId = result.rows[0].id;
+    await revalidatePost(postId, url_slug, "create");
+
+    return NextResponse.json(
+      { success: true, data: result.rows[0] },
+      { status: 201 }
+    );
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message },
+      { status: 500 }
+    );
   } finally {
     client.release();
   }

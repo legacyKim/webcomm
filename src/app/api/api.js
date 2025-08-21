@@ -63,13 +63,23 @@ export const fetchBoard = async () => {
 // 각 게시판
 export async function fetchBoardData(url_slug, page, limit, isUserId) {
   try {
-    const response = await axios.get(
-      `${baseUrl}/api/board/${url_slug}/${page}/${limit}`,
-      {
-        params: { userId: isUserId },
-      }
-    );
-    return response.data;
+    let url = `${baseUrl}/api/board/${url_slug}/${page}/${limit}`;
+    if (isUserId) {
+      url += `?userId=${isUserId}`;
+    }
+
+    const response = await fetch(url, {
+      next: {
+        revalidate: 60 * 10, // 10분 캐시
+        tags: [`board-${url_slug}`, `board-${url_slug}-page-${page}`], // 게시판별 + 페이지별 태그
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
   } catch (err) {
     console.error(err);
     return [];
@@ -205,7 +215,8 @@ export default async function fetchPostDetail(url_slug, id, userId = null) {
 
     const response = await fetch(url, {
       next: {
-        revalidate: 60 * 10,
+        revalidate: 60 * 60 * 24, // 24 hours
+        tags: [`post-${id}`], // 캐시 무효화 태그
       },
     });
     const data = await response.json();

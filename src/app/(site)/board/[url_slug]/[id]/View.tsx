@@ -465,7 +465,6 @@ export default function View({
       if (response.data.success) {
         setCommentContent("");
         setRecommentContent("");
-        alert(response.data.message);
         setCommentAdd(null);
         setRecommentAdd(null);
         setCommentImagesFile([]);
@@ -473,6 +472,8 @@ export default function View({
           setSingleCommentImageFile(null);
         }
         setReset(false);
+
+        alert(response.data.message);
       } else {
         if (response.data.message === "인증되지 않은 사용자입니다.") {
           const isConfirmed = confirm(

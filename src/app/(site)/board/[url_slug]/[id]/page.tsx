@@ -3,7 +3,7 @@ import fetchPostDetail from "@/api/api";
 
 import View from "./View";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400; // 24시간 ISR 캐시
 
 export async function generateMetadata({
   params,
