@@ -786,8 +786,6 @@ export default function View({
               commentPost={commentPost}
               commentCorrect={commentCorrect}
               setCommentCorrect={setCommentCorrect}
-              commentLike={commentLike}
-              commentLikers={commentLikers}
               isCommentLikedByUser={isCommentLikedByUser}
               clickHistory={clickHistory}
               setClickHistory={setClickHistory}

@@ -58,8 +58,6 @@ export default function CommentTree({
   commentCorrect,
   setCommentCorrect,
 
-  commentLike,
-  commentLikers,
   isCommentLikedByUser,
 
   // 연타 방지 상태 (상위 컴포넌트에서 전달)
@@ -164,7 +162,7 @@ export default function CommentTree({
   };
 
   // 댓글 좋아요
-  const handleCommentLike = async (id: number) => {
+  const commentLike = async (id: number) => {
     if (isUserId === 0) {
       const isConfirmed = confirm("로그인이 필요합니다.");
       if (isConfirmed) {
@@ -422,7 +420,7 @@ export default function CommentTree({
                       {comment.user_id !== isUserId && (
                         <>
                           <button
-                            onClick={() => handleCommentLike(comment.id)}
+                            onClick={() => commentLike(comment.id)}
                             disabled={Boolean(
                               isRateLimited && Date.now() < isRateLimited
                             )}
