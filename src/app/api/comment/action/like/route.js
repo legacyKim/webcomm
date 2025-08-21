@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import { createNotificationService } from "@/lib/notification-service";
+import { callRevalidate } from "@/lib/revalidate";
 
 export async function GET(req) {
   const client = await pool.connect();
@@ -47,12 +48,28 @@ export async function POST(req) {
 
     await client.query("BEGIN");
 
-    // 댓글 작성자 정보 조회
+    // 댓글과 관련 게시글 정보 조회
     const commentQuery = await client.query(
-      "SELECT user_id FROM comments WHERE id = $1",
+      `SELECT c.user_id, p.id as post_id, p.url_slug 
+       FROM comments c 
+       JOIN posts p ON c.post_id = p.id 
+       WHERE c.id = $1`,
       [id]
     );
-    const commentAuthorId = commentQuery.rows[0]?.user_id;
+
+    if (commentQuery.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { success: false, message: "댓글을 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+
+    const {
+      user_id: commentAuthorId,
+      post_id: postId,
+      url_slug: urlSlug,
+    } = commentQuery.rows[0];
 
     // 기존 좋아요 여부 확인
     const existingLike = await client.query(
@@ -85,8 +102,27 @@ export async function POST(req) {
       }
 
       await client.query("COMMIT");
+
+      // 업데이트된 likers 정보 조회 (최대 100명으로 제한)
+      const likersQuery = await client.query(
+        `SELECT ca.user_id, m.nickname as user_nickname, m.profile as user_profile, ca.created_at
+         FROM comment_actions ca
+         LEFT JOIN members m ON ca.user_id = m.id
+         WHERE ca.comment_id = $1 AND ca.action_type = '1'
+         ORDER BY ca.created_at DESC
+         LIMIT 100`,
+        [id]
+      );
+
+      // 댓글 좋아요 변경 시 게시글 캐시 무효화
+      await callRevalidate([
+        `/board/${urlSlug}/${postId}`,
+        `/board/${urlSlug}`,
+        `/board/popular`,
+      ]);
+
       return NextResponse.json(
-        { success: true, liked: false },
+        { success: true, liked: false, likers: likersQuery.rows },
         { status: 200 }
       );
     } else {
@@ -124,7 +160,29 @@ export async function POST(req) {
       }
 
       await client.query("COMMIT");
-      return NextResponse.json({ success: true, liked: true }, { status: 201 });
+
+      // 업데이트된 likers 정보 조회 (최대 100명으로 제한)
+      const likersQuery = await client.query(
+        `SELECT ca.user_id, m.nickname as user_nickname, m.profile as user_profile, ca.created_at
+         FROM comment_actions ca
+         LEFT JOIN members m ON ca.user_id = m.id
+         WHERE ca.comment_id = $1 AND ca.action_type = '1'
+         ORDER BY ca.created_at DESC
+         LIMIT 100`,
+        [id]
+      );
+
+      // 댓글 좋아요 변경 시 게시글 캐시 무효화
+      await callRevalidate([
+        `/board/${urlSlug}/${postId}`,
+        `/board/${urlSlug}`,
+        `/board/popular`,
+      ]);
+
+      return NextResponse.json(
+        { success: true, liked: true, likers: likersQuery.rows },
+        { status: 201 }
+      );
     }
   } catch (error) {
     await client.query("ROLLBACK");

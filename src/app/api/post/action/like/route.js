@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { createNotificationService } from "@/lib/notification-service";
+import { callRevalidate } from "@/lib/revalidate";
 // import { invalidateUserProfileCacheById } from "@/src/lib/cache-utils";
 
 export async function GET(req) {
@@ -37,12 +38,21 @@ export async function POST(req) {
   try {
     await client.query("BEGIN");
 
-    // 게시글 작성자 정보 조회
+    // 게시글 정보 조회 (url_slug 포함)
     const postQuery = await client.query(
-      "SELECT user_id FROM posts WHERE id = $1",
+      "SELECT user_id, url_slug FROM posts WHERE id = $1",
       [id]
     );
-    const postAuthorId = postQuery.rows[0]?.user_id;
+
+    if (postQuery.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return NextResponse.json(
+        { success: false, message: "게시글을 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+
+    const { user_id: postAuthorId, url_slug: urlSlug } = postQuery.rows[0];
 
     const existingLike = await client.query(
       "SELECT * FROM post_actions WHERE user_id = $1 AND post_id = $2 AND action_type = 'like'",
@@ -73,6 +83,14 @@ export async function POST(req) {
       }
 
       await client.query("COMMIT");
+
+      // 게시글 좋아요 변경 시 캐시 무효화
+      await callRevalidate([
+        `/board/${urlSlug}/${id}`,
+        `/board/${urlSlug}`,
+        `/board/popular`,
+      ]);
+
       return NextResponse.json(
         { success: true, liked: false },
         { status: 200 }
@@ -97,13 +115,6 @@ export async function POST(req) {
 
         // 게시글 좋아요 알림 생성 (자기 자신 제외)
         if (postAuthorId !== isUserId) {
-          // 게시글의 url_slug 조회
-          const postSlugResult = await client.query(
-            "SELECT url_slug FROM posts WHERE id = $1",
-            [id]
-          );
-          const urlSlug = postSlugResult.rows[0]?.url_slug;
-
           const notificationService = createNotificationService(client);
           await notificationService.createPostLikeNotification(
             isUserId,
@@ -118,6 +129,14 @@ export async function POST(req) {
       }
 
       await client.query("COMMIT");
+
+      // 게시글 좋아요 변경 시 캐시 무효화
+      await callRevalidate([
+        `/board/${urlSlug}/${id}`,
+        `/board/${urlSlug}`,
+        `/board/popular`,
+      ]);
+
       return NextResponse.json({ success: true, liked: true }, { status: 201 });
     }
   } catch (error) {

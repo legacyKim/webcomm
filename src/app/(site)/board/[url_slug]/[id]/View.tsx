@@ -38,6 +38,20 @@ import { CommentImage, CommentTreeNode } from "@/type/commentType";
 
 const CommentEditor = dynamic(() => import("./commentEditor"), { ssr: false });
 
+// 좋아요 상태 확인 유틸리티 함수들
+export const checkIsPostLikedByUser = (likers: PostLiker[], userId: number) => {
+  if (!userId || !likers) return false;
+  return likers.some((liker) => liker.user_id === userId);
+};
+
+export const checkIsCommentLikedByUser = (
+  likers: PostLiker[],
+  userId: number
+) => {
+  if (!userId || !likers) return false;
+  return likers.some((liker) => liker.user_id === userId);
+};
+
 export default function View({
   post,
   comment,
@@ -65,10 +79,17 @@ export default function View({
     setRedirectPath(pathname);
   }, [pathname, setRedirectPath]);
 
+  // 좋아요 상태 확인 함수들
+  const isPostLikedByUser = useMemo(() => {
+    return checkIsPostLikedByUser(post?.likers || [], isUserId || 0);
+  }, [post?.likers, isUserId]);
+
+  const isCommentLikedByUser = (comment: CommentTreeNode) => {
+    return checkIsCommentLikedByUser(comment?.likers || [], isUserId || 0);
+  };
+
   const [viewPost] = useState<Posts | null>(post);
-  const [isLiked, setIsLiked] = useState<boolean>(
-    post?.is_liked_by_user || false
-  );
+  const [isLiked, setIsLiked] = useState<boolean>(isPostLikedByUser);
   const [likeCount, setLikeCount] = useState<number>(post?.likes || 0);
   const [isLikeLoading, setIsLikeLoading] = useState<boolean>(false);
   const [likers, setLikers] = useState<PostLiker[]>(post?.likers || []);
@@ -79,7 +100,7 @@ export default function View({
   // SSR 데이터가 변경되면 상태 업데이트
   useEffect(() => {
     if (post) {
-      setIsLiked(post.is_liked_by_user || false);
+      setIsLiked(isPostLikedByUser);
       setLikeCount(post.likes || 0);
       setLikers(post.likers || []);
     }
@@ -87,11 +108,11 @@ export default function View({
     if (comment) {
       const initialCommentLikers: { [key: number]: PostLiker[] } = {};
       comment.forEach((c: CommentTreeNode) => {
-        initialCommentLikers[c.id] = [];
+        initialCommentLikers[c.id] = c.likers || [];
       });
       setCommentLikers(initialCommentLikers);
     }
-  }, [post, comment]);
+  }, [post, comment, isPostLikedByUser]);
 
   // 게시물 삭제
   const postDel = async () => {

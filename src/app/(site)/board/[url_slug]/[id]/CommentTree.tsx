@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import TiptapViewer from "@/components/tiptapViewer";
 import CommentEditor from "./commentEditor";
+import { checkIsCommentLikedByUser } from "./View";
 
 import { CommentTreeProps } from "@/type/commentType";
+import { PostLiker } from "@/type/type";
 import { useCommentResizeObserver } from "@/func/hook/useCommentResizeObserver";
 
 import {
@@ -56,10 +58,66 @@ export default function CommentTree({
 
   commentCorrect,
   setCommentCorrect,
+
+  // 연타 방지 상태 (상위 컴포넌트에서 전달)
+  clickHistory: propClickHistory,
+  setClickHistory: propSetClickHistory,
+  isRateLimited: propIsRateLimited,
+  setIsRateLimited: propSetIsRateLimited,
 }: CommentTreeProps) {
   const router = useRouter();
 
   const { isUserId } = useAuth();
+
+  // 댓글별 좋아요 상태 관리 (낙관적 업데이트용)
+  const [commentLikeStates, setCommentLikeStates] = useState<{
+    [key: number]: { isLiked: boolean; likeCount: number; likers: PostLiker[] };
+  }>({});
+
+  // 연타 방지를 위한 클릭 이력 관리 (사용자별)
+  const [localClickHistory, setLocalClickHistory] = useState<number[]>([]);
+  const [localIsRateLimited, setLocalIsRateLimited] = useState<number>(0);
+
+  const clickHistory = propClickHistory ?? localClickHistory;
+  const setClickHistory = propSetClickHistory ?? setLocalClickHistory;
+  const isRateLimited = propIsRateLimited ?? localIsRateLimited;
+  const setIsRateLimited = propSetIsRateLimited ?? setLocalIsRateLimited;
+
+  // 초기 댓글 좋아요 상태 설정
+  useEffect(() => {
+    if (comments) {
+      const initialStates: typeof commentLikeStates = {};
+      comments.forEach((comment) => {
+        const processComment = (c: any) => {
+          initialStates[c.id] = {
+            isLiked: checkIsCommentLikedByUser(c.likers || [], isUserId || 0),
+            likeCount: c.likes || 0,
+            likers: c.likers || [],
+          };
+          if (c.children) {
+            c.children.forEach(processComment);
+          }
+        };
+        processComment(comment);
+      });
+      setCommentLikeStates(initialStates);
+    }
+  }, [comments, isUserId]);
+
+  // 연타 제한 해제를 위한 타이머 (최상위 컴포넌트에서만 실행)
+  useEffect(() => {
+    // props로 연타 방지 상태를 받지 않는 경우에만 타이머 실행 (최상위 컴포넌트)
+    if (!propIsRateLimited) {
+      const interval = setInterval(() => {
+        const now = Date.now();
+        if (isRateLimited && now >= isRateLimited) {
+          setIsRateLimited(0);
+        }
+      }, 1000); // 1초마다 체크
+
+      return () => clearInterval(interval);
+    }
+  }, [isRateLimited, propIsRateLimited, setIsRateLimited]);
 
   const [recommentCorrect, setRecommentCorrect] = useState<{
     content: string;
@@ -67,6 +125,7 @@ export default function CommentTree({
     recomment_id: number;
   } | null>(null);
 
+  // 댓글 삭제
   const commentDelete = async (id: number) => {
     const isConfirmed = confirm("삭제하시겠습니까?");
     if (isConfirmed) {
@@ -80,6 +139,7 @@ export default function CommentTree({
     }
   };
 
+  // 댓글 수정
   const commentUpdate = async (recommentContent: string, id: number) => {
     const comment = recommentContent.trim();
 
@@ -100,6 +160,7 @@ export default function CommentTree({
     }
   };
 
+  // 댓글 좋아요
   const commentLike = async (id: number) => {
     if (isUserId === 0) {
       const isConfirmed = confirm("로그인이 필요합니다.");
@@ -110,12 +171,91 @@ export default function CommentTree({
       }
     }
 
-    await axios.post("/api/comment/action/like", {
-      isUserId,
-      id,
-    });
+    // 현재 시간
+    const now = Date.now();
+
+    // 연타 제한 체크 (사용자별 전체 차단)
+    if (isRateLimited && now < isRateLimited) {
+      const remainingTime = Math.ceil((isRateLimited - now) / 1000);
+      alert(`너무 많은 요청입니다. ${remainingTime}초 후에 다시 시도해주세요.`);
+      return;
+    }
+
+    // 클릭 이력 업데이트 (사용자별)
+    const recentClicks = [...clickHistory, now].filter(
+      (time) => now - time <= 10000
+    ); // 10초 이내 클릭만 유지
+
+    setClickHistory(recentClicks);
+
+    // 10초 안에 10번 이상 클릭했는지 체크
+    if (recentClicks.length >= 10) {
+      const blockUntil = now + 30000; // 30초 차단
+      setIsRateLimited(blockUntil);
+
+      alert("너무 많은 요청이 감지되었습니다. 30초 후에 다시 시도해주세요.");
+      return;
+    }
+    const currentState = commentLikeStates[id];
+    if (!currentState) return;
+
+    const wasLiked = currentState.isLiked;
+    const newLikeCount = wasLiked
+      ? currentState.likeCount - 1
+      : currentState.likeCount + 1;
+
+    // 낙관적 업데이트: UI 즉시 변경
+    const newLikers: PostLiker[] = wasLiked
+      ? currentState.likers.filter((liker) => liker.user_id !== isUserId)
+      : [
+          ...currentState.likers,
+          {
+            user_id: isUserId as number,
+            user_nickname: "",
+            user_profile: "",
+            created_at: new Date().toISOString(),
+          },
+        ];
+
+    setCommentLikeStates((prev) => ({
+      ...prev,
+      [id]: {
+        ...currentState,
+        isLiked: !wasLiked,
+        likeCount: newLikeCount,
+        likers: newLikers,
+      },
+    }));
+
+    try {
+      const response = await axios.post("/api/comment/action/like", {
+        isUserId,
+        id,
+      });
+
+      // 서버 응답으로 정확한 데이터 동기화 (필요시)
+      if (response.data.success && response.data.likers) {
+        setCommentLikeStates((prev) => ({
+          ...prev,
+          [id]: {
+            ...prev[id],
+            likers: response.data.likers,
+            likeCount: response.data.likers.length,
+          },
+        }));
+      }
+    } catch (error) {
+      // 에러 발생 시 롤백
+      console.error("댓글 좋아요 실패:", error);
+      setCommentLikeStates((prev) => ({
+        ...prev,
+        [id]: currentState, // 원래 상태로 복원
+      }));
+      alert("좋아요 처리 중 오류가 발생했습니다.");
+    }
   };
 
+  // 댓글 신고
   const commentReport = async (id: number) => {
     const reason = prompt("신고 사유를 입력해주세요.");
     if (!reason) return;
@@ -278,9 +418,28 @@ export default function CommentTree({
 
                       {comment.user_id !== isUserId && (
                         <>
-                          <button onClick={() => commentLike(comment.id)}>
+                          <button
+                            onClick={() => commentLike(comment.id)}
+                            disabled={Boolean(
+                              isRateLimited && Date.now() < isRateLimited
+                            )}
+                            style={{
+                              opacity:
+                                isRateLimited && Date.now() < isRateLimited
+                                  ? 0.6
+                                  : 1,
+                              cursor:
+                                isRateLimited && Date.now() < isRateLimited
+                                  ? "not-allowed"
+                                  : "pointer",
+                            }}
+                          >
                             <HeartIcon className="icon" />
-                            <span>공감</span>
+                            <span>
+                              {commentLikeStates[comment.id]?.isLiked
+                                ? "공감해제"
+                                : "공감"}
+                            </span>
                           </button>
                           <div className="ball"></div>
                           <button
@@ -323,7 +482,10 @@ export default function CommentTree({
                   {!isEditingComment && (
                     <>
                       <TiptapViewer content={comment.content} />
-                      <i className="comment_content_likes">{comment.likes}</i>
+                      <i className="comment_content_likes">
+                        {commentLikeStates[comment.id]?.likeCount ??
+                          comment.likes}
+                      </i>
                     </>
                   )}
                 </div>
@@ -460,6 +622,11 @@ export default function CommentTree({
                     commentPost={commentPost}
                     commentCorrect={commentCorrect}
                     setCommentCorrect={setCommentCorrect}
+                    // 연타 방지 상태 전달
+                    clickHistory={clickHistory}
+                    setClickHistory={setClickHistory}
+                    isRateLimited={isRateLimited}
+                    setIsRateLimited={setIsRateLimited}
                   />
                 </div>
               )}

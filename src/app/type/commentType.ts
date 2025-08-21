@@ -21,6 +21,7 @@ export type CommentTreeNode = {
   event: string;
   post_id: string;
   children: CommentTreeNode[];
+  likers?: PostLiker[]; // 좋아요한 사용자 목록 추가
 };
 
 export interface CommentTreeProps {
@@ -73,4 +74,10 @@ export interface CommentTreeProps {
 
   commentLike?: (commentId: number, isLiked: boolean) => void;
   commentLikers?: { [key: number]: PostLiker[] };
+
+  // 연타 방지 상태 (상위 컴포넌트에서 관리)
+  clickHistory?: number[];
+  setClickHistory?: React.Dispatch<React.SetStateAction<number[]>>;
+  isRateLimited?: number;
+  setIsRateLimited?: React.Dispatch<React.SetStateAction<number>>;
 }

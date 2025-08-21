@@ -4,34 +4,29 @@ import { revalidatePost } from "@/lib/revalidate.js";
 
 export async function GET(req, context) {
   const { id } = await context.params;
-  const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
   const client = await pool.connect();
 
   try {
     // 트랜잭션 시작
     await client.query("BEGIN");
 
-    // 게시물 조회 (사용자 좋아요 상태 포함)
-    let query = `
+    // 게시물 조회 (개인화 없이 공통 데이터만)
+    const query = `
       SELECT 
         p.*, 
         m.profile AS user_profile
-        ${userId ? `, CASE WHEN pa.id IS NOT NULL THEN true ELSE false END AS is_liked_by_user` : ""}
       FROM posts p
       LEFT JOIN members m ON p.user_id = m.id
-      ${userId ? `LEFT JOIN post_actions pa ON pa.post_id = p.id AND pa.user_id = $2 AND pa.action_type = 'like'` : ""}
       WHERE p.deleted = FALSE AND p.id = $1;
     `;
 
-    const queryParams = userId ? [id, userId] : [id];
-    const posts = await client.query(query, queryParams);
+    const posts = await client.query(query, [id]);
 
     if (posts.rows.length === 0) {
       return NextResponse.json({ response: false, message: "Post not found" });
     }
 
-    // 게시글 좋아요한 사용자 목록 조회
+    // 게시글 좋아요한 사용자 목록 조회 (모든 사용자)
     const postLikersQuery = `
       SELECT pa.user_id, m.user_nickname, m.profile
       FROM post_actions pa
@@ -41,16 +36,14 @@ export async function GET(req, context) {
     `;
     const postLikers = await client.query(postLikersQuery, [id]);
 
-    // 댓글 조회 (사용자 좋아요 상태 포함)
+    // 댓글 조회 (개인화 없이 공통 데이터만)
     const commentQuery = `
       WITH RECURSIVE comment_tree AS (
       SELECT 
         c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, 0 AS depth,
         m.profile
-        ${userId ? `, CASE WHEN ca.id IS NOT NULL THEN true ELSE false END AS is_liked_by_user` : ""}
       FROM comments c
       LEFT JOIN members m ON c.user_id = m.id
-      ${userId ? `LEFT JOIN comment_actions ca ON ca.comment_id = c.id AND ca.user_id = $2 AND ca.action_type = '1'` : ""}
       WHERE c.post_id = $1 AND c.parent_id IS NULL
 
       UNION ALL
@@ -58,18 +51,15 @@ export async function GET(req, context) {
       SELECT 
         c.id, c.post_id, c.user_id, c.user_nickname, c.parent_id, c.content, c.likes, c.dislikes, c.created_at, c.depth,
         m.profile
-        ${userId ? `, CASE WHEN ca.id IS NOT NULL THEN true ELSE false END AS is_liked_by_user` : ""}
       FROM comments c
       INNER JOIN comment_tree ct ON c.parent_id = ct.id
       LEFT JOIN members m ON c.user_id = m.id
-      ${userId ? `LEFT JOIN comment_actions ca ON ca.comment_id = c.id AND ca.user_id = $2 AND ca.action_type = '1'` : ""}
     )
     SELECT *
     FROM comment_tree
     ORDER BY depth ASC, created_at ASC;`;
 
-    const commentParams = userId ? [id, userId] : [id];
-    const comments = await client.query(commentQuery, commentParams);
+    const comments = await client.query(commentQuery, [id]);
 
     // 각 댓글별 좋아요한 사용자 목록 조회
     const commentLikersQuery = `
