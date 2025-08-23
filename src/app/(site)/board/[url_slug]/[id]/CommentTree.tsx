@@ -50,8 +50,6 @@ export default function CommentTree({
 
   commentAdd,
   setCommentAdd,
-  recommentAdd,
-  setRecommentAdd,
 
   commentPost,
 
@@ -349,12 +347,6 @@ export default function CommentTree({
         const isWritingComment = commentAdd?.id === comment.id;
         const isEditingComment = commentCorrect?.id === comment.id;
 
-        const isWritingRecomment =
-          recommentAdd?.recomment_id === comment.id ||
-          (recommentAdd?.id === comment.id && comment.children.length === 0);
-        const isEditingRecomment =
-          recommentCorrect?.recomment_id === comment.id;
-
         const commentDepth = Number(comment.depth);
 
         return (
@@ -363,25 +355,12 @@ export default function CommentTree({
               className={`depth_indicator`}
               style={{
                 height: commentHeights[comment.id] ?? 0,
-                width: `calc(${commentDepth * 40}px)`,
+                width: `calc(${commentDepth > 0 ? 40 : 0}px)`,
               }}
             >
-              {commentDepth === 1 && (
+              {commentDepth > 0 && (
                 <div className="depth_indicator_box">
                   <div className="depth_reply"></div>
-                </div>
-              )}
-              {commentDepth === 2 && (
-                <div className="depth_indicator_box">
-                  <div className="depth_line"></div>
-                  <div className="depth_reply depth2"></div>
-                </div>
-              )}
-              {commentDepth === 3 && (
-                <div className="depth_indicator_box">
-                  <div className="depth_line"></div>
-                  <div className="depth_line depth3"></div>
-                  <div className="depth_reply depth3"></div>
                 </div>
               )}
             </div>
@@ -436,7 +415,6 @@ export default function CommentTree({
                                 user_id: comment.user_id,
                                 id: comment.id,
                               });
-                              setRecommentAdd?.(null);
                               setCommentCorrect(null);
                               setRecommentCorrect(null);
                             }}
@@ -489,7 +467,6 @@ export default function CommentTree({
                           <button
                             onClick={() => {
                               setCommentAdd?.(null);
-                              setRecommentAdd?.(null);
                               setCommentCorrect({
                                 content: comment.content,
                                 id: comment.id,
@@ -521,19 +498,14 @@ export default function CommentTree({
                   )}
                 </div>
 
-                {(isWritingComment ||
-                  isEditingComment ||
-                  isWritingRecomment ||
-                  isEditingRecomment) && (
+                {(isWritingComment || isEditingComment) && (
                   <div
                     className={`comment_add ${comment.depth === 1 ? "depth1" : "depth2"}`}
                   >
                     <CommentEditor
                       singleCommentImageFile={singleCommentImageFile}
                       initialContent={
-                        isEditingComment || isEditingRecomment
-                          ? (commentCorrect?.content ?? "")
-                          : ""
+                        isEditingComment ? (commentCorrect?.content ?? "") : ""
                       }
                       onChange={(html: string) =>
                         isRecomment
@@ -565,7 +537,7 @@ export default function CommentTree({
                         </label>
                       </div>
                       <div className="btn_wrap">
-                        {isEditingComment || isEditingRecomment ? (
+                        {isEditingComment ? (
                           <button
                             onClick={() =>
                               commentUpdate(
@@ -589,11 +561,12 @@ export default function CommentTree({
                                 ? (comment.depth || 0) + 1
                                 : 0;
 
+                              // 항상 현재 댓글의 ID를 parent_id로 사용
                               commentPost?.(
                                 isRecomment
                                   ? (recommentContent ?? "")
                                   : (commentContent ?? ""),
-                                comment.parent_id ?? comment.id,
+                                comment.id, // 현재 댓글의 ID를 parent_id로 사용
                                 newDepth
                               );
                             }}
@@ -604,7 +577,6 @@ export default function CommentTree({
                         <button
                           onClick={() => {
                             setCommentAdd?.(null);
-                            setRecommentAdd?.(null);
                             setCommentCorrect(null);
                             setRecommentCorrect(null);
                             setCommentContent("");
@@ -624,6 +596,10 @@ export default function CommentTree({
               {comment.children.length > 0 && (
                 <div className="comment_children">
                   <CommentTree
+                    key={`child-tree-${comment.id}-${comment.children
+                      .map((c) => c.id)
+                      .sort()
+                      .join("-")}`}
                     params={{
                       id: params.id as string,
                       url_slug: params.url_slug as string,
@@ -648,8 +624,6 @@ export default function CommentTree({
                     setReset={setReset}
                     commentAdd={commentAdd}
                     setCommentAdd={setCommentAdd}
-                    recommentAdd={recommentAdd}
-                    setRecommentAdd={setRecommentAdd}
                     commentPost={commentPost}
                     commentCorrect={commentCorrect}
                     setCommentCorrect={setCommentCorrect}

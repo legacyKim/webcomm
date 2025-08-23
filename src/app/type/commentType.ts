@@ -60,10 +60,6 @@ export interface CommentTreeProps {
 
   commentAdd?: { user_id: number; id: number } | null;
   setCommentAdd?: (commentAdd: { user_id: number; id: number } | null) => void;
-  recommentAdd?: { user_id: number; id: number; recomment_id: number } | null;
-  setRecommentAdd?: (
-    recommentAdd: { user_id: number; id: number; recomment_id: number } | null
-  ) => void;
 
   commentPost?: (commentContent: string, id?: number, depth?: number) => void;
 

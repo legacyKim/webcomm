@@ -243,13 +243,21 @@ export default function View({
 
   // 댓글 실시간 열람
   useEffect(() => {
+    console.log("SSE 연결 시도:", `${SSE_BASE_URL}/comments/stream`);
     const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
 
+    eventSource.onopen = () => {
+      console.log("✅ SSE 연결 성공");
+    };
+
     eventSource.onerror = (error) => {
-      console.error("SSE 연결 오류:", error);
+      console.error("❌ SSE 연결 오류:", error);
+      console.log("EventSource readyState:", eventSource.readyState);
+      console.log("EventSource URL:", eventSource.url);
     };
 
     eventSource.onmessage = (event) => {
+      console.log("📨 SSE 메시지 수신:", event.data);
       try {
         const data = JSON.parse(event.data) as CommentTreeNode & {
           event: string;
@@ -258,6 +266,7 @@ export default function View({
 
         // 연결 확인 메시지는 무시
         if (data.event === "connected") {
+          console.log("🔗 SSE 서버 연결 확인");
           return;
         }
 
@@ -359,11 +368,6 @@ export default function View({
     user_id: number;
     id: number;
   } | null>(null);
-  const [recommentAdd, setRecommentAdd] = useState<{
-    user_id: number;
-    id: number;
-    recomment_id: number;
-  } | null>(null);
 
   // 댓글 등록
   const commentPost = async (
@@ -424,7 +428,6 @@ export default function View({
         setCommentContent("");
         setRecommentContent("");
         setCommentAdd(null);
-        setRecommentAdd(null);
         setCommentImagesFile([]);
         if (setSingleCommentImageFile) {
           setSingleCommentImageFile(null);
@@ -712,8 +715,6 @@ export default function View({
               setReset={setReset}
               commentAdd={commentAdd}
               setCommentAdd={setCommentAdd}
-              recommentAdd={recommentAdd}
-              setRecommentAdd={setRecommentAdd}
               commentPost={commentPost}
               commentCorrect={commentCorrect}
               setCommentCorrect={setCommentCorrect}
