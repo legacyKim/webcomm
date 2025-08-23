@@ -434,9 +434,14 @@ export default function View({
         if (setSingleCommentImageFile) {
           setSingleCommentImageFile(null);
         }
-        setReset(false);
+        setReset(true); // CommentEditor 초기화를 위해 true로 설정
 
         alert(response.data.message);
+
+        // 약간의 지연 후 reset을 false로 변경
+        setTimeout(() => {
+          setReset(false);
+        }, 100);
       } else {
         if (response.data.message === "인증되지 않은 사용자입니다.") {
           const isConfirmed = confirm(
@@ -734,6 +739,7 @@ export default function View({
             <div className="comment_add">
               <b>댓글 작성</b>
               <CommentEditor
+                key={`main-comment-editor-${reset ? "reset" : "normal"}-${commentContent ? "with-content" : "empty"}`}
                 singleCommentImageFile={singleCommentImageFile}
                 initialContent={commentCorrect ? commentCorrect.content : ""}
                 onChange={(html: string) => setCommentContent(html)}

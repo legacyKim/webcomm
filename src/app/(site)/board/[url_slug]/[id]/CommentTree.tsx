@@ -165,23 +165,59 @@ export default function CommentTree({
   };
 
   // 댓글 수정
-  const commentUpdate = async (recommentContent: string, id: number) => {
-    const comment = recommentContent.trim();
+  const commentUpdate = async (commentContent: string, id: number) => {
+    const comment = commentContent.trim();
 
-    setReset(true);
+    console.log("댓글 수정 시도:", { commentContent, id, trimmed: comment });
 
-    const response = await axios.put(`/api/comment/${params.id}`, {
-      comment,
-      id,
-    });
+    if (comment === "") {
+      alert("댓글 내용을 입력해주세요.");
+      return;
+    }
 
-    if (response.data.success) {
-      setCommentContent("");
-      setRecommentContent("");
-      alert(response.data.message);
-      setCommentCorrect(null);
-      setRecommentCorrect(null);
-      setReset(true);
+    setReset?.(true);
+
+    try {
+      const response = await axios.put(`/api/comment/${params.id}`, {
+        comment,
+        id,
+      });
+
+      console.log("댓글 수정 응답:", response.data);
+
+      if (response.data.success) {
+        // 로컬 상태 즉시 업데이트 (낙관적 업데이트)
+        setCommentList?.((prev: CommentTreeNode[] | null) => {
+          if (!prev) return prev;
+          return prev.map((c) =>
+            c.id === id
+              ? { ...c, content: comment, updated_at: new Date().toISOString() }
+              : c
+          );
+        });
+
+        // 상태 초기화
+        setCommentContent?.("");
+        setRecommentContent?.("");
+        setCommentCorrect?.(null);
+        setRecommentCorrect?.(null);
+
+        // CommentEditor 초기화를 위해 reset을 true로 설정
+        setReset?.(true);
+
+        alert(response.data.message);
+
+        // 약간의 지연 후 reset을 false로 변경
+        setTimeout(() => {
+          setReset?.(false);
+        }, 100);
+      } else {
+        console.error("댓글 수정 실패:", response.data);
+        alert(response.data.message || "댓글 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("댓글 수정 요청 실패:", error);
+      alert("댓글 수정에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -466,12 +502,18 @@ export default function CommentTree({
                         <>
                           <button
                             onClick={() => {
+                              console.log("수정 버튼 클릭:", {
+                                commentId: comment.id,
+                                originalContent: comment.content,
+                              });
+
                               setCommentAdd?.(null);
-                              setCommentCorrect({
+                              setCommentCorrect?.({
                                 content: comment.content,
                                 id: comment.id,
                               });
-                              setRecommentCorrect(null);
+
+                              console.log("commentCorrect 설정 완료");
                             }}
                           >
                             <span>수정</span>
@@ -503,15 +545,37 @@ export default function CommentTree({
                     className={`comment_add ${comment.depth === 1 ? "depth1" : "depth2"}`}
                   >
                     <CommentEditor
+                      key={`comment-editor-${comment.id}-${isEditingComment ? "edit" : "write"}-${commentCorrect?.content ? "with-content" : "empty"}-${reset ? "reset" : "normal"}`}
                       singleCommentImageFile={singleCommentImageFile}
                       initialContent={
-                        isEditingComment ? (commentCorrect?.content ?? "") : ""
+                        isEditingComment
+                          ? (commentCorrect?.content ?? comment.content)
+                          : ""
                       }
-                      onChange={(html: string) =>
-                        isRecomment
-                          ? setRecommentContent(html)
-                          : setCommentContent(html)
-                      }
+                      onChange={(html: string) => {
+                        console.log("CommentEditor onChange:", {
+                          html: html.substring(0, 50) + "...",
+                          isEditingComment,
+                          isRecomment,
+                          commentId: comment.id,
+                        });
+
+                        if (isEditingComment) {
+                          // 수정 중일 때는 commentCorrect 상태 업데이트
+                          setCommentCorrect?.((prev) =>
+                            prev
+                              ? { ...prev, content: html }
+                              : { content: html, id: comment.id }
+                          );
+                        } else {
+                          // 새 댓글 작성 중일 때
+                          if (isRecomment) {
+                            setRecommentContent?.(html);
+                          } else {
+                            setCommentContent?.(html);
+                          }
+                        }
+                      }}
                       onMentionUsersChange={setCommentMentionUser}
                       users={mentionUsers}
                       reset={reset}
@@ -539,14 +603,15 @@ export default function CommentTree({
                       <div className="btn_wrap">
                         {isEditingComment ? (
                           <button
-                            onClick={() =>
-                              commentUpdate(
-                                isRecomment
-                                  ? (recommentContent ?? "")
-                                  : (commentContent ?? ""),
-                                comment.id
-                              )
-                            }
+                            onClick={() => {
+                              const contentToUpdate =
+                                commentCorrect?.content ?? "";
+                              console.log("댓글 수정 버튼 클릭:", {
+                                contentToUpdate,
+                                commentId: comment.id,
+                              });
+                              commentUpdate(contentToUpdate, comment.id);
+                            }}
                           >
                             댓글 수정
                           </button>
@@ -577,11 +642,10 @@ export default function CommentTree({
                         <button
                           onClick={() => {
                             setCommentAdd?.(null);
-                            setCommentCorrect(null);
-                            setRecommentCorrect(null);
-                            setCommentContent("");
-                            setRecommentContent("");
-                            setReset(true);
+                            setCommentCorrect?.(null);
+                            setCommentContent?.("");
+                            setRecommentContent?.("");
+                            setReset?.(true);
                           }}
                         >
                           취소

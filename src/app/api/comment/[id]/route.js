@@ -250,7 +250,7 @@ export async function PUT(req, context) {
     const { comment, id } = await req.json();
 
     const result = await client.query(
-      "UPDATE comments SET content = $2 WHERE id = $1 RETURNING *;",
+      "UPDATE comments SET content = $2, updated_at = NOW() WHERE id = $1 RETURNING *;",
       [id, comment]
     );
 
@@ -286,10 +286,11 @@ export async function PUT(req, context) {
             post_id: postId,
             content: comment,
             likes: updatedComment.likes,
-            updated_at: new Date().toISOString(),
+            updated_at: updatedComment.updated_at, // 실제 DB에서 업데이트된 시간 사용
           }),
         }
       );
+
       sseSuccess = sseResponse.ok;
     } catch (sseError) {
       console.error("SSE notification failed:", sseError);
