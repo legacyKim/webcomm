@@ -281,6 +281,8 @@ export default function View({
           return;
         }
 
+        console.log(data.event);
+
         if (data.event === "INSERT") {
           setCommentList((prev: CommentTreeNode[] | null) => {
             const newComment: CommentTreeNode = {
