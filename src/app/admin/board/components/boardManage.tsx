@@ -128,7 +128,7 @@ export default function BoardManage() {
               <div>게시물 총 조회수</div>
               <div className="table_btn">관리</div>
             </li>
-            {boardData?.boards?.map((b: Board, index: number) => (
+            {boardData?.boards?.map((b: Board) => (
               <li key={b.id}>
                 <div className="board-seq table_no">
                   {b.seq}

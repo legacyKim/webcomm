@@ -348,7 +348,7 @@ export default function View({
     return () => {
       eventSource.close();
     };
-  }, [params.id]);
+  }, [postId]);
 
   // 댓글 트리 구조로 변환 - useMemo로 최적화
   const commentTree = useMemo(() => {

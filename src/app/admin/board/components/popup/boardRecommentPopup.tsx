@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 
-import { BoardRecommendation, PaginationData } from "@/type/adminType";
+import { BoardRecommendation } from "@/type/adminType";
 import XMarkIcon from "@heroicons/react/24/outline/XMarkIcon";
 
 const TiptapEditor = dynamic(

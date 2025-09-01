@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import Pagination from "@/components/pagination";
-import { XCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
 // 날짜 포맷 함수 (클라이언트에서만 실행)
 const formatDate = (dateString: string, isClient: boolean = true) => {
@@ -65,7 +65,6 @@ export default function NotificationList({
     data: notificationData,
     isLoading,
     error,
-    refetch,
   } = useQuery({
     queryKey: ["notifications", isUserId, limit, currentPage, showOnlyUnread],
     queryFn: async () => {
@@ -161,7 +160,15 @@ export default function NotificationList({
       // React Query 캐시 업데이트
       queryClient.setQueryData(
         ["notifications", isUserId, limit, currentPage, showOnlyUnread],
-        (oldData: any) => {
+        (
+          oldData:
+            | {
+                notifications: Notification[];
+                totalCount: number;
+                totalPages: number;
+              }
+            | undefined
+        ) => {
           if (!oldData) return oldData;
 
           return {
