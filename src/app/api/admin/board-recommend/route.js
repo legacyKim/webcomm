@@ -5,8 +5,7 @@ import { serverTokenCheck } from "@/lib/serverTokenCheck";
 // 게시판 추천 생성 API
 export async function POST(request) {
   try {
-    // JWT 토큰 검증
-    const tokenData = await serverTokenCheck(request);
+    const tokenData = await serverTokenCheck();
     if (!tokenData) {
       return NextResponse.json(
         { error: "로그인이 필요합니다." },
@@ -68,8 +67,8 @@ export async function POST(request) {
 // 게시판 추천 목록 조회 API (관리자용)
 export async function GET(request) {
   try {
-    // JWT 토큰 검증
-    const tokenData = await serverTokenCheck(request);
+    // JWT 토큰 검증 (request 파라미터 제거)
+    const tokenData = await serverTokenCheck();
     if (!tokenData) {
       return NextResponse.json(
         { error: "로그인이 필요합니다." },
@@ -175,8 +174,8 @@ export async function GET(request) {
 // 게시판 추천 상태 업데이트 API (관리자용)
 export async function PATCH(request) {
   try {
-    // JWT 토큰 검증
-    const tokenData = await serverTokenCheck(request);
+    // JWT 토큰 검증 (request 파라미터 제거)
+    const tokenData = await serverTokenCheck();
     if (!tokenData) {
       return NextResponse.json(
         { error: "로그인이 필요합니다." },

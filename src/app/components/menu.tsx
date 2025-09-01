@@ -67,16 +67,14 @@ export default function Menu() {
               ))}
             </div>
 
-            {normalMenus.length > 0 && (
-              <div className="menu_custom_btn">
-                <button
-                  onClick={toggleMenu}
-                  className={showToggleMenu ? "active" : ""}
-                >
-                  <BarsArrowDownIcon className="icon" />
-                </button>
-              </div>
-            )}
+            <div className="menu_custom_btn">
+              <button
+                onClick={toggleMenu}
+                className={showToggleMenu ? "active" : ""}
+              >
+                <BarsArrowDownIcon className="icon" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -84,18 +82,22 @@ export default function Menu() {
           className={`menu_custom_dropdown ${showToggleMenu ? "active" : ""}`}
         >
           <div className="menu_list page">
-            {normalMenus.map((board) => (
-              <Link
-                key={board.id}
-                href={`/board/${board.url_slug}`}
-                className={
-                  pathname === `/board/${board.url_slug}` ? "active" : ""
-                }
-                onClick={() => setShowToggleMenu(false)}
-              >
-                {board.board_name}
-              </Link>
-            ))}
+            {normalMenus.length > 0 ? (
+              normalMenus.map((board) => (
+                <Link
+                  key={board.id}
+                  href={`/board/${board.url_slug}`}
+                  className={
+                    pathname === `/board/${board.url_slug}` ? "active" : ""
+                  }
+                  onClick={() => setShowToggleMenu(false)}
+                >
+                  {board.board_name}
+                </Link>
+              ))
+            ) : (
+              <div className="menu_empty">표시할 게시판이 없습니다.</div>
+            )}
           </div>
           <div className="board_recommend page">
             <span className="notice">게시판을 추천해 주세요!</span>

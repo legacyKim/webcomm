@@ -1782,7 +1782,7 @@ sub .board_list {
   background-color: $box-color;
   border: $border-grey;
   border-radius: 16px;
-  padding: 24px 16px 14px;
+  padding: 28px 16px 14px;
   max-width: 376px;
   width: 100%;
   box-shadow: $box-shadow;
@@ -1925,6 +1925,8 @@ sub .board_list {
 
   .notice {
     font-size: 13px;
+    margin-bottom: 0;
+    top: 2px;
 
     span {
       margin-right: 4px;
@@ -3274,7 +3276,7 @@ h2.mypage_title {
       color: $font-color;
       font-size: 1rem;
       font-weight: 600;
-      color: #333;
+      color: $font-color;
       text-align: center;
     }
 
@@ -3286,6 +3288,7 @@ h2.mypage_title {
       max-height: 400px;
       overflow-y: auto;
       gap: 8px;
+      background-color: $white-color;
 
       .menu-item {
         font-size: 16px;
@@ -3328,6 +3331,7 @@ h2.mypage_title {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: $font-color;
 
     &:hover:not(:disabled) {
       background-color: #f0f0f0;
