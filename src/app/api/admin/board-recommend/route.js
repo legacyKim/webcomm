@@ -1,34 +1,38 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
+import { error } from "console";
 
 // 게시판 추천 생성 API
 export async function POST(request) {
   try {
     const tokenData = await serverTokenCheck();
     if (!tokenData) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다." },
-        { status: 401 }
-      );
+      return NextResponse.json({
+        message: "로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?",
+        status: 401,
+        error: "로그인이 필요합니다.",
+      });
     }
 
     const { board_name, reason } = await request.json();
 
     // 필수 필드 검증
     if (!board_name || board_name.trim() === "") {
-      return NextResponse.json(
-        { error: "게시판 이름을 입력해주세요." },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        message: "게시판 이름을 입력해주세요.",
+        error: "게시판 이름을 입력해 주세요",
+        status: 400,
+      });
     }
 
     // 게시판 이름 길이 검증
     if (board_name.length > 8) {
-      return NextResponse.json(
-        { error: "게시판 이름이 너무 깁니다. (최대 8자)" },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        message: "게시판 이름이 너무 깁니다. (최대 8자)",
+        error: "게시판 이름이 너무 깁니다. (최대 8자)",
+        status: 400,
+      });
     }
 
     // 게시판 추천 저장
@@ -57,10 +61,11 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("게시판 추천 API 오류:", error);
-    return NextResponse.json(
-      { error: "서버 오류가 발생했습니다." },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      message: "서버 오류가 발생했습니다.",
+      error: "서버 오류가 발생했습니다.",
+      status: 500,
+    });
   }
 }
 

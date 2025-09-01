@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface BoardRecommendProps {
   boardRecommendPopup: boolean;
@@ -11,6 +12,8 @@ interface BoardRecommendProps {
 export default function BoardRecommend({
   setBoardRecommendPopup,
 }: BoardRecommendProps) {
+  const router = useRouter();
+
   const [boardName, setBoardName] = useState("");
   const [reason, setReason] = useState("");
 
@@ -36,10 +39,18 @@ export default function BoardRecommend({
         alert("게시판 추천이 접수되었습니다.");
         setBoardName("");
         setReason("");
+      } else {
+        if (response.data.status === 401) {
+          const isConfirm = confirm(response.data.message);
+          if (isConfirm) {
+            router.push("./login");
+          }
+        } else {
+          alert(response.data.message || "게시판 추천에 실패했습니다.");
+        }
       }
     } catch (error) {
       console.error(error);
-      alert("게시판 추천 중 오류가 발생했습니다.");
     } finally {
       setBoardRecommendPopup(false);
     }
