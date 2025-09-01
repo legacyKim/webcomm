@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
-import { error } from "console";
 
 // 게시판 추천 생성 API
 export async function POST(request) {
