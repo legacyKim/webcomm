@@ -97,7 +97,7 @@ export default function MyFollowing() {
           {isLoading ? (
             <div className="loading_spinner_container">
               <div className="loading_spinner"></div>
-              <p>사용자 목록을 불러오는 중...</p>
+              <p>데이터를 불러오는 중...</p>
             </div>
           ) : (
             <div className="user_list">

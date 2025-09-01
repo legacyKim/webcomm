@@ -2,15 +2,31 @@ import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { revalidatePost } from "@/lib/revalidate.js";
 
+// 슬러그에서 ID 추출하는 함수
+function extractIdFromSlug(slug) {
+  const match = slug.match(/-(\d+)$/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
 export async function GET(req, context) {
-  const { id } = await context.params;
+  const { title } = await context.params;
   const client = await pool.connect();
 
   try {
+    // 슬러그에서 ID 추출
+    const postId = extractIdFromSlug(title);
+
+    if (!postId) {
+      return NextResponse.json({
+        response: false,
+        message: "Invalid post URL",
+      });
+    }
+
     // 트랜잭션 시작
     await client.query("BEGIN");
 
-    // 게시물 조회 (개인화 없이 공통 데이터만)
+    // 게시물 조회 (ID 기반으로 조회)
     const query = `
       SELECT 
         p.*, 
@@ -20,7 +36,7 @@ export async function GET(req, context) {
       WHERE p.deleted = FALSE AND p.id = $1;
     `;
 
-    const posts = await client.query(query, [id]);
+    const posts = await client.query(query, [postId]);
 
     if (posts.rows.length === 0) {
       return NextResponse.json({ response: false, message: "Post not found" });
@@ -34,7 +50,7 @@ export async function GET(req, context) {
       WHERE pa.post_id = $1 AND pa.action_type = 'like'
       ORDER BY pa.created_at DESC;
     `;
-    const postLikers = await client.query(postLikersQuery, [id]);
+    const postLikers = await client.query(postLikersQuery, [postId]);
 
     // 댓글 조회 (개인화 없이 공통 데이터만)
     const commentQuery = `
@@ -59,7 +75,7 @@ export async function GET(req, context) {
     FROM comment_tree
     ORDER BY depth ASC, created_at ASC;`;
 
-    const comments = await client.query(commentQuery, [id]);
+    const comments = await client.query(commentQuery, [postId]);
 
     // 각 댓글별 좋아요한 사용자 목록 조회
     const commentLikersQuery = `
@@ -75,7 +91,7 @@ export async function GET(req, context) {
       ) AND ca.action_type = '1'
       ORDER BY ca.created_at DESC;
     `;
-    const commentLikers = await client.query(commentLikersQuery, [id]);
+    const commentLikers = await client.query(commentLikersQuery, [postId]);
 
     // 댓글별 좋아요 데이터 그룹화
     const commentLikersMap = {};
@@ -97,7 +113,7 @@ export async function GET(req, context) {
     }));
 
     const viewsQuery = `UPDATE posts SET views = views + 1 WHERE id = $1 RETURNING views;`;
-    await client.query(viewsQuery, [id]);
+    await client.query(viewsQuery, [postId]);
 
     // 트랜잭션 커밋
     await client.query("COMMIT");
@@ -125,6 +141,7 @@ export async function GET(req, context) {
   }
 }
 
+// 게시글 삭제
 export async function POST(req, context) {
   const { id, url_slug } = await context.params;
   const client = await pool.connect();

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 
 export default function SiteSettingsManage() {
   const [logoUrl, setLogoUrl] = useState<string>("");
-  const [siteName, setSiteName] = useState<string>("");
+  // const [siteName, setSiteName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -21,7 +21,7 @@ export default function SiteSettingsManage() {
 
       if (result.success && result.data) {
         setLogoUrl(result.data.logo_url || "");
-        setSiteName(result.data.site_name || "");
+        // setSiteName(result.data.site_name || "");
       }
     } catch (error) {
       console.error("사이트 설정 로딩 실패:", error);
@@ -86,7 +86,6 @@ export default function SiteSettingsManage() {
         },
         body: JSON.stringify({
           logo_url: logoUrl,
-          site_name: siteName,
         }),
       });
 
@@ -110,75 +109,46 @@ export default function SiteSettingsManage() {
   }
 
   return (
-    <div className="site-settings-manage">
-      <h2>일반 설정</h2>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
+        <h4 className="">일반 설정</h4>
 
-      <div className="setting-group">
-        <label htmlFor="siteName">사이트 이름:</label>
-        <input
-          id="siteName"
-          type="text"
-          value={siteName}
-          onChange={(e) => setSiteName(e.target.value)}
-          placeholder="사이트 이름을 입력하세요"
-        />
-      </div>
-
-      <div className="setting-group">
-        <label>로고 이미지:</label>
-
-        {/* 현재 로고 미리보기 */}
-        {logoUrl && (
-          <div className="logo-preview">
-            <p>현재 로고:</p>
-            <img
-              src={logoUrl}
-              alt="현재 로고"
-              style={{
-                maxWidth: "200px",
-                height: "auto",
-                marginBottom: "10px",
-              }}
-            />
-          </div>
-        )}
-
-        {/* 파일 업로드 */}
-        <div className="upload-section">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            style={{ display: "none" }}
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isUploading}
-            className="upload-btn"
-          >
-            {isUploading ? "업로드 중..." : "로고 파일 선택"}
+        <div className="admin_btn">
+          <button onClick={handleSave} disabled={isSaving} className="save-btn">
+            {isSaving ? "저장 중..." : "설정 저장"}
           </button>
-          <p className="upload-hint">JPG, PNG, GIF 파일 (최대 5MB)</p>
-        </div>
-
-        {/* 수동 URL 입력 */}
-        <div className="manual-url">
-          <label htmlFor="logoUrl">또는 직접 URL 입력:</label>
-          <input
-            id="logoUrl"
-            type="text"
-            value={logoUrl}
-            onChange={(e) => setLogoUrl(e.target.value)}
-            placeholder="로고 이미지 URL을 입력하세요"
-          />
         </div>
       </div>
 
-      <button onClick={handleSave} disabled={isSaving} className="save-btn">
-        {isSaving ? "저장 중..." : "설정 저장"}
-      </button>
+      <div className="setting_group">
+        <div className="setting_info">
+          {/* 현재 로고 미리보기 */}
+          {logoUrl && (
+            <div className="logo-preview">
+              <img src={logoUrl} alt="현재 로고" />
+            </div>
+          )}
+
+          <div className="upload_section">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              style={{ display: "none" }}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="upload-btn"
+            >
+              {isUploading ? "업로드 중..." : "로고 파일 선택"}
+            </button>
+            <p className="notice">JPG, PNG, GIF 파일 (최대 5MB)</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

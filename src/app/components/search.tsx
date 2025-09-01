@@ -21,7 +21,7 @@ export default function Search() {
   };
 
   return (
-    <div className="search page">
+    <div className="search ">
       <input
         type="text"
         placeholder="검색어를 입력해 주세요."

@@ -19,6 +19,9 @@ import "@/style/style.common.scss";
 import "@/style/checkbox.scss";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
   title: {
     default: "톡티(Tokti) - 자유로운 소통의 커뮤니티",
     template: "%s | 톡티(Tokti)",

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
 import webpush from "web-push";
 import prisma from "@/lib/prisma";
+import { createTitleSlug } from "@/lib/url-utils";
 
 // VAPID 키 설정 (환경변수로 관리)
 webpush.setVapidDetails(
@@ -13,6 +14,8 @@ webpush.setVapidDetails(
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const limitParam = searchParams.get("limit");
+  const pageParam = searchParams.get("page");
+  const unreadOnlyParam = searchParams.get("unreadOnly");
 
   try {
     // 토큰에서 사용자 정보 확인
@@ -22,38 +25,76 @@ export async function GET(req) {
       return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
     }
 
-    const limit = limitParam ? parseInt(limitParam, 10) : null;
+    const limit = limitParam ? parseInt(limitParam, 10) : 10; // 기본값 10개
+    const page = pageParam ? parseInt(pageParam, 10) : 1;
+    const skip = (page - 1) * limit;
+    const unreadOnly = unreadOnlyParam === "true";
 
-    // Prisma로 알림 조회
-    const notifications = await prisma.notification.findMany({
-      where: {
-        receiver_id: userData.id, // userId가 아닌 id 사용
-        OR: [
-          { is_read: false },
-          {
-            created_at: {
-              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7일 전
-            },
+    // 조건 설정
+    const whereCondition = {
+      receiver_id: userData.id,
+      OR: [
+        // 읽지 않은 알림은 날짜 제한 없이 모두 표시
+        { is_read: false },
+        // 읽은 알림은 7일 이내만 표시
+        {
+          is_read: true,
+          created_at: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7일 전
           },
-        ],
-      },
+        },
+      ],
+    };
+
+    if (unreadOnly) {
+      // 읽지 않은 알림만 필터링 (날짜 제한 없음)
+      whereCondition.OR = [{ is_read: false }];
+    }
+
+    // 전체 알림 수 조회 (페이지네이션용)
+    const totalCount = await prisma.notification.count({
+      where: whereCondition,
+    });
+
+    // Prisma로 알림 조회 (페이지네이션 적용)
+    const notifications = await prisma.notification.findMany({
+      where: whereCondition,
       include: {
         sender: {
           select: {
             user_nickname: true,
           },
         },
+        post: {
+          select: {
+            id: true,
+            title: true,
+            url_slug: true,
+          },
+        },
       },
       orderBy: {
         created_at: "desc",
       },
-      take: limit || undefined,
+      skip: skip,
+      take: limit,
     });
+
+    console.log("조회된 알림 수:", notifications.length, "/ 전체:", totalCount); // 디버그 로그
 
     // 메시지와 링크 생성
     const processedNotifications = notifications.map((n) => {
       let message = "";
       let link = "/";
+
+      // post가 있는 경우 title 기반 URL 생성
+      const getPostUrl = () => {
+        if (n.post && n.post.title) {
+          const titleSlug = createTitleSlug(n.post.title, n.post.id);
+          return `/board/${n.post.url_slug}/${titleSlug}`;
+        }
+        return `/board/${n.url_slug}/${n.post_id}`; // fallback
+      };
 
       switch (n.type) {
         case "test":
@@ -62,23 +103,23 @@ export async function GET(req) {
           break;
         case "comment":
           message = `게시물에 ${n.sender.user_nickname}님이 댓글을 달았습니다.`;
-          link = `/board/${n.url_slug}/${n.post_id}`;
+          link = getPostUrl();
           break;
         case "reply":
           message = `댓글에 ${n.sender.user_nickname}님이 대댓글을 달았습니다.`;
-          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          link = `${getPostUrl()}#comment-${n.comment_id}`;
           break;
         case "mention":
           message = `${n.sender.user_nickname}님이 언급했습니다.`;
-          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          link = `${getPostUrl()}#comment-${n.comment_id}`;
           break;
         case "liked_post_comment":
           message = `좋아요한 게시물에 ${n.sender.user_nickname}님이 댓글을 달았습니다.`;
-          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          link = `${getPostUrl()}#comment-${n.comment_id}`;
           break;
         case "liked_comment_reply":
           message = `좋아요한 댓글에 ${n.sender.user_nickname}님이 대댓글을 달았습니다.`;
-          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          link = `${getPostUrl()}#comment-${n.comment_id}`;
           break;
         case "message":
           message = `${n.sender.user_nickname}님이 쪽지를 보냈습니다.`;
@@ -86,11 +127,11 @@ export async function GET(req) {
           break;
         case "post_like":
           message = `${n.sender.user_nickname}님이 게시글을 좋아합니다.`;
-          link = `/board/${n.url_slug}/${n.post_id}`;
+          link = getPostUrl();
           break;
         case "comment_like":
           message = `${n.sender.user_nickname}님이 댓글을 좋아합니다.`;
-          link = `/board/${n.url_slug}/${n.post_id}#comment-${n.comment_id}`;
+          link = `${getPostUrl()}#comment-${n.comment_id}`;
           break;
         default:
           message = "새로운 알림이 있습니다.";
@@ -107,7 +148,19 @@ export async function GET(req) {
       };
     });
 
-    return NextResponse.json(processedNotifications);
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return NextResponse.json({
+      notifications: processedNotifications,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalCount: totalCount,
+        limit: limit,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    });
   } catch (err) {
     console.error("Error fetching notifications:", err);
     return NextResponse.json(
@@ -297,6 +350,61 @@ export async function POST(req) {
     });
   } catch (err) {
     console.error("Error creating notification:", err);
+    return NextResponse.json({ error: "서버 에러" }, { status: 500 });
+  }
+}
+
+// DELETE: 알림 삭제
+export async function DELETE(req) {
+  try {
+    // 토큰에서 사용자 정보 확인
+    const userData = await serverTokenCheck(req);
+
+    if (!userData) {
+      return NextResponse.json({ error: "인증이 필요합니다" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { notificationIds, deleteAll } = body;
+
+    if (deleteAll) {
+      // 현재 표시되는 모든 알림 삭제 (읽지 않은 알림 + 7일 이내 읽은 알림)
+      await prisma.notification.deleteMany({
+        where: {
+          receiver_id: userData.id,
+          OR: [
+            // 읽지 않은 알림은 날짜 제한 없이 모두 삭제
+            { is_read: false },
+            // 읽은 알림은 7일 이내만 삭제
+            {
+              is_read: true,
+              created_at: {
+                gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7일 전
+              },
+            },
+          ],
+        },
+      });
+    } else if (notificationIds && Array.isArray(notificationIds)) {
+      // 특정 알림들 삭제
+      await prisma.notification.deleteMany({
+        where: {
+          id: {
+            in: notificationIds,
+          },
+          receiver_id: userData.id, // 보안: 자신의 알림만 삭제 가능
+        },
+      });
+    } else {
+      return NextResponse.json(
+        { error: "삭제할 알림을 지정해주세요" },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("Error deleting notifications:", err);
     return NextResponse.json({ error: "서버 에러" }, { status: 500 });
   }
 }

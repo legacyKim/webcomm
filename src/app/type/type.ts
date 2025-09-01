@@ -137,7 +137,8 @@ export interface UserActivity {
     likes: number;
   }[];
   recent_comments: {
-    id: number;
+    id: number; // post_id
+    comment_id: number; // 실제 댓글 ID
     content: string;
     post_title: string;
     board_name: string;

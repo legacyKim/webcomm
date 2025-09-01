@@ -169,7 +169,6 @@ export class NotificationService {
       );
 
       if (!isDuplicateAllowed) {
-        console.log(`중복 알림 방지: 댓글 ${commentId} 좋아요 알림 생략`);
         return null;
       }
 

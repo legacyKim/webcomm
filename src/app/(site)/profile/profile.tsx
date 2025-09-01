@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import TiptapViewer from "@/components/tiptapViewer";
 import CountUpAnimation from "@/components/CountUpAnimation";
+import { createTitleSlug } from "@/lib/url-utils";
 
 import { UserProfile, UserActivity } from "@/type/type";
 
@@ -311,7 +312,7 @@ export default function Profile({
                   <div className="recent_posts">
                     {userActivity.recent_posts.slice(0, 5).map((post) => (
                       <Link
-                        href={`/board/${post.url_slug}/${post.id}`}
+                        href={`/board/${post.url_slug}/${createTitleSlug(post.title, post.id)}`}
                         key={post.id}
                         className="post_item"
                       >
@@ -344,8 +345,8 @@ export default function Profile({
                   <div className="recent_comments">
                     {userActivity.recent_comments.slice(0, 5).map((comment) => (
                       <Link
-                        key={comment.id}
-                        href={`/board/${comment.post_url_slug}/${comment.id}`}
+                        key={comment.comment_id}
+                        href={`/board/${comment.post_url_slug}/${createTitleSlug(comment.post_title, comment.id)}`}
                         className="comment_item"
                       >
                         <div className="comment_content">
@@ -384,7 +385,7 @@ export default function Profile({
                     {userActivity.recent_posts.length > 0 ? (
                       userActivity.recent_posts.map((post) => (
                         <Link
-                          href={`/board/${post.url_slug}/${post.id}`}
+                          href={`/board/${post.url_slug}/${createTitleSlug(post.title, post.id)}`}
                           key={post.id}
                           className="post_item"
                         >
@@ -425,8 +426,8 @@ export default function Profile({
                   {userActivity.recent_comments.length > 0 ? (
                     userActivity.recent_comments.map((comment) => (
                       <Link
-                        href={`/board/${comment.post_url_slug}/${comment.id}`}
-                        key={comment.id}
+                        href={`/board/${comment.post_url_slug}/${createTitleSlug(comment.post_title, comment.id)}`}
+                        key={comment.comment_id}
                         className="comment_item"
                       >
                         <div className="comment_content">
@@ -468,7 +469,7 @@ export default function Profile({
                   userActivity.liked_posts.length > 0 ? (
                     userActivity.liked_posts.map((post) => (
                       <Link
-                        href={`/board/${post.url_slug}/${post.id}`}
+                        href={`/board/${post.url_slug}/${createTitleSlug(post.title, post.id)}`}
                         key={post.id}
                         className="post_item"
                       >
@@ -502,7 +503,7 @@ export default function Profile({
 
           {activeTab === "follower" && userActivity && (
             <div className="follower_tab tab">
-              {userActivity.followers.length > 0 && (
+              {userActivity.followers.length > 0 ? (
                 <div className="section">
                   <h3>팔로워 목록</h3>
                   <div className="followers_list">
@@ -523,6 +524,10 @@ export default function Profile({
                       </Link>
                     ))}
                   </div>
+                </div>
+              ) : (
+                <div className="empty_state">
+                  <p>팔로워가 없습니다.</p>
                 </div>
               )}
             </div>

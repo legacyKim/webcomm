@@ -11,7 +11,8 @@ interface CustomJwtPayload {
   id: number;
 }
 
-export const revalidate = 600; // 10분 ISR 캐시
+// 기본 캐시 시간 (서버에서 동적으로 조정됨)
+export const revalidate = 1800; // 30분 기본값
 
 export async function generateMetadata({
   params,

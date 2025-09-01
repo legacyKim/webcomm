@@ -22,6 +22,9 @@ import { SSE_BASE_URL } from "@/lib/sse";
 
 import { Posts, PostLiker, initDataPosts } from "@/type/type";
 
+// 🚀 URL에서 ID 추출하는 유틸리티 함수 추가
+import { extractIdFromSlug } from "@/lib/url-utils";
+
 import dynamic from "next/dynamic";
 
 import {
@@ -65,6 +68,15 @@ export default function View({
   const params = useParams();
   const router = useRouter();
   const loginCheck = useLoginCheck();
+
+  // 🚀 title 파라미터에서 실제 postId 추출
+  const postId = useMemo(() => {
+    if (params.title && typeof params.title === "string") {
+      const id = extractIdFromSlug(params.title);
+      return id || post?.id; // 추출 실패 시 post.id 사용
+    }
+    return post?.id;
+  }, [params.title, post?.id]);
 
   const {
     isUserId,
@@ -243,21 +255,13 @@ export default function View({
 
   // 댓글 실시간 열람
   useEffect(() => {
-    console.log("SSE 연결 시도:", `${SSE_BASE_URL}/comments/stream`);
     const eventSource = new EventSource(`${SSE_BASE_URL}/comments/stream`);
-
-    eventSource.onopen = () => {
-      console.log("✅ SSE 연결 성공");
-    };
 
     eventSource.onerror = (error) => {
       console.error("❌ SSE 연결 오류:", error);
-      console.log("EventSource readyState:", eventSource.readyState);
-      console.log("EventSource URL:", eventSource.url);
     };
 
     eventSource.onmessage = (event) => {
-      console.log("📨 SSE 메시지 수신:", event.data);
       try {
         const data = JSON.parse(event.data) as CommentTreeNode & {
           event: string;
@@ -266,12 +270,11 @@ export default function View({
 
         // 연결 확인 메시지는 무시
         if (data.event === "connected") {
-          console.log("🔗 SSE 서버 연결 확인");
           return;
         }
 
         // 현재 게시글이 아닌 댓글은 무시
-        const currentPostId = parseInt(params.id as string);
+        const currentPostId = postId; // 🚀 추출된 postId 사용
         const receivedPostId =
           typeof data.post_id === "string"
             ? parseInt(data.post_id)
@@ -280,8 +283,6 @@ export default function View({
         if (receivedPostId !== currentPostId) {
           return;
         }
-
-        console.log(data.event);
 
         if (data.event === "INSERT") {
           setCommentList((prev: CommentTreeNode[] | null) => {
@@ -297,7 +298,7 @@ export default function View({
               created_at: data.created_at,
               updated_at: data.updated_at,
               event: data.event,
-              post_id: data.post_id || (params.id as string) || "0",
+              post_id: data.post_id || postId?.toString() || "0", // 🚀 추출된 postId 사용
               children: [],
             };
 
@@ -379,6 +380,7 @@ export default function View({
   ) => {
     const comment = commentContent.trim();
     const parentId = id;
+
     // depth가 명시적으로 전달되지 않은 경우 최상위 댓글(0)으로 처리
     const commentDepth = depth !== null && depth !== undefined ? depth : 0;
 
@@ -420,7 +422,7 @@ export default function View({
         formData.append("imageFiles", JSON.stringify(imageFilesData));
       }
 
-      const response = await axios.post(`/api/comment/${params.id}`, formData, {
+      const response = await axios.post(`/api/comment/${postId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -436,7 +438,7 @@ export default function View({
         }
         setReset(true); // CommentEditor 초기화를 위해 true로 설정
 
-        alert(response.data.message);
+        // alert(response.data.message);
 
         // 약간의 지연 후 reset을 false로 변경
         setTimeout(() => {
@@ -699,7 +701,7 @@ export default function View({
           <div className="comment_list">
             <CommentTree
               params={{
-                id: params.id as string,
+                id: String(postId) as string,
                 url_slug: params.url_slug as string,
               }}
               comments={commentTree}
@@ -800,9 +802,8 @@ export default function View({
         )} */}
         <div></div>
         <div className="btn_wrap btn_wrap_mb0">
-          <Link href={`/board/${params.url_slug}`}>
+          <Link href={`/board/${params.url_slug}`} className="list">
             <ListBulletIcon className="icon" />
-            <span>목록으로</span>
           </Link>
           {isUserId !== null && (
             <Link href={`/write`} className="write">

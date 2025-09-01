@@ -8,11 +8,11 @@ export const revalidate = 86400; // 24시간 ISR 캐시
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ url_slug: string; id: string }>;
+  params: Promise<{ url_slug: string; title: string }>;
 }) {
-  const { url_slug, id } = await params;
+  const { url_slug, title } = await params;
 
-  const postData = await fetchPostDetail(url_slug, id);
+  const postData = await fetchPostDetail(url_slug, title);
 
   if (!postData || !postData.post) {
     return {
@@ -46,7 +46,7 @@ export async function generateMetadata({
     openGraph: {
       title: post.title,
       description: cleanContent,
-      url: `https://tokti.net/board/${url_slug}/${id}`,
+      url: `https://tokti.net/board/${url_slug}/${title}`,
       siteName: "톡티(Tokti)",
       type: "article",
       locale: "ko_KR",
@@ -71,7 +71,7 @@ export async function generateMetadata({
       images: [post.thumbnail || "https://tokti.net/logo.png"],
     },
     alternates: {
-      canonical: `https://tokti.net/board/${url_slug}/${id}`,
+      canonical: `https://tokti.net/board/${url_slug}/${title}`,
     },
   };
 }
@@ -80,13 +80,13 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: Promise<{ url_slug: string; id: string }>;
+  params: Promise<{ url_slug: string; title: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
-  const { url_slug, id } = await params;
+  const { url_slug, title } = await params;
   const { page = "1" } = await searchParams;
 
-  const post = await fetchPostDetail(url_slug, id);
+  const post = await fetchPostDetail(url_slug, title);
 
   return <View post={post.post} comment={post.comments} page={Number(page)} />;
 }

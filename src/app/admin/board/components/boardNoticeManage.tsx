@@ -14,6 +14,18 @@ import TiptapViewer from "@/components/tiptapViewer";
 
 import type { Notice } from "@/type/adminType";
 
+// 날짜 포맷팅 함수
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
 export default function BoardNoticeManage() {
   const fetchNotices = async (page: number, limit: number = 10) => {
     const { data } = await axios.get(`/api/notice?page=${page}&limit=${limit}`);
@@ -73,58 +85,90 @@ export default function BoardNoticeManage() {
         </div>
       </div>
       <div className="admin_content">
-        <ol className="table">
-          <li className="table_header">
-            <span className="table_no">No</span>
-            <span className="table_board">게시판</span>
-            <span className="table_title">제목</span>
-            <span className="table_content">내용</span>
-            <span className="table_date">날짜</span>
-            <span className="table_btn">관리</span>
-          </li>
-
-          <QueryInfiniteScrollContainer
-            data={data}
-            loading={loading}
-            loadingMore={loadingMore}
-            hasMore={hasMore}
-            lastElementRef={lastElementRef}
-            error={error}
-            onRetry={() => refresh()}
-            renderItem={(notice: Notice) => (
-              <li key={notice.id}>
-                <span className="table_no">{notice.id}</span>
-                <span className="table_board">{notice.url_slug}</span>
-                <span className="table_title">{notice.title}</span>
-                <span className="table_content">
-                  <TiptapViewer content={notice.content ?? ""} />
-                </span>
-                <span className="table_date">
-                  <span className="table_board">{notice.board_name}</span>
-                </span>
-                <span className="table_btn btn_wrap">
-                  <button
-                    onClick={() => {
-                      setSelectedNotice(notice);
-                      setViewPopupOpen(true);
-                    }}
-                  >
-                    보기
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingNotice(notice);
-                      setPopupOpen(true);
-                    }}
-                  >
-                    수정
-                  </button>
-                  <button onClick={() => noticeDelete(notice.id)}>삭제</button>
-                </span>
-              </li>
-            )}
-          />
-        </ol>
+        {!loading ? (
+          <ol className="table">
+            <li className="table_header">
+              <div className="table_no">No</div>
+              <div className="table_board">게시판</div>
+              <div className="table_title">제목</div>
+              <div className="table_content">내용</div>
+              <div className="table_comments">댓글</div>
+              <div className="table_date">작성일</div>
+              <div className="table_btn">관리</div>
+            </li>
+            <QueryInfiniteScrollContainer
+              data={data}
+              loading={loading}
+              loadingMore={loadingMore}
+              hasMore={hasMore}
+              lastElementRef={lastElementRef}
+              error={error}
+              onRetry={() => refresh()}
+              renderItem={(notice: Notice) => (
+                <li
+                  key={notice.id}
+                  onClick={() => {
+                    setSelectedNotice(notice);
+                    setViewPopupOpen(true);
+                  }}
+                >
+                  <div className="table_no">
+                    <span>{notice.id}</span>
+                  </div>
+                  <div className="table_board">
+                    <span>{notice.board_name}</span>
+                  </div>
+                  <div className="table_title">
+                    <span>{notice.title}</span>
+                  </div>
+                  <div className="table_content">
+                    <TiptapViewer content={notice.content ?? ""} />
+                  </div>
+                  <div className="table_comments">
+                    <span>{notice.comment_count || 0}</span>
+                  </div>
+                  <div className="table_date">
+                    <span>{formatDate(notice.created_at)}</span>
+                  </div>
+                  <div className="table_btn btn_wrap">
+                    <button
+                      onClick={() => {
+                        setSelectedNotice(notice);
+                        setViewPopupOpen(true);
+                      }}
+                    >
+                      보기
+                    </button>
+                    <button
+                      className="edit_btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingNotice(notice);
+                        setPopupOpen(true);
+                      }}
+                    >
+                      수정
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        noticeDelete(notice.id);
+                      }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </li>
+              )}
+            />
+          </ol>
+        ) : (
+          <div className="loading_spinner_container">
+            <div className="loading_spinner"></div>
+            <p>데이터를 불러오는 중...</p>
+          </div>
+        )}
       </div>
 
       {popupOpen && (

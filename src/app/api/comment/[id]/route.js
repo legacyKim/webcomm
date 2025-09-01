@@ -195,48 +195,76 @@ export async function POST(req, context) {
 
     await client.query("COMMIT");
 
-    // SSE 알림 전송 시도
-    let sseSuccess = false;
-    try {
-      const sseResponse = await fetch(
-        `${process.env.SSE_BASE_URL}/api/comment/notify`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id: commentId,
-            event: "INSERT",
-            post_id: id,
-            user_id: isUserId,
-            user_nickname: isUserNick,
-            content: processedComment,
-            parent_id: parentId,
-            profile: user.profile,
-            likes: 0,
-            depth: depth,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }),
-        }
-      );
-
-      sseSuccess = sseResponse.ok;
-    } catch (sseError) {
-      console.error("SSE notification failed:", sseError);
-      sseSuccess = false;
-    }
-
-    // SSE 성공 시 캐시 무효화 (실시간 업데이트되었으므로)
-    if (sseSuccess && urlSlug) {
-      await revalidateComment(id, urlSlug);
-    }
-
-    return NextResponse.json(
-      { success: true, message: "댓글이 추가되었습니다." },
+    // 🚀 즉시 응답 반환 (사용자 체감 속도 향상!)
+    const response = NextResponse.json(
+      {
+        success: true,
+        message: "댓글이 추가되었습니다.",
+        commentId,
+        comment: {
+          id: commentId,
+          content: processedComment,
+          user_id: isUserId,
+          user_nickname: isUserNick,
+          parent_id: parentId,
+          profile: user.profile,
+          likes: 0,
+          depth: depth,
+          created_at: new Date().toISOString(),
+        },
+      },
       { status: 201 }
     );
+
+    // 🔄 백그라운드에서 비동기 처리 (응답 후 실행)
+    setImmediate(async () => {
+      const bgClient = await pool.connect();
+      try {
+        // 알림 처리
+        const notificationService = createNotificationService(bgClient);
+        await notificationService.createCommentNotifications({
+          senderId: isUserId,
+          postId: parseInt(id),
+          commentId: commentId,
+          parentId: parentId,
+          mentionedUserIds: mentionedUserIds,
+          urlSlug: urlSlug,
+        });
+
+        // SSE 알림 전송
+        const sseResponse = await fetch(
+          `${process.env.SSE_BASE_URL}/api/comment/notify`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: commentId,
+              event: "INSERT",
+              post_id: id,
+              user_id: isUserId,
+              user_nickname: isUserNick,
+              content: processedComment,
+              parent_id: parentId,
+              profile: user.profile,
+              likes: 0,
+              depth: depth,
+              created_at: new Date().toISOString(),
+            }),
+          }
+        );
+
+        // 캐시 무효화 (revalidate)
+        if (sseResponse.ok && urlSlug) {
+          await revalidateComment(id, urlSlug);
+        }
+      } catch (bgError) {
+        console.error("Background processing failed:", bgError);
+      } finally {
+        bgClient.release();
+      }
+    });
+
+    return response;
   } finally {
     client.release();
   }

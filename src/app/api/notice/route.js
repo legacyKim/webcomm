@@ -70,7 +70,7 @@ export async function GET(req) {
     const offset = (page - 1) * limit;
 
     const query = `
-      SELECT id, title, content, created_at, user_nickname, url_slug, board_name
+      SELECT id, title, content, created_at, user_nickname, url_slug, board_name, views, likes
       FROM posts
       WHERE notice = true
       ORDER BY created_at DESC

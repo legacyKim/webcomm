@@ -4,6 +4,7 @@ import { Board } from "@/type/type";
 import { useQuery } from "@tanstack/react-query";
 import { fetchBoard } from "@/api/api";
 import { useState } from "react";
+
 import BoardManagePopup from "./popup/boardManagePopup";
 
 export default function BoardManage() {
@@ -61,6 +62,7 @@ export default function BoardManage() {
   };
 
   // 게시판 순서 변경
+  /*
   const handleMoveBoard = async (boardId: number, direction: "up" | "down") => {
     try {
       const response = await fetch("/api/admin/boards/move", {
@@ -78,6 +80,7 @@ export default function BoardManage() {
       alert("게시판 순서 변경 중 오류가 발생했습니다.");
     }
   };
+  */
 
   const openEditPopup = (board: Board) => {
     if (popupOpen) return; // 이미 팝업이 열려있으면 무시
@@ -111,22 +114,25 @@ export default function BoardManage() {
 
       <div className="admin_content">
         {isLoading ? (
-          <div className="loading">로딩 중...</div>
+          <div className="loading_spinner_container">
+            <div className="loading_spinner"></div>
+            <p>데이터를 불러오는 중...</p>
+          </div>
         ) : (
           <ol className="table">
             <li className="table_header">
-              <span>순서</span>
-              <span>게시판</span>
-              <span>URL</span>
-              <span>게시물 총합</span>
-              <span>게시물 총 조회수</span>
-              <span>관리</span>
+              <div className="table_no">순서</div>
+              <div>게시판</div>
+              <div>URL</div>
+              <div>게시물 총합</div>
+              <div>게시물 총 조회수</div>
+              <div className="table_btn">관리</div>
             </li>
             {boardData?.boards?.map((b: Board, index: number) => (
               <li key={b.id}>
-                <span className="board-seq">
+                <div className="board-seq table_no">
                   {b.seq}
-                  <div className="seq-controls">
+                  {/* <div className="seq-controls">
                     <button
                       onClick={() => handleMoveBoard(b.id, "up")}
                       disabled={index === 0}
@@ -143,13 +149,21 @@ export default function BoardManage() {
                     >
                       ↓
                     </button>
-                  </div>
-                </span>
-                <span className="board-name">{b.board_name}</span>
-                <span className="board-url">/{b.url_slug}</span>
-                <span>{b.post_count || 0}</span>
-                <span>{b.total_views || 0}</span>
-                <span className="board-actions">
+                  </div> */}
+                </div>
+                <div className="board-name">
+                  <span>{b.board_name}</span>
+                </div>
+                <div className="board-url">
+                  <span>{b.url_slug}</span>
+                </div>
+                <div>
+                  <span>{b.post_count || 0}</span>
+                </div>
+                <div>
+                  <span>{b.total_views || 0}</span>
+                </div>
+                <div className="table_btn">
                   <button onClick={() => openEditPopup(b)} className="edit-btn">
                     수정
                   </button>
@@ -159,7 +173,7 @@ export default function BoardManage() {
                   >
                     삭제
                   </button>
-                </span>
+                </div>
               </li>
             ))}
           </ol>

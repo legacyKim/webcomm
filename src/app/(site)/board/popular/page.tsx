@@ -10,7 +10,7 @@ interface CustomJwtPayload {
   id: number;
 }
 
-export const revalidate = 300; // 5분 ISR 캐시 (인기글은 자주 변함)
+export const revalidate = 300;
 
 export async function generateMetadata() {
   return {

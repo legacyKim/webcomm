@@ -85,3 +85,27 @@ export const callRevalidateAsync = (tag, path) => {
     console.error("async revalidate error:", error);
   });
 };
+
+/**
+ * 스마트 캐시 무효화 - 활동량 기반 캐시 전략
+ * @param {string} urlSlug - 게시판 URL 슬러그
+ * @param {string} action - 액션 타입 ('post', 'comment', 'like')
+ */
+export const smartRevalidate = async (urlSlug, action = "post") => {
+  const results = [];
+
+  // 1. 즉시 게시판 목록 캐시 무효화 (새 게시글/댓글 반영)
+  results.push(await callRevalidate(null, `/board/${urlSlug}`));
+
+  // 2. 인기 게시판도 함께 무효화 (베스트 반영)
+  if (action === "post" || action === "like") {
+    results.push(await callRevalidateAsync(null, `/board/popular`));
+  }
+
+  // 3. 메인 페이지 캐시도 무효화 (최신 게시글 반영)
+  if (action === "post") {
+    results.push(await callRevalidateAsync(null, `/`));
+  }
+
+  return results.filter(Boolean).length > 0;
+};

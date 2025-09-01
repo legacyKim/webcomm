@@ -8,6 +8,8 @@ import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
 import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 import BoardConManagePopup from "./popup/boardConManagePopup";
 
+import { MagnifyingGlassIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
+
 export default function BoardConManage() {
   const [selectedSlug, setSelectedSlug] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -103,8 +105,8 @@ export default function BoardConManage() {
       </div>
       <div className="admin_content">
         {/* 검색 및 필터 */}
-        <div className="search-filters">
-          <div className="filter-group">
+        <div className="search_filters">
+          <div className="filter_group">
             <select
               value={selectedSlug}
               onChange={(e) => {
@@ -121,7 +123,7 @@ export default function BoardConManage() {
               ))}
             </select>
           </div>
-          <div className="search-group">
+          <div className="search_group">
             <input
               type="text"
               placeholder="제목, 내용, 작성자로 검색..."
@@ -129,27 +131,27 @@ export default function BoardConManage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button onClick={handleSearch} className="search-btn">
-              검색
+            <button onClick={handleSearch} className="search_btn">
+              <MagnifyingGlassIcon className="icon" />
             </button>
-            <button onClick={() => refresh()} className="reset-btn">
-              새로고침
+            <button onClick={() => refresh()} className="reset_btn">
+              <ArrowPathIcon className="icon" />
             </button>
           </div>
         </div>
 
         <ol className="table">
           <li className="table_header">
-            <span className="table_no">No</span>
-            <span className="table_board">게시판</span>
-            <span className="table_title">제목</span>
-            <span className="table_nickname">닉네임</span>
-            <span className="table_views">조회수</span>
-            <span className="table_likes">좋아요</span>
-            <span className="table_dislikes">싫어요</span>
-            <span className="table_reports">신고</span>
-            <span className="table_date">날짜</span>
-            <span className="table_btn">관리</span>
+            <div className="table_no">No</div>
+            <div className="table_board">게시판</div>
+            <div className="table_title">제목</div>
+            <div className="table_nickname">닉네임</div>
+            <div className="table_views">조회수</div>
+            <div className="table_likes">좋아요</div>
+            <div className="table_dislikes">싫어요</div>
+            <div className="table_reports">신고</div>
+            <div className="table_date">등록일</div>
+            <div className="table_btn">관리</div>
           </li>
           {!loading ? (
             <QueryInfiniteScrollContainer
@@ -162,18 +164,36 @@ export default function BoardConManage() {
               onRetry={() => refresh()}
               renderItem={(post: Posts, index: number) => (
                 <li key={post.id}>
-                  <span className="table_no">{index + 1}</span>
-                  <span className="table_board">{post.board_name}</span>
-                  <span className="table_title">{post.title}</span>
-                  <span>{post.user_nickname}</span>
-                  <span>{post.views}</span>
-                  <span>{post.likes}</span>
-                  <span>{post.dislike}</span>
-                  <span>{post.reports}</span>
-                  <span className="table_date">
-                    {new Date(post.created_at).toLocaleDateString()}
-                  </span>
-                  <span className="table_btn">
+                  <div className="table_no">
+                    <span>{index + 1}</span>
+                  </div>
+                  <div className="table_board">
+                    <span>{post.board_name}</span>
+                  </div>
+                  <div className="table_title">
+                    <span>{post.title}</span>
+                  </div>
+                  <div className="table_nickname">
+                    <span>{post.user_nickname}</span>
+                  </div>
+                  <div className="table_views">
+                    <span>{post.views}</span>
+                  </div>
+                  <div className="table_likes">
+                    <span>{post.likes}</span>
+                  </div>
+                  <div className="table_dislikes">
+                    <span>{post.dislike}</span>
+                  </div>
+                  <div className="table_reports">
+                    <span>{post.reports}</span>
+                  </div>
+                  <div className="table_date">
+                    <span>
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="table_btn">
                     <button
                       onClick={() => {
                         setBoardContent(post);
@@ -185,13 +205,16 @@ export default function BoardConManage() {
                     <button onClick={() => handleArchivePost(post.id)}>
                       보관
                     </button>
-                  </span>
+                  </div>
                 </li>
               )}
               emptyMessage="게시물이 없습니다."
             />
           ) : (
-            <li>로딩 중...</li>
+            <div className="loading_spinner_container">
+              <div className="loading_spinner"></div>
+              <p>데이터를 불러오는 중...</p>
+            </div>
           )}
         </ol>
       </div>

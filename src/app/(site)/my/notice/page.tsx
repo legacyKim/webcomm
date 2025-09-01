@@ -129,7 +129,7 @@ export default function MyNotice() {
                 <div className="notification-manager">
                   <div className="notification-controls">
                     <p className="">
-                      마케팅 정보: 새로운 기능, 이벤트, 프로모션 소식을 이메일로
+                      마케팅 정보, 새로운 기능, 이벤트, 프로모션 소식을 이메일로
                       받아보실 수 있습니다.
                     </p>
                     <div className="toggle-container">
@@ -150,7 +150,7 @@ export default function MyNotice() {
 
               {/* 알림 목록은 항상 표시하도록 변경 */}
               <div className="notification-list-section">
-                <NotificationList isUserId={isUserId} limit={50} />
+                <NotificationList isUserId={isUserId} limit={10} />
               </div>
             </div>
           </div>

@@ -10,7 +10,9 @@ import {
   useStatsUpdateMutation,
 } from "@/func/hook/useMutations";
 import RestrictionPopup from "./popup/RestrictionPopup";
-import MemberDetailModal from "./MemberDetailModal";
+import MemberDetailModal from "./popup/MemberDetailModal";
+
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 export default function MemberManage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -197,33 +199,22 @@ export default function MemberManage() {
 
   const renderMember = (member: Member, index: number) => (
     <li key={member.id}>
-      <span>{index + 1}</span>
-      <span
+      <div className="table_no">{index + 1}</div>
+      <div
+        className="table_nickname"
         onClick={() => setMemberDetailModal({ isOpen: true, member })}
-        style={{
-          cursor: "pointer",
-          color: "#007bff",
-          textDecoration: "underline",
-        }}
       >
         {member.userid}
-      </span>
-      <span
-        onClick={() => setMemberDetailModal({ isOpen: true, member })}
-        style={{
-          cursor: "pointer",
-          color: "#007bff",
-          textDecoration: "underline",
-        }}
-      >
+      </div>
+      <div onClick={() => setMemberDetailModal({ isOpen: true, member })}>
         {member.email}
-      </span>
-      <span>{member.all_posts}</span>
-      <span>{member.comment_count || 0}</span>
-      <span className={getAuthorityClass(member.authority)}>
+      </div>
+      <div>{member.all_posts}</div>
+      <div>{member.comment_count || 0}</div>
+      <div className={getAuthorityClass(member.authority)}>
         {getAuthorityText(member.authority)}
-      </span>
-      <span className="member-actions">
+      </div>
+      <div className="table_btn">
         <select
           onChange={(e) =>
             handleAuthorityChange(member.id, parseInt(e.target.value), e.target)
@@ -242,7 +233,7 @@ export default function MemberManage() {
           className="delete-btn"
           disabled={deleteMutation.isPending}
         >
-          {deleteMutation.isPending ? "삭제중..." : "삭제"}
+          {deleteMutation.isPending ? "삭제중..." : "회원 삭제"}
         </button>
         <button
           onClick={() => setRestrictionPopup({ isOpen: true, member })}
@@ -250,7 +241,7 @@ export default function MemberManage() {
         >
           제한설정
         </button>
-      </span>
+      </div>
     </li>
   );
 
@@ -270,8 +261,8 @@ export default function MemberManage() {
 
       <div className="admin_content">
         {/* 검색 및 필터 */}
-        <div className="search-filters">
-          <div className="search-group">
+        <div className="search_filters">
+          <div className="filter_group">
             <select
               value={filterAuthority}
               onChange={(e) => setFilterAuthority(e.target.value)}
@@ -282,7 +273,8 @@ export default function MemberManage() {
               <option value="2">경고회원</option>
               <option value="3">정지회원</option>
             </select>
-
+          </div>
+          <div className="search_group">
             <input
               type="text"
               placeholder="닉네임, 이메일로 검색..."
@@ -290,33 +282,42 @@ export default function MemberManage() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
 
-            <button onClick={handleSearch}>검색</button>
+            <button className="search_btn" onClick={handleSearch}>
+              <MagnifyingGlassIcon className="icon" />
+            </button>
           </div>
         </div>
 
-        <ol className="table">
-          <li className="table_header">
-            <span>No</span>
-            <span>닉네임</span>
-            <span>이메일</span>
-            <span>작성 게시물</span>
-            <span>작성 댓글</span>
-            <span>권한</span>
-            <span>관리</span>
-          </li>
+        {!loading ? (
+          <ol className="table">
+            <li className="table_header">
+              <div className="table_no">No</div>
+              <div className="table_nickname">닉네임</div>
+              <div className="table_email">이메일</div>
+              <div className="table_posts">작성 게시물</div>
+              <div className="table_comments">작성 댓글</div>
+              <div className="table_authority">권한</div>
+              <div className="table_btn">관리</div>
+            </li>
 
-          <QueryInfiniteScrollContainer
-            data={members}
-            loading={loading}
-            loadingMore={loadingMore}
-            hasMore={hasMore}
-            error={error}
-            lastElementRef={lastElementRef}
-            onRetry={() => refresh()}
-            renderItem={renderMember}
-            emptyMessage="회원이 없습니다."
-          />
-        </ol>
+            <QueryInfiniteScrollContainer
+              data={members}
+              loading={loading}
+              loadingMore={loadingMore}
+              hasMore={hasMore}
+              error={error}
+              lastElementRef={lastElementRef}
+              onRetry={() => refresh()}
+              renderItem={renderMember}
+              emptyMessage="회원이 없습니다."
+            />
+          </ol>
+        ) : (
+          <div className="loading_spinner_container">
+            <div className="loading_spinner"></div>
+            <p>데이터를 불러오는 중...</p>
+          </div>
+        )}
       </div>
 
       {/* 제한 설정 팝업 */}

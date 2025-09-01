@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 
 import Link from "next/link";
+import { createTitleSlug } from "@/lib/url-utils";
 
 import { useDropDown } from "@/func/hook/useDropDown";
 import DropDownMenu from "@/components/dropDownMenu";
@@ -47,8 +48,10 @@ const getBoardQueryFn = (boardType: string) => {
     const [url_slug, page, limit, userId] = queryKey;
 
     if (boardType === "popular") {
+      console.log("popular 들어오나?");
       return await fetchBoardPop(page, limit, userId);
     } else if (boardType === "userPost") {
+      console.log("이건 쓰일텐데?");
       return await fetchUserPostData(url_slug, page, limit);
     } else if (boardType === "userComment") {
       return await fetchUserCommentData(url_slug, page, limit);
@@ -129,13 +132,13 @@ export default function Boardlist({
         {isLoading ? (
           <div className="loading_spinner_container">
             <div className="loading_spinner"></div>
-            <p>게시글을 불러오는 중...</p>
+            <p>데이터를 불러오는 중...</p>
           </div>
         ) : postData?.posts?.length > 0 ? (
           postData?.posts.map((b: Posts) => (
             <li key={`${b.url_slug}_${b.id}`}>
               <Link
-                href={`/board/${boardType === "popular" ? "popular" : url_slug}/${b.id}/?${new URLSearchParams(
+                href={`/board/${boardType === "popular" ? "popular" : url_slug}/${createTitleSlug(b.title, b.id)}?${new URLSearchParams(
                   {
                     page: String(page),
                   }

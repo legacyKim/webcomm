@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import pool from "@/db/db";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { serverTokenCheck } from "@/lib/serverTokenCheck";
-import { revalidatePost } from "@/lib/revalidate";
+import { revalidatePost, smartRevalidate } from "@/lib/revalidate";
 
 const s3 = new S3Client({
   region: process.env.AWS_REGION,
@@ -163,9 +163,10 @@ export async function POST(req) {
       [user_id]
     );
 
-    // 게시물 생성 후 캐시 무효화
+    // 게시물 생성 후 스마트 캐시 무효화
     const postId = result.rows[0].id;
     await revalidatePost(postId, url_slug, "create");
+    await smartRevalidate(url_slug, "post");
 
     return NextResponse.json(
       { success: true, data: result.rows[0] },

@@ -109,6 +109,8 @@
     0 0px 7px 0 rgba(0, 0, 0, 0.1), 0 1.5px 3px 0 rgba(0, 0, 0, 0.14);
   --box-shadow3:
     0px 0px 10px 2px rgba(0, 0, 0, 0.22), 0 1.5px 8px 0 rgba(0, 0, 0, 0.14);
+  --box-shadow4:
+    0px 1px 1px 0px rgba(0, 0, 0, 0.02), 0 1.5px 8px 0 rgba(0, 0, 0, 0.04);
 }
 
 // Dark mode
@@ -179,6 +181,8 @@
     0 0px 7px 0 rgba(0, 0, 0, 0.4), 0 1.5px 3px 0 rgba(0, 0, 0, 0.5);
   --box-shadow3:
     0px 0px 10px 2px rgba(66, 66, 66, 0.6), 0 1.5px 8px 0 rgba(0, 0, 0, 0.5);
+  --box-shadow4:
+    0px 1px 1px 2px rgba(0, 0, 0, 0.22), 0 1.5px 8px 0 rgba(0, 0, 0, 0.14);
 }
 
 $red-color: rgb(255, 122, 122);
@@ -224,6 +228,7 @@ $search-border-grey: var(--search-border-grey);
 $box-shadow: var(--box-shadow) !important;
 $box-shadow2: var(--box-shadow2) !important;
 $box-shadow3: var(--box-shadow3) !important;
+$box-shadow4: var(--box-shadow4) !important;
 
 $header-bg: var(--header-bg-color);
 $bg-color: var(--bg-color);

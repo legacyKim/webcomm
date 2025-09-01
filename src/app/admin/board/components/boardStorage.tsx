@@ -7,11 +7,16 @@ import { fetchBoard } from "@/api/api";
 import { useInfiniteScrollQuery } from "@/func/hook/useInfiniteQuery";
 import { QueryInfiniteScrollContainer } from "@/components/QueryComponents";
 import formatPostDate from "@/components/formatDate";
-import TiptapViewer from "@/components/tiptapViewer";
+import BoardConManagePopup from "./popup/boardConManagePopup";
+
+import { MagnifyingGlassIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 
 export default function BoardConManage() {
   const [selectedBoard, setSelectedBoard] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const [popupOpen, setPopupOpen] = useState<boolean>(false);
+  const [boardContent, setBoardContent] = useState<Posts | null>(null);
 
   const { data: boardData } = useQuery({
     queryKey: ["boardData"],
@@ -23,7 +28,9 @@ export default function BoardConManage() {
     // url_slug를 통해 board_name 찾기
     let boardName = "";
     if (selectedBoard) {
-      const selectedBoardData = boardData?.boards?.find((b: Board) => b.url_slug === selectedBoard);
+      const selectedBoardData = boardData?.boards?.find(
+        (b: Board) => b.url_slug === selectedBoard
+      );
       boardName = selectedBoardData?.board_name || "";
     }
 
@@ -101,7 +108,12 @@ export default function BoardConManage() {
 
   // 게시물 완전 삭제
   const handlePermanentDelete = async (postId: number) => {
-    if (!confirm("이 게시물을 완전히 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.")) return;
+    if (
+      !confirm(
+        "이 게시물을 완전히 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+      )
+    )
+      return;
 
     try {
       const response = await fetch(`/api/admin/posts/delete`, {
@@ -125,22 +137,23 @@ export default function BoardConManage() {
   };
 
   return (
-    <div className='admin_content_wrap'>
-      <div className='admin_title'>
-        <h4>게시글 보관</h4>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
+        <h4>게시글 보관 관리</h4>
       </div>
-      <div className='admin_content'>
+      <div className="admin_content">
         {/* 검색 및 필터 */}
-        <div className='search-filters'>
-          <div className='filter-group'>
+        <div className="search_filters">
+          <div className="filter_group">
             <select
               value={selectedBoard}
               onChange={(e) => {
                 setSelectedBoard(e.target.value);
                 // 게시판 선택 시 즉시 새로고침
                 setTimeout(() => refresh(), 0);
-              }}>
-              <option value=''>전체 게시판</option>
+              }}
+            >
+              <option value="">전체 게시판</option>
               {boardData?.boards?.map((b: Board) => (
                 <option key={b.id} value={b.url_slug}>
                   {b.board_name}
@@ -148,73 +161,113 @@ export default function BoardConManage() {
               ))}
             </select>
           </div>
-          <div className='search-group'>
+
+          <div className="search_group">
             <input
-              type='text'
-              placeholder='제목, 내용, 작성자로 검색...'
+              type="text"
+              placeholder="제목, 내용, 작성자로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button onClick={handleSearch} className='search-btn'>
-              검색
+            <button onClick={handleSearch} className="search_btn">
+              <MagnifyingGlassIcon className="icon" />
             </button>
-            <button onClick={() => refresh()} className='reset-btn'>
-              새로고침
+            <button onClick={() => refresh()} className="reset_btn">
+              <ArrowPathIcon className="icon" />
             </button>
           </div>
         </div>
 
-        <ol className='table'>
-          <li className='table_header'>
-            <span>No</span>
-            <span className='table_board'>게시판</span>
-            <span className='table_title'>제목</span>
-            <span className='table_content'>내용</span>
-            <span>작성자</span>
-            <span>조회수</span>
-            <span>좋아요</span>
-            <span>싫어요</span>
-            <span>신고</span>
-            <span className='table_date'>날짜</span>
-            <span className='table_btn'>관리</span>
-          </li>
-
-          <QueryInfiniteScrollContainer
-            data={posts}
-            loading={loading}
-            loadingMore={loadingMore}
-            hasMore={hasMore}
-            error={error}
-            lastElementRef={lastElementRef}
-            onRetry={() => refresh()}
-            renderItem={(post: Posts, index: number) => (
-              <li key={post.id}>
-                <span>{index + 1}</span>
-                <span className='table_board'>{post.board_name}</span>
-                <span className='table_title'>{post.title}</span>
-
-                <span className='table_content'>
-                  <TiptapViewer content={post.content.substring(0, 50)} />
-                </span>
-                <span>{post.user_nickname}</span>
-                <span>{post.views}</span>
-                <span>{post.likes}</span>
-                <span>{post.dislike}</span>
-                <span>{post.reports}</span>
-                <span className='table_date'>{formatPostDate(post.created_at)}</span>
-                <span className='table_btn'>
-                  <button onClick={() => handleRestorePost(post.id)}>복구</button>
-                  <button onClick={() => handlePermanentDelete(post.id)} className='delete-btn'>
-                    완전삭제
-                  </button>
-                </span>
-              </li>
-            )}
-            emptyMessage='보관된 게시물이 없습니다.'
-          />
-        </ol>
+        {!loading ? (
+          <ol className="table">
+            <li className="table_header">
+              <div className="table_no">No</div>
+              <div className="table_board">게시판</div>
+              <div className="table_title">제목</div>
+              <div className="table_nickname">작성자</div>
+              <div>조회수</div>
+              <div>좋아요</div>
+              <div>싫어요</div>
+              <div>신고</div>
+              <div className="table_date">날짜</div>
+              <div className="table_btn">관리</div>
+            </li>
+            <QueryInfiniteScrollContainer
+              data={posts}
+              loading={loading}
+              loadingMore={loadingMore}
+              hasMore={hasMore}
+              error={error}
+              lastElementRef={lastElementRef}
+              onRetry={() => refresh()}
+              renderItem={(post: Posts, index: number) => (
+                <li key={post.id}>
+                  <div className="table_no">
+                    <span>{index + 1}</span>
+                  </div>
+                  <div className="table_board">
+                    <span>{post.board_name}</span>
+                  </div>
+                  <div className="table_title">
+                    <span>{post.title}</span>
+                  </div>
+                  <div className="table_nickname">
+                    <span>{post.user_nickname}</span>
+                  </div>
+                  <div>
+                    <span>{post.views}</span>
+                  </div>
+                  <div>
+                    <span>{post.likes}</span>
+                  </div>
+                  <div>
+                    <span>{post.dislike}</span>
+                  </div>
+                  <div>
+                    <span>{post.reports}</span>
+                  </div>
+                  <div className="table_date">
+                    <span>{formatPostDate(post.created_at)}</span>
+                  </div>
+                  <div className="table_btn">
+                    <button
+                      onClick={() => {
+                        setBoardContent(post);
+                        setPopupOpen(true);
+                      }}
+                    >
+                      보기
+                    </button>
+                    <button onClick={() => handleRestorePost(post.id)}>
+                      복구
+                    </button>
+                    <button
+                      onClick={() => handlePermanentDelete(post.id)}
+                      className="delete-btn"
+                    >
+                      완전삭제
+                    </button>
+                  </div>
+                </li>
+              )}
+              emptyMessage="보관된 게시물이 없습니다."
+            />
+          </ol>
+        ) : (
+          <div className="loading_spinner_container">
+            <div className="loading_spinner"></div>
+            <p>데이터를 불러오는 중...</p>
+          </div>
+        )}
       </div>
+
+      {popupOpen && (
+        <BoardConManagePopup
+          boardContent={boardContent}
+          setPopupOpen={setPopupOpen}
+        />
+      )}
     </div>
   );
 }

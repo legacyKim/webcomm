@@ -49,8 +49,8 @@ export default function Menu() {
 
   return (
     <>
-      <div className="menu">
-        <div className="menu_list ">
+      <div className="menu ">
+        <div className="menu_list page">
           <div className="menu_list_top page">
             {/* 메인 메뉴 표시 */}
             <div className="menu_list_main">
@@ -78,35 +78,35 @@ export default function Menu() {
               </div>
             )}
           </div>
+        </div>
 
-          <div
-            className={`menu_custom_dropdown ${showToggleMenu ? "active" : ""}`}
-          >
-            <div className="menu_list page">
-              {normalMenus.map((board) => (
-                <Link
-                  key={board.id}
-                  href={`/board/${board.url_slug}`}
-                  className={
-                    pathname === `/board/${board.url_slug}` ? "active" : ""
-                  }
-                  onClick={() => setShowToggleMenu(false)}
-                >
-                  {board.board_name}
-                </Link>
-              ))}
-            </div>
-            <div className="board_recommend page">
-              <span className="notice">게시판을 추천해 주세요!</span>
-              <button
-                className="btn"
-                onClick={() => {
-                  setBoardRecommendPopup(!boardRecommendPopup);
-                }}
+        <div
+          className={`menu_custom_dropdown ${showToggleMenu ? "active" : ""}`}
+        >
+          <div className="menu_list page">
+            {normalMenus.map((board) => (
+              <Link
+                key={board.id}
+                href={`/board/${board.url_slug}`}
+                className={
+                  pathname === `/board/${board.url_slug}` ? "active" : ""
+                }
+                onClick={() => setShowToggleMenu(false)}
               >
-                게시판 추천
-              </button>
-            </div>
+                {board.board_name}
+              </Link>
+            ))}
+          </div>
+          <div className="board_recommend page">
+            <span className="notice">게시판을 추천해 주세요!</span>
+            <button
+              className="btn"
+              onClick={() => {
+                setBoardRecommendPopup(!boardRecommendPopup);
+              }}
+            >
+              게시판 추천
+            </button>
           </div>
         </div>
       </div>

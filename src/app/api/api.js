@@ -205,10 +205,15 @@ export const fetchPost = async (url_slug) => {
   }
 };
 
-// 게시물 상세 조회
-export default async function fetchPostDetail(url_slug, id, userId = null) {
+// 게시물 상세 조회 - title 기반 라우팅 지원
+export default async function fetchPostDetail(
+  url_slug,
+  titleSlug,
+  userId = null
+) {
   try {
-    let url = `${baseUrl}/api/post/${url_slug}/${id}`;
+    // 🚀 title 파라미터를 받아서 API 호출
+    let url = `${baseUrl}/api/post/${url_slug}/${titleSlug}`;
     if (userId !== null && userId !== undefined) {
       url += `?userId=${userId}`;
     }
@@ -216,13 +221,18 @@ export default async function fetchPostDetail(url_slug, id, userId = null) {
     const response = await fetch(url, {
       next: {
         revalidate: 60 * 60 * 24, // 24 hours
-        tags: [`post-${id}`], // 캐시 무효화 태그
+        tags: [`post-${titleSlug}`], // 캐시 무효화 태그를 title로 변경
       },
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const data = await response.json();
     return data;
   } catch (err) {
-    console.error(err);
+    console.error("fetchPostDetail error:", err);
     return {
       post: null,
       comments: [],

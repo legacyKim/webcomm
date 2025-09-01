@@ -168,8 +168,6 @@ export default function CommentTree({
   const commentUpdate = async (commentContent: string, id: number) => {
     const comment = commentContent.trim();
 
-    console.log("댓글 수정 시도:", { commentContent, id, trimmed: comment });
-
     if (comment === "") {
       alert("댓글 내용을 입력해주세요.");
       return;
@@ -182,8 +180,6 @@ export default function CommentTree({
         comment,
         id,
       });
-
-      console.log("댓글 수정 응답:", response.data);
 
       if (response.data.success) {
         // 로컬 상태 즉시 업데이트 (낙관적 업데이트)
@@ -502,18 +498,11 @@ export default function CommentTree({
                         <>
                           <button
                             onClick={() => {
-                              console.log("수정 버튼 클릭:", {
-                                commentId: comment.id,
-                                originalContent: comment.content,
-                              });
-
                               setCommentAdd?.(null);
                               setCommentCorrect?.({
                                 content: comment.content,
                                 id: comment.id,
                               });
-
-                              console.log("commentCorrect 설정 완료");
                             }}
                           >
                             <span>수정</span>
@@ -553,13 +542,6 @@ export default function CommentTree({
                           : ""
                       }
                       onChange={(html: string) => {
-                        console.log("CommentEditor onChange:", {
-                          html: html.substring(0, 50) + "...",
-                          isEditingComment,
-                          isRecomment,
-                          commentId: comment.id,
-                        });
-
                         if (isEditingComment) {
                           // 수정 중일 때는 commentCorrect 상태 업데이트
                           setCommentCorrect?.((prev) =>
@@ -606,10 +588,7 @@ export default function CommentTree({
                             onClick={() => {
                               const contentToUpdate =
                                 commentCorrect?.content ?? "";
-                              console.log("댓글 수정 버튼 클릭:", {
-                                contentToUpdate,
-                                commentId: comment.id,
-                              });
+
                               commentUpdate(contentToUpdate, comment.id);
                             }}
                           >

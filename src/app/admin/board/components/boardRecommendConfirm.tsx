@@ -4,29 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import Image from "next/image";
 
-interface BoardRecommendation {
-  id: number;
-  board_name: string;
-  reason: string | null;
-  status: "pending" | "approved" | "rejected";
-  admin_response: string | null;
-  created_at: string;
-  updated_at: string;
-  user: {
-    id: number;
-    username: string;
-    user_nickname: string;
-    profile: string | null;
-  };
-}
+import BoardRecommendPopup from "./popup/boardRecommentPopup";
 
-interface PaginationData {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
-  limit: number;
-  hasMore: boolean;
-}
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+
+import { BoardRecommendation, PaginationData } from "@/type/adminType";
 
 export default function BoardRecommendConfirm() {
   const [recommendations, setRecommendations] = useState<BoardRecommendation[]>(
@@ -44,8 +26,9 @@ export default function BoardRecommendConfirm() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecommendation, setSelectedRecommendation] =
     useState<BoardRecommendation | null>(null);
+
   const [adminResponse, setAdminResponse] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
 
   // 게시판 추천 목록 조회
   const fetchRecommendations = useCallback(
@@ -135,7 +118,7 @@ export default function BoardRecommendConfirm() {
           )
         );
         alert("상태가 업데이트되었습니다.");
-        setIsModalOpen(false);
+        setPopupOpen(false);
         setSelectedRecommendation(null);
         setAdminResponse("");
       }
@@ -149,7 +132,7 @@ export default function BoardRecommendConfirm() {
   const openModal = (recommendation: BoardRecommendation) => {
     setSelectedRecommendation(recommendation);
     setAdminResponse(recommendation.admin_response || "");
-    setIsModalOpen(true);
+    setPopupOpen(true);
   };
 
   // 날짜 포맷팅
@@ -192,220 +175,138 @@ export default function BoardRecommendConfirm() {
   };
 
   return (
-    <div className="board_recommend_confirm">
-      <div className="admin_header">
-        <h2>게시판 추천 관리</h2>
-        <div className="total_count">총 {pagination.totalCount}건</div>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
+        <h4>게시판 추천 관리</h4>
       </div>
 
-      {/* 필터 및 검색 */}
-      <div className="filter_section">
-        <div className="filter_group">
-          <label htmlFor="statusFilter">상태 필터:</label>
-          <select
-            id="statusFilter"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">전체</option>
-            <option value="pending">대기</option>
-            <option value="approved">승인</option>
-            <option value="rejected">거부</option>
-          </select>
-        </div>
+      <div className="admin_content">
+        {/* 필터 및 검색 */}
+        <div className="search_filters">
+          <div className="filter_group">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              <option value="all">전체</option>
+              <option value="pending">대기</option>
+              <option value="approved">승인</option>
+              <option value="rejected">거부</option>
+            </select>
+          </div>
 
-        <div className="search_group">
-          <input
-            type="text"
-            placeholder="게시판명 또는 사용자명으로 검색"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                fetchRecommendations(1, true);
-              }
-            }}
-          />
-          <button onClick={() => fetchRecommendations(1, true)}>검색</button>
+          <div className="search_group">
+            <input
+              type="text"
+              placeholder="게시판명 또는 사용자명으로 검색"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  fetchRecommendations(1, true);
+                }
+              }}
+            />
+            <button
+              onClick={() => fetchRecommendations(1, true)}
+              className="search_btn"
+            >
+              <MagnifyingGlassIcon className="icon" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 게시판 추천 목록 테이블 */}
-      <div className="table_container">
-        <table className="admin_table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>추천자</th>
-              <th>게시판명</th>
-              <th>추천사유</th>
-              <th>상태</th>
-              <th>등록일</th>
-              <th>액션</th>
-            </tr>
-          </thead>
-          <tbody>
-            {recommendations.map((recommendation) => (
-              <tr key={recommendation.id}>
-                <td>{recommendation.id}</td>
-                <td>
-                  <div className="user_info">
-                    <Image
-                      src={recommendation.user.profile || "/profile/basic.png"}
-                      alt="프로필"
-                      width={32}
-                      height={32}
-                      className="user_avatar"
-                    />
-                    <div>
-                      <div className="user_nickname">
-                        {recommendation.user.user_nickname}
-                      </div>
-                      <div className="username">
-                        @{recommendation.user.username}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <strong>{recommendation.board_name}</strong>
-                </td>
-                <td>
-                  <div className="reason_cell">
-                    {recommendation.reason ? (
-                      recommendation.reason.length > 50 ? (
-                        <span title={recommendation.reason}>
-                          {recommendation.reason.substring(0, 50)}...
-                        </span>
-                      ) : (
-                        recommendation.reason
-                      )
-                    ) : (
-                      <span className="no_reason">사유 없음</span>
-                    )}
-                  </div>
-                </td>
-                <td>
-                  <span
-                    className={`status_badge ${getStatusStyle(recommendation.status)}`}
-                  >
-                    {getStatusText(recommendation.status)}
-                  </span>
-                </td>
-                <td>{formatDate(recommendation.created_at)}</td>
-                <td>
-                  <button
-                    className="btn_action"
-                    onClick={() => openModal(recommendation)}
-                  >
-                    처리
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
 
-        {loading && (
-          <div className="loading_container">
-            <div className="loading_spinner"></div>
-            <p>데이터를 불러오는 중...</p>
-          </div>
-        )}
-
-        {!loading && recommendations.length === 0 && (
-          <div className="empty_state">
-            <p>게시판 추천이 없습니다.</p>
-          </div>
-        )}
-      </div>
-
-      {/* 처리 모달 */}
-      {isModalOpen && selectedRecommendation && (
-        <div className="modal_overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal_container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal_header">
-              <h3>게시판 추천 처리</h3>
-              <button
-                className="close_btn"
-                onClick={() => setIsModalOpen(false)}
-              >
-                ×
-              </button>
+      {!loading ? (
+        <ol className="table">
+          <li className="table_header">
+            <div className="table_no">No</div>
+            <div className="table_nickname table_nickname_recommend">
+              추천자
             </div>
-
-            <div className="modal_content">
-              <div className="recommendation_info">
-                <h4>추천 정보</h4>
-                <div className="info_grid">
-                  <div className="info_item">
-                    <label>추천자:</label>
-                    <span>
-                      {selectedRecommendation.user.user_nickname} (@
-                      {selectedRecommendation.user.username})
-                    </span>
-                  </div>
-                  <div className="info_item">
-                    <label>게시판명:</label>
-                    <span>{selectedRecommendation.board_name}</span>
-                  </div>
-                  <div className="info_item">
-                    <label>추천사유:</label>
-                    <span>{selectedRecommendation.reason || "사유 없음"}</span>
-                  </div>
-                  <div className="info_item">
-                    <label>등록일:</label>
-                    <span>{formatDate(selectedRecommendation.created_at)}</span>
-                  </div>
+            <div className="table_board">게시판명</div>
+            <div className="table_reason">추천사유</div>
+            <div className="table_status">상태</div>
+            <div className="table_date">등록일</div>
+            <div className="table_btn">액션</div>
+          </li>
+          {recommendations.map((recommendation) => (
+            <li key={recommendation.id}>
+              <div className="table_no">
+                <span>{recommendation.id}</span>
+              </div>
+              <div className="table_nickname table_nickname_recommend">
+                <div>
+                  <Image
+                    src={recommendation.user.profile || "/profile/basic.png"}
+                    alt="프로필"
+                    width={32}
+                    height={32}
+                    className="user_avatar"
+                  />
+                  <span>{recommendation.user.user_nickname}</span>
                 </div>
               </div>
-
-              <div className="admin_response_section">
-                <label htmlFor="adminResponse">관리자 응답:</label>
-                <textarea
-                  id="adminResponse"
-                  value={adminResponse}
-                  onChange={(e) => setAdminResponse(e.target.value)}
-                  placeholder="처리 결과에 대한 응답을 입력하세요 (선택사항)"
-                  rows={4}
-                />
+              <div className="table_board">
+                <span>{recommendation.board_name}</span>
               </div>
-
-              <div className="modal_actions">
+              <div className="table_reason">
+                {recommendation.reason ? (
+                  recommendation.reason.length > 50 ? (
+                    <span title={recommendation.reason}>
+                      {recommendation.reason.substring(0, 50)}...
+                    </span>
+                  ) : (
+                    <span>{recommendation.reason}</span>
+                  )
+                ) : (
+                  <span className="no_reason">사유 없음</span>
+                )}
+              </div>
+              <div
+                className={`table_status ${getStatusStyle(recommendation.status)}`}
+              >
+                <span>{getStatusText(recommendation.status)}</span>
+              </div>
+              <div className="table_date">
+                <span>{formatDate(recommendation.created_at)}</span>
+              </div>
+              <div className="table_btn">
                 <button
-                  className="btn_approve"
-                  onClick={() =>
-                    updateStatus(
-                      selectedRecommendation.id,
-                      "approved",
-                      adminResponse
-                    )
-                  }
+                  className="btn_action"
+                  onClick={() => openModal(recommendation)}
                 >
-                  승인
-                </button>
-                <button
-                  className="btn_reject"
-                  onClick={() =>
-                    updateStatus(
-                      selectedRecommendation.id,
-                      "rejected",
-                      adminResponse
-                    )
-                  }
-                >
-                  거부
-                </button>
-                <button
-                  className="btn_cancel"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  취소
+                  처리
                 </button>
               </div>
+            </li>
+          ))}
+
+          {!loading && recommendations.length === 0 && (
+            <div className="empty_state">
+              <p>게시판 추천이 없습니다.</p>
             </div>
-          </div>
+          )}
+        </ol>
+      ) : (
+        <div className="loading_spinner_container">
+          <div className="loading_spinner"></div>
+          <p>데이터를 불러오는 중...</p>
         </div>
+      )}
+
+      {/* 처리 모달 */}
+      {popupOpen && selectedRecommendation && (
+        <BoardRecommendPopup
+          recommendation={selectedRecommendation}
+          adminResponse={adminResponse}
+          setPopupOpen={() => setPopupOpen(false)}
+          setAdminResponse={(response) => setAdminResponse(response)}
+          updateStatus={updateStatus}
+          formatDate={formatDate}
+        />
       )}
     </div>
   );

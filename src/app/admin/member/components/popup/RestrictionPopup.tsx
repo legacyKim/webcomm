@@ -13,10 +13,17 @@ interface RestrictionPopupProps {
   onSuccess: (memberId: number, restrictionUntil: string | null) => void;
 }
 
-export default function RestrictionPopup({ member, isOpen, onClose, onSuccess }: RestrictionPopupProps) {
+export default function RestrictionPopup({
+  member,
+  isOpen,
+  onClose,
+  onSuccess,
+}: RestrictionPopupProps) {
   const [restrictionDays, setRestrictionDays] = useState<number>(7);
   const [customDate, setCustomDate] = useState<string>("");
-  const [restrictionType, setRestrictionType] = useState<"days" | "custom" | "remove">("days");
+  const [restrictionType, setRestrictionType] = useState<
+    "days" | "custom" | "remove"
+  >("days");
 
   if (!isOpen) return null;
 
@@ -53,24 +60,26 @@ export default function RestrictionPopup({ member, isOpen, onClose, onSuccess }:
       }
     } catch (error) {
       console.error("제한 설정 오류:", error);
-      alert(`제한 설정 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`);
+      alert(
+        `제한 설정 중 오류가 발생했습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`
+      );
     }
   };
 
   return (
-    <div className='admin_popup_bg'>
-      <div className='admin_popup admin_popup_mo'>
-        <div className='admin_popup_header'>
+    <div className="admin_popup_bg">
+      <div className="admin_popup admin_popup_mo">
+        <div className="admin_popup_header">
           <h6>{member.user_nickname} 회원 제한 설정</h6>
         </div>
 
-        <div className='admin_popup_content'>
-          <div className='restriction-options'>
+        <div className="admin_popup_content">
+          <div className="restriction-options">
             <label>
               <input
-                type='radio'
-                name='restrictionType'
-                value='days'
+                type="radio"
+                name="restrictionType"
+                value="days"
                 checked={restrictionType === "days"}
                 onChange={(e) => setRestrictionType(e.target.value as "days")}
               />
@@ -78,11 +87,11 @@ export default function RestrictionPopup({ member, isOpen, onClose, onSuccess }:
             </label>
 
             {restrictionType === "days" && (
-              <div className='days-input'>
+              <div className="days-input">
                 <input
-                  type='number'
-                  min='1'
-                  max='365'
+                  type="number"
+                  min="1"
+                  max="365"
                   value={restrictionDays}
                   onChange={(e) => setRestrictionDays(parseInt(e.target.value))}
                 />
@@ -92,9 +101,9 @@ export default function RestrictionPopup({ member, isOpen, onClose, onSuccess }:
 
             <label>
               <input
-                type='radio'
-                name='restrictionType'
-                value='custom'
+                type="radio"
+                name="restrictionType"
+                value="custom"
                 checked={restrictionType === "custom"}
                 onChange={(e) => setRestrictionType(e.target.value as "custom")}
               />
@@ -102,14 +111,18 @@ export default function RestrictionPopup({ member, isOpen, onClose, onSuccess }:
             </label>
 
             {restrictionType === "custom" && (
-              <input type='datetime-local' value={customDate} onChange={(e) => setCustomDate(e.target.value)} />
+              <input
+                type="datetime-local"
+                value={customDate}
+                onChange={(e) => setCustomDate(e.target.value)}
+              />
             )}
 
             <label>
               <input
-                type='radio'
-                name='restrictionType'
-                value='remove'
+                type="radio"
+                name="restrictionType"
+                value="remove"
                 checked={restrictionType === "remove"}
                 onChange={(e) => setRestrictionType(e.target.value as "remove")}
               />
@@ -118,7 +131,7 @@ export default function RestrictionPopup({ member, isOpen, onClose, onSuccess }:
           </div>
         </div>
 
-        <div className='admin_popup_footer'>
+        <div className="admin_popup_footer">
           <button onClick={handleSubmit}>적용</button>
           <button onClick={onClose}>취소</button>
         </div>

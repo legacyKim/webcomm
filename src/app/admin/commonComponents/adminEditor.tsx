@@ -55,16 +55,7 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
   return (
     <div className="admin-tiptap-editor">
       {/* 툴바 */}
-      <div
-        className="editor-toolbar"
-        style={{
-          display: "flex",
-          gap: "8px",
-          padding: "12px",
-          borderBottom: "1px solid #e0e0e0",
-          backgroundColor: "#f9f9f9",
-        }}
-      >
+      <div className="editor-toolbar">
         {/* 헤딩 */}
         <select
           onChange={(e) => {
@@ -79,11 +70,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
                 .run();
             }
           }}
-          style={{
-            padding: "4px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-          }}
         >
           <option value="0">본문</option>
           <option value="1">제목 1</option>
@@ -95,13 +81,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive("bold") ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive("bold") ? "#007bff" : "white",
-            color: editor.isActive("bold") ? "white" : "black",
-          }}
         >
           <BoldIcon className="icon" />
         </button>
@@ -110,13 +89,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={editor.isActive("italic") ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive("italic") ? "#007bff" : "white",
-            color: editor.isActive("italic") ? "white" : "black",
-          }}
         >
           <ItalicIcon className="icon" />
         </button>
@@ -125,13 +97,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           className={editor.isActive("underline") ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive("underline") ? "#007bff" : "white",
-            color: editor.isActive("underline") ? "white" : "black",
-          }}
         >
           <UnderlineIcon className="icon" />
         </button>
@@ -140,13 +105,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().toggleHighlight().run()}
           className={editor.isActive("highlight") ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive("highlight") ? "#007bff" : "white",
-            color: editor.isActive("highlight") ? "white" : "black",
-          }}
         >
           <PaintBrushIcon className="icon" />
         </button>
@@ -155,15 +113,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
           className={editor.isActive({ textAlign: "left" }) ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive({ textAlign: "left" })
-              ? "#007bff"
-              : "white",
-            color: editor.isActive({ textAlign: "left" }) ? "white" : "black",
-          }}
         >
           <Bars3BottomLeftIcon className="icon" />
         </button>
@@ -173,15 +122,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
           className={
             editor.isActive({ textAlign: "center" }) ? "is-active" : ""
           }
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive({ textAlign: "center" })
-              ? "#007bff"
-              : "white",
-            color: editor.isActive({ textAlign: "center" }) ? "white" : "black",
-          }}
         >
           <Bars3BottomCenterIcon className="icon" />
         </button>
@@ -189,15 +129,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
           className={editor.isActive({ textAlign: "right" }) ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive({ textAlign: "right" })
-              ? "#007bff"
-              : "white",
-            color: editor.isActive({ textAlign: "right" }) ? "white" : "black",
-          }}
         >
           <Bars3BottomRightIcon className="icon" />
         </button>
@@ -206,15 +137,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           className={editor.isActive("bulletList") ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive("bulletList")
-              ? "#007bff"
-              : "white",
-            color: editor.isActive("bulletList") ? "white" : "black",
-          }}
         >
           • 목록
         </button>
@@ -222,15 +144,6 @@ export default function TiptapEditor({ content, onChange }: TiptapEditorProps) {
         <button
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           className={editor.isActive("orderedList") ? "is-active" : ""}
-          style={{
-            padding: "6px",
-            border: "1px solid #ccc",
-            borderRadius: "4px",
-            backgroundColor: editor.isActive("orderedList")
-              ? "#007bff"
-              : "white",
-            color: editor.isActive("orderedList") ? "white" : "black",
-          }}
         >
           1. 목록
         </button>

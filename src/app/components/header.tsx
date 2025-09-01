@@ -233,12 +233,19 @@ export default function Header() {
 
     const fetchNotifications = async () => {
       try {
-        const limit = 10;
-        const { data } = await axios.get(`/api/notifications?limit=${limit}`);
-        setNotifications(data);
+        const limit = 5;
+        const currentPage = 1;
+        const { data } = await axios.get(
+          `/api/notifications?limit=${limit}&page=${currentPage}`
+        );
+
+        // 새로운 API 응답 구조에 맞게 수정
+        setNotifications(data.notifications || []);
 
         // 읽지 않은 알림 수 계산
-        const unreadCount = data.filter((n: Notification) => !n.is_read).length;
+        const unreadCount = (data.notifications || []).filter(
+          (n: Notification) => !n.is_read
+        ).length;
         setUnreadCount(unreadCount);
       } catch (err) {
         console.error("알림 가져오기 실패:", err);
@@ -290,9 +297,13 @@ export default function Header() {
       try {
         const limit = 10;
         const { data } = await axios.get(`/api/notifications?limit=${limit}`);
-        setNotifications(data);
 
-        const unreadCount = data.filter((n: Notification) => !n.is_read).length;
+        // 새로운 API 응답 구조에 맞게 수정
+        setNotifications(data.notifications || []);
+
+        const unreadCount = (data.notifications || []).filter(
+          (n: Notification) => !n.is_read
+        ).length;
         setUnreadCount(unreadCount);
       } catch (err) {
         console.error("알림 가져오기 실패:", err);
@@ -309,7 +320,7 @@ export default function Header() {
         prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
-      
+
       // 알림 상태 업데이트 후 페이지 이동
       setMessageBox(false);
       router.push(link);

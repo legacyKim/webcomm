@@ -4,10 +4,12 @@ import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 
 // Dynamic import to avoid SSR issues
-const TiptapEditor = dynamic(() => import("../adminEditor"), {
-  ssr: false,
-  loading: () => <p>에디터 로딩 중...</p>,
-});
+const TiptapEditor = dynamic(
+  () => import("@/admin/commonComponents/adminEditor"),
+  {
+    ssr: false,
+  }
+);
 
 const CommUseTerm: React.FC = () => {
   const [content, setContent] = useState<string>("");
@@ -77,30 +79,28 @@ const CommUseTerm: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return <div>로딩 중...</div>;
-  }
-
   return (
-    <div className='admin_content_wrap'>
-      <div className='admin_title'>
-        <h4 className=''>이용약관 관리</h4>
+    <div className="admin_content_wrap">
+      <div className="admin_title">
+        <h4 className="">이용약관 관리</h4>
 
-        <div className='admin_btn_wrap'>
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50'>
+        <div className="admin_btn">
+          <button onClick={handleSave} disabled={isSaving}>
             {isSaving ? "저장 중..." : "저장"}
           </button>
 
-          <button onClick={handlePreview} className='px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600'>
-            미리보기
-          </button>
+          <button onClick={handlePreview}>미리보기</button>
         </div>
       </div>
 
-      <TiptapEditor content={content} onChange={setContent} />
+      {isLoading ? (
+        <div className="loading_spinner_container">
+          <div className="loading_spinner"></div>
+          <p>데이터를 불러오는 중...</p>
+        </div>
+      ) : (
+        <TiptapEditor content={content} onChange={setContent} />
+      )}
     </div>
   );
 };

@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useDropDown } from "@/func/hook/useDropDown";
 import DropDownMenu from "@/components/dropDownMenu";
 import formatPostDate from "@/components/formatDate";
+import { createTitleSlug } from "@/lib/url-utils";
 
 // import { fetchHome } from "@/api/api";
 
@@ -126,7 +127,11 @@ export default function Home({
                 popBoardposts?.posts.map((post: Posts) => (
                   <li key={post.id}>
                     <Link
-                      href={`/board/popular/${post.id}`}
+                      href={`/board/popular/${createTitleSlug(post.title, post.id)}?${new URLSearchParams(
+                        {
+                          page: String(1),
+                        }
+                      )}`}
                       // onClick={() => setBoardType("popular")}
                     >
                       <div className="title">

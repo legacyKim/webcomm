@@ -5,8 +5,6 @@ import jwt from "jsonwebtoken";
 
 import { UserProfile, UserActivity } from "@/type/type";
 
-// 사용자 프로필 데이터 타입
-
 // API 응답 타입 정의
 interface ProfileResponse {
   profile: UserProfile;

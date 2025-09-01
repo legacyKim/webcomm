@@ -178,6 +178,7 @@ export default function BoardNoticePopup({
             <button onClick={noticeSubmit}>저장</button>
           )}
           <button
+            className="btn_secondary"
             onClick={() => {
               setPopupOpen(false);
               setEditingNotice(null);
